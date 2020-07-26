@@ -21,7 +21,7 @@
 					type="button"
 					ng-click="clearSearchText()"
 					ng-show="searchText.value.length > 0"
-				) #{translate('clear_search')}
+				) {{translate('clear_search')}}
 
 		.project-tools(ng-cloak)
 			.btn-toolbar
@@ -70,12 +70,12 @@
 						i.fa.fa-folder-open
 						|  
 						span.caret
-						span.sr-only #{translate('add_to_folders')}
+						span.sr-only {{translate('add_to_folders')}}
 					ul.dropdown-menu.dropdown-menu-right.js-tags-dropdown-menu.tags-dropdown-menu(
 						role="menu"
 						ng-controller="TagListController"
 					)
-						li.dropdown-header #{translate("add_to_folder")}
+						li.dropdown-header {{translate("add_to_folder")}}
 						li(
 							ng-repeat="tag in tags | orderBy:'name'",
 							ng-controller="TagDropdownItemController"
@@ -92,7 +92,7 @@
 								|  {{tag.name}}
 						li.divider
 						li
-							a(href, ng-click="openNewTagModal()", stop-propagation="click") #{translate("create_new_folder")}
+							a(href, ng-click="openNewTagModal()", stop-propagation="click") {{translate("create_new_folder")}}
 
 				.btn-group.dropdown(
 					ng-hide="selectedProjects.length != 1  || filter === 'archived' || filter === 'trashed'", 
@@ -102,19 +102,19 @@
 						href,
 						data-toggle="dropdown",
 						dropdown-toggle
-					) #{translate("more")} 
+					) {{translate("more")}} 
 						span.caret
 					ul.dropdown-menu.dropdown-menu-right(role="menu")
 						li(ng-show="getFirstSelectedProject().accessLevel == 'owner'")
 							a(
 								href,
 								ng-click="openRenameProjectModal()"
-							) #{translate("rename")}
+							) {{translate("rename")}}
 						li
 							a(
 								href,
 								ng-click="openCloneProjectModal()"
-							) #{translate("make_copy")}
+							) {{translate("make_copy")}}
 
 				.btn-group(ng-show="filter === 'archived' && selectedProjects.length > 0")
 					a.btn.btn-default(
@@ -123,7 +123,7 @@
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="unarchiveProjects(selectedProjects)"
-					) #{translate("unarchive")}
+					) {{translate("unarchive")}}
 
 				.btn-group(ng-show="filter === 'trashed' && selectedProjects.length > 0")
 					a.btn.btn-default(
@@ -132,7 +132,7 @@
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="untrashProjects(selectedProjects)"
-					) #{translate("untrash")}
+					) {{translate("untrash")}}
 
 				.btn-group(ng-show="filter === 'trashed' && selectedProjects.length > 0")
 					a.btn.btn-danger(
@@ -142,7 +142,7 @@
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="openLeaveProjectsModal()"
-					) #{translate("leave")}
+					) {{translate("leave")}}
 
 					a.btn.btn-danger(
 						href,
@@ -151,7 +151,7 @@
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="openDeleteProjectsModal()"
-					) #{translate("delete")}
+					) {{translate("delete")}}
 
 					a.btn.btn-danger(
 						href,
@@ -160,7 +160,7 @@
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="openLeaveOrDeleteProjectsModal()"
-					) #{translate("delete_and_leave")}
+					) {{translate("delete_and_leave")}}
 
 .row.row-spaced
 	each warning in warnings
@@ -184,19 +184,19 @@
 									type="checkbox"
 									aria-label=translate('select_all_projects')
 								)
-								span.header.clickable.project-list-table-name(ng-click="changePredicate('name')") #{translate("title")}
+								span.header.clickable.project-list-table-name(ng-click="changePredicate('name')") {{translate("title")}}
 									i.tablesort.fa(ng-class="getSortIconClass('name')" aria-hidden="true")
-								button.sr-only(ng-click="changePredicate('name')") Sort by #{translate("title")}
+								button.sr-only(ng-click="changePredicate('name')") Sort by {{translate("title")}}
 						th.project-list-table-owner-cell
-							span.header.clickable(ng-click="changePredicate('ownerName')") #{translate("owner")}
+							span.header.clickable(ng-click="changePredicate('ownerName')") {{translate("owner")}}
 								i.tablesort.fa(ng-class="getSortIconClass('ownerName')" aria-hidden="true")
-							button.sr-only(ng-click="changePredicate('ownerName')") Sort by #{translate("owner")}
+							button.sr-only(ng-click="changePredicate('ownerName')") Sort by {{translate("owner")}}
 						th.project-list-table-lastupdated-cell
-							span.header.clickable(ng-click="changePredicate('lastUpdated')") #{translate("last_modified")}
+							span.header.clickable(ng-click="changePredicate('lastUpdated')") {{translate("last_modified")}}
 								i.tablesort.fa(ng-class="getSortIconClass('lastUpdated')" aria-hidden="true")
-							button.sr-only(ng-click="changePredicate('lastUpdated')") Sort by #{translate("last_modified")}
+							button.sr-only(ng-click="changePredicate('lastUpdated')") Sort by {{translate("last_modified")}}
 						th.project-list-table-actions-cell
-							span.header #{translate("actions")}
+							span.header {{translate("actions")}}
 					tr.project-list-table-row(
 						ng-repeat="project in visibleProjects | orderBy:getValueForCurrentPredicate:reverse:comparator",
 						ng-controller="ProjectListItemController"
@@ -208,16 +208,16 @@
 						ng-cloak
 					)
 						td(colspan="4").project-list-table-no-projects-cell
-								span.small #{translate("no_projects")}
+								span.small {{translate("no_projects")}}
 
 			div.welcome.text-centered(ng-if="projects.length == 0", ng-cloak)
-				h2 #{translate("welcome_to_sl")}
-				p #{translate("new_to_latex_look_at")} 
+				h2 {{translate("welcome_to_sl")}}
+				p {{translate("new_to_latex_look_at")}} 
 					a(href="/templates") #{translate("templates").toLowerCase()}
-					|   #{translate("or")}
-					a(href="/learn")  #{translate("latex_help_guide")}
+					|   {{translate("or")}}
+					a(href="/learn")  {{translate("latex_help_guide")}}
 					| ,
 					br 
-					|  #{translate("or_create_project_left")}
+					| &nbsp;{{translate("or_create_project_left")}}
 
 							

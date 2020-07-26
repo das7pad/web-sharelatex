@@ -10,12 +10,12 @@ block content
 							.row
 								.col-md-12
 									.page-header
-										h1 #{translate("help_us_spread_word")}.
+										h1 {{translate("help_us_spread_word")}}.
 
 
 							.row
 								.col-md-10.col-md-offset-1
-									h2 #{translate("share_sl_to_get_rewards")}
+									h2 {{translate("share_sl_to_get_rewards")}}
 
 							.row
 								.col-md-8.col-md-offset-2.bonus-banner
@@ -35,7 +35,7 @@ block content
 										a(href='mailto:?subject='+encodeURIComponent(translate("bonus_email_share_header"))+'&body='+encodeURIComponent(translate("bonus_email_share_body")+' ')+encodeURIComponent(buildReferalUrl("e")), title='Share by Email').email
 											i.fa.fa-fw.fa-2x.fa-envelope-open-o(aria-hidden)
 											|
-											| #{translate("email_us_to_your_friends")}
+											| {{translate("email_us_to_your_friends")}}
 
 							.row
 								.col-md-8.col-md-offset-2.bonus-banner
@@ -43,16 +43,16 @@ block content
 										a(href='#link-modal', data-toggle="modal", ng-click="openLinkToUsModal()").link
 											i.fa.fa-fw.fa-2x.fa-globe(aria-hidden)
 											|
-											| #{translate("link_to_us")}
+											| {{translate("link_to_us")}}
 
 							.row
 								.col-md-10.col-md-offset-1.bonus-banner
-									h2.direct-link #{translate("direct_link")}
+									h2.direct-link {{translate("direct_link")}}
 									pre.text-centered #{buildReferalUrl("d")}
 
 							.row.ab-bonus
 								.col-md-10.col-md-offset-1.bonus-banner
-									p.thanks !{translate("sl_gives_you_free_stuff_see_progress_below")}
+									p.thanks {{translate("sl_gives_you_free_stuff_see_progress_below")}}
 							.row.ab-bonus
 								.col-md-10.col-md-offset-1.bonus-banner(style="position: relative; height: 30px; margin-top: 20px;")
 									- for (var i = 0; i <= 10; i++) {
@@ -66,21 +66,21 @@ block content
 								.col-md-10.col-md-offset-1.bonus-banner
 									.progress
 										- if (refered_user_count == 0)
-											div(style="text-align: center; padding: 4px;") #{translate("spread_the_word_and_fill_bar")}
+											div(style="text-align: center; padding: 4px;") {{translate("spread_the_word_and_fill_bar")}}
 										.progress-bar.progress-bar-info(style="width: "+refered_user_count+"0%")
 
 							.row.ab-bonus
 								.col-md-10.col-md-offset-1.bonus-banner(style="position: relative; height: 110px;")
-									.perk(style="left: 10%;", class = refered_user_count >= 1 ? "active" : "") #{translate("one_free_collab")}
-									.perk(style="left: 30%;", class = refered_user_count >= 3 ? "active" : "") #{translate("three_free_collab")}
-									.perk(style="left: 60%;", class = refered_user_count >= 6 ? "active" : "") #{translate("free_dropbox_and_history")} + #{translate("three_free_collab")}
-									.perk(style="left: 90%;", class = refered_user_count >= 9 ? "active" : "") #{translate("free_dropbox_and_history")} + #{translate("unlimited_collabs")}
+									.perk(style="left: 10%;", class = refered_user_count >= 1 ? "active" : "") {{translate("one_free_collab")}}
+									.perk(style="left: 30%;", class = refered_user_count >= 3 ? "active" : "") {{translate("three_free_collab")}}
+									.perk(style="left: 60%;", class = refered_user_count >= 6 ? "active" : "") {{translate("free_dropbox_and_history")}} + {{translate("three_free_collab")}}
+									.perk(style="left: 90%;", class = refered_user_count >= 9 ? "active" : "") {{translate("free_dropbox_and_history")}} + {{translate("unlimited_collabs")}}
 							.row &nbsp;
 
 							.row.ab-bonus
 								.col-md-10.col-md-offset-1.bonus-banner
 									- if (refered_user_count == 0)
-										p.thanks !{translate("you_not_introed_anyone_to_sl")}
+										p.thanks {{translate("you_not_introed_anyone_to_sl")}}
 									- else if (refered_user_count == 1)
 										p.thanks !{translate("you_introed_small_number", {numberOfPeople:"<strong>" + refered_user_count + "</strong>"})}
 									- else
@@ -95,19 +95,19 @@ block content
 									aria-label="Close"
 								)
 									span(aria-hidden="true") &times;
-								h3 #{translate("link_to_sl")}
+								h3 {{translate("link_to_sl")}}
 							.modal-body.modal-body-share.link-modal
 
-								p #{translate("can_link_to_sl_with_html")}
+								p {{translate("can_link_to_sl_with_html")}}
 								p
 									textarea.col-md-12(readonly=true)
-										<a href="#{buildReferalUrl("d")}">#{translate("bonus_share_link_text")}</a>
+										<a href="#{buildReferalUrl("d")}">{{translate("bonus_share_link_text")}}</a>
 
-								p #{translate("thanks")}!
+								p {{translate("thanks")}}!
 
 
 							.modal-footer()
 								button.btn.btn-default(
 									ng-click="cancel()",
 								)
-									span #{translate("close")}
+									span {{translate("close")}}

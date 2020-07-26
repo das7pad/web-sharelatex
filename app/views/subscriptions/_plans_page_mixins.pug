@@ -4,50 +4,50 @@ mixin btn_buy_collaborator(location)
 		ng-href="/user/subscription/new?planCode={{ getCollaboratorPlanCode() }}&currency={{currencyCode}}&itm_campaign=plans&itm_content=" + location,
 		ng-click="signUpNowClicked('collaborator','" + location + "')"
 	)
-		span(ng-show="ui.view != 'annual'") #{translate("start_free_trial")}
-		span(ng-show="ui.view == 'annual'") #{translate("buy_now")}
+		span(ng-show="ui.view != 'annual'") {{translate("start_free_trial")}}
+		span(ng-show="ui.view == 'annual'") {{translate("buy_now")}}
 mixin btn_buy_free(location)
 	a.btn.btn-primary(
 		href="/register"
 		style=(getLoggedInUserId() === null ? "" : "visibility: hidden")
 		ng-click="signUpNowClicked('free','" + location + "')"
 	)
-		span.text-capitalize #{translate('get_started_now')}
+		span.text-capitalize {{translate('get_started_now')}}
 mixin btn_buy_professional(location)
 	a.btn.btn-primary(
 		ng-href="/user/subscription/new?planCode=professional{{ ui.view == 'annual' && '-annual' || planQueryString}}&currency={{currencyCode}}&itm_campaign=plans&itm_content=" + location,
 		ng-click="signUpNowClicked('professional','" + location + "')"
 	)
-		span(ng-show="ui.view != 'annual'") #{translate("start_free_trial")}
-		span(ng-show="ui.view == 'annual'") #{translate("buy_now")}
+		span(ng-show="ui.view != 'annual'") {{translate("start_free_trial")}}
+		span(ng-show="ui.view == 'annual'") {{translate("buy_now")}}
 mixin btn_buy_student(location, plan)
 	if plan == 'annual'
 		a.btn.btn-primary(
 			ng-href="/user/subscription/new?planCode=student-annual&currency={{currencyCode}}&itm_campaign=plans&itm_content=" + location,
 			ng-click="signUpNowClicked('student-annual','" + location + "')"
-		) #{translate("buy_now")}
+		) {{translate("buy_now")}}
 	else
 		//- planQueryString will contain _free_trial_7_days
 		a.btn.btn-primary(
 			ng-href="/user/subscription/new?planCode=student{{planQueryString}}&currency={{currencyCode}}&itm_campaign=plans&itm_content=" + location,
 			ng-click="signUpNowClicked('student-monthly','" + location + "')"
-		) #{translate("start_free_trial")}
+		) {{translate("start_free_trial")}}
 
 //- Cards
 mixin card_student_annual(location)
 	.best-value
-		strong #{translate('best_value')}
+		strong {{translate('best_value')}}
 	.card-header
-		h2 #{translate("student")} (#{translate("annual")})
-	h5.tagline #{translate('tagline_student_annual')}
+		h2 {{translate("student")}} ({{translate("annual")}})
+	h5.tagline {{translate('tagline_student_annual')}}
 	.circle
 		span
 			+price_student_annual
 	+features_student(location, 'annual')
 mixin card_student_monthly(location)
 	.card-header
-		h2 #{translate("student")}
-	h5.tagline #{translate('tagline_student_monthly')}
+		h2 {{translate("student")}}
+	h5.tagline {{translate('tagline_student_monthly')}}
 	.circle
 		span
 			+price_student_monthly
@@ -64,7 +64,7 @@ mixin features_collaborator(location)
 			+btn_buy_collaborator(location)
 mixin features_free(location)
 	ul.list-unstyled
-		li #{translate("one_collaborator")}
+		li {{translate("one_collaborator")}}
 		li(class="hidden-xs hidden-sm") &nbsp;
 		li(class="hidden-xs hidden-sm") &nbsp;
 		li(class="hidden-xs hidden-sm") &nbsp;
@@ -77,15 +77,15 @@ mixin features_free(location)
 mixin features_premium
 	li &nbsp;
 	li
-		strong #{translate('all_premium_features')}
-	li #{translate('sync_dropbox_github')}
-	li #{translate('full_doc_history')}
-	li #{translate('track_changes')}
+		strong {{translate('all_premium_features')}}
+	li {{translate('sync_dropbox_github')}}
+	li {{translate('full_doc_history')}}
+	li {{translate('track_changes')}}
 	li + #{translate('more').toLowerCase()}
 mixin features_professional(location)
 	ul.list-unstyled
 		li
-			strong #{translate("unlimited_collabs")}
+			strong {{translate("unlimited_collabs")}}
 			+features_premium
 		li
 			br
@@ -144,17 +144,17 @@ mixin plan_switch(location)
 			a.btn.btn-default-outline(
 				href="#"
 				ng-click="switchToMonthly($event,'" + location + "')"
-			) #{translate("monthly")}
+			) {{translate("monthly")}}
 		li(ng-class="{'active': ui.view == 'annual'}")
 			a.btn.btn-default-outline(
 				href="#"
 				ng-click="switchToAnnual($event,'" + location + "')"
-			) #{translate("annual")}
+			) {{translate("annual")}}
 		li(ng-class="{'active': ui.view == 'student'}")
 			a.btn.btn-default-outline(
 				href="#"
 				ng-click="switchToStudent($event,'" + location + "')"
-			) #{translate("half_price_student")}
+			) {{translate("half_price_student")}}
 
 mixin allCardsAndControls(controlsRowSpaced, listLocation)
 	- var location = listLocation ? 'card_' + listLocation : 'card'
@@ -171,25 +171,25 @@ mixin allCardsAndControls(controlsRowSpaced, listLocation)
 					.col-md-4
 						.card.card-first
 							.card-header
-								h2 #{translate("personal")}
-							h5.tagline #{translate("tagline_personal")}
-							.circle #{translate("free")}
+								h2 {{translate("personal")}}
+							h5.tagline {{translate("tagline_personal")}}
+							.circle {{translate("free")}}
 							+features_free(location)
 					.col-md-4
 						.card.card-highlighted
 							.best-value
-								strong #{translate('best_value')}
+								strong {{translate('best_value')}}
 							.card-header
-								h2 #{translate("collaborator")}
-							h5.tagline #{translate("tagline_collaborator")}
+								h2 {{translate("collaborator")}}
+							h5.tagline {{translate("tagline_collaborator")}}
 							.circle
 								+price_collaborator
 							+features_collaborator(location)
 					.col-md-4
 						.card.card-last
 							.card-header
-								h2 #{translate("professional")}
-							h5.tagline #{translate("tagline_professional")}
+								h2 {{translate("professional")}}
+							h5.tagline {{translate("tagline_professional")}}
 							.circle
 								+price_professional
 							+features_professional(location)
@@ -198,9 +198,9 @@ mixin allCardsAndControls(controlsRowSpaced, listLocation)
 					.col-md-4
 						.card.card-first
 							.card-header
-								h2 #{translate("personal")}
-							h5.tagline #{translate("tagline_personal")}
-							.circle #{translate("free")}
+								h2 {{translate("personal")}}
+							h5.tagline {{translate("tagline_personal")}}
+							.circle {{translate("free")}}
 							+features_free(location)
 
 					.col-md-4

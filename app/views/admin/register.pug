@@ -19,7 +19,7 @@ block content
 									on-enter="registerUsers()"
 								)
 								.col-md-8.col-xs-4
-									button.btn.btn-primary(ng-click="registerUsers()") #{translate("register")}
+									button.btn.btn-primary(ng-click="registerUsers()") {{translate("register")}}
 									
 						.row-spaced(ng-show="error").ng-cloak.text-danger
 							p Sorry, an error occured
@@ -32,7 +32,7 @@ block content
 						hr(ng-show="users.length > 0").ng-cloak
 						table(ng-show="users.length > 0").table.table-striped.ng-cloak
 							tr
-								th #{translate("email")}
+								th {{translate("email")}}
 								th Set Password Url
 							tr(ng-repeat="user in users")
 								td {{ user.email }}

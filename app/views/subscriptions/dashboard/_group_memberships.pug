@@ -10,22 +10,22 @@ div(ng-controller="GroupMembershipController")
 					p
 						em(ng-non-bindable) #{groupSubscription.teamNotice}
 				span 
-					button.btn.btn-danger.text-capitalise(ng-click="removeSelfFromGroup('"+groupSubscription.admin_id._id+"')") #{translate("leave_group")}
+					button.btn.btn-danger.text-capitalise(ng-click="removeSelfFromGroup('"+groupSubscription.admin_id._id+"')") {{translate("leave_group")}}
 			hr
 
 script(type='text/ng-template', id='LeaveGroupModalTemplate')
 	.modal-header
-		h3 #{translate("leave_group")}
+		h3 {{translate("leave_group")}}
 	.modal-body
-		p #{translate("sure_you_want_to_leave_group")}
+		p {{translate("sure_you_want_to_leave_group")}}
 	.modal-footer
 		button.btn.btn-default(
 			ng-disabled="inflight"
 			ng-click="cancel()"
-		) #{translate("cancel")}
+		) {{translate("cancel")}}
 		button.btn.btn-danger(
 			ng-disabled="state.inflight"
 			ng-click="confirmLeaveGroup()"
 		)
-			span(ng-hide="inflight") #{translate("leave_now")}
-			span(ng-show="inflight") #{translate("processing")}…
+			span(ng-hide="inflight") {{translate("leave_now")}}
+			span(ng-show="inflight") {{translate("processing")}}…

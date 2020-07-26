@@ -98,7 +98,6 @@ module.exports = {
           inviterName: invite.inviterName,
           inviteToken: invite.token,
           hasIndividualRecurlySubscription,
-          appName: settings.appName,
           expired: req.query.expired
         })
       })

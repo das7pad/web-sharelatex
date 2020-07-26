@@ -30,7 +30,7 @@ block content
 			)
 				button(ng-hide="protected",ng-click="hide()").close.pull-right
 					span(aria-hidden="true") &times;
-					span.sr-only #{translate("close")}
+					span.sr-only {{translate("close")}}
 				.system-message-content(ng-bind-html="htmlContent")
 
 			include ../translations/_translation_message

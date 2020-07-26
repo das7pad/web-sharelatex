@@ -17,8 +17,8 @@ div.full-size.pdf(ng-controller="PdfController")
 					ng-class="{'fa-spin': pdf.compiling }"
 				)
 				| &nbsp;&nbsp;
-				span(ng-show="!pdf.compiling") #{translate("recompile")}
-				span(ng-show="pdf.compiling") #{translate("compiling")}…
+				span(ng-show="!pdf.compiling") {{translate("recompile")}}
+				span(ng-show="pdf.compiling") {{translate("compiling")}}…
 			a.btn.btn-recompile.dropdown-toggle(
 				href,
 				ng-disabled="pdf.compiling",
@@ -26,38 +26,38 @@ div.full-size.pdf(ng-controller="PdfController")
 			)
 				span.caret
 			ul.dropdown-menu.dropdown-menu-left
-				li.dropdown-header #{translate("auto_compile")}
+				li.dropdown-header {{translate("auto_compile")}}
 				li
 					a(href, ng-click="autocompile_enabled = true")
 						i.fa.fa-fw(ng-class="{'fa-check': autocompile_enabled}")
-						| &nbsp;#{translate('on')}
+						| &nbsp;{{translate('on')}}
 				li
 					a(href, ng-click="autocompile_enabled = false")
 						i.fa.fa-fw(ng-class="{'fa-check': !autocompile_enabled}")
-						| &nbsp;#{translate('off')}
-				li.dropdown-header #{translate("compile_mode")}
+						| &nbsp;{{translate('off')}}
+				li.dropdown-header {{translate("compile_mode")}}
 				li
 					a(href, ng-click="draft = false")
 						i.fa.fa-fw(ng-class="{'fa-check': !draft}")
-						| &nbsp;#{translate("normal")}
+						| &nbsp;{{translate("normal")}}
 				li
 					a(href, ng-click="draft = true")
 						i.fa.fa-fw(ng-class="{'fa-check': draft}")
-						| &nbsp;#{translate("fast")}&nbsp;
+						| &nbsp;{{translate("fast")}}&nbsp;
 						span.subdued [draft]
-				li.dropdown-header #{translate("compile_time_checks")}
+				li.dropdown-header {{translate("compile_time_checks")}}
 				li
 					a(href, ng-click="stop_on_validation_error = true")
 						i.fa.fa-fw(ng-class="{'fa-check': stop_on_validation_error}")
-						| &nbsp;#{translate("stop_on_validation_error")}
+						| &nbsp;{{translate("stop_on_validation_error")}}
 				li
 					a(href, ng-click="stop_on_validation_error = false")
 						i.fa.fa-fw(ng-class="{'fa-check': !stop_on_validation_error}")
-						| &nbsp;#{translate("ignore_validation_errors")}
+						| &nbsp;{{translate("ignore_validation_errors")}}
 				li
 					a(href, ng-click="recompile({check:true})")
 						i.fa.fa-fw()
-						| &nbsp;#{translate("run_syntax_check_now")}
+						| &nbsp;{{translate("run_syntax_check_now")}}
 		a(
 			href
 			ng-click="stop()"
@@ -94,7 +94,7 @@ div.full-size.pdf(ng-controller="PdfController")
 		.toolbar-right
 			span.auto-compile-status.small(
 				ng-show="changesToAutoCompile && !compiling && !autoCompileLintingError"
-			) #{translate('uncompiled_changes')}
+			) {{translate('uncompiled_changes')}}
 			span.auto-compile-status.auto-compile-error.small(
 				ng-show="autoCompileLintingError"
 				tooltip-placement="bottom"
@@ -103,7 +103,7 @@ div.full-size.pdf(ng-controller="PdfController")
 			)
 				i.fa.fa-fw.fa-exclamation-triangle
 				|
-				| #{translate("code_check_failed")}
+				| {{translate("code_check_failed")}}
 			a(
 				href,
 				ng-click="switchToFlatLayout('pdf')"
@@ -127,27 +127,27 @@ div.full-size.pdf(ng-controller="PdfController")
 	// logs view
 	.pdf-logs(ng-show="shouldShowLogs")
 		.alert.alert-success(ng-show="pdf.logEntries.all.length == 0 && !pdf.failure")
-			| #{translate("no_errors_good_job")}
+			| {{translate("no_errors_good_job")}}
 
 		.alert.alert-danger(ng-show="pdf.failure")
-			strong #{translate("compile_error")}. 
-			span #{translate("generic_failed_compile_message")}.
+			strong {{translate("compile_error")}}. 
+			span {{translate("generic_failed_compile_message")}}.
 
 		.alert.alert-danger(ng-show="pdf.failedCheck")
-			strong #{translate("failed_compile_check")}.
+			strong {{translate("failed_compile_check")}}.
 			p
 			p.text-center(ng-show="!check")
 				a.text-info(
 					href,
 					ng-disabled="pdf.compiling",
 					ng-click="recompile({try:true})"
-				) #{translate("failed_compile_check_try")}
-				| &#32;#{translate("failed_compile_option_or")}&#32;
+				) {{translate("failed_compile_check_try")}}
+				| &#32;{{translate("failed_compile_option_or")}}&#32;
 				a.text-info(
 					href,
 					ng-disabled="pdf.compiling",
 					ng-click="recompile({force:true})"
-				) #{translate("failed_compile_check_ignore")}
+				) {{translate("failed_compile_check_ignore")}}
 				| .
 
 		div(ng-repeat="entry in pdf.logEntries.all", ng-controller="PdfLogEntryController")
@@ -183,7 +183,7 @@ div.full-size.pdf(ng-controller="PdfController")
 								target="_blank"
 							)
 								i.fa.fa-external-link
-								|&nbsp;#{translate("log_hint_extra_info")}
+								|&nbsp;{{translate("log_hint_extra_info")}}
 
 				p.entry-content(ng-show="entry.content") {{ entry.content.trim() }}
 
@@ -206,7 +206,7 @@ div.full-size.pdf(ng-controller="PdfController")
 						href
 						dropdown-toggle
 					)
-						| !{translate("other_logs_and_files")}
+						| {{translate("other_logs_and_files")}}
 						span.caret
 					ul.dropdown-menu.dropdown-menu-right
 						li(ng-repeat="file in pdf.outputFiles")
@@ -215,8 +215,8 @@ div.full-size.pdf(ng-controller="PdfController")
 								target="_blank"
 							) {{ file.name }}
 			a.btn.btn-info.btn-sm(href, ng-click="toggleRawLog()")
-				span(ng-show="!pdf.showRawLog") #{translate("view_raw_logs")}
-				span(ng-show="pdf.showRawLog") #{translate("hide_raw_logs")}
+				span(ng-show="!pdf.showRawLog") {{translate("view_raw_logs")}}
+				span(ng-show="pdf.showRawLog") {{translate("hide_raw_logs")}}
 
 		pre(ng-bind="pdf.rawLog", ng-show="pdf.showRawLog")
 	
@@ -226,7 +226,7 @@ div.full-size.pdf(ng-controller="PdfController")
 		.pdf-uncompiled(ng-switch-when="uncompiled" ng-show="!pdf.compiling")
 			| &nbsp;
 			i.fa.fa-level-up.fa-flip-horizontal.fa-2x
-			| &nbsp;&nbsp;#{translate('click_here_to_preview_pdf')}
+			| &nbsp;&nbsp;{{translate('click_here_to_preview_pdf')}}
 		
 		.pdf-viewer(ng-switch-when="pdf")
 			div(
@@ -247,128 +247,128 @@ div.full-size.pdf(ng-controller="PdfController")
 		.pdf-validation-problems(ng-switch-when="validation-problems")
 
 			.alert.alert-danger(ng-show="pdf.validation.duplicatePaths")
-				strong #{translate("latex_error")}
-				span #{translate("duplicate_paths_found")}
+				strong {{translate("latex_error")}}
+				span {{translate("duplicate_paths_found")}}
 
 
 			.alert.alert-danger(ng-show="pdf.validation.sizeCheck")
-				strong #{translate("project_too_large")} 
-				div #{translate("project_too_large_please_reduce")}
+				strong {{translate("project_too_large")}} 
+				div {{translate("project_too_large_please_reduce")}}
 				div
 					li(ng-repeat="entry in pdf.validation.sizeCheck.resources") {{ '/'+entry['path'] }} - {{entry['kbSize']}}kb
 	
 			.alert.alert-danger(ng-show="pdf.validation.conflictedPaths")
 				div
-					strong #{translate("conflicting_paths_found")}
-				div !{translate("following_paths_conflict")}
+					strong {{translate("conflicting_paths_found")}}
+				div {{translate("following_paths_conflict")}}
 				div
 					li(ng-repeat="entry in pdf.validation.conflictedPaths") {{ '/'+entry['path'] }}
 
 			.alert.alert-danger(ng-show="pdf.validation.mainFile")
-				strong #{translate("main_file_not_found")} 
-				span #{translate("please_set_main_file")}
+				strong {{translate("main_file_not_found")}} 
+				span {{translate("please_set_main_file")}}
 
 		.pdf-errors(ng-switch-when="errors")
 	
 			.alert.alert-danger(ng-show="pdf.error")
-				strong #{translate("server_error")} 
-				span #{translate("somthing_went_wrong_compiling")}
+				strong {{translate("server_error")}} 
+				span {{translate("somthing_went_wrong_compiling")}}
 
 			.alert.alert-danger(ng-show="pdf.renderingError")
-				strong #{translate("pdf_rendering_error")} 
-				span #{translate("something_went_wrong_rendering_pdf")}
+				strong {{translate("pdf_rendering_error")}} 
+				span {{translate("something_went_wrong_rendering_pdf")}}
 	
 			.alert.alert-danger(ng-show="pdf.clsiMaintenance")
-				strong #{translate("server_error")} 
-				span #{translate("clsi_maintenance")}
+				strong {{translate("server_error")}} 
+				span {{translate("clsi_maintenance")}}
 
 			.alert.alert-danger(ng-show="pdf.clsiUnavailable")
-				strong #{translate("server_error")} 
-				span #{translate("clsi_unavailable")}
+				strong {{translate("server_error")}} 
+				span {{translate("clsi_unavailable")}}
 
 			.alert.alert-danger(ng-show="pdf.tooRecentlyCompiled")
-				strong #{translate("server_error")} 
-				span #{translate("too_recently_compiled")}
+				strong {{translate("server_error")}} 
+				span {{translate("too_recently_compiled")}}
 
 			.alert.alert-danger(ng-show="pdf.compileTerminated")
-				strong #{translate("terminated")}. 
-				span #{translate("compile_terminated_by_user")}
+				strong {{translate("terminated")}}. 
+				span {{translate("compile_terminated_by_user")}}
 			
 			.alert.alert-danger(ng-show="pdf.rateLimited")
-				strong #{translate("pdf_compile_rate_limit_hit")} 
-				span #{translate("project_flagged_too_many_compiles")}
+				strong {{translate("pdf_compile_rate_limit_hit")}} 
+				span {{translate("project_flagged_too_many_compiles")}}
 
 			.alert.alert-danger(ng-show="pdf.compileInProgress")
-				strong #{translate("pdf_compile_in_progress_error")}. 
-				span #{translate("pdf_compile_try_again")}
+				strong {{translate("pdf_compile_in_progress_error")}}. 
+				span {{translate("pdf_compile_try_again")}}
 
 			.alert.alert-danger(ng-show="pdf.timedout")
 				p
-					strong #{translate("timedout")}. 
-					span #{translate("proj_timed_out_reason")}
+					strong {{translate("timedout")}}. 
+					span {{translate("proj_timed_out_reason")}}
 				p
 					a.text-info(href="https://www.sharelatex.com/learn/Debugging_Compilation_timeout_errors", target="_blank")
-						| #{translate("learn_how_to_make_documents_compile_quickly")}
+						| {{translate("learn_how_to_make_documents_compile_quickly")}}
 
 			if settings.enableSubscriptions
 				.alert.alert-success(ng-show="pdf.timedout && !hasPremiumCompile")
 					p(ng-if="project.owner._id == user.id")
-						strong #{translate("upgrade_for_longer_compiles")}
+						strong {{translate("upgrade_for_longer_compiles")}}
 					p(ng-if="project.owner._id != user.id")
-						strong #{translate("ask_proj_owner_to_upgrade_for_longer_compiles")}
-					p #{translate("free_accounts_have_timeout_upgrade_to_increase")}
-					p #{translate("plus_upgraded_accounts_receive")}:
+						strong {{translate("ask_proj_owner_to_upgrade_for_longer_compiles")}}
+					p {{translate("free_accounts_have_timeout_upgrade_to_increase")}}
+					p {{translate("plus_upgraded_accounts_receive")}}:
 					div
 						ul.list-unstyled
 							li
 								i.fa.fa-check &nbsp;
-								| #{translate("unlimited_projects")}
+								| {{translate("unlimited_projects")}}
 							li
 								i.fa.fa-check &nbsp;
 								| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
 							li
 								i.fa.fa-check &nbsp;
-								| #{translate("full_doc_history")}
+								| {{translate("full_doc_history")}}
 							li
 								i.fa.fa-check &nbsp;
-								| #{translate("sync_to_dropbox")}
+								| {{translate("sync_to_dropbox")}}
 							li
 								i.fa.fa-check &nbsp;
-								| #{translate("sync_to_github")}
+								| {{translate("sync_to_github")}}
 							li
 								i.fa.fa-check &nbsp;
-								|#{translate("compile_larger_projects")}
+								|{{translate("compile_larger_projects")}}
 					p(ng-controller="FreeTrialModalController", ng-if="project.owner._id == user.id")
 						a.btn.btn-success.row-spaced-small(
 							href
 							ng-class="buttonClass"
 							ng-click="startFreeTrial('compile-timeout')"
-						) #{translate("start_free_trial")}
+						) {{translate("start_free_trial")}}
 
 			.alert.alert-danger(ng-show="pdf.autoCompileDisabled")
 				p
-					strong #{translate("autocompile_disabled")}. 
-					span #{translate("autocompile_disabled_reason")}
+					strong {{translate("autocompile_disabled")}}. 
+					span {{translate("autocompile_disabled_reason")}}
 
 			.alert.alert-danger(ng-show="pdf.projectTooLarge")
-				strong #{translate("project_too_large")} 
-				span #{translate("project_too_large_please_reduce")}
+				strong {{translate("project_too_large")}} 
+				span {{translate("project_too_large_please_reduce")}}
 
 
 script(type='text/ng-template', id='clearCacheModalTemplate')
 	.modal-header
-		h3 #{translate("clear_cache")}?
+		h3 {{translate("clear_cache")}}?
 	.modal-body
-		p #{translate("clear_cache_explanation")}
-		p #{translate("clear_cache_is_safe")}
+		p {{translate("clear_cache_explanation")}}
+		p {{translate("clear_cache_is_safe")}}
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()"
 			ng-disabled="state.inflight"
-		) #{translate("cancel")}
+		) {{translate("cancel")}}
 		button.btn.btn-info(
 			ng-click="clear()"
 			ng-disabled="state.inflight"
 		) 
-			span(ng-show="!state.inflight") #{translate("clear_cache")}
-			span(ng-show="state.inflight") #{translate("clearing")}…
+			span(ng-show="!state.inflight") {{translate("clear_cache")}}
+			span(ng-show="state.inflight") {{translate("clearing")}}…

@@ -57,7 +57,7 @@ td.project-list-table-lastupdated-cell
 		| {{project.lastUpdated | fromNowDate}}
 	span(ng-show='project.lastUpdatedBy')
 		|
-		| #{translate('by')}
+		| {{translate('by')}}
 		| {{getUserName(project.lastUpdatedBy)}}
 
 

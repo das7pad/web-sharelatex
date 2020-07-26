@@ -18,7 +18,7 @@ mixin faq_search(headerText, headerClass)
 							type="button"
 							ng-click="clearSearchText()",
 							ng-show="searchQueryText.length > 0"
-						) #{translate('clear_search')}
+						) {{translate('clear_search')}}
 
 			.row(role="region" aria-label="search results")
 				.col-md-12(ng-cloak)
@@ -29,4 +29,4 @@ mixin faq_search(headerText, headerClass)
 						span(ng-bind-html='hit.name')
 						div.search-result-content(ng-show="hit.content != ''", ng-bind-html='hit.content')
 					.row-spaced-small.search-result.card.card-thin(ng-if="!processingSearch && searchQueryText.length > 1 && hits.length === 0")
-						p #{translate("no_search_results")}
+						p {{translate("no_search_results")}}

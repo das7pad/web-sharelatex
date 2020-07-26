@@ -5,12 +5,12 @@ mixin printPlan(plan)
 				strong(ng-non-bindable) #{plan.name}
 			td
 				-if (plan.annual)
-					| {{price}} / #{translate("year")}
+					| {{price}} / {{translate("year")}}
 				-else
-					| {{price}} / #{translate("month")}
+					| {{price}} / {{translate("month")}}
 			td
 				-if (typeof(personalSubscription.planCode) != "undefined" && plan.planCode == personalSubscription.planCode.split("_")[0])
-					button.btn.disabled #{translate("your_plan")}
+					button.btn.disabled {{translate("your_plan")}}
 				-else
 					form
 						input(type="hidden", ng-model="plan_code", name="plan_code", value=plan.planCode)

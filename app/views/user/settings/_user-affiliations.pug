@@ -2,7 +2,7 @@ include ../../_meta/saml.pug
 include ../../_mixins/saml
 
 mixin aboutInstitutionLink()
-	a(href="/learn/how-to/Institutional_Login") #{translate("find_out_more_about_institution_login")}.
+	a(href="/learn/how-to/Institutional_Login") {{translate("find_out_more_about_institution_login")}}.
 
 mixin btnMakePrimaryDisabled(tooltip)
 	div(
@@ -13,20 +13,20 @@ mixin btnMakePrimaryDisabled(tooltip)
 		button.btn.btn-sm.btn-success.affiliations-table-inline-action(
 			disabled
 			type="button"
-		) #{translate("make_primary")}
+		) {{translate("make_primary")}}
 
 form.row(
 	ng-controller="UserAffiliationsController"
 	name="affiliationsForm"
 )
 	.col-md-12
-		h3 #{translate("emails_and_affiliations_title")}
-		p.small #{translate("emails_and_affiliations_explanation")}
+		h3 {{translate("emails_and_affiliations_title")}}
+		p.small {{translate("emails_and_affiliations_explanation")}}
 		table.table.affiliations-table
 			thead
 				tr
-					th.affiliations-table-email  #{translate("email")}
-					th.affiliations-table-institution  #{translate("institution_and_role")}
+					th.affiliations-table-email  {{translate("email")}}
+					th.affiliations-table-institution  {{translate("institution_and_role")}}
 					th.affiliations-table-inline-actions
 			tbody
 				tr(
@@ -35,16 +35,16 @@ form.row(
 					td
 						| {{ userEmail.email + (userEmail.default ? ' (primary)' : '') }}
 						div(ng-if="!userEmail.confirmedAt").small
-							strong #{translate('unconfirmed')}.
-								span(ng-if="!userEmail.ssoAvailable") &nbsp;#{translate('please_check_your_inbox')}.
+							strong {{translate('unconfirmed')}}.
+								span(ng-if="!userEmail.ssoAvailable") &nbsp;{{translate('please_check_your_inbox')}}.
 							br
 							a(
 								href,
 								ng-click="resendConfirmationEmail(userEmail)",
 								ng-if="!userEmail.ssoAvailable"
-							) #{translate('resend_confirmation_email')}
+							) {{translate('resend_confirmation_email')}}
 						div(ng-if="userEmail.confirmedAt && userEmail.affiliation.institution && userEmail.affiliation.institution.confirmed && userEmail.affiliation.licence && userEmail.affiliation.licence != 'free'").small
-							span.label.label-primary #{translate("professional")}
+							span.label.label-primary {{translate("professional")}}
 					td
 						div(ng-if="userEmail.affiliation.institution")
 							div {{ userEmail.affiliation.institution.name }}
@@ -53,7 +53,7 @@ form.row(
 									href
 									ng-if="!isChangingAffiliation(userEmail.email) && !userEmail.affiliation.role && !userEmail.affiliation.department"
 									ng-click="changeAffiliation(userEmail);"
-								)  #{translate("add_role_and_department")}
+								)  {{translate("add_role_and_department")}}
 							div.small(
 								ng-if="!isChangingAffiliation(userEmail.email) && (userEmail.affiliation.role || userEmail.affiliation.department)"
 							)
@@ -64,7 +64,7 @@ form.row(
 								a(
 									href
 									ng-click="changeAffiliation(userEmail);"
-								) #{translate("change")}
+								) {{translate("change")}}
 							.affiliation-change-container(
 								ng-if="isChangingAffiliation(userEmail.email)"
 							)
@@ -78,12 +78,12 @@ form.row(
 										ng-click="saveAffiliationChange(userEmail);"
 										ng-disabled="!(affiliationToChange.role && affiliationToChange.department)"
 										type="button"
-									) #{translate("save_or_cancel-save")}
+									) {{translate("save_or_cancel-save")}}
 									| &emsp;#{translate("save_or_cancel-or" )}&emsp;
 									a(
 										href
 										ng-click="cancelAffiliationChange();"
-									) #{translate("save_or_cancel-cancel")}
+									) {{translate("save_or_cancel-cancel")}}
 					td.affiliations-table-inline-actions
 						// Disabled buttons don't work with tooltips, due to pointer-events: none,
 						// so create a wrapper for the tooltip
@@ -96,7 +96,7 @@ form.row(
 							ng-if="!userEmail.default && (userEmail.confirmedAt && !ui.isMakingRequest)"
 							ng-click="setDefaultUserEmail(userEmail)"
 							type="button"
-						) #{translate("make_primary")}
+						) {{translate("make_primary")}}
 						| &nbsp;
 						button.btn.btn-sm.btn-danger.affiliations-table-inline-action(
 							ng-if="!userEmail.default"
@@ -106,7 +106,7 @@ form.row(
 							type="button"
 						)
 							i.fa.fa-fw.fa-trash(aria-hidden="true")
-							span.sr-only #{translate("remove")}
+							span.sr-only {{translate("remove")}}
 				tr.affiliations-table-saml-row(ng-repeat-end ng-if="userEmail.affiliation && userEmail.affiliation && userEmail.ssoAvailable")
 					td
 					td(ng-attr-colspan="{{userEmail.samlProviderId ? '2' : '1'}}" ng-class="institutionAlreadyLinked(userEmail) ? '' : 'with-border'")
@@ -119,7 +119,7 @@ form.row(
 							p.small
 								| !{translate("can_link_your_institution_acct", {institutionName: '{{userEmail.affiliation.institution.name}}'})}
 							p.small
-								| !{translate("doing_this_allow_log_in_through_institution")}&nbsp;
+								| {{translate("doing_this_allow_log_in_through_institution")}}&nbsp;
 								+aboutInstitutionLink()
 					td.with-border.affiliations-table-inline-actions(ng-if="!userEmail.samlProviderId && !institutionAlreadyLinked(userEmail)")
 						button.btn-sm.btn.btn-info(
@@ -127,7 +127,7 @@ form.row(
 							ng-disabled="ui.isMakingRequest"
 							type="button"
 						)
-							| #{translate("link_accounts")}
+							| {{translate("link_accounts")}}
 				tr.affiliations-table-highlighted-row(
 					ng-if="!ui.showAddEmailUI && !ui.isMakingRequest"
 				)
@@ -135,7 +135,7 @@ form.row(
 						a(
 							href
 							ng-click="showAddEmailForm()"
-						) #{translate("add_another_email")}
+						) {{translate("add_another_email")}}
 
 				tr.affiliations-table-highlighted-row(
 					ng-if="ui.showAddEmailUI && !ui.isLoadingEmails"
@@ -166,7 +166,7 @@ form.row(
 							ng-disabled="ui.isMakingRequest"
 							type="button"
 						)
-							| #{translate("link_accounts_and_add_email")}
+							| {{translate("link_accounts_and_add_email")}}
 					td(
 						ng-if="!newAffiliation.ssoAvailable"
 					)
@@ -179,20 +179,20 @@ form.row(
 								a(
 									href
 									ng-click="selectUniversityManually();"
-								) #{translate("change")}
+								) {{translate("change")}}
 								| )
 						.affiliations-table-label(
 							ng-if="!newAffiliation.university && !ui.isValidEmail && !ui.showManualUniversitySelectionUI"
-						) #{translate("start_by_adding_your_email")}
+						) {{translate("start_by_adding_your_email")}}
 						.affiliations-table-label(
 							ng-if="!newAffiliation.university && ui.isValidEmail && !ui.isBlacklistedEmail && !ui.showManualUniversitySelectionUI"
 						)
-							| #{translate("is_email_affiliated")}
+							| {{translate("is_email_affiliated")}}
 							br
 							a(
 								href
 								ng-click="selectUniversityManually();"
-							) #{translate("let_us_know")}
+							) {{translate("let_us_know")}}
 						affiliation-form(
 							affiliation-data="newAffiliation"
 							show-university-and-country="ui.showManualUniversitySelectionUI"
@@ -205,29 +205,29 @@ form.row(
 							ng-disabled="affiliationsForm.$invalid || ui.isMakingRequest"
 							ng-click="addNewEmail()"
 						)
-							| #{translate("add_new_email")}
+							| {{translate("add_new_email")}}
 				tr.affiliations-table-highlighted-row(
 					ng-if="ui.isMakingRequest"
 				)
 					td.text-center(colspan="3", ng-if="ui.isLoadingEmails")
 						i.fa.fa-fw.fa-spin.fa-refresh(aria-hidden="true")
-						| &nbsp;#{translate("loading")}…
+						| &nbsp;{{translate("loading")}}…
 					td.text-center(colspan="3", ng-if="ui.isResendingConfirmation")
 						i.fa.fa-fw.fa-spin.fa-refresh(aria-hidden="true")
-						| &nbsp;#{translate("sending")}…
+						| &nbsp;{{translate("sending")}}…
 					td.text-center.text-capitalize(colspan="3", ng-if="ui.isProcessing")
 						i.fa.fa-fw.fa-spin.fa-refresh(aria-hidden="true")
-						| &nbsp;#{translate("processing")}
+						| &nbsp;{{translate("processing")}}
 					td.text-center(colspan="3", ng-if="!ui.isLoadingEmails && !ui.isResendingConfirmation && !ui.isProcessing")
 						i.fa.fa-fw.fa-spin.fa-refresh(aria-hidden="true")
-						| &nbsp;#{translate("saving")}
+						| &nbsp;{{translate("saving")}}
 				tr.affiliations-table-error-row(
 					ng-if="ui.hasError"
 				)
 					td.text-center(colspan="3")
 						div
 							i.fa.fa-fw.fa-exclamation-triangle(aria-hidden="true")
-							span(ng-if="!ui.errorMessage") &nbsp;#{translate("error_performing_request")}
+							span(ng-if="!ui.errorMessage") &nbsp;{{translate("error_performing_request")}}
 							span(ng-if="ui.errorMessage") &nbsp;{{ui.errorMessage}}
 				if institutionLinked
 					tr.affiliations-table-info-row(ng-if="!hideInstitutionNotifications.info")
@@ -241,7 +241,7 @@ form.row(
 								span(aria-hidden="true") &times;
 							.small !{translate("institution_acct_successfully_linked", {institutionName: institutionLinked.universityName})}
 							if institutionLinked.hasEntitlement
-								.small !{translate("this_grants_access_to_features", {featureType: translate("professional")})}
+								.small {{translate("this_grants_access_to_features", {featureType: translate("professional")})}
 					if institutionEmailNonCanonical
 						tr.affiliations-table-warning-row(ng-if="!hideInstitutionNotifications.warning")
 							td.text-center(aria-live="assertive" colspan="3")
@@ -255,7 +255,7 @@ form.row(
 								.small
 									i.fa.fa-exclamation-triangle(aria-hidden="true")
 									| &nbsp;
-									| !{translate("in_order_to_match_institutional_metadata", {email: institutionEmailNonCanonical})}
+									| {{translate("in_order_to_match_institutional_metadata", {email: "#{institutionEmailNonCanonical}"})}}
 				if institutionLinkedToAnother
 					tr.affiliations-table-error-row(ng-if="!hideInstitutionNotifications.error")
 						td.text-center(aria-live="assertive" colspan="3")
@@ -269,7 +269,7 @@ form.row(
 							.small
 								i.fa.fa-exclamation-triangle(aria-hidden="true")
 								| &nbsp;
-								| !{translate("institution_account_tried_to_add_already_registered")}
+								| {{translate("institution_account_tried_to_add_already_registered")}}
 				if institutionLinkingError
 					tr.affiliations-table-error-row(ng-if="!hideInstitutionNotifications.linkError")
 						td.text-center(aria-live="assertive" colspan="3")

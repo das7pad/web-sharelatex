@@ -5,7 +5,7 @@
 			.form-group
 				form-messages(for="updateAccountEmailAddress")
 					.alert.alert-success(ng-show="updateAccountEmailAddress.response.success")
-						| #{translate('recurly_email_updated')}
+						| {{translate('recurly_email_updated')}}
 				div(ng-hide="updateAccountEmailAddress.response.success")
 					p !{translate("recurly_email_update_needed", { recurlyEmail: "<i>" + personalSubscription.recurly.account.email + "</i>", userEmail: "<i>" + user.email + "</i>" })}
 					.actions
@@ -13,5 +13,5 @@
 							type='submit',
 							ng-disabled="updateAccountEmailAddress.inflight"
 						)
-							span(ng-show="!updateAccountEmailAddress.inflight") #{translate("update")}
-							span(ng-show="updateAccountEmailAddress.inflight") #{translate("updating")}…
+							span(ng-show="!updateAccountEmailAddress.inflight") {{translate("update")}}
+							span(ng-show="updateAccountEmailAddress.inflight") {{translate("updating")}}…

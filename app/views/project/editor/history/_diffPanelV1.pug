@@ -17,7 +17,7 @@
 				a.btn.btn-danger.btn-xs(
 					href,
 					ng-click="openRestoreDiffModal()"
-				) #{translate("restore_to_before_these_changes")}
+				) {{translate("restore_to_before_these_changes")}}
 		.diff-editor.hide-ace-cursor(
 			ace-editor="history",
 			theme="settings.editorTheme",
@@ -38,21 +38,21 @@
 				href,
 				ng-click="restoreDeletedDoc()",
 				ng-disabled="history.diff.restoreInProgress"
-			) #{translate("restore")}
+			) {{translate("restore")}}
 
 	.diff-deleted.text-centered(
 		ng-show="history.diff.deleted && history.diff.restoreDeletedSuccess"
 	)
 		p.text-serif  #{translate("file_restored", {filename:"{{ history.diff.doc.name }} "})}
-		p.text-serif  #{translate("file_restored_back_to_editor")}
+		p.text-serif  {{translate("file_restored_back_to_editor")}}
 		p
 			a.btn.btn-default(
 				href,
 				ng-click="backToEditorAfterRestore()",
-			) #{translate("file_restored_back_to_editor_btn")}
+			) {{translate("file_restored_back_to_editor_btn")}}
 
 	.loading-panel(ng-show="history.diff.loading")
 		i.fa.fa-spin.fa-refresh
-		| &nbsp;&nbsp;#{translate("loading")}…
+		| &nbsp;&nbsp;{{translate("loading")}}…
 	.error-panel(ng-show="history.diff.error")
-		.alert.alert-danger #{translate("generic_something_went_wrong")}
+		.alert.alert-danger {{translate("generic_something_went_wrong")}}

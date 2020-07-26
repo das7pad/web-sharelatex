@@ -7,9 +7,9 @@ script(type="text/ng-template", id="hotkeysModalTemplate")
 			aria-label="Close"
 		)
 			span(aria-hidden="true") &times;
-		h3 #{translate("hotkeys")}
+		h3 {{translate("hotkeys")}}
 	.modal-body.modal-hotkeys
-		h3 #{translate("common")}
+		h3 {{translate("common")}}
 		.row
 			.col-xs-4
 				.hotkey
@@ -26,7 +26,7 @@ script(type="text/ng-template", id="hotkeysModalTemplate")
 				.hotkey
 					span.combination {{ctrl}} + Y
 					span.description Redo
-		h3 #{translate("navigation")}
+		h3 {{translate("navigation")}}
 		.row
 			.col-xs-4
 				.hotkey
@@ -40,7 +40,7 @@ script(type="text/ng-template", id="hotkeysModalTemplate")
 				.hotkey
 					span.combination {{ctrl}} + L
 					span.description Go To Line
-		h3 #{translate("editing")}
+		h3 {{translate("editing")}}
 		.row
 			.col-xs-4
 				.hotkey
@@ -70,7 +70,7 @@ script(type="text/ng-template", id="hotkeysModalTemplate")
 					span.combination {{ctrl}} + I
 					span.description Italic Text
 	
-		h3 #{translate("autocomplete")}
+		h3 {{translate("autocomplete")}}
 		.row
 			.col-xs-4
 				.hotkey
@@ -85,14 +85,14 @@ script(type="text/ng-template", id="hotkeysModalTemplate")
 					span.combination Enter
 					span.description Insert Candidate
 	
-		h3 !{translate("autocomplete_references")}
+		h3 {{translate("autocomplete_references")}}
 		.row
 			.col-xs-4
 				.hotkey
 					span.combination Ctrl + Space 
 					span.description Search References
 		
-		h3(ng-if="trackChangesVisible") #{translate("review")}
+		h3(ng-if="trackChangesVisible") {{translate("review")}}
 		.row(ng-if="trackChangesVisible")
 			.col-xs-4
 				.hotkey
@@ -110,4 +110,4 @@ script(type="text/ng-template", id="hotkeysModalTemplate")
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()"
-		) #{translate("ok")}
+		) {{translate("ok")}}

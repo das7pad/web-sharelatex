@@ -17,13 +17,13 @@ mixin providerList()
 						ng-disabled="providers[key].ui.isProcessing"
 						ng-if="thirdPartyIds[key]"
 					)
-						span(ng-if="!providers[key].ui.isProcessing") #{translate("unlink")}
-						span(ng-if="providers[key].ui.isProcessing") #{translate("processing")}
+						span(ng-if="!providers[key].ui.isProcessing") {{translate("unlink")}}
+						span(ng-if="providers[key].ui.isProcessing") {{translate("processing")}}
 					//- Link
 					a.btn.btn-primary.text-capitalize(
 						href="{{provider.linkPath}}?intent=link"
 						ng-if="!thirdPartyIds[key] && !provider.hideWhenNotLinked"
-					) #{translate("link")}
+					) {{translate("link")}}
 			//- unlink error
 			.row(
 				ng-if="providers[key].ui.hasError"
@@ -41,6 +41,6 @@ mixin providerList()
 	ng-cloak
 )
 	.col-xs-12
-		h3.text-capitalize#linked-accounts #{translate("linked_accounts")}
-		p.small #{translate("linked_accounts_explained", {appName:'{{settings.appName}}'})}
+		h3.text-capitalize#linked-accounts {{translate("linked_accounts")}}
+		p.small {{translate("linked_accounts_explained")}}
 		+providerList()

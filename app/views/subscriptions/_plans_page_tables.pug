@@ -4,17 +4,17 @@ mixin table_premium
 	table.card.plans-table
 		tr
 			th
-			th #{translate("personal")}
-			th #{translate("collaborator")}
+			th {{translate("personal")}}
+			th {{translate("collaborator")}}
 				.outer.outer-top
 					.outer-content
 						.best-value
-							strong #{translate('best_value')}
-			th #{translate("professional")}
+							strong {{translate('best_value')}}
+			th {{translate("professional")}}
 
 		tr
-			td #{translate("price")}
-			td #{translate("free")}
+			td {{translate("price")}}
+			td {{translate("free")}}
 			td
 				+price_collaborator
 			td
@@ -63,17 +63,17 @@ mixin table_student
 	table.card.plans-table
 		tr
 			th
-			th #{translate("personal")}
-			th #{translate("student")} (#{translate("annual")})
+			th {{translate("personal")}}
+			th {{translate("student")}} ({{translate("annual")}})
 				.outer.outer-top
 					.outer-content
 						.best-value
 							strong Best Value
-			th #{translate("student")}
+			th {{translate("student")}}
 
 		tr
-			td #{translate("price")}
-			td #{translate("free")}
+			td {{translate("price")}}
+			td {{translate("free")}}
 			td
 				+price_student_annual
 			td

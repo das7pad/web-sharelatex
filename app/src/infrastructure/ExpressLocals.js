@@ -44,6 +44,7 @@ module.exports = function(app, webRouter) {
         vars.appName = Settings.appName
         return req.i18n.translate(key, vars)
       }
+      res.locals.translate.has = req.i18n.translate.has
       res.locals.recomendSubdomain = LNG_TO_SPEC.get(req.showUserOtherLng)
       res.locals.currentLngCode = req.lng
 

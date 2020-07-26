@@ -24,7 +24,7 @@ block content
 					div#loadingScreen.loading-screen-brand()
 
 				h3.loading-screen-label.text-center
-					| #{translate('join_project')}
+					| {{translate('join_project')}}
 					span(ng-show="accessInFlight == true")
 						span.loading-screen-ellip .
 						span.loading-screen-ellip .
@@ -40,9 +40,9 @@ block content
 									| Project not found
 
 							div(ng-switch-default)
-								.alert.alert-danger(aria-live="assertive") #{translate('token_access_failure')}
+								.alert.alert-danger(aria-live="assertive") {{translate('token_access_failure')}}
 								p
-									a(href="/") #{translate('home')}
+									a(href="/") {{translate('home')}}
 
 			.loading-screen(
 				ng-show="mode == 'v1Import'"

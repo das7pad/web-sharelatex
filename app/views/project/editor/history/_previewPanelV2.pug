@@ -21,9 +21,9 @@
 
 	.loading-panel(ng-show="isHistoryLoading()")
 		i.fa.fa-spin.fa-refresh
-		| &nbsp;&nbsp;#{translate("loading")}…
+		| &nbsp;&nbsp;{{translate("loading")}}…
 	.error-panel(ng-show="history.selection.diff.error && !isHistoryLoading()")
-		.alert.alert-danger #{translate("generic_something_went_wrong")}
+		.alert.alert-danger {{translate("generic_something_went_wrong")}}
 
 .point-in-time-panel.full-size(
 	ng-if="history.isV2 && history.viewMode === HistoryViewModes.POINT_IN_TIME && history.updates.length !== 0"
@@ -44,11 +44,11 @@
 			| We're still working on showing image and binary changes, sorry. Stay tuned!
 	.loading-panel(ng-show="isHistoryLoading()")
 		i.fa.fa-spin.fa-refresh
-		| &nbsp;&nbsp;#{translate("loading")}…
+		| &nbsp;&nbsp;{{translate("loading")}}…
 	.error-panel(ng-show="history.error")
 		.alert.alert-danger 
 			p
-				| #{translate("generic_history_error")} 
+				| {{translate("generic_history_error")}} 
 				a(
 					ng-href="mailto:#{settings.adminEmail}?Subject=Error%20loading%20history%20for%project%20{{ project_id }}",
 					ng-non-bindable
@@ -57,6 +57,6 @@
 				a.alert-link-as-btn.pull-right(
 					href
 					ng-click="toggleHistory()"
-			) #{translate("back_to_editor")}
+			) {{translate("back_to_editor")}}
 	.error-panel(ng-show="history.selection.file.error")
-		.alert.alert-danger #{translate("generic_something_went_wrong")}
+		.alert.alert-danger {{translate("generic_something_went_wrong")}}

@@ -23,7 +23,7 @@ block content
 						.row
 							.col-md-12
 								.text-center
-									h1 #{translate('welcome_to_sl')}
+									h1 {{translate('welcome_to_sl')}}
 									p
 										img(src=buildImgPath('ol-brand/overleaf-o.svg'))
 
@@ -35,7 +35,7 @@ block content
 								<!-- create first admin form -->
 								.row(ng-if="shouldShowAdminForm()")
 									.col-md-12
-										h2 #{translate('create_first_admin_account')}
+										h2 {{translate('create_first_admin_account')}}
 
 										// Local Auth Form
 										div(ng-if="authMethod == 'local'")
@@ -45,7 +45,7 @@ block content
 												input(name='_csrf', type='hidden', value=csrfToken)
 												form-messages(for="registerForm")
 												.form-group
-													label(for='email') #{translate("email")}
+													label(for='email') {{translate("email")}}
 													input.form-control(
 														type='email',
 														name='email',
@@ -56,9 +56,9 @@ block content
 														focus="true"
 													)
 													span.small.text-primary(ng-show="registerForm.email.$invalid && registerForm.email.$dirty")
-														| #{translate("must_be_email_address")}
+														| {{translate("must_be_email_address")}}
 												.form-group
-													label(for='password') #{translate("password")}
+													label(for='password') {{translate("password")}}
 													input.form-control#passwordField(
 														type='password',
 														name='password',
@@ -74,14 +74,14 @@ block content
 														type='submit'
 														ng-disabled="registerForm.inflight || registerForm.password.$error.required|| registerForm.password.$error.complexPassword || createAdminSuccess"
 													)
-														span(ng-show="!registerForm.inflight") #{translate("register")}
-														span(ng-show="registerForm.inflight") #{translate("registering")}…
+														span(ng-show="!registerForm.inflight") {{translate("register")}}
+														span(ng-show="registerForm.inflight") {{translate("registering")}}…
 
 										// Ldap Form
 										div(ng-if="authMethod == 'ldap'")
-											h3 #{translate('ldap')}
+											h3 {{translate('ldap')}}
 											p
-												| #{translate('ldap_create_admin_instructions')}
+												| {{translate('ldap_create_admin_instructions')}}
 
 											form(async-form="register", name="registerLdapForm", on-success="onCreateAdminSuccess"
 													on-error="onCreateAdminError"
@@ -89,7 +89,7 @@ block content
 												input(name='_csrf', type='hidden', value=csrfToken)
 												form-messages(for="registerLdapForm")
 												.form-group
-													label(for='email') #{translate("email")}
+													label(for='email') {{translate("email")}}
 													input.form-control(
 														type='email',
 														name='email',
@@ -100,21 +100,21 @@ block content
 														focus="true"
 													)
 													span.small.text-primary(ng-show="registerLdapForm.email.$invalid && registerLdapForm.email.$dirty")
-														| #{translate("must_be_email_address")}
+														| {{translate("must_be_email_address")}}
 												.actions
 													button.btn-primary.btn(
 														type='submit'
 														ng-disabled="registerLdapForm.inflight || registerLdapForm.password.$error.required|| registerLdapForm.password.$error.complexPassword || createAdminSuccess"
 													)
-														span(ng-show="!registerLdapForm.inflight") #{translate("register")}
-														span(ng-show="registerLdapForm.inflight") #{translate("registering")}…
+														span(ng-show="!registerLdapForm.inflight") {{translate("register")}}
+														span(ng-show="registerLdapForm.inflight") {{translate("registering")}}…
 
 
 										// Saml Form
 										div(ng-if="authMethod == 'saml'")
-											h3 #{translate('saml')}
+											h3 {{translate('saml')}}
 											p
-												| #{translate('saml_create_admin_instructions')}
+												| {{translate('saml_create_admin_instructions')}}
 
 											form(async-form="register", name="registerSamlForm", on-success="onCreateAdminSuccess"
 													on-error="onCreateAdminError"
@@ -122,7 +122,7 @@ block content
 												input(name='_csrf', type='hidden', value=csrfToken)
 												form-messages(for="registerSamlForm")
 												.form-group
-													label(for='email') #{translate("email")}
+													label(for='email') {{translate("email")}}
 													input.form-control(
 														type='email',
 														name='email',
@@ -133,27 +133,27 @@ block content
 														focus="true"
 													)
 													span.small.text-primary(ng-show="registerSamlForm.email.$invalid && registerSamlForm.email.$dirty")
-														| #{translate("must_be_email_address")}
+														| {{translate("must_be_email_address")}}
 												.actions
 													button.btn-primary.btn(
 														type='submit'
 														ng-disabled="registerSamlForm.inflight || registerSamlForm.password.$error.required|| registerSamlForm.password.$error.complexPassword || createAdminSuccess"
 													)
-														span(ng-show="!registerSamlForm.inflight") #{translate("register")}
-														span(ng-show="registerSamlForm.inflight") #{translate("registering")}…
+														span(ng-show="!registerSamlForm.inflight") {{translate("register")}}
+														span(ng-show="registerSamlForm.inflight") {{translate("registering")}}…
 
 
 										<!-- success message -->
 										.row(ng-if="createAdminSuccess")
 											.col-md-12.text-center
 												.alert.alert-success
-													| !{translate('admin_user_created_message', {link: '/login?redir=/launchpad'})}
+													| {{translate('admin_user_created_message', {link: '/login?redir=/launchpad'})}}
 
 										<!-- error message -->
 										.row(ng-if="createAdminError")
 											.col-md-12.text-center
 												.alert.alert-danger
-													| #{translate('generic_something_went_wrong')}
+													| {{translate('generic_something_went_wrong')}}
 
 										br
 
@@ -162,30 +162,30 @@ block content
 									.row
 										.col-md-12.status-indicators
 
-											h2 #{translate('status_checks')}
+											h2 {{translate('status_checks')}}
 
 											<!-- ide js -->
 											.row.status-check
 												.col-sm-5
-													| #{translate('editor_resources')}
+													| {{translate('editor_resources')}}
 												.col-sm-7
 													div(ng-switch="statusChecks.ideJs.status")
 
 														span(ng-switch-when="inflight")
 															i.fa.fa-fw.fa-spinner.fa-spin
-															span &nbsp;#{translate('checking')}
+															span &nbsp;{{translate('checking')}}
 
 														span(ng-switch-when="ok")
 															i.fa.fa-check
-															span &nbsp;#{translate('ok')}
+															span &nbsp;{{translate('ok')}}
 															a(ng-click="tryFetchIdeJs()")
-																small &nbsp;#{translate('retry')}
+																small &nbsp;{{translate('retry')}}
 
 														span(ng-switch-when="error")
 															i.fa.fa-exclamation
-															span &nbsp;#{translate('error')}
+															span &nbsp;{{translate('error')}}
 															a(ng-click="tryFetchIdeJs()")
-																small &nbsp;#{translate('retry')}
+																small &nbsp;{{translate('retry')}}
 															div.alert.alert-danger
 																| {{ statusChecks.ideJs.error }}
 
@@ -193,25 +193,25 @@ block content
 											<!-- websocket -->
 											.row.status-check
 												.col-sm-5
-													| #{translate('websockets')}
+													| {{translate('websockets')}}
 												.col-sm-7
 													div(ng-switch="statusChecks.websocket.status")
 
 														span(ng-switch-when="inflight")
 															i.fa.fa-fw.fa-spinner.fa-spin
-															span &nbsp;#{translate('checking')}
+															span &nbsp;{{translate('checking')}}
 
 														span(ng-switch-when="ok")
 															i.fa.fa-check
-															span &nbsp;#{translate('ok')}
+															span &nbsp;{{translate('ok')}}
 															a(ng-click="tryOpenWebSocket()")
-																small &nbsp;#{translate('retry')}
+																small &nbsp;{{translate('retry')}}
 
 														span(ng-switch-when="error")
 															i.fa.fa-exclamation
-															span &nbsp;#{translate('error')}
+															span &nbsp;{{translate('error')}}
 															a(ng-click="tryOpenWebSocket()")
-																small &nbsp;#{translate('retry')}
+																small &nbsp;{{translate('retry')}}
 															div.alert.alert-danger
 																| {{ statusChecks.websocket.error }}
 
@@ -222,22 +222,22 @@ block content
 									<!-- other actions -->
 									.row
 										.col-md-12
-											h2 #{translate('other_actions')}
+											h2 {{translate('other_actions')}}
 
-											h3 #{translate('send_test_email')}
+											h3 {{translate('send_test_email')}}
 											form.form
 												.form-group
 													label(for="emailInput") Email
 													input(type="text", name="emailInput" ng-model="testEmail.emailAddress").form-control
 												button(ng-click="sendTestEmail()", ng-disabled="testEmail.inflight").btn.btn-primary
-													span(ng-show="!testEmail.inflight") #{translate("send")}
-													span(ng-show="testEmail.inflight") #{translate("sending")}…
+													span(ng-show="!testEmail.inflight") {{translate("send")}}
+													span(ng-show="testEmail.inflight") {{translate("sending")}}…
 											div(ng-if="testEmail.status == 'ok'")
 												.alert.alert-success
-													| #{translate('email_sent')}
+													| {{translate('email_sent')}}
 											div(ng-if="testEmail.status == 'error'")
 												.alert.alert-danger
-													| #{translate('generic_something_went_wrong')}
+													| {{translate('generic_something_went_wrong')}}
 
 
 

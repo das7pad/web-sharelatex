@@ -47,7 +47,7 @@ block content
 									ng-show="!deleting"
 								)
 									i.fa.fa-trash-o
-									| &nbsp; #{translate('delete')} #{translate('subscription')}
+									| &nbsp; {{translate('delete')}} {{translate('subscription')}}
 								div(ng-show="deleting")
 									| Are you sure?&nbsp;
 									a(href, ng-click="deleteSubscription()") Yes

@@ -8,7 +8,7 @@ p
 				td {{ user._id }}
 			tr
 				td
-					label #{translate("email")}
+					label {{translate("email")}}
 				td
 					div(ng-show="!editingEmail")
 						a(href="mailto:{{user.email}}") {{ user.email }} &nbsp;
@@ -31,7 +31,7 @@ p
 
 			tr(ng-if="user.emails.length > 1")
 				td
-					label #{translate("emails")}
+					label {{translate("emails")}}
 				td
 					ul(ng-repeat="emailData in user.emails")
 						li {{ emailData.email }} 
@@ -87,7 +87,7 @@ p
 
 			tr
 				td
-					label(for="first_name") #{translate("first_name")}
+					label(for="first_name") {{translate("first_name")}}
 				td
 					input#first_name.form-control(
 						name='first_name',
@@ -97,7 +97,7 @@ p
 
 			tr
 				td
-					label(for="last_name") #{translate("last_name")}
+					label(for="last_name") {{translate("last_name")}}
 				td
 					input#last_name.form-control(
 						name='last_name',
@@ -374,4 +374,4 @@ p
 					ng-click="openDeleteUserModal()"
 				)
 					i.fa.fa-trash-o
-					| &nbsp; #{translate('delete')} #{translate('user')}
+					| &nbsp; {{translate('delete')}} {{translate('user')}}

@@ -16,7 +16,7 @@ block content
 		.loading-screen(ng-hide="error || serverError")
 			.loading-screen-brand-container
 				div#loadingScreen.loading-screen-brand()
-			h3.loading-screen-label() #{translate('loading_content')}
+			h3.loading-screen-label() {{translate('loading_content')}}
 				span.loading-screen-ellip .
 				span.loading-screen-ellip .
 				span.loading-screen-ellip .
@@ -24,10 +24,10 @@ block content
 			.row
 				.col-md-8.col-md-offset-2
 					.page-header
-						h1 #{translate('loading_content')}
+						h1 {{translate('loading_content')}}
 					.message
-						p #{translate('there_was_an_error_opening_your_content')}
+						p {{translate('there_was_an_error_opening_your_content')}}
 					.errors
-						.alert.alert-danger(ng-show="error" ng-cloak) #{translate('sorry_something_went_wrong_opening_the_document_please_try_again')}
+						.alert.alert-danger(ng-show="error" ng-cloak) {{translate('sorry_something_went_wrong_opening_the_document_please_try_again')}}
 						.alert.alert-danger(ng-show="serverError" ng-cloak) {{serverError}}
 						a.error-btn(href="/") Home

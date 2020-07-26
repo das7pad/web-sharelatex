@@ -20,10 +20,10 @@ block content
 						.row-spaced-small
 							div(ng-if="inputs.removeMembers.error", ng-cloak)
 								div.alert.alert-danger(ng-if="inputs.removeMembers.errorMessage")
-									| #{translate('error')}:
+									| {{translate('error')}}:
 									| {{ inputs.removeMembers.errorMessage }}
 								div.alert.alert-danger(ng-if="!inputs.removeMembers.errorMessage")
-									| #{translate('generic_something_went_wrong')}
+									| {{translate('generic_something_went_wrong')}}
 							ul.list-unstyled.structured-list(
 								select-all-list,
 								ng-cloak
@@ -35,11 +35,11 @@ block content
 												select-all,
 												type="checkbox"
 											)
-											span.header #{translate("email")}
+											span.header {{translate("email")}}
 										.col-md-5
-											span.header #{translate("name")}
+											span.header {{translate("name")}}
 										.col-md-2
-											span.header #{translate("accepted_invite")}
+											span.header {{translate("accepted_invite")}}
 								li.container-fluid(
 									ng-repeat="user in users | orderBy:'email':true",
 									ng-controller="UserMembershipListItemController"
@@ -57,26 +57,26 @@ block content
 										.col-md-2
 											span.registered
 												i.fa.fa-check.text-success(ng-show="!user.invite" aria-hidden="true")
-												span.sr-only(ng-show="!user.invite") #{translate('accepted_invite')}
+												span.sr-only(ng-show="!user.invite") {{translate('accepted_invite')}}
 												i.fa.fa-times(ng-show="user.invite" aria-hidden="true")
-												span.sr-only(ng-show="user.invite") #{translate('invite_not_accepted')}
+												span.sr-only(ng-show="user.invite") {{translate('invite_not_accepted')}}
 								li(
 									ng-if="users.length == 0",
 									ng-cloak
 								)
 									.row
 										.col-md-12.text-centered
-											small #{translate("no_members")}
+											small {{translate("no_members")}}
 
 						hr
 						div(ng-if="!groupSize || users.length < groupSize", ng-cloak)
-							p.small #{translate("add_more_members")}
+							p.small {{translate("add_more_members")}}
 							div(ng-if="inputs.addMembers.error", ng-cloak)
 								div.alert.alert-danger(ng-if="inputs.addMembers.errorMessage")
-									| #{translate('error')}:
+									| {{translate('error')}}:
 									| {{ inputs.addMembers.errorMessage }}
 								div.alert.alert-danger(ng-if="!inputs.addMembers.errorMessage")
-									| #{translate('generic_something_went_wrong')}
+									| {{translate('generic_something_went_wrong')}}
 							form.form
 								.row
 									.col-xs-6
@@ -90,18 +90,18 @@ block content
 										)
 									.col-xs-4
 										button.btn.btn-primary(ng-click="addMembers()", ng-disabled="inputs.addMembers.inflightCount > 0")
-											span(ng-show="inputs.addMembers.inflightCount === 0") #{translate("add")}
-											span(ng-show="inputs.addMembers.inflightCount > 0") #{translate("adding")}…
+											span(ng-show="inputs.addMembers.inflightCount === 0") {{translate("add")}}
+											span(ng-show="inputs.addMembers.inflightCount > 0") {{translate("adding")}}…
 									.col-xs-2(ng-if="paths.exportMembers", ng-cloak)
-										a(href=paths.exportMembers) #{translate('export_csv')}
+										a(href=paths.exportMembers) {{translate('export_csv')}}
 								.row
 									.col-xs-8
-										span.help-block #{translate('add_comma_separated_emails_help')}
+										span.help-block {{translate('add_comma_separated_emails_help')}}
 
 						div(ng-if="groupSize && users.length >= groupSize && users.length > 0", ng-cloak)
 							.row
 								.col-xs-2.col-xs-offset-10(ng-if="paths.exportMembers", ng-cloak)
-									a(href=paths.exportMembers) #{translate('export_csv')}
+									a(href=paths.exportMembers) {{translate('export_csv')}}
 									
 	meta(id="ol-users" data-json content=users)
 	meta(id="ol-paths" data-json content=paths)

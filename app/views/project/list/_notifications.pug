@@ -15,28 +15,31 @@ include ../../_mixins/saml
 					ng-controller="ProjectInviteNotificationController"
 				)
 					.notification-body
-						span(ng-show="!notification.accepted") !{translate("notification_project_invite_message", { userName: "{{ userName }}", projectName: "{{ projectName }}" })}
-						span(ng-show="notification.accepted") !{translate("notification_project_invite_accepted_message", { projectName: "{{ projectName }}" })}
+						span(ng-show="!notification.accepted")
+						| {{translate("notification_project_invite_message", {userName, projectName})}}
+						span(ng-show="notification.accepted")
+						| {{translate("notification_project_invite_accepted_message", {projectName})}}
 					.notification-action
 						a.pull-right.btn.btn-sm.btn-info(
 							ng-show="notification.accepted",
 							href="/project/{{ notification.messageOpts.projectId }}"
-						) #{translate("open_project")}
+						) {{translate("open_project")}}
 						a.pull-right.btn.btn-sm.btn-info(
 							href,
 							ng-click="accept()",
 							ng-disabled="notification.inflight",
 							ng-show="!notification.accepted"
 						)
-							span(ng-show="!notification.inflight") #{translate("join_project")}
+							span(ng-show="!notification.inflight")
+								| {{translate("join_project")}}
 							span(ng-show="notification.inflight")
 								i.fa.fa-fw.fa-spinner.fa-spin(aria-hidden="true")
 								| &nbsp;
-								| #{translate("joining")}…
+								| {{translate("joining")}}…
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 				.alert.alert-info(
 					ng-switch-when="wfh_2020_upgrade_offer"
 				)
@@ -47,7 +50,7 @@ include ../../_mixins/saml
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 				.alert.alert-info(
 					ng-switch-when="notification_ip_matched_affiliation"
 				)
@@ -64,7 +67,7 @@ include ../../_mixins/saml
 					.notification-close
 						button.btn-sm(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 				.alert.alert-danger(
 					ng-switch-when="notification_tpds_file_limit"
@@ -80,7 +83,7 @@ include ../../_mixins/saml
 					.notification-close
 						button.btn-sm(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 				.alert.alert-info(
 					ng-switch-default
@@ -89,7 +92,7 @@ include ../../_mixins/saml
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 	ul.list-unstyled(
 		ng-if="notificationsInstitution.length > 0",
@@ -103,21 +106,21 @@ include ../../_mixins/saml
 						ng-switch-when="notification_institution_sso_available"
 					)
 					.notification-body
-						p !{translate("can_link_institution_email_acct_to_institution_acct", {appName: settings.appName, email: "{{notification.email}}", institutionName: "{{notification.institutionName}}"})}
-						div !{translate("doing_this_allow_log_in_through_institution", {appName: settings.appName})}
+						p  {{translate("can_link_institution_email_acct_to_institution_acct", notification)}}
+						div {{translate("doing_this_allow_log_in_through_institution")}}
 					.notification-action
 						a.btn.btn-sm.btn-info(href="{{samlInitPath}}?university_id={{notification.institutionId}}&auto=/project&email={{notification.email}}")
-							| #{translate('link_account')}
+							| {{translate('link_account')}}
 
 				.alert.alert-info(
 					ng-switch-when="notification_institution_sso_linked"
 				)
 					.notification-body
-						div !{translate("account_has_been_link_to_institution_account", {appName: settings.appName, email: "{{notification.email}}", institutionName: "{{notification.institutionName}}"})}
+						div {{translate("account_has_been_link_to_institution_account", notification)}}
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 				.alert.alert-warning(
 					ng-switch-when="notification_institution_sso_non_canonical"
@@ -125,25 +128,26 @@ include ../../_mixins/saml
 					.notification-body
 						div
 							i.fa.fa-fw.fa-exclamation-triangle(aria-hidden="true")
-							| !{translate("tried_to_log_in_with_email", {email: "{{notification.requestedEmail}}"})} !{translate("in_order_to_match_institutional_metadata_associated", {email: "{{notification.institutionEmail}}"})}
+							| {{translate("tried_to_log_in_with_email", {email: notification.requestedEmail})}}
+							| {{translate("in_order_to_match_institutional_metadata_associated", {email: notification.institutionEmail})}}
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 				.alert.alert-info(
 					ng-switch-when="notification_institution_sso_already_registered"
 				)
 					.notification-body
-						| !{translate("tried_to_register_with_email", {appName: settings.appName, email: "{{notification.email}}"})}
-						| #{translate("we_logged_you_in")}
+						| {{translate("tried_to_register_with_email", notification)}}
+						| {{translate("we_logged_you_in")}}
 					.notification-action
 						a.btn.btn-sm.btn-info(href="/learn/how-to/Institutional_Login")
-							| #{translate("find_out_more")}
+							| {{translate("find_out_more")}}
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 				.alert.alert-danger(
 					ng-switch-when="notification_institution_sso_linked_by_another"
@@ -151,11 +155,11 @@ include ../../_mixins/saml
 					.notification-body
 						div
 							i.fa.fa-fw.fa-exclamation-triangle(aria-hidden="true")
-							| !{translate("institution_account_tried_to_add_already_registered")}
+							| {{translate("institution_account_tried_to_add_already_registered")}}
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 				if institutionLinkingError
 					.alert.alert-danger(ng-switch-when="notification_institution_sso_error")
@@ -165,7 +169,7 @@ include ../../_mixins/saml
 						.notification-close
 							button(ng-click="dismiss(notification)").close.pull-right
 								span(aria-hidden="true") &times;
-								span.sr-only #{translate("close")}
+								span.sr-only {{translate("close")}}
 
 	if !settings.emailConfirmationDisabled
 		ul.list-unstyled(
@@ -178,17 +182,17 @@ include ../../_mixins/saml
 			)
 				.alert.alert-warning(ng-if="!userEmail.confirmationInflight")
 					.notification-body
-						| #{translate("please_confirm_email", {emailAddress: "{{ userEmail.email }}"})}
+						| {{translate("please_confirm_email", {emailAddress: userEmail.email})}}
 						|
 						a(
 							href
 							ng-click="resendConfirmationEmail(userEmail)"
-						) (#{translate('resend_confirmation_email')})
+						) ({{translate('resend_confirmation_email')}})
 				.alert.alert-warning(ng-if="userEmail.confirmationInflight")
 					.notification-body
 						i.fa.fa-spinner.fa-spin(aria-hidden="true")
 						|
-						| #{translate('resending_confirmation_email')}&hellip;
+						| {{translate('resending_confirmation_email')}}&hellip;
 	- var hasPaidAffiliation = userAffiliations.some(affiliation => affiliation.licence && affiliation.licence !== 'free')
 	if settings.enableSubscriptions && !hasSubscription && !hasPaidAffiliation
 		ul.list-unstyled(
@@ -206,4 +210,4 @@ include ../../_mixins/saml
 					.notification-close
 						button(ng-click="dismiss()").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}

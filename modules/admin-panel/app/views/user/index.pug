@@ -63,7 +63,7 @@ block content
 						span(ng-if='isLoading')
 							loading
 									i.fa.fa-fw.fa-spin.fa-refresh
-									| &nbsp;#{translate("loading")}...
+									| &nbsp;{{translate("loading")}}...
 						.user-list-card(ng-if='!isLoading')
 							ul.list-unstyled.user-list.structured-list(
 								select-all-list,

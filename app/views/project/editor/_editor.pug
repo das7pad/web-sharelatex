@@ -9,8 +9,8 @@ div.full-size(
 	minimum-restore-size-east="300"
 	allow-overflow-on="'center'"
 	custom-toggler-pane=hasFeature('custom-togglers') ? "east" : false
-	custom-toggler-msg-when-open=hasFeature('custom-togglers') ? translate("tooltip_hide_pdf") : false
-	custom-toggler-msg-when-closed=hasFeature('custom-togglers') ? translate("tooltip_show_pdf") : false
+	custom-toggler-msg-when-open=(hasFeature('custom-togglers') ? '{{translate("tooltip_hide_pdf")}}' : false)
+	custom-toggler-msg-when-closed=(hasFeature('custom-togglers') ? '{{translate("tooltip_show_pdf")}}' : false)
 )
 	.ui-layout-center(
 		ng-controller="ReviewPanelController",
@@ -32,10 +32,10 @@ div.full-size(
 		)
 			span(ng-show="editor.open_doc_id")
 				i.fa.fa-spin.fa-refresh
-				| &nbsp;&nbsp;#{translate("loading")}…
+				| &nbsp;&nbsp;{{translate("loading")}}…
 			span(ng-show="!editor.open_doc_id")
 				i.fa.fa-arrow-left
-				| &nbsp;&nbsp;#{translate("open_a_file_on_the_left")}
+				| &nbsp;&nbsp;{{translate("open_a_file_on_the_left")}}
 
 		!= moduleIncludes('editor:main', locals)
 
@@ -43,7 +43,7 @@ div.full-size(
 			ng-show="multiSelectedCount > 0"
 		)
 			.multi-selection-message
-				h4 {{ multiSelectedCount }} #{translate('files_selected')}
+				h4 {{ multiSelectedCount }} {{translate('files_selected')}}
 
 		#editor(
 			ace-editor="editor",
@@ -121,17 +121,17 @@ div.full-size.no-file-selection(
 		ng-if="rootFolder.children && rootFolder.children.length > 0"
 	)
 		h3
-			| #{translate('no_selection_select_file')}
+			| {{translate('no_selection_select_file')}}
 	.no-file-selection-message(
 		ng-if="rootFolder.children && rootFolder.children.length === 0"
 	)
 		h3
-			| #{translate('no_selection_create_new_file')}
+			| {{translate('no_selection_create_new_file')}}
 		div(
 			ng-controller="FileTreeController"
 		)
 			button.btn.btn-primary(
 				ng-click="openNewDocModal()"
 			)
-				| #{translate('new_file')}
+				| {{translate('new_file')}}
 

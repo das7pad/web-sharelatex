@@ -49,16 +49,16 @@
 								select-all,
 								type="checkbox"
 							)
-							span.header.clickable(ng-click="changePredicate('name')") #{translate("title")}
+							span.header.clickable(ng-click="changePredicate('name')") {{translate("title")}}
 								i.tablesort.fa(ng-class="getSortIconClass('name')")
 						.col-xs-2
 							span.header.clickable(ng-click="changePredicate('archived')") Archived
 								i.tablesort.fa(ng-class="getSortIconClass('archived')")
 						.col-xs-2
-							span.header.clickable(ng-click="changePredicate('lastUpdated')") #{translate("last_modified")}
+							span.header.clickable(ng-click="changePredicate('lastUpdated')") {{translate("last_modified")}}
 								i.tablesort.fa(ng-class="getSortIconClass('lastUpdated')")
 						.col-xs-2
-							span.header.clickable(ng-click="changePredicate('createdAt')") #{translate("created_at")}
+							span.header.clickable(ng-click="changePredicate('createdAt')") {{translate("created_at")}}
 								i.tablesort.fa(ng-class="getSortIconClass('createdAt')")
 				li.project_entry.container-fluid(
 					ng-repeat="project in visibleProjects | orderBy:predicate:reverse",
@@ -96,4 +96,4 @@
 				)
 					.row
 						.col-xs-12.text-centered
-							small #{translate("no_projects")}
+							small {{translate("no_projects")}}

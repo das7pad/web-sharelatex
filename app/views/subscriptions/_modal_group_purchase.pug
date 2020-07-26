@@ -16,7 +16,7 @@ script(type="text/ng-template", id="groupPlanModalPurchaseTemplate")
 						li(ng-if="selected.plan_code == 'collaborator'")
 							strong #{translate("collabs_per_proj", {collabcount:10})}
 						li(ng-if="selected.plan_code == 'professional'")
-							strong #{translate("unlimited_collabs")}
+							strong {{translate("unlimited_collabs")}}
 						+features_premium
 				.col-md-6
 					form.form

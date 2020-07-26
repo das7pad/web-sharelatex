@@ -45,13 +45,13 @@ script(type='text/ng-template', id='newFileModalTemplate')
 							)
 						div.alert.alert-danger.row-spaced-small(ng-if="error")
 							div(ng-switch="error")
-								span(ng-switch-when="already exists") #{translate("file_already_exists")}
+								span(ng-switch-when="already exists") {{translate("file_already_exists")}}
 								span(ng-switch-default) {{error}}
 						div.alert.alert-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile && newDocForm.name.$viewValue.length")
-							| #{translate('files_cannot_include_invalid_characters')}
+							| {{translate('files_cannot_include_invalid_characters')}}
 					div(ng-if="type == 'upload'", ng-controller="UploadFileModalController")
 						.alert.alert-warning.small(ng-if="tooManyFiles") #{translate("maximum_files_uploaded_together", {max:"{{max_files}}"})}
-						.alert.alert-warning.small(ng-if="rateLimitHit") #{translate("too_many_files_uploaded_throttled_short_period")}
+						.alert.alert-warning.small(ng-if="rateLimitHit") {{translate("too_many_files_uploaded_throttled_short_period")}}
 						.alert.alert-warning.small(ng-if="notLoggedIn") #{translate("session_expired_redirecting_to_login", {seconds:"{{secondsToRedirect}}"})}
 						.alert.alert-warning.small(ng-if="conflicts.length > 0")
 							p.text-center
@@ -142,7 +142,7 @@ script(type='text/ng-template', id='newFileModalTemplate')
 										span(ng-show="!state.isOutputFilesMode") select from output files
 
 								.form-controls.row-spaced-small
-									label(for="name") #{translate("file_name_in_this_project")}
+									label(for="name") {{translate("file_name_in_this_project")}}
 									input.form-control(
 										type="text"
 										placeholder="example.tex"
@@ -152,8 +152,8 @@ script(type='text/ng-template', id='newFileModalTemplate')
 									)
 						div.alert.alert-danger.row-spaced-small(ng-if="error")
 							div(ng-switch="error")
-								span(ng-switch-when="already exists") #{translate("file_already_exists")}
-								span(ng-switch-when="too many files") #{translate("project_has_too_many_files")}
+								span(ng-switch-when="already exists") {{translate("file_already_exists")}}
+								span(ng-switch-when="too many files") {{translate("project_has_too_many_files")}}
 								span(ng-switch-default) Error, something went wrong!
 					div(ng-if="type == 'url'", ng-controller="UrlLinkedFileModalController")
 						form(novalidate, name="newLinkedFileForm")
@@ -168,7 +168,7 @@ script(type='text/ng-template', id='newFileModalTemplate')
 								name="url"
 							)
 							.row-spaced-small
-								label(for="name") #{translate("file_name_in_this_project")}
+								label(for="name") {{translate("file_name_in_this_project")}}
 								input.form-control(
 									type="text",
 									placeholder="my_file",
@@ -180,38 +180,38 @@ script(type='text/ng-template', id='newFileModalTemplate')
 									name="name"
 								)
 								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
-									| #{translate('files_cannot_include_invalid_characters')}
+									| {{translate('files_cannot_include_invalid_characters')}}
 						div.alert.alert-danger.row-spaced-small(ng-if="error")
 							div(ng-switch="error")
-								span(ng-switch-when="already exists") #{translate("file_already_exists")}
-								span(ng-switch-when="too many files") #{translate("project_has_too_many_files")}
+								span(ng-switch-when="already exists") {{translate("file_already_exists")}}
+								span(ng-switch-when="too many files") {{translate("project_has_too_many_files")}}
 								span(ng-switch-default) {{error}}
 
 					!= moduleIncludes("newFileModal:panel", locals)
 
 	.modal-footer
 		.modal-footer-left.approaching-file-limit(ng-if="file_count > 1900 && file_count < 2000")
-			|	#{translate("project_approaching_file_limit")} ({{file_count}}/2000)
+			|	{{translate("project_approaching_file_limit")}} ({{file_count}}/2000)
 		.alert.alert-warning.at-file-limit(ng-if="file_count >= 2000")
-			|	#{translate("project_has_too_many_files")}
+			|	{{translate("project_has_too_many_files")}}
 		button.btn.btn-default(
 			ng-disabled="state.inflight"
 			ng-click="cancel()"
-		) #{translate("cancel")}
+		) {{translate("cancel")}}
 		button.btn.btn-primary(
 			ng-disabled="state.inflight || !state.valid"
 			ng-click="create()"
 			ng-hide="type == 'upload'"
 		)
-			span(ng-hide="state.inflight") #{translate("create")}
-			span(ng-show="state.inflight") #{translate("creating")}…
+			span(ng-hide="state.inflight") {{translate("create")}}
+			span(ng-show="state.inflight") {{translate("creating")}}…
 
 script(type="text/template", id="qq-file-uploader-template")
 	div.qq-uploader-selector
 		div(qq-hide-dropzone="").qq-upload-drop-area-selector.qq-upload-drop-area
-			span.qq-upload-drop-area-text-selector #{translate('drop_files_here_to_upload')}
+			span.qq-upload-drop-area-text-selector {{translate('drop_files_here_to_upload')}}
 		div Drag here
-		div.row-spaced-small.small #{translate('or')}
+		div.row-spaced-small.small {{translate('or')}}
 		div.row-spaced-small
 			div.qq-upload-button-selector.btn.btn-primary
 				| Select from your computer
@@ -227,6 +227,6 @@ script(type="text/template", id="qq-file-uploader-template")
 					)
 				span.qq-upload-file-selector.qq-upload-file
 				span.qq-upload-size-selector.qq-upload-size
-				a(type="button").qq-btn.qq-upload-cancel-selector.qq-upload-cancel #{translate('cancel')}
-				button(type="button").qq-btn.qq-upload-retry-selector.qq-upload-retry #{translate('retry')}
+				a(type="button").qq-btn.qq-upload-cancel-selector.qq-upload-cancel {{translate('cancel')}}
+				button(type="button").qq-btn.qq-upload-retry-selector.qq-upload-retry {{translate('retry')}}
 				span(role="status").qq-upload-status-text-selector.qq-upload-status-text

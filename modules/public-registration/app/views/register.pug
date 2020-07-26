@@ -9,26 +9,26 @@ block content
 						h1  #{translate("user_wants_you_to_see_project", {username:sharedProjectData.user_first_name, projectname:""})}
 							em #{sharedProjectData.project_name}
 						div
-							| #{translate("join_sl_to_view_project")}.
+							| {{translate("join_sl_to_view_project")}}.
 						div
-							| #{translate("if_you_are_registered")},
-							a(href="/login")  #{translate("login_here")}
+							| {{translate("if_you_are_registered")}},
+							a(href="/login")  {{translate("login_here")}}
 					else if newTemplateData.templateName !== undefined
 						h1 #{translate("register_to_edit_template", {templateName:newTemplateData.templateName})}
 
-						div #{translate("already_have_sl_account")}
-							a(href="/login")  #{translate("login_here")}
+						div {{translate("already_have_sl_account")}}
+							a(href="/login")  {{translate("login_here")}}
 
 			.row
 				.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4
 					.card
 						.page-header
-							h1 #{translate("register")}
+							h1 {{translate("register")}}
 						form(async-form="register", name="registerForm", action="/register", method="POST", captcha, ng-cloak)
 							input(name='_csrf', type='hidden', value=csrfToken)
 							form-messages(for="registerForm")
 							.form-group
-								label(for='email') #{translate("email")}
+								label(for='email') {{translate("email")}}
 								input.form-control(
 									type='email',
 									name='email',
@@ -40,9 +40,9 @@ block content
 									focus="true"
 								)
 								span.small.text-primary(ng-show="registerForm.email.$invalid && registerForm.email.$dirty")
-									| #{translate("must_be_email_address")}
+									| {{translate("must_be_email_address")}}
 							.form-group
-								label(for='password') #{translate("password")}
+								label(for='password') {{translate("password")}}
 								input.form-control#passwordField(
 									type='password',
 									name='password',
@@ -66,6 +66,6 @@ block content
 									type='submit'
 									ng-disabled="registerForm.inflight || registerForm.password.$error.required|| registerForm.password.$error.complexPassword"
 								)
-									span(ng-show="!registerForm.inflight") #{translate("register")}
-									span(ng-show="registerForm.inflight") #{translate("registering")}...
+									span(ng-show="!registerForm.inflight") {{translate("register")}}
+									span(ng-show="registerForm.inflight") {{translate("registering")}}...
 	meta(id="ol-passwordStrengthOptions" data-json content=(settings.passwordStrengthOptions || {}))

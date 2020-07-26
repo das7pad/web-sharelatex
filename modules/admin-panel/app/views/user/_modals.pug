@@ -5,7 +5,7 @@ script(type='text/ng-template', id='deleteUsersModalTemplate')
 			data-dismiss="modal"
 			ng-click="cancel()"
 		) &times;
-		h3 #{translate("delete")} User
+		h3 {{translate("delete")}} User
 	.modal-body
 		div
 			p You are about to delete the following users:
@@ -15,10 +15,10 @@ script(type='text/ng-template', id='deleteUsersModalTemplate')
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()"
-		) #{translate("cancel")}
+		) {{translate("cancel")}}
 		button.btn.btn-danger(
 			ng-click="delete()"
-		) #{translate("delete")}
+		) {{translate("delete")}}
 
 script(type='text/ng-template', id='deleteSecondaryEmailModalTemplate')
 	.modal-header
@@ -37,10 +37,10 @@ script(type='text/ng-template', id='deleteSecondaryEmailModalTemplate')
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()"
-		) #{translate("cancel")}
+		) {{translate("cancel")}}
 		button.btn.btn-danger(
 			ng-click="delete()"
-		) #{translate("delete")}
+		) {{translate("delete")}}
 
 
 script(type='text/ng-template', id='unlinkOlModalTemplate')
@@ -60,7 +60,7 @@ script(type='text/ng-template', id='unlinkOlModalTemplate')
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()"
-		) #{translate("cancel")}
+		) {{translate("cancel")}}
 		button.btn.btn-danger(
 			ng-click="unlink()"
-		) #{translate("Unlink")}
+		) {{translate("Unlink")}}

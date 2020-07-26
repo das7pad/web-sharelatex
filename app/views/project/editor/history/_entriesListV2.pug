@@ -56,17 +56,17 @@ script(type="text/ng-template", id="historyEntriesListTpl")
 			)
 			.loading(ng-show="$ctrl.isLoading")
 				i.fa.fa-spin.fa-refresh
-				| &nbsp;&nbsp; #{translate("loading")}…
+				| &nbsp;&nbsp; {{translate("loading")}}…
 			.history-entries-list-upgrade-prompt(
 				ng-if="$ctrl.freeHistoryLimitHit && $ctrl.currentUserIsOwner"
 				ng-controller="FreeTrialModalController"
 			)
-				p #{translate("currently_seeing_only_24_hrs_history")}
+				p {{translate("currently_seeing_only_24_hrs_history")}}
 				p: strong #{translate("upgrade_to_get_feature", {feature:"full Project History"})}
 				ul.list-unstyled
 					li 
 						i.fa.fa-check &nbsp;
-						| #{translate("unlimited_projects")}
+						| {{translate("unlimited_projects")}}
 					
 					li
 						i.fa.fa-check &nbsp;
@@ -74,31 +74,31 @@ script(type="text/ng-template", id="historyEntriesListTpl")
 					
 					li 
 						i.fa.fa-check &nbsp;
-						| #{translate("full_doc_history")}
+						| {{translate("full_doc_history")}}
 					
 					li 
 						i.fa.fa-check &nbsp;
-						| #{translate("sync_to_dropbox")}
+						| {{translate("sync_to_dropbox")}}
 
 					li 
 						i.fa.fa-check &nbsp;
-						| #{translate("sync_to_github")}
+						| {{translate("sync_to_github")}}
 
 					li  
 						i.fa.fa-check &nbsp;
-						|#{translate("compile_larger_projects")}
+						|{{translate("compile_larger_projects")}}
 				p.text-center
 					a.btn.btn-success(
 						href
 						ng-class="buttonClass"
 						ng-click="startFreeTrial('history')"
-					) #{translate("start_free_trial")}
-				p.small(ng-show="startedFreeTrial") #{translate("refresh_page_after_starting_free_trial")}
+					) {{translate("start_free_trial")}}
+				p.small(ng-show="startedFreeTrial") {{translate("refresh_page_after_starting_free_trial")}}
 			.history-entries-list-upgrade-prompt(
 				ng-if="$ctrl.freeHistoryLimitHit && !$ctrl.currentUserIsOwner"
 			) 
-				p #{translate("currently_seeing_only_24_hrs_history")}
-				strong #{translate("ask_proj_owner_to_upgrade_for_full_history")}
+				p {{translate("currently_seeing_only_24_hrs_history")}}
+				strong {{translate("ask_proj_owner_to_upgrade_for_full_history")}}
 
 script(type="text/ng-template", id="historyEntryTpl")
 	time.history-entry-day(ng-if="::$ctrl.entry.meta.first_in_day") {{ ::$ctrl.entry.meta.end_ts | relativeDate }}
@@ -140,20 +140,20 @@ script(type="text/ng-template", id="historyEntryTpl")
 				li.history-entry-change(
 					ng-repeat="pathname in ::$ctrl.entry.pathnames"
 				)
-					span.history-entry-change-action #{translate("file_action_edited")} 
+					span.history-entry-change-action {{translate("file_action_edited")}} 
 					span.history-entry-change-doc {{ ::pathname }}
 				li.history-entry-change(
 					ng-repeat="project_op in ::$ctrl.entry.project_ops"
 				)
 					span.history-entry-change-action(
 						ng-if="::project_op.rename"
-					) #{translate("file_action_renamed")}
+					) {{translate("file_action_renamed")}}
 					span.history-entry-change-action(
 						ng-if="::project_op.add"
-					) #{translate("file_action_created")}
+					) {{translate("file_action_created")}}
 					span.history-entry-change-action(
 						ng-if="::project_op.remove"
-					) #{translate("file_action_deleted")}
+					) {{translate("file_action_deleted")}}
 					span.history-entry-change-doc {{ ::$ctrl.getProjectOpDoc(project_op) }}
 			.history-entry-metadata
 				time.history-entry-metadata-time {{ ::$ctrl.entry.meta.end_ts | formatDate:'h:mm a' }}
@@ -174,11 +174,11 @@ script(type="text/ng-template", id="historyEntryTpl")
 						span.name(
 							ng-if="::update_user == null"
 							ng-style="$ctrl.getUserCSSStyle(update_user);"
-						) #{translate("anonymous")}
+						) {{translate("anonymous")}}
 					li.history-entry-metadata-user(ng-if="::$ctrl.entry.meta.users.length == 0")
 						span.name(
 							ng-style="$ctrl.getUserCSSStyle();"
-						) #{translate("anonymous")}
+						) {{translate("anonymous")}}
 
 			.history-entry-fromV-handle(
 				ng-show="$ctrl.rangeSelectionEnabled && $ctrl.selectedHistoryRange && ((!$ctrl.isDragging && $ctrl.selectedHistoryRange.fromV === $ctrl.entry.fromV) || ($ctrl.isDragging && $ctrl.hoveredHistoryRange.fromV === $ctrl.entry.fromV))"
@@ -237,7 +237,7 @@ script(type="text/ng-template", id="historyLabelsListTpl")
 						span.name(
 							ng-if="user == null"
 							ng-style="$ctrl.getUserCSSStyle(user, versionWithLabel);"
-						) #{translate("anonymous")}
+						) {{translate("anonymous")}}
 					time.history-entry-label-metadata-time {{ ::label.created_at | formatDate }}
 			.history-entry-fromV-handle(
 				ng-show="$ctrl.rangeSelectionEnabled && $ctrl.selectedHistoryRange && ((!$ctrl.isDragging && $ctrl.selectedHistoryRange.fromV === versionWithLabel.version) || ($ctrl.isDragging && $ctrl.hoveredHistoryRange.fromV === versionWithLabel.version))"
@@ -248,4 +248,4 @@ script(type="text/ng-template", id="historyLabelsListTpl")
 			
 		.loading(ng-show="$ctrl.isLoading")
 			i.fa.fa-spin.fa-refresh
-			| &nbsp;&nbsp; #{translate("loading")}…
+			| &nbsp;&nbsp; {{translate("loading")}}…

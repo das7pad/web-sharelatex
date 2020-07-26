@@ -7,7 +7,7 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 			aria-label="Close"
 		)
 			span(aria-hidden="true") &times;
-		h3 #{translate("share_project")}
+		h3 {{translate("share_project")}}
 	.modal-body.modal-body-share
 		.container-fluid
 
@@ -16,19 +16,19 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 				.row.public-access-level
 					.col-xs-12.access-token-display-area
 						div.access-token-wrapper
-							strong #{translate('anyone_with_link_can_view')}
+							strong {{translate('anyone_with_link_can_view')}}
 							pre.access-token {{ readOnlyTokenLink }}
 
 			if !isRestrictedTokenMember
 				//- Private (with token-access available)
 				.row.public-access-level(ng-show="isAdmin && project.publicAccesLevel == 'private'")
 					.col-xs-12.text-center
-						| #{translate('link_sharing_is_off')}
+						| {{translate('link_sharing_is_off')}}
 						| &nbsp;&nbsp;
 						a(
 							href
 							ng-click="makeTokenBased()"
-						) #{translate('turn_on_link_sharing')}
+						) {{translate('turn_on_link_sharing')}}
 						span &nbsp;&nbsp;
 						a(
 							href="/learn/how-to/What_is_Link_Sharing%3F"
@@ -42,12 +42,12 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 				.row.public-access-level(ng-show="isAdmin && project.publicAccesLevel == 'tokenBased'")
 					.col-xs-12.text-center
 						strong
-							| #{translate('link_sharing_is_on')}.
+							| {{translate('link_sharing_is_on')}}.
 							| &nbsp;&nbsp;
 						a(
 							href
 							ng-click="makePrivate()"
-						) #{translate('turn_off_link_sharing')}
+						) {{translate('turn_off_link_sharing')}}
 						span &nbsp;&nbsp;
 						a(
 							href="/learn/how-to/What_is_Link_Sharing%3F"
@@ -59,28 +59,28 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 
 					.col-xs-12.access-token-display-area
 						div.access-token-wrapper
-							strong #{translate('anyone_with_link_can_edit')}
+							strong {{translate('anyone_with_link_can_edit')}}
 							pre.access-token(ng-show="readAndWriteTokenLink") {{ readAndWriteTokenLink }}
-							pre.access-token(ng-hide="readAndWriteTokenLink") #{translate('loading')}…
+							pre.access-token(ng-hide="readAndWriteTokenLink") {{translate('loading')}}…
 						div.access-token-wrapper
-							strong #{translate('anyone_with_link_can_view')}
+							strong {{translate('anyone_with_link_can_view')}}
 							pre.access-token(ng-show="readOnlyTokenLink") {{ readOnlyTokenLink }}
-							pre.access-token(ng-hide="readOnlyTokenLink") #{translate('loading')}…
+							pre.access-token(ng-hide="readOnlyTokenLink") {{translate('loading')}}…
 
 				//- legacy public-access
 				.row.public-access-level(ng-show="isAdmin && (project.publicAccesLevel == 'readAndWrite' || project.publicAccesLevel == 'readOnly')")
 					.col-xs-12.text-center
-						strong(ng-if="project.publicAccesLevel == 'readAndWrite'") #{translate("this_project_is_public")}
-						strong(ng-if="project.publicAccesLevel == 'readOnly'") #{translate("this_project_is_public_read_only")}
+						strong(ng-if="project.publicAccesLevel == 'readAndWrite'") {{translate("this_project_is_public")}}
+						strong(ng-if="project.publicAccesLevel == 'readOnly'") {{translate("this_project_is_public_read_only")}}
 						| &nbsp;&nbsp;
 						a(
 							href
 							ng-click="makePrivate()"
-						) #{translate("make_private")}
+						) {{translate("make_private")}}
 
 				.row.project-member
 					.col-xs-7 {{ project.owner.email }}
-					.text-left.col-xs-3 #{translate("owner")}
+					.text-left.col-xs-3 {{translate("owner")}}
 				form.form-horizontal(
 					ng-if="isAdmin"
 					ng-repeat="member in project.members"
@@ -90,9 +90,9 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 						.col-xs-7.form-control-static {{ member.email }}
 						.col-xs-3
 							select.privileges.form-control.input-sm(name="privileges" ng-model="form.privileges")
-								option(value="owner") #{translate("owner")}
-								option(value="readAndWrite") #{translate("can_edit")}
-								option(value="readOnly") #{translate("read_only")}
+								option(value="owner") {{translate("owner")}}
+								option(value="readAndWrite") {{translate("can_edit")}}
+								option(value="readOnly") {{translate("read_only")}}
 						.col-xs-2.form-control-static.text-center(ng-hide="form.isModified()")
 							a(
 								href
@@ -106,29 +106,29 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 							button.btn.btn-sm.btn-success(
 								type="submit"
 								ng-click="form.submit()"
-							) #{translate("change")}
+							) {{translate("change")}}
 							.text-sm
-								| #{translate("or")}
+								| {{translate("or")}}
 								|
 								button.btn.btn-inline-link(ng-click="form.reset()") #{translate("cancel").toLowerCase()}
 
 				.row.project-member(ng-if="!isAdmin" ng-repeat="member in project.members")
 					.col-xs-7 {{ member.email }}
 					.col-xs-3
-						span(ng-if="member.privileges == 'readAndWrite'") #{translate("can_edit")}
-						span(ng-if="member.privileges == 'readOnly'") #{translate("read_only")}
+						span(ng-if="member.privileges == 'readAndWrite'") {{translate("can_edit")}}
+						span(ng-if="member.privileges == 'readOnly'") {{translate("read_only")}}
 				.row.project-invite(ng-repeat="invite in project.invites")
 					.col-xs-7 {{ invite.email }}&nbsp;
 						div.small
-							| #{translate("invite_not_accepted")}.&nbsp;
+							| {{translate("invite_not_accepted")}}.&nbsp;
 							button.btn.btn-inline-link(
 								ng-show="isAdmin",
 								ng-click="resendInvite(invite, $event)"
-							) #{translate("resend")}
+							) {{translate("resend")}}
 					.col-xs-3.text-left
 						// todo: get invite privileges
-						span(ng-show="invite.privileges == 'readAndWrite'") #{translate("can_edit")}
-						span(ng-show="invite.privileges == 'readOnly'") #{translate("read_only")}
+						span(ng-show="invite.privileges == 'readAndWrite'") {{translate("can_edit")}}
+						span(ng-show="invite.privileges == 'readOnly'") {{translate("read_only")}}
 					.col-xs-2.text-center(ng-if="isAdmin")
 						a(
 							href
@@ -139,7 +139,7 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 							i.fa.fa-times
 				.row.invite-controls(ng-show="isAdmin")
 					form(ng-show="canAddCollaborators")
-						.small #{translate("share_with_your_collabs")}
+						.small {{translate("share_with_your_collabs")}}
 						.form-group
 							tags-input(
 								template="shareTagTemplate"
@@ -164,8 +164,8 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 									ng-model="inputs.privileges"
 									name="privileges"
 								)
-									option(value="readAndWrite") #{translate("can_edit")}
-									option(value="readOnly") #{translate("read_only")}
+									option(value="readAndWrite") {{translate("can_edit")}}
+									option(value="readOnly") {{translate("read_only")}}
 								| &nbsp;&nbsp;
 								//- We have to use mousedown here since click has issues with the
 								//- blur handler in tags-input sometimes changing its height and
@@ -174,15 +174,15 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 									type="submit"
 									ng-mousedown="addMembers()"
 									ng-keyup="$event.keyCode == 13 ? addMembers() : null"
-								) #{translate("share")}
+								) {{translate("share")}}
 					div(ng-hide="canAddCollaborators")
-						p.text-center #{translate("need_to_upgrade_for_more_collabs")}. Also:
+						p.text-center {{translate("need_to_upgrade_for_more_collabs")}}. Also:
 						.row
 							.col-md-8.col-md-offset-2
 								ul.list-unstyled
 									li
 										i.fa.fa-check &nbsp;
-										| #{translate("unlimited_projects")}
+										| {{translate("unlimited_projects")}}
 
 									li
 										i.fa.fa-check &nbsp;
@@ -190,51 +190,51 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 
 									li
 										i.fa.fa-check &nbsp;
-										| #{translate("full_doc_history")}
+										| {{translate("full_doc_history")}}
 
 									li
 										i.fa.fa-check &nbsp;
-										| #{translate("sync_to_dropbox")}
+										| {{translate("sync_to_dropbox")}}
 
 									li
 										i.fa.fa-check &nbsp;
-										| #{translate("sync_to_github")}
+										| {{translate("sync_to_github")}}
 
 									li
 										i.fa.fa-check &nbsp;
-										|#{translate("compile_larger_projects")}
+										|{{translate("compile_larger_projects")}}
 
 						p.text-center.row-spaced-thin(ng-controller="FreeTrialModalController")
 							a.btn.btn-success(
 								href
 								ng-class="buttonClass"
 								ng-click="startFreeTrial('projectMembers')"
-							) #{translate("start_free_trial")}
+							) {{translate("start_free_trial")}}
 
 						p.small(ng-show="startedFreeTrial")
-							| #{translate("refresh_page_after_starting_free_trial")}
+							| {{translate("refresh_page_after_starting_free_trial")}}
 				.row.public-access-level.public-access-level--notice(ng-show="!isAdmin")
-					.col-xs-12.text-center(ng-show="project.publicAccesLevel == 'private'") #{translate("to_add_more_collaborators")}
-					.col-xs-12.text-center(ng-show="project.publicAccesLevel == 'tokenBased'") #{translate("to_change_access_permissions")}
+					.col-xs-12.text-center(ng-show="project.publicAccesLevel == 'private'") {{translate("to_add_more_collaborators")}}
+					.col-xs-12.text-center(ng-show="project.publicAccesLevel == 'tokenBased'") {{translate("to_change_access_permissions")}}
 	.modal-footer.modal-footer-share
 		.modal-footer-left
 			i.fa.fa-refresh.fa-spin(ng-show="state.inflight")
 			span.text-danger.error(ng-show="state.error")
 				span(ng-switch="state.errorReason")
 					span(ng-switch-when="cannot_invite_non_user")
-						| #{translate("cannot_invite_non_user")}
+						| {{translate("cannot_invite_non_user")}}
 					span(ng-switch-when="cannot_verify_user_not_robot")
-						| #{translate("cannot_verify_user_not_robot")}
+						| {{translate("cannot_verify_user_not_robot")}}
 					span(ng-switch-when="cannot_invite_self")
-						| #{translate("cannot_invite_self")}
+						| {{translate("cannot_invite_self")}}
 					span(ng-switch-when="invalid_email")
-						| #{translate("invalid_email")}
+						| {{translate("invalid_email")}}
 					span(ng-switch-default)
-						| #{translate("generic_something_went_wrong")}
+						| {{translate("generic_something_went_wrong")}}
 		.modal-footer-right
 			button.btn.btn-default(
 				ng-click="done()"
-			) #{translate("close")}
+			) {{translate("close")}}
 
 script(type="text/ng-template", id="shareTagTemplate")
 	.tag-template
@@ -267,14 +267,14 @@ script(type="text/ng-template", id="ownershipTransferConfirmTemplate")
 			aria-label="Close"
 		)
 			span(aria-hidden="true") &times;
-		h3 #{translate("change_project_owner")}
+		h3 {{translate("change_project_owner")}}
 	.modal-body
 		p !{translate('project_ownership_transfer_confirmation_1', { user: '<strong>{{ member.email }}</strong>', project: '<strong>{{ project.name }}</strong>' })}
-		p #{translate('project_ownership_transfer_confirmation_2')}
+		p {{translate('project_ownership_transfer_confirmation_2')}}
 	.modal-footer
 		.modal-footer-left
 			i.fa.fa-refresh.fa-spin(ng-show="state.inflight")
-			span.text-danger.error(ng-show="state.error") #{translate("generic_something_went_wrong")}
+			span.text-danger.error(ng-show="state.error") {{translate("generic_something_went_wrong")}}
 		.modal-footer-right
-			button.btn.btn-default(ng-click="cancel()") #{translate("cancel")}
-			button.btn.btn-success(ng-click="confirm()") #{translate("change_owner")}
+			button.btn.btn-default(ng-click="cancel()") {{translate("cancel")}}
+			button.btn.btn-success(ng-click="confirm()") {{translate("change_owner")}}
