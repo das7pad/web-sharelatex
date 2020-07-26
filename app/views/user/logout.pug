@@ -8,7 +8,7 @@ block content
 		.login-register-container
 			.card.login-register-card
 				.login-register-header
-					h1.login-register-header-heading {{translate("log_out")}}
+					h1.login-register-header-heading(ng-cloak) {{translate("log_out")}}
 				form.login-register-form(name="logoutForm", action='/logout', method="POST" ng-init="$scope.inflight=true" auto-submit-form)
 					input(name='_csrf', type='hidden', value=csrfToken)
 					.actions
@@ -16,5 +16,5 @@ block content
 							type='submit',
 							ng-disabled="$scope.inflight"
 						)
-							span(ng-show="!$scope.inflight") {{translate("log_out")}}
+							span(ng-show="!$scope.inflight" ng-cloak) {{translate("log_out")}}
 							span(ng-show="$scope.inflight" ng-cloak) {{translate("logging_out")}}…

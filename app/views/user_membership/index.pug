@@ -4,7 +4,7 @@ block content
 	.content.content-alt
 		.container
 			.row
-				.col-md-10.col-md-offset-1
+				.col-md-10.col-md-offset-1(ng-cloak)
 					meta(id="ol-userMembershipName" content=name)
 					h1 {{getMeta("ol-userMembershipName") || translate("#{translations.title}")}}
 					.card(ng-controller="UserMembershipController")

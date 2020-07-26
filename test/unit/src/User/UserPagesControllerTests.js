@@ -102,10 +102,8 @@ describe('UserPagesController', function() {
       this.req.query.user_first_name = 'user_first_name_here'
 
       this.res.render = (page, opts) => {
-        opts.sharedProjectData.project_name.should.equal('myProject')
-        opts.sharedProjectData.user_first_name.should.equal(
-          'user_first_name_here'
-        )
+        opts.sharedProjectData.projectname.should.equal('myProject')
+        opts.sharedProjectData.username.should.equal('user_first_name_here')
         return done()
       }
       return this.UserPagesController.registerPage(this.req, this.res)

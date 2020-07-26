@@ -11,7 +11,7 @@ block content
 			.row
 				.col-md-8.col-md-offset-2
 					-if (expired)
-						.alert.alert-warning {{translate("email_link_expired")}}
+						.alert.alert-warning(ng-cloak) {{translate("email_link_expired")}}
 
 			.row.row-spaced
 				.col-md-8.col-md-offset-2.text-center(ng-cloak)

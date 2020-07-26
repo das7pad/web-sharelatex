@@ -61,8 +61,8 @@ Please also take a moment to confirm your email address for ${settings.appName}:
 module.exports = PublicRegistrationController = {
   showRegisterPage(req, res, next) {
     const sharedProjectData = {
-      project_name: req.query.project_name,
-      user_first_name: req.query.user_first_name
+      projectname: req.query.project_name,
+      username: req.query.user_first_name
     }
 
     const newTemplateData = {}

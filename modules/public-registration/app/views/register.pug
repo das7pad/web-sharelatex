@@ -4,24 +4,25 @@ block content
 	.content.content-alt
 		.container
 			.row
-				.registration_message
-					if sharedProjectData.user_first_name !== undefined
-						h1  #{translate("user_wants_you_to_see_project", {username:sharedProjectData.user_first_name, projectname:""})}
-							em #{sharedProjectData.project_name}
+				.registration_message(ng-cloak)
+					if sharedProjectData.username !== undefined
+						meta(id="ol-sharedProjectData" data-json content=sharedProjectData)
+						h1 {{translate("user_wants_you_to_see_project", getMeta("ol-sharedProjectData"))}}
 						div
 							| {{translate("join_sl_to_view_project")}}.
 						div
 							| {{translate("if_you_are_registered")}},
 							a(href="/login")  {{translate("login_here")}}
 					else if newTemplateData.templateName !== undefined
-						h1 #{translate("register_to_edit_template", {templateName:newTemplateData.templateName})}
+						meta(id="ol-newTemplateData" data-json content=newTemplateData)
+						h1 {{translate("register_to_edit_template", getMeta("ol-newTemplateData"))}}
 
 						div {{translate("already_have_sl_account")}}
 							a(href="/login")  {{translate("login_here")}}
 
 			.row
 				.col-md-6.col-md-offset-3.col-lg-4.col-lg-offset-4
-					.card
+					.card(ng-cloak)
 						.page-header
 							h1 {{translate("register")}}
 						form(async-form="register", name="registerForm", action="/register", method="POST", captcha, ng-cloak)

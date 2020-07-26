@@ -12,7 +12,7 @@ block content
 			.row
 				.col-md-6.col-md-offset-3
 					.card
-						p.text-center {{translate('processing_your_request')}}
+						p.text-center(ng-cloak) {{translate('processing_your_request')}}
 
 	form(
 		ng-controller="PostGatewayController",

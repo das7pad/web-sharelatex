@@ -7,12 +7,11 @@ block content
 				.col-md-8.col-md-offset-2
 					.card.project-invite-accept
 						.page-header.text-centered
-							h1 #{translate("user_wants_you_to_see_project", {username:owner.first_name, projectname:""})}
-								br
-								em(ng-non-bindable) #{project.name}
+							meta(id="ol-projectInviteContext" data-json content={username: owner.first_name, projectname: project.name})
+							h1(ng-cloak) {{translate("user_wants_you_to_see_project", getMeta("ol-projectInviteContext"))}}
 						.row.text-center
 							.col-md-12
-								p
+								p(ng-cloak)
 									| {{translate("accepting_invite_as")}}&nbsp;
 									em(ng-non-bindable) #{currentUsersEmail}
 						.row
@@ -25,6 +24,6 @@ block content
 									input(name='_csrf', type='hidden', value=csrfToken)
 									input(name='token', type='hidden', value=invite.token)
 									.form-group.text-center
-										button.btn.btn-lg.btn-primary(type="submit")
+										button.btn.btn-lg.btn-primary(type="submit" ng-cloak)
 											| {{translate("join_project")}}
 									.form-group.text-center

@@ -7,18 +7,18 @@ block content
 				.col-md-10.col-md-offset-1.col-lg-8.col-lg-offset-2
 					.card
 						.page-header.text-centered
-							h1 
+							h1(ng-cloak)
 								| {{translate("sharelatex_beta_program")}}
 						.beta-opt-in
 							.container-fluid
 								.row
-									.col-md-12
+									.col-md-12(ng-cloak)
 										p.text-centered {{translate("beta_program_benefits")}}
 										p.text-centered
 											| {{translate("beta_program_badge_description")}}
 											span.beta-feature-badge
 								.row.text-centered
-									.col-md-12
+									.col-md-12(ng-cloak)
 										if user.betaProgram
 											p {{translate("beta_program_already_participating")}}
 											form(id="beta-program-opt-out", method="post", action="/beta/opt-out", novalidate)

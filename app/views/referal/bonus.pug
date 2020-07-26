@@ -6,7 +6,7 @@ block content
 			.row
 				.col-md-8.col-md-offset-2
 					.card
-						.container-fluid(ng-controller="BonusLinksController")
+						.container-fluid(ng-controller="BonusLinksController" ng-cloak)
 							.row
 								.col-md-12
 									.page-header
@@ -52,7 +52,8 @@ block content
 
 							.row.ab-bonus
 								.col-md-10.col-md-offset-1.bonus-banner
-									p.thanks {{translate("sl_gives_you_free_stuff_see_progress_below")}}
+									p.thanks
+										span(ng-bind-html="translate('sl_gives_you_free_stuff_see_progress_below')")
 							.row.ab-bonus
 								.col-md-10.col-md-offset-1.bonus-banner(style="position: relative; height: 30px; margin-top: 20px;")
 									- for (var i = 0; i <= 10; i++) {
@@ -82,12 +83,14 @@ block content
 									- if (refered_user_count == 0)
 										p.thanks {{translate("you_not_introed_anyone_to_sl")}}
 									- else if (refered_user_count == 1)
-										p.thanks !{translate("you_introed_small_number", {numberOfPeople:"<strong>" + refered_user_count + "</strong>"})}
+										p.thanks
+											span(ng-bind-html="translate('you_introed_small_number', {numberOfPeople: '<b>1</b>'})")
 									- else
-										p.thanks !{translate("you_introed_high_number", {numberOfPeople:"<strong>" + refered_user_count + "</strong>"})}
+										p.thanks
+											span(ng-bind-html="translate('you_introed_high_number', {numberOfPeople: '<b>" + refered_user_count + "</b>'})")
 
 						script(type="text/ng-template", id="BonusLinkToUsModal")
-							.modal-header
+							.modal-header(ng-cloak)
 								button.close(
 									type="button"
 									data-dismiss="modal"
@@ -96,7 +99,7 @@ block content
 								)
 									span(aria-hidden="true") &times;
 								h3 {{translate("link_to_sl")}}
-							.modal-body.modal-body-share.link-modal
+							.modal-body.modal-body-share.link-modal(ng-cloak)
 
 								p {{translate("can_link_to_sl_with_html")}}
 								p
