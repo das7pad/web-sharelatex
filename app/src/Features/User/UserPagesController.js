@@ -201,7 +201,7 @@ const UserPagesController = {
       for (const provider in providers) {
         const data = providers[provider]
         data.description = req.i18n.translate(
-          data.descriptionKey,
+          String(data.descriptionKey),
           Object.assign({}, data.descriptionOptions)
         )
         result[provider] = data
