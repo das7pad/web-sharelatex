@@ -53,8 +53,8 @@
 			)
 				i.fa.fa-circle
 			span(ng-click="toggleFullTCStateCollapse();")
-				span(ng-if="editor.wantTrackChanges === false") {{translate("track_changes_is_off")}}
-				span(ng-if="editor.wantTrackChanges === true") {{translate("track_changes_is_on")}}
+				span(ng-if="editor.wantTrackChanges === false" ng-bind-html="translate('track_changes_is_off')")
+				span(ng-if="editor.wantTrackChanges === true" ng-bind-html="translate('track_changes_is_on')")
 				span.rp-tc-state-collapse(
 					ng-class="{ 'rp-tc-state-collapse-on': reviewPanel.fullTCStateCollapsed }"
 				)
