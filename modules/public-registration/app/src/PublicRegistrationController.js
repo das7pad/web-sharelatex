@@ -61,7 +61,7 @@ Please also take a moment to confirm your email address for ${settings.appName}:
 module.exports = PublicRegistrationController = {
   showRegisterPage(req, res, next) {
     const sharedProjectData = {
-      projectname: req.query.project_name,
+      projectname: req.query.project_name || ' ',
       username: req.query.user_first_name
     }
 

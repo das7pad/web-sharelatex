@@ -8,7 +8,7 @@ const AuthenticationController = require('../Authentication/AuthenticationContro
 const UserPagesController = {
   registerPage(req, res) {
     const sharedProjectData = {
-      projectname: req.query.project_name,
+      projectname: req.query.project_name || ' ',
       username: req.query.user_first_name
     }
 
