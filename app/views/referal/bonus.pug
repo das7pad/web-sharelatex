@@ -101,12 +101,14 @@ block content
 								h3 {{translate("link_to_sl")}}
 							.modal-body.modal-body-share.link-modal(ng-cloak)
 
-								p {{translate("can_link_to_sl_with_html")}}
+								p
+									span {{translate("can_link_to_sl_with_html")}}
 								p
 									textarea.col-md-12(readonly=true)
 										<a href="#{buildReferalUrl("d")}">{{translate("bonus_share_link_text")}}</a>
 
-								p {{translate("thanks")}}!
+								p
+									span {{translate("thanks")}}!
 
 
 							.modal-footer()

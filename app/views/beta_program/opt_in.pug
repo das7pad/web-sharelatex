@@ -20,7 +20,8 @@ block content
 								.row.text-centered
 									.col-md-12(ng-cloak)
 										if user.betaProgram
-											p {{translate("beta_program_already_participating")}}
+											p
+												span {{translate("beta_program_already_participating")}}
 											form(id="beta-program-opt-out", method="post", action="/beta/opt-out", novalidate)
 												.form-group
 													input(type="hidden", name="_csrf", value=csrfToken)

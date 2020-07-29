@@ -13,6 +13,7 @@ import _ from 'lodash'
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import t from '../../../misc/t'
 
 export default App.directive('resolvedCommentsDropdown', () => ({
   restrict: 'E',
@@ -30,6 +31,7 @@ export default App.directive('resolvedCommentsDropdown', () => ({
   },
 
   link(scope, element, attrs) {
+    scope.translate = t
     let filterResolvedComments
     scope.state = { isOpen: false }
 

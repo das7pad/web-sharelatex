@@ -17,7 +17,8 @@ block content
 						meta(id="ol-newTemplateData" data-json content=newTemplateData)
 						h1 {{translate("register_to_edit_template", getMeta("ol-newTemplateData"))}}
 
-						div {{translate("already_have_sl_account")}}
+						div
+							span {{translate("already_have_sl_account")}}
 							a(href="/login")  {{translate("login_here")}}
 
 			.row

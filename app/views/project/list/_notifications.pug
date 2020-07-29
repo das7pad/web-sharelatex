@@ -107,7 +107,8 @@ include ../../_mixins/saml
 					)
 					.notification-body
 						p  {{translate("can_link_institution_email_acct_to_institution_acct", notification)}}
-						div {{translate("doing_this_allow_log_in_through_institution")}}
+						div
+							span {{translate("doing_this_allow_log_in_through_institution")}}
 					.notification-action
 						a.btn.btn-sm.btn-info(href="{{samlInitPath}}?university_id={{notification.institutionId}}&auto=/project&email={{notification.email}}")
 							| {{translate('link_account')}}
@@ -116,7 +117,8 @@ include ../../_mixins/saml
 					ng-switch-when="notification_institution_sso_linked"
 				)
 					.notification-body
-						div {{translate("account_has_been_link_to_institution_account", notification)}}
+						div
+							span {{translate("account_has_been_link_to_institution_account", notification)}}
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;

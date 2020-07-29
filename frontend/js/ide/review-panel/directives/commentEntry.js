@@ -10,6 +10,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import t from '../../../misc/t'
 
 export default App.directive('commentEntry', $timeout => ({
   restrict: 'E',
@@ -26,6 +27,7 @@ export default App.directive('commentEntry', $timeout => ({
     onBodyClick: '&'
   },
   link(scope, element, attrs) {
+    scope.translate = t
     scope.state = { animating: false }
 
     element.on('click', function(e) {

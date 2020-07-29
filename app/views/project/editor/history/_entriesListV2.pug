@@ -61,7 +61,8 @@ script(type="text/ng-template", id="historyEntriesListTpl")
 				ng-if="$ctrl.freeHistoryLimitHit && $ctrl.currentUserIsOwner"
 				ng-controller="FreeTrialModalController"
 			)
-				p {{translate("currently_seeing_only_24_hrs_history")}}
+				p
+					span {{translate("currently_seeing_only_24_hrs_history")}}
 				p: strong {{translate("upgrade_to_get_feature", {feature: "full Project History"})}}
 				ul.list-unstyled
 					li 
@@ -97,8 +98,9 @@ script(type="text/ng-template", id="historyEntriesListTpl")
 			.history-entries-list-upgrade-prompt(
 				ng-if="$ctrl.freeHistoryLimitHit && !$ctrl.currentUserIsOwner"
 			) 
-				p {{translate("currently_seeing_only_24_hrs_history")}}
-				strong {{translate("ask_proj_owner_to_upgrade_for_full_history")}}
+				p
+					span {{translate("currently_seeing_only_24_hrs_history")}}
+					span(ng-bind-hmtl="translate('ask_proj_owner_to_upgrade_for_full_history').bold()")
 
 script(type="text/ng-template", id="historyEntryTpl")
 	time.history-entry-day(ng-if="::$ctrl.entry.meta.first_in_day") {{ ::$ctrl.entry.meta.end_ts | relativeDate }}

@@ -11,6 +11,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import t from '../../../misc/t'
 
 export default App.directive('reviewPanelToggle', () => ({
   restrict: 'E',
@@ -23,6 +24,7 @@ export default App.directive('reviewPanelToggle', () => ({
     description: '@'
   },
   link(scope) {
+    scope.translate = t
     if (scope.disabled == null) {
       scope.disabled = false
     }

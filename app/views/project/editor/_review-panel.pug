@@ -274,14 +274,14 @@ script(type='text/ng-template', id='changeEntryTemplate')
 								href
 								ng-if="needsCollapsing"
 								ng-click="toggleCollapse();"
-							) {{ isCollapsed ? '… ({{translate("show_all")}})' : ' ({{translate("show_less")}})' }}
+							) {{ isCollapsed ? ('… (' + translate("show_all") + ')') : (' (' + translate("show_less") + ')') }}
 						span(ng-switch-when="delete") {{translate("tracked_change_deleted")}}&nbsp;
 							del.rp-content-highlight {{ entry.content | limitTo:(isCollapsed ? contentLimit : entry.content.length) }}
 							a.rp-collapse-toggle(
 								href
 								ng-if="needsCollapsing"
 								ng-click="toggleCollapse();"
-							) {{ isCollapsed ? '… ({{translate("show_all")}})' : ' ({{translate("show_less")}})' }}
+							) {{ isCollapsed ? ('… (' translate("show_all") + ')') : (' (' + translate("show_less") ')') }}
 					.rp-entry-metadata
 						| {{ entry.metadata.ts | date : 'MMM d, y h:mm a' }}&nbsp;&bull;&nbsp;
 						span.rp-entry-user(style="color: hsl({{ user.hue }}, 70%, 40%);") {{ user.name }}
@@ -351,7 +351,7 @@ script(type='text/ng-template', id='commentEntryTemplate')
 		)
 
 			.rp-loading(ng-if="!threads[entry.thread_id].submitting && (!threads[entry.thread_id] || threads[entry.thread_id].messages.length == 0)")
-				| {{translate("no_comments")}}
+				span {{translate('no_comments')}}
 			.rp-comment-loaded
 				.rp-comment(
 					ng-repeat="comment in threads[entry.thread_id].messages track by comment.id"
@@ -378,13 +378,16 @@ script(type='text/ng-template', id='commentEntryTemplate')
 							a(href, ng-click="startEditing(comment)") {{translate("edit")}}
 							span(ng-if="threads[entry.thread_id].messages.length > 1")
 								| &nbsp;&bull;&nbsp;
-								a(href, ng-click="confirmDelete(comment)") {{translate("delete")}}
+								a(href, ng-click="confirmDelete(comment)")
+									span {{translate("delete")}}
 						span.rp-confim-delete(ng-if="comment.user.isSelf && comment.deleting")
-							| {{translate("are_you_sure")}}
+							span {{translate("are_you_sure")}}
 							| &bull;&nbsp;
-							a(href, ng-click="doDelete(comment)") {{translate("delete")}}
+							a(href, ng-click="doDelete(comment)")
+								span {{translate("delete")}}
 							| &nbsp;&bull;&nbsp;
-							a(href, ng-click="cancelDelete(comment)") {{translate("cancel")}}
+							a(href, ng-click="cancelDelete(comment)")
+								span {{translate("cancel")}}
 
 			.rp-loading(ng-if="threads[entry.thread_id].submitting")
 				i.fa.fa-spinner.fa-spin
@@ -423,7 +426,7 @@ script(type='text/ng-template', id='resolvedCommentEntryTemplate')
 						href
 						ng-if="needsCollapsing"
 						ng-click="toggleCollapse();"
-					) &nbsp;{{ isCollapsed ? '… ({{translate("show_all")}})' : ' ({{translate("show_less")}})' }}
+					) &nbsp;{{ isCollapsed ? ('… (' + translate("show_all") + ')') : (' (' + translate("show_less") + ')') }}
 			.rp-comment(
 				ng-repeat="comment in thread.messages track by comment.id"
 			)
@@ -449,12 +452,14 @@ script(type='text/ng-template', id='resolvedCommentEntryTemplate')
 				href
 				ng-click="onUnresolve({ 'threadId': thread.threadId });"
 			)
-				| &nbsp;{{translate("reopen")}}
+				| &nbsp;
+				span {{translate("reopen")}}
 			a.rp-entry-button(
 				href
 				ng-click="onDelete({ 'entryId': thread.entryId, 'docId': thread.docId, 'threadId': thread.threadId });"
 			)
-				| &nbsp;{{translate("delete")}}
+				| &nbsp;
+				span {{translate("delete")}}
 
 
 script(type='text/ng-template', id='addCommentEntryTemplate')

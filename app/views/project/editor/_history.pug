@@ -20,7 +20,8 @@ script(type="text/ng-template", id="historyRestoreDiffModalTemplate")
 			span(aria-hidden="true") &times;
 		h3 {{translate("restore")}} {{diff.doc.name}}
 	.modal-body.modal-body-share
-		p {{translate("sure_you_want_to_restore_before", {filename: String(diff.doc.name).bold(), date: (diff.start_ts | formatDate)})}}
+		p
+			span {{translate("sure_you_want_to_restore_before", {filename: String(diff.doc.name).bold(), date: (diff.start_ts | formatDate)})}}
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()",

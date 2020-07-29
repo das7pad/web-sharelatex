@@ -253,14 +253,16 @@ div.full-size.pdf(ng-controller="PdfController")
 
 			.alert.alert-danger(ng-show="pdf.validation.sizeCheck")
 				strong {{translate("project_too_large")}} 
-				div {{translate("project_too_large_please_reduce")}}
+				div
+					span {{translate("project_too_large_please_reduce")}}
 				div
 					li(ng-repeat="entry in pdf.validation.sizeCheck.resources") {{ '/'+entry['path'] }} - {{entry['kbSize']}}kb
 	
 			.alert.alert-danger(ng-show="pdf.validation.conflictedPaths")
 				div
 					strong {{translate("conflicting_paths_found")}}
-				div {{translate("following_paths_conflict")}}
+				div
+					span {{translate("following_paths_conflict")}}
 				div
 					li(ng-repeat="entry in pdf.validation.conflictedPaths") {{ '/'+entry['path'] }}
 
@@ -316,8 +318,10 @@ div.full-size.pdf(ng-controller="PdfController")
 						strong {{translate("upgrade_for_longer_compiles")}}
 					p(ng-if="project.owner._id != user.id")
 						strong {{translate("ask_proj_owner_to_upgrade_for_longer_compiles")}}
-					p {{translate("free_accounts_have_timeout_upgrade_to_increase")}}
-					p {{translate("plus_upgraded_accounts_receive")}}:
+					p
+						span {{translate("free_accounts_have_timeout_upgrade_to_increase")}}
+					p
+						span {{translate("plus_upgraded_accounts_receive")}}:
 					div
 						ul.list-unstyled
 							li
@@ -359,8 +363,10 @@ script(type='text/ng-template', id='clearCacheModalTemplate')
 	.modal-header
 		h3 {{translate("clear_cache")}}?
 	.modal-body
-		p {{translate("clear_cache_explanation")}}
-		p {{translate("clear_cache_is_safe")}}
+		p
+			span {{translate("clear_cache_explanation")}}
+		p
+			span {{translate("clear_cache_is_safe")}}
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()"

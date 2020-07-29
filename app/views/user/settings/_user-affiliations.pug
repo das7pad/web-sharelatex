@@ -47,7 +47,8 @@ form.row(
 							span.label.label-primary {{translate("professional")}}
 					td
 						div(ng-if="userEmail.affiliation.institution")
-							div {{ userEmail.affiliation.institution.name }}
+							div
+								span {{ userEmail.affiliation.institution.name }}
 							span.small
 								a(
 									href
@@ -158,8 +159,10 @@ form.row(
 						ng-if="newAffiliation.ssoAvailable"
 					)
 						p.affiliations-table-label {{ newAffiliation.university.name }}
-						p {{translate("to_add_email_accounts_need_to_be_linked", {institutionName: newAffiliation.university.name})}}
-						p {{translate("doing_this_will_verify_affiliation_and_allow_log_in", {institutionName: newAffiliation.university.name})}}&nbsp;
+						p
+							span {{translate("to_add_email_accounts_need_to_be_linked", {institutionName: newAffiliation.university.name})}}
+						p
+							span {{translate("doing_this_will_verify_affiliation_and_allow_log_in", {institutionName: newAffiliation.university.name})}}&nbsp;
 							+aboutInstitutionLink()
 						button.btn-sm.btn.btn-primary.btn-link-accounts(
 							ng-click="linkInstitutionAcct(newAffiliation.email, newAffiliation.university.id)"

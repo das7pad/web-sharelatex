@@ -9,6 +9,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import t from '../../../misc/t'
 
 export default App.directive('bulkActionsEntry', () => ({
   restrict: 'E',
@@ -19,6 +20,7 @@ export default App.directive('bulkActionsEntry', () => ({
     nEntries: '='
   },
   link(scope, element, attrs) {
+    scope.translate = t
     scope.bulkAccept = () => scope.onBulkAccept()
     return (scope.bulkReject = () => scope.onBulkReject())
   }

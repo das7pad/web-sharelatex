@@ -8,6 +8,7 @@
  */
 import App from '../base'
 import qq from '../vendor/libs/fineuploader'
+import t from '../misc/t'
 
 export default App.directive('fineUpload', $timeout => ({
   scope: {
@@ -27,6 +28,7 @@ export default App.directive('fineUpload', $timeout => ({
     control: '='
   },
   link(scope, element, attrs) {
+    scope.translate = t
     let autoUpload, validation
     const multiple = scope.multiple || false
     const { endpoint } = scope

@@ -211,7 +211,8 @@ script(type="text/template", id="qq-file-uploader-template")
 		div(qq-hide-dropzone="").qq-upload-drop-area-selector.qq-upload-drop-area
 			span.qq-upload-drop-area-text-selector {{translate('drop_files_here_to_upload')}}
 		div Drag here
-		div.row-spaced-small.small {{translate('or')}}
+		div.row-spaced-small.small
+			span {{translate('or')}}
 		div.row-spaced-small
 			div.qq-upload-button-selector.btn.btn-primary
 				| Select from your computer

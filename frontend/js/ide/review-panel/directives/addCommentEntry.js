@@ -1,4 +1,5 @@
 import App from '../../../base'
+import t from '../../../misc/t'
 let content = ''
 App.directive('addCommentEntry', () => ({
   restrict: 'E',
@@ -9,6 +10,7 @@ App.directive('addCommentEntry', () => ({
     onCancel: '&'
   },
   link(scope, element, attrs) {
+    scope.translate = t
     scope.state = {
       isAdding: false,
       content: content
