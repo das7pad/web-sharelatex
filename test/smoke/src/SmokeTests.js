@@ -36,6 +36,18 @@ class InsecureCookieJar extends requestModule.jar().constructor {
   }
 }
 
+const CSRF_REGEX = /<meta id="ol-csrfToken" content="(.+?)">/
+function _parseCsrf(body) {
+  if (typeof body !== 'string') {
+    throw new Error('Body is not of type string.')
+  }
+  const match = CSRF_REGEX.exec(body)
+  if (!match) {
+    throw new Error('No meta element for csrfToken found.')
+  }
+  return match[1]
+}
+
 module.exports = runSmokeTest
 module.exports.Failure = Failure
 async function runSmokeTest(stats) {
@@ -99,12 +111,12 @@ async function runSmokeTest(stats) {
     lastStep = step
   })
 
-  const _csrf = await request({ url: 'dev/csrf' })
+  const _csrf = await request({ url: 'login' })
     .then(response => {
       if (response.statusCode !== 200) {
         throw new Error(`unexpected response code: ${response.statusCode}`)
       }
-      return response.body
+      return _parseCsrf(response.body)
     })
     .finally(() => {
       step = Date.now()
