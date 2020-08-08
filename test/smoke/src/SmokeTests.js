@@ -111,31 +111,43 @@ async function runSmokeTest(stats) {
     lastStep = step
   })
 
-  const _csrf = await request({ url: 'login' })
-    .then(response => {
-      if (response.statusCode !== 200) {
-        throw new Error(`unexpected response code: ${response.statusCode}`)
-      }
-      return _parseCsrf(response.body)
-    })
-    .finally(() => {
-      step = Date.now()
-      steps.push({ getCsrfToken: step - lastStep })
-      lastStep = step
-    })
-    .catch(err => {
-      throw new Failure('error fetching csrf token', stats).withCause(err)
-    })
-
-  async function cleanup() {
-    return request({ method: 'POST', url: 'logout', json: { _csrf } })
+  async function getCsrfTokenFor(endpoint) {
+    return request({ url: endpoint })
+      .then(response => {
+        if (response.statusCode !== 200) {
+          throw new Error(`unexpected response code: ${response.statusCode}`)
+        }
+        return _parseCsrf(response.body)
+      })
+      .finally(() => {
+        step = Date.now()
+        const logEntry = {}
+        logEntry['getCsrfTokenFor/' + endpoint] = step - lastStep
+        steps.push(logEntry)
+        lastStep = step
+      })
+      .catch(err => {
+        throw new Failure('error fetching csrf token', stats).withCause(err)
+      })
   }
 
+  async function cleanup() {
+    const logoutCsrfToken = await getCsrfTokenFor('logout')
+    return request({
+      method: 'POST',
+      url: 'logout',
+      json: {
+        _csrf: logoutCsrfToken
+      }
+    })
+  }
+
+  const loginCsrfToken = await getCsrfTokenFor('login')
   await request({
     method: 'POST',
     url: 'login',
     json: {
-      _csrf,
+      _csrf: loginCsrfToken,
       email: Settings.smokeTest.user,
       password: Settings.smokeTest.password
     }
