@@ -75,41 +75,43 @@ async function runSmokeTest(stats) {
   steps.push({ init: step - lastStep })
   lastStep = step
 
-  let timeoutCleanupRateLimits
-  await Promise.race([
-    new Promise((resolve, reject) => {
-      timeoutCleanupRateLimits = setTimeout(
-        reject,
-        4000,
-        new Failure('cleanupRateLimits timed out', stats)
-      )
-    }),
-    Promise.all([
-      LoginRateLimiter.promises
-        .recordSuccessfulLogin(Settings.smokeTest.user)
-        .catch(err => {
-          throw new Failure(
-            'error clearing login failure rate limit',
-            stats
-          ).withCause(err)
-        }),
-      RateLimiter.promises
-        .clearRateLimit(
-          'open-project',
-          `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`
+  async function cleanupRateLimits() {
+    let timeoutCleanupRateLimits
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        timeoutCleanupRateLimits = setTimeout(
+          reject,
+          4000,
+          new Failure('cleanupRateLimits timed out', stats)
         )
-        .catch(err => {
-          throw new Failure(
-            'error clearing open-project rate limit',
-            stats
-          ).withCause(err)
-        })
-    ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
-  ]).finally(() => {
-    step = Date.now()
-    steps.push({ cleanupRateLimits: step - lastStep })
-    lastStep = step
-  })
+      }),
+      Promise.all([
+        LoginRateLimiter.promises
+          .recordSuccessfulLogin(Settings.smokeTest.user)
+          .catch(err => {
+            throw new Failure(
+              'error clearing login failure rate limit',
+              stats
+            ).withCause(err)
+          }),
+        RateLimiter.promises
+          .clearRateLimit(
+            'open-project',
+            `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`
+          )
+          .catch(err => {
+            throw new Failure(
+              'error clearing open-project rate limit',
+              stats
+            ).withCause(err)
+          })
+      ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
+    ]).finally(() => {
+      step = Date.now()
+      steps.push({ cleanupRateLimits: step - lastStep })
+      lastStep = step
+    })
+  }
 
   async function getCsrfTokenFor(endpoint) {
     return request({ url: endpoint })
@@ -143,6 +145,7 @@ async function runSmokeTest(stats) {
   }
 
   const loginCsrfToken = await getCsrfTokenFor('login')
+  await cleanupRateLimits()
   await request({
     method: 'POST',
     url: 'login',
