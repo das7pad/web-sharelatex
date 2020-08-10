@@ -1,15 +1,6 @@
 import getMeta from './meta'
 
-const base = getMeta(
-  'ol-staticPath',
-  document.currentScript.src.split('/').reduceRight((url, component) => {
-    if (component !== 'js' && !url) return ''
-    if (component === 'js' && !url) return '/'
-    // start concatenating as soon as we passed the 'js/' component
-    if (url === '/') return component + '/'
-    return component + '/' + url
-  }, '')
-).replace(/\/$/, '')
+const base = getMeta('ol-staticPath', '').replace(/\/$/, '')
 
 export default function staticPath(path) {
   return base + path

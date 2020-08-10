@@ -22,6 +22,20 @@ chai.Assertion.addMethod('equalPos', function(expectedPos) {
   )
 })
 
+function insertMeta(id, content, type) {
+  const meta = document.createElement('meta')
+  meta.id = id
+  meta.content = content
+  if (typeof content === 'boolean') {
+    meta.setAttribute('data-boolean', true)
+  }
+  if (typeof content === 'object') {
+    meta.setAttribute('data-json', true)
+  }
+  document.body.appendChild(meta)
+}
+insertMeta('ol-staticPath', '/base/public')
+
 /*
  * Bundle all test files together into a single bundle, and run tests against
  * this single bundle.
