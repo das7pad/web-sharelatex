@@ -74,7 +74,7 @@
     "requestretry": "^1.13.0",
     "rolling-rate-limiter": "^0.1.11",
     "settings-sharelatex": "https://github.com/das7pad/settings-sharelatex/archive/d0797834438df2d102798a64602adf2f71ac8e48.tar.gz",
-    "translations-sharelatex": "https://github.com/das7pad/translations-sharelatex/archive/4e465fadcaf86643a128a8df08d6117ba991c83f.tar.gz",
+    "translations-sharelatex": "https://github.com/das7pad/translations-sharelatex/archive/6d4a5c2b5e23a82ae49fdbe1614bcf6e16ff710c.tar.gz",
     "underscore": "1.6.0",
     "url-parse": "^1.4.7",
     "utf-8-validate": "^5.0.2",
