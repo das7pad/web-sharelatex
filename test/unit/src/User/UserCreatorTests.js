@@ -24,7 +24,7 @@ describe('UserCreator', function() {
         'logger-sharelatex': {
           error: sinon.stub()
         },
-        'metrics-sharelatex': { timeAsyncMethod() {} },
+        '@overleaf/metrics': { timeAsyncMethod() {} },
         '../../infrastructure/Features': (this.Features = {
           hasFeature: sinon.stub().returns(false)
         }),

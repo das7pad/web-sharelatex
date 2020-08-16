@@ -13,7 +13,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const metrics = require('metrics-sharelatex')
+const metrics = require('@overleaf/metrics')
 const { db, ObjectId } = require('../../infrastructure/mongojs')
 const async = require('async')
 const { promisifyAll } = require('../../util/promises')

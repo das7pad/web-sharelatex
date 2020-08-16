@@ -32,7 +32,7 @@ describe('EditorRealTimeController', function() {
         },
         '../../infrastructure/Server': { io: (this.io = {}) },
         'settings-sharelatex': { redis: {} },
-        'metrics-sharelatex': this.Metrics,
+        '@overleaf/metrics': this.Metrics,
         crypto: (this.crypto = {
           randomBytes: sinon
             .stub()

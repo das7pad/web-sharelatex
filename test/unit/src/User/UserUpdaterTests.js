@@ -40,7 +40,7 @@ describe('UserUpdater', function() {
       requires: {
         'logger-sharelatex': this.logger,
         '../../infrastructure/mongojs': this.mongojs,
-        'metrics-sharelatex': { timeAsyncMethod: sinon.stub() },
+        '@overleaf/metrics': { timeAsyncMethod: sinon.stub() },
         './UserGetter': this.UserGetter,
         '../Institutions/InstitutionsAPI': {
           addAffiliation: this.addAffiliation,

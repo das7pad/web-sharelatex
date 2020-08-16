@@ -14,7 +14,7 @@
  */
 const logger = require('logger-sharelatex')
 const async = require('async')
-const metrics = require('metrics-sharelatex')
+const metrics = require('@overleaf/metrics')
 const Settings = require('settings-sharelatex')
 const { ObjectId } = require('mongoose').Types
 const { Project } = require('../../models/Project')

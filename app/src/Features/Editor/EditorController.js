@@ -14,7 +14,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const logger = require('logger-sharelatex')
-const Metrics = require('metrics-sharelatex')
+const Metrics = require('@overleaf/metrics')
 const ProjectEntityUpdateHandler = require('../Project/ProjectEntityUpdateHandler')
 const ProjectOptionsHandler = require('../Project/ProjectOptionsHandler')
 const ProjectDetailsHandler = require('../Project/ProjectDetailsHandler')

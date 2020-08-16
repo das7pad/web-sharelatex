@@ -12,7 +12,7 @@
  */
 let ProjectAdminController
 const logger = require('logger-sharelatex')
-const metrics = require('metrics-sharelatex')
+const metrics = require('@overleaf/metrics')
 const _ = require('underscore')
 const Path = require('path')
 const UserGetter = require('../../../../app/src/Features/User/UserGetter')

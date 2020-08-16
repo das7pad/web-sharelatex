@@ -1,6 +1,6 @@
 const { callbackify } = require('util')
 const logger = require('logger-sharelatex')
-const metrics = require('metrics-sharelatex')
+const metrics = require('@overleaf/metrics')
 const Settings = require('settings-sharelatex')
 const OError = require('@overleaf/o-error')
 const RateLimiter = require('../../infrastructure/RateLimiter')

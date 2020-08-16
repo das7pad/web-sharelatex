@@ -47,7 +47,7 @@ describe('EmailSender', function() {
           warn() {},
           err() {}
         },
-        'metrics-sharelatex': { inc() {} }
+        '@overleaf/metrics': { inc() {} }
       }
     })
 

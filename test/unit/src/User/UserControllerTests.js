@@ -102,7 +102,7 @@ describe('UserController', function() {
           err() {},
           error() {}
         },
-        'metrics-sharelatex': { inc() {} },
+        '@overleaf/metrics': { inc() {} },
         '../Errors/Errors': Errors,
         '@overleaf/o-error': OError,
         '@overleaf/o-error/http': HttpErrors,

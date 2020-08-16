@@ -164,7 +164,7 @@ describe('ProjectController', function() {
           log() {},
           err() {}
         },
-        'metrics-sharelatex': this.Metrics,
+        '@overleaf/metrics': this.Metrics,
         '@overleaf/o-error/http': HttpErrors,
         './ProjectDeleter': this.ProjectDeleter,
         './ProjectDuplicator': this.ProjectDuplicator,

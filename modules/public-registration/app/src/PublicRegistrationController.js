@@ -16,7 +16,7 @@ let PublicRegistrationController
 const Path = require('path')
 const Url = require('url')
 const logger = require('logger-sharelatex')
-const metrics = require('metrics-sharelatex')
+const metrics = require('@overleaf/metrics')
 const ReferalAllocator = require('../../../../app/src/Features/Referal/ReferalAllocator')
 const UserRegistrationHandler = require('../../../../app/src/Features/User/UserRegistrationHandler')
 const UserEmailsConfirmationHandler = require('../../../../app/src/Features/User/UserEmailsConfirmationHandler')

@@ -58,7 +58,7 @@ describe('SubscriptionAdminController', function() {
           })())
         },
         '../../../../app/src/Features/Errors/ErrorController': (this.ErrorController = {}),
-        'metrics-sharelatex': {
+        '@overleaf/metrics': {
           gauge() {}
         }
       }

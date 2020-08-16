@@ -43,7 +43,7 @@ describe('LaunchpadController', function() {
           err() {},
           error() {}
         }),
-        'metrics-sharelatex': (this.Metrics = {}),
+        '@overleaf/metrics': (this.Metrics = {}),
         '../../../../app/src/Features/User/UserRegistrationHandler': (this.UserRegistrationHandler = {}),
         '../../../../app/src/Features/Email/EmailHandler': (this.EmailHandler = {}),
         '../../../../app/src/Features/User/UserGetter': (this.UserGetter = {}),

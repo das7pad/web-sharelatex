@@ -34,6 +34,7 @@
     "firefox esr"
   ],
   "dependencies": {
+    "@overleaf/metrics": "https://github.com/das7pad/metrics-sharelatex/archive/314238a72d2d91d3b912f4deab4a8be97a99552f.tar.gz",
     "@overleaf/o-error": "^2.1.0",
     "archiver": "4.0.1",
     "async": "0.6.2",
@@ -54,9 +55,8 @@
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
-    "logger-sharelatex": "https://github.com/das7pad/logger-sharelatex/archive/9517d83da189fd80f8a70d4f90619c0a08ff5b12.tar.gz",
+    "logger-sharelatex": "https://github.com/das7pad/logger-sharelatex/archive/16a8d66c59318ca4b3c236136fd9603ee2edb4f0.tar.gz",
     "marked": "^0.7.0",
-    "metrics-sharelatex": "https://github.com/das7pad/metrics-sharelatex/archive/471b0a35d8125818393738cb95702367add6d203.tar.gz",
     "mmmagic": "^0.5.3",
     "moment": "^2.24.0",
     "mongojs": "https://github.com/das7pad/mongojs/archive/e39e97bf289435e2d111c6201d3306b6b776d31e.tar.gz",
@@ -68,7 +68,7 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pug-runtime": "^2.0.4",
-    "redis-sharelatex": "https://github.com/das7pad/redis-sharelatex/archive/70ee5b4fb50d36f793b44715072872bbb29717bd.tar.gz",
+    "redis-sharelatex": "https://github.com/das7pad/redis-sharelatex/archive/2d77ad921db0effe7e522cfb311ae8c8ae22f359.tar.gz",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
     "requestretry": "^1.13.0",

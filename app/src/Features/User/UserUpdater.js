@@ -1,5 +1,5 @@
 const logger = require('logger-sharelatex')
-const metrics = require('metrics-sharelatex')
+const metrics = require('@overleaf/metrics')
 const async = require('async')
 const { db, ObjectId } = require('../../infrastructure/mongojs')
 const { promisify } = require('util')

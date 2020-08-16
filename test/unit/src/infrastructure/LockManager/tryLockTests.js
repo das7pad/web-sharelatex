@@ -47,7 +47,7 @@ describe('LockManager - trying the lock', function() {
             slowExecutionThreshold: 5000
           }
         },
-        'metrics-sharelatex': { inc() {} }
+        '@overleaf/metrics': { inc() {} }
       }
     })
     this.callback = sinon.stub()

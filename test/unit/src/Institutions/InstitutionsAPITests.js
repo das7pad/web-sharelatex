@@ -37,7 +37,7 @@ describe('InstitutionsAPI', function() {
       },
       requires: {
         'logger-sharelatex': this.logger,
-        'metrics-sharelatex': { timeAsyncMethod: sinon.stub() },
+        '@overleaf/metrics': { timeAsyncMethod: sinon.stub() },
         'settings-sharelatex': this.settings,
         request: this.request,
         '../Notifications/NotificationsBuilder': {

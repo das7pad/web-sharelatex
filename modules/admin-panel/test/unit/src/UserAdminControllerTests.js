@@ -101,7 +101,7 @@ describe('UserAdminController', function() {
         '../../../../app/src/Features/Project/ProjectGetter': this
           .ProjectGetter,
         '../../../../app/src/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
-        'metrics-sharelatex': {
+        '@overleaf/metrics': {
           gauge() {}
         },
         'settings-sharelatex': (this.settings = {})

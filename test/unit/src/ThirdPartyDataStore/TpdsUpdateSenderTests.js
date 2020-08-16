@@ -69,7 +69,7 @@ describe('TpdsUpdateSender', function() {
         'request-promise-native': this.request,
         '../Collaborators/CollaboratorsGetter': this.CollaboratorsGetter,
         '../User/UserGetter.js': this.UserGetter,
-        'metrics-sharelatex': {
+        '@overleaf/metrics': {
           inc() {}
         }
       }

@@ -21,7 +21,7 @@ const logger = require('logger-sharelatex')
 const ErrorController = require('../../../../app/src/Features/Errors/ErrorController')
 const _ = require('underscore')
 const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
-const metrics = require('metrics-sharelatex')
+const metrics = require('@overleaf/metrics')
 
 const async = require('async')
 const other_lngs = ['es']
