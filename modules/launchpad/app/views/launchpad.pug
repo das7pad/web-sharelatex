@@ -260,7 +260,5 @@ block content
 														| Start Using ShareLaTeX
 												br
 
-block foot-scripts
-	script(async defer src=(wsUrl || '/socket.io') + '/socket.io.js')
-	script(async defer src=buildJsPath('libraries.js'))
-	script(async defer src=buildJsPath('main.js'))
+block prepend foot-scripts
+	script(defer src=(wsUrl || '/socket.io') + '/socket.io.js')
