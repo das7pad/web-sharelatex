@@ -67,7 +67,7 @@ module.exports = function(app, webRouter) {
     Settings.security.csp &&
     (Settings.security.csp.reportOnly || Settings.security.csp.enforce)
   ) {
-    webRouter.use(cspMiddleware())
+    webRouter.use(getCspMiddleware())
   }
   webRouter.use('/generate/worker', function(req, res, next) {
     const workerPath = req.path
@@ -172,7 +172,7 @@ function getPreloadMiddleware(app) {
   }
 }
 
-function cspMiddleware() {
+function getCspMiddleware() {
   const csp = Settings.security.csp
   const cdnOrigin = staticFilesBase.startsWith('http')
     ? new URL(staticFilesBase).origin
@@ -314,7 +314,7 @@ function cspMiddleware() {
   })
   const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
 
-  return function(req, res, next) {
+  return function cspMiddleware(req, res, next) {
     const actualRender = res.render
     res.render = function() {
       const endpoint = req.route.path
