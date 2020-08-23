@@ -30,6 +30,9 @@
 // * @license MIT
 //
 // From: https://github.com/marklagendijk/angular-recursion
+import t from '../misc/t'
+import getMeta from '../utils/meta'
+
 angular.module('RecursionHelper', []).factory('RecursionHelper', [
   '$compile',
   function($compile) {
@@ -56,6 +59,11 @@ angular.module('RecursionHelper', []).factory('RecursionHelper', [
         Compiles and re-adds the contents
         */
           post(scope, element) {
+            // expose t and translate to all views -- without explicit import
+            scope.t = scope.translate = t
+            // expose getMeta without explicit import
+            scope.getMeta = getMeta
+
             // Compile the contents
             if (!compiledContents) {
               compiledContents = $compile(contents)
