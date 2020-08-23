@@ -57,7 +57,9 @@ const Features = {
         return Settings.enableSaml
       case 'link-url':
         return !!(
-          Settings.apis.linkedUrlProxy && Settings.apis.linkedUrlProxy.url
+          Settings.apis.linkedUrlProxy &&
+          (Settings.apis.linkedUrlProxy.chain ||
+            Settings.apis.linkedUrlProxy.url)
         )
       case 'public-registration':
         return publicRegistrationModuleAvailable
