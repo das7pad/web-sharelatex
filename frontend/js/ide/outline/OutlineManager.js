@@ -39,7 +39,6 @@ class OutlineManager {
     })
 
     scope.$on('cursor:editor:update', (event, cursorPosition) => {
-      if (!window.user.alphaProgram) return
       if (this.ignoreNextCursorUpdate) {
         this.ignoreNextCursorUpdate = false
         return
@@ -49,14 +48,12 @@ class OutlineManager {
     })
 
     scope.$on('scroll:editor:update', (event, middleVisibleRow) => {
-      if (!window.user.alphaProgram) return
       if (this.ignoreNextScroll) {
         this.ignoreNextScroll = false
         return
       }
 
       this.updateHighlightedLine(middleVisibleRow + 1)
-      this.broadcastChangeEvent()
     })
 
     scope.$watch('editor.showRichText', () => {
@@ -84,7 +81,9 @@ class OutlineManager {
       if (editorLine < outline.line) break // editorLine is above
       closestOutlineLine = outline.line
     }
+    if (closestOutlineLine === this.highlightedLine) return
     this.highlightedLine = closestOutlineLine
+    this.broadcastChangeEvent()
   }
 
   jumpToLine(line) {

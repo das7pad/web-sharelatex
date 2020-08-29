@@ -65,3 +65,6 @@ modules/**/Makefile
 
 # Sentry secrets file (injected by CI)
 .sentryclirc
+
+# via dev-environment
+.npmrc

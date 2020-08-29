@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef } from 'react'
+import React, { useState, useEffect, createRef, useRef } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import OutlineList from './OutlineList'
@@ -6,6 +6,7 @@ import OutlineList from './OutlineList'
 function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
   const [expanded, setExpanded] = useState(true)
   const titleElementRef = createRef()
+  const isHighlightedRef = useRef(false)
 
   const mainItemClasses = classNames('outline-item', {
     'outline-item-no-children': !outlineItem.children
@@ -29,13 +30,17 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
   }
 
   useEffect(() => {
-    if (highlightedLine !== outlineItem.line) return
+    const wasHighlighted = isHighlightedRef.current
+    const isNowHighlighted = highlightedLine === outlineItem.line
 
-    titleElementRef.current.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    })
-  }, [highlightedLine, titleElementRef])
+    isHighlightedRef.current = isNowHighlighted
+
+    if (!wasHighlighted && isNowHighlighted) {
+      titleElementRef.current.scrollIntoView({
+        block: 'center'
+      })
+    }
+  }, [highlightedLine, titleElementRef, isHighlightedRef])
 
   return (
     <li className={mainItemClasses}>
