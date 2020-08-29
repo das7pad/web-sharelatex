@@ -2,10 +2,12 @@ const mongojs = require('../../app/src/infrastructure/mongojs')
 const { db } = mongojs
 const async = require('async')
 
-db.subscriptions.aggregate(
-  { $match: { teamName: /(Work From Home|Work from Home)/ } },
-  { $unwind: '$member_ids' },
-  { $group: { _id: null, memberIds: { $addToSet: '$member_ids' } } },
+db.deletedSubscriptions.aggregate(
+  { $match: { 'subscription.teamName': /(Work From Home|Work from Home)/ } },
+  { $unwind: '$subscription.member_ids' },
+  {
+    $group: { _id: null, memberIds: { $addToSet: '$subscription.member_ids' } }
+  },
   function(err, results) {
     if (err) {
       console.error(err)
@@ -26,12 +28,16 @@ db.subscriptions.aggregate(
       10,
       function(userId, callback) {
         db.users.findOne(userId, function(err, user) {
-          const emails = user.emails.map(email => email.email)
-          console.log(
-            `${user._id},${user.first_name || ''},${user.last_name || ''},${
-              user.signUpDate
-            },${emails.join(',')}`
-          )
+          if (user) {
+            const emails = user.emails.map(email => email.email)
+            console.log(
+              `${user._id},${user.first_name || ''},${user.last_name || ''},${
+                user.signUpDate
+              },${emails.join(',')}`
+            )
+          } else {
+            console.error('A group user was not found')
+          }
           callback(err)
         })
       },

@@ -564,8 +564,21 @@ templates.securityAlert = NoCTAEmailTemplate({
       `${settings.siteUrl}/learn/how-to/Keeping_your_account_secure`,
       isPlainText
     )
+
+    const actionDescribed = EmailMessageHelper.cleanHTML(
+      opts.actionDescribed,
+      isPlainText
+    )
+
+    if (!opts.message) {
+      opts.message = []
+    }
+    const message = opts.message.map(m => {
+      return EmailMessageHelper.cleanHTML(m, isPlainText)
+    })
+
     return [
-      `We are writing to let you know that ${opts.actionDescribed} on ${dateFormatted} at ${timeFormatted} GMT.`,
+      `We are writing to let you know that ${actionDescribed} on ${dateFormatted} at ${timeFormatted} GMT.`,...message,
       `If this was you, you can ignore this email.`,
       `If this was not you, we recommend getting in touch with our support team at ${settings.adminEmail} to report this as potentially suspicious activity on your account.`,
       `We also encourage you to read our ${helpLink} to keeping your ${settings.appName} account safe.`

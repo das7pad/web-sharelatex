@@ -234,6 +234,7 @@ const UserSessionsManager = {
 }
 
 UserSessionsManager.promises = {
+  getAllUserSessions: promisify(UserSessionsManager.getAllUserSessions),
   revokeAllUserSessions: promisify(UserSessionsManager.revokeAllUserSessions)
 }
 
