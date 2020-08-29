@@ -1,22 +1,7 @@
-/* eslint-disable
-    handle-callback-err,
-    max-len,
-    no-return-assign,
-    no-unused-vars,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const { expect } = require('chai')
 const async = require('async')
 const User = require('./helpers/User')
-const request = require('./helpers/request')
-const settings = require('settings-sharelatex')
+const UserHelper = require('./helpers/UserHelper')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongojs')
 const MockV1Api = require('./helpers/MockV1Api')
 const expectErrorResponse = require('./helpers/expectErrorResponse')
@@ -33,10 +18,10 @@ describe('UserEmails', function() {
   describe('confirming an email', function() {
     it('should confirm the email', function(done) {
       let token = null
-      return async.series(
+      async.series(
         [
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -45,44 +30,44 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(204)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
                 expect(body[0].confirmedAt).to.not.exist
                 expect(body[1].confirmedAt).to.not.exist
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // There should only be one confirmation token at the moment
                 expect(tokens.length).to.equal(1)
                 expect(tokens[0].data.email).to.equal(this.newEmail)
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
                 ;({ token } = tokens[0])
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/confirm',
@@ -91,36 +76,36 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
                 expect(body[0].confirmedAt).to.not.exist
                 expect(body[1].confirmedAt).to.exist
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // Token should be deleted after use
                 expect(tokens.length).to.equal(0)
-                return cb()
+                cb()
               }
             )
           }
@@ -134,12 +119,12 @@ describe('UserEmails', function() {
       let token2 = null
       this.user2 = new User()
       this.email = `duplicate-email${Math.random()}@example.com`
-      return async.series(
+      async.series(
         [
           cb => this.user2.login(cb),
           cb => {
             // Create email for first user
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -149,25 +134,26 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // There should only be one confirmation token at the moment
                 expect(tokens.length).to.equal(1)
                 expect(tokens[0].data.email).to.equal(this.email)
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
                 token1 = tokens[0].token
-                return cb()
+                cb()
               }
             )
           },
           cb => {
             // Delete the email from the first user
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/delete',
@@ -178,7 +164,7 @@ describe('UserEmails', function() {
           },
           cb => {
             // Create email for second user
-            return this.user2.request(
+            this.user2.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -189,7 +175,7 @@ describe('UserEmails', function() {
           },
           cb => {
             // Original confirmation token should no longer work
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/confirm',
@@ -198,34 +184,33 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(404)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user2._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // The first token has been used, so this should be token2 now
                 expect(tokens.length).to.equal(1)
                 expect(tokens[0].data.email).to.equal(this.email)
                 expect(tokens[0].data.user_id).to.equal(this.user2._id)
                 token2 = tokens[0].token
-                return cb()
+                cb()
               }
             )
           },
           cb => {
             // Second user should be able to confirm the email
-            return this.user2.request(
+            this.user2.request(
               {
                 method: 'POST',
                 url: '/user/emails/confirm',
@@ -234,22 +219,21 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user2.request(
+            this.user2.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
                 expect(body[0].confirmedAt).to.not.exist
                 expect(body[1].confirmedAt).to.exist
-                return cb()
+                cb()
               }
             )
           }
@@ -262,10 +246,10 @@ describe('UserEmails', function() {
   describe('with an expired token', function() {
     it('should not confirm the email', function(done) {
       let token = null
-      return async.series(
+      async.series(
         [
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -274,33 +258,32 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(204)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // There should only be one confirmation token at the moment
                 expect(tokens.length).to.equal(1)
                 expect(tokens[0].data.email).to.equal(this.email)
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
                 ;({ token } = tokens[0])
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.update(
+            db.tokens.update(
               {
                 token
               },
@@ -313,7 +296,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/confirm',
@@ -322,11 +305,9 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(404)
-                return cb()
+                cb()
               }
             )
           }
@@ -338,10 +319,10 @@ describe('UserEmails', function() {
 
   describe('resending the confirmation', function() {
     it('should generate a new token', function(done) {
-      return async.series(
+      async.series(
         [
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -350,32 +331,31 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(204)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // There should only be one confirmation token at the moment
                 expect(tokens.length).to.equal(1)
                 expect(tokens[0].data.email).to.equal(this.email)
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/resend_confirmation',
@@ -384,29 +364,28 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // There should be two tokens now
                 expect(tokens.length).to.equal(2)
                 expect(tokens[0].data.email).to.equal(this.email)
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
                 expect(tokens[1].data.email).to.equal(this.email)
                 expect(tokens[1].data.user_id).to.equal(this.user._id)
-                return cb()
+                cb()
               }
             )
           }
@@ -418,10 +397,10 @@ describe('UserEmails', function() {
     it('should create a new token if none exists', function(done) {
       // This should only be for users that have sign up with their main
       // emails before the confirmation system existed
-      return async.series(
+      async.series(
         [
           cb => {
-            return db.tokens.remove(
+            db.tokens.remove(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
@@ -431,7 +410,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/resend_confirmation',
@@ -440,27 +419,26 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 // There should still only be one confirmation token
                 expect(tokens.length).to.equal(1)
                 expect(tokens[0].data.email).to.equal(this.user.email)
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
-                return cb()
+                cb()
               }
             )
           }
@@ -470,10 +448,10 @@ describe('UserEmails', function() {
     })
 
     it("should not allow reconfirmation if the email doesn't match the user", function(done) {
-      return async.series(
+      async.series(
         [
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/resend_confirmation',
@@ -482,24 +460,23 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(422)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return db.tokens.find(
+            db.tokens.find(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
                 usedAt: { $exists: false }
               },
               (error, tokens) => {
+                expect(error).to.not.exist
                 expect(tokens.length).to.equal(0)
-                return cb()
+                cb()
               }
             )
           }
@@ -511,11 +488,10 @@ describe('UserEmails', function() {
 
   describe('setting a default email', function() {
     it('should update confirmed emails for users not in v1', function(done) {
-      const token = null
-      return async.series(
+      async.series(
         [
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -524,17 +500,15 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(204)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
             // Mark the email as confirmed
-            return db.users.update(
+            db.users.update(
               {
                 'emails.email': this.email
               },
@@ -547,7 +521,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/default',
@@ -556,24 +530,23 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
                 expect(body[0].confirmedAt).to.not.exist
                 expect(body[0].default).to.equal(false)
                 expect(body[1].confirmedAt).to.exist
                 expect(body[1].default).to.equal(true)
-                return cb()
+                cb()
               }
             )
           }
@@ -583,11 +556,10 @@ describe('UserEmails', function() {
     })
 
     it('should not allow changing unconfirmed emails in v1', function(done) {
-      const token = null
-      return async.series(
+      async.series(
         [
           cb => {
-            return db.users.update(
+            db.users.update(
               {
                 _id: ObjectId(this.user._id)
               },
@@ -600,7 +572,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -609,16 +581,14 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(204)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/default',
@@ -627,21 +597,20 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(409)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
+                expect(error).to.not.exist
                 expect(body[0].default).to.equal(true)
                 expect(body[1].default).to.equal(false)
-                return cb()
+                cb()
               }
             )
           }
@@ -651,11 +620,10 @@ describe('UserEmails', function() {
     })
 
     it('should not update the email in v1', function(done) {
-      const token = null
-      return async.series(
+      async.series(
         [
           cb => {
-            return db.users.update(
+            db.users.update(
               {
                 _id: ObjectId(this.user._id)
               },
@@ -668,7 +636,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -677,17 +645,15 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(204)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
             // Mark the email as confirmed
-            return db.users.update(
+            db.users.update(
               {
                 'emails.email': this.email
               },
@@ -700,7 +666,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/default',
@@ -709,19 +675,15 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
-                return cb()
+                cb()
               }
             )
           }
         ],
         error => {
-          if (error != null) {
-            return done(error)
-          }
+          expect(error).to.not.exist
           expect(MockV1Api.updateEmail.callCount).to.equal(0)
           done()
         }
@@ -732,10 +694,10 @@ describe('UserEmails', function() {
       MockV1Api.existingEmails.push(
         (this.email = `exists-in-v1${Math.random()}@example.com`)
       )
-      return async.series(
+      async.series(
         [
           cb => {
-            return db.users.update(
+            db.users.update(
               {
                 _id: ObjectId(this.user._id)
               },
@@ -748,7 +710,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails',
@@ -757,17 +719,15 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(204)
-                return cb()
+                cb()
               }
             )
           },
           cb => {
             // Mark the email as confirmed
-            return db.users.update(
+            db.users.update(
               {
                 'emails.email': this.email
               },
@@ -780,7 +740,7 @@ describe('UserEmails', function() {
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               {
                 method: 'POST',
                 url: '/user/emails/default',
@@ -789,21 +749,20 @@ describe('UserEmails', function() {
                 }
               },
               (error, response, body) => {
-                if (error != null) {
-                  return done(error)
-                }
+                expect(error).to.not.exist
                 expect(response.statusCode).to.equal(200)
                 cb()
               }
             )
           },
           cb => {
-            return this.user.request(
+            this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
+                expect(error).to.not.exist
                 expect(body[0].default).to.equal(false)
                 expect(body[1].default).to.equal(true)
-                return cb()
+                cb()
               }
             )
           }
@@ -835,6 +794,38 @@ describe('UserEmails', function() {
           done()
         }
       )
+    })
+  })
+
+  describe('secondary email', function() {
+    let newEmail, userHelper, userId, user
+    beforeEach(async function() {
+      newEmail = 'a-new-email@overleaf.com'
+      userHelper = new UserHelper()
+      userHelper = await UserHelper.createUser()
+      userHelper = await UserHelper.loginUser({
+        email: userHelper.getDefaultEmail(),
+        password: userHelper.getDefaultPassword()
+      })
+      userId = userHelper.user._id
+      await userHelper.request.post({
+        form: {
+          email: newEmail
+        },
+        simple: false,
+        uri: '/user/emails'
+      })
+      userHelper = await UserHelper.getUser(userId)
+      user = userHelper.user
+    })
+    it('should add the email', async function() {
+      expect(user.emails[1].email).to.equal(newEmail)
+    })
+    it('should add to the user audit log', async function() {
+      expect(typeof user.auditLog[0].initiatorId).to.equal('object')
+      expect(user.auditLog[0].initiatorId).to.deep.equal(user._id)
+      expect(user.auditLog[0].info.newSecondaryEmail).to.equal(newEmail)
+      expect(user.auditLog[0].ip).to.equal(this.user.request.ip)
     })
   })
 })
