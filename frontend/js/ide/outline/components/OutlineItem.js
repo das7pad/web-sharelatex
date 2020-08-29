@@ -28,17 +28,14 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
     jumpToLine(outlineItem.line)
   }
 
-  useEffect(
-    () => {
-      if (highlightedLine !== outlineItem.line) return
+  useEffect(() => {
+    if (highlightedLine !== outlineItem.line) return
 
-      titleElementRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      })
-    },
-    [highlightedLine, titleElementRef]
-  )
+    titleElementRef.current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    })
+  }, [highlightedLine, titleElementRef])
 
   return (
     <li className={mainItemClasses}>
