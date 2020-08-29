@@ -446,9 +446,7 @@ templates.emailThirdPartyIdentifierLinked = NoCTAEmailTemplate({
     return `Accounts Linked`
   },
   message(opts) {
-    const message = `We're contacting you to notify you that your ${
-      opts.provider
-    } account is now linked to your ${settings.appName} account.`
+    const message = `We're contacting you to notify you that your ${opts.provider} account is now linked to your ${settings.appName} account.`
     return [message]
   }
 })
@@ -461,9 +459,7 @@ templates.emailThirdPartyIdentifierUnlinked = NoCTAEmailTemplate({
     return `Accounts No Longer Linked`
   },
   message(opts) {
-    const message = `We're contacting you to notify you that your ${
-      opts.provider
-    } account is no longer linked with your ${settings.appName} account.`
+    const message = `We're contacting you to notify you that your ${opts.provider} account is no longer linked with your ${settings.appName} account.`
     return [message]
   }
 })
@@ -490,9 +486,7 @@ templates.ownershipTransferConfirmationPreviousOwner = NoCTAEmailTemplate({
       : `<b>${projectName}</b>`
     return [
       `As per your request, we have made ${nameAndEmail} the owner of ${projectNameDisplay}.`,
-      `If you haven't asked to change the owner of ${projectNameDisplay}, please get in touch with us via ${
-        settings.adminEmail
-      }.`
+      `If you haven't asked to change the owner of ${projectNameDisplay}, please get in touch with us via ${settings.adminEmail}.`
     ]
   }
 })
@@ -543,23 +537,17 @@ templates.userOnboardingEmail = NoCTAEmailTemplate({
   message(opts, isPlainText) {
     const learnLatexLink = EmailMessageHelper.displayLink(
       'Learn LaTeX in 30 minutes',
-      `${
-        settings.siteUrl
-      }/learn/latex/Learn_LaTeX_in_30_minutes?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
+      `${settings.siteUrl}/learn/latex/Learn_LaTeX_in_30_minutes?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
       isPlainText
     )
     const templatesLinks = EmailMessageHelper.displayLink(
       'Find a beautiful template',
-      `${
-        settings.siteUrl
-      }/latex/templates?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
+      `${settings.siteUrl}/latex/templates?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
       isPlainText
     )
     const collaboratorsLink = EmailMessageHelper.displayLink(
       'Work with your collaborators',
-      `${
-        settings.siteUrl
-      }/learn/how-to/Sharing_a_project?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
+      `${settings.siteUrl}/learn/how-to/Sharing_a_project?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
       isPlainText
     )
     const siteLink = EmailMessageHelper.displayLink(
