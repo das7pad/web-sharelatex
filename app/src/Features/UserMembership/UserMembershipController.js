@@ -1,6 +1,6 @@
 /* eslint-disable
-    max-len,
-*/
+   max-len,
+ */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
 /*
@@ -14,6 +14,7 @@ const AuthenticationController = require('../Authentication/AuthenticationContro
 const UserMembershipHandler = require('./UserMembershipHandler')
 const Errors = require('../Errors/Errors')
 const EmailHelper = require('../Helpers/EmailHelper')
+const CSVParser = require('json2csv').Parser
 
 module.exports = {
   index(req, res, next) {
@@ -133,6 +134,7 @@ module.exports = {
 
   exportCsv(req, res, next) {
     const { entity, entityConfig } = req
+    const fields = ['email', 'last_logged_in_at']
 
     return UserMembershipHandler.getUsers(entity, entityConfig, function(
       error,
@@ -141,12 +143,9 @@ module.exports = {
       if (error != null) {
         return next(error)
       }
-      let csvOutput = ''
-      for (const user of Array.from(users)) {
-        csvOutput += user.email + '\n'
-      }
+      const csvParser = new CSVParser({ fields })
       res.attachment('Group.csv')
-      return res.send(csvOutput)
+      return res.send(csvParser.parse(users))
     })
   },
 
