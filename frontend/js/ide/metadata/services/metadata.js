@@ -87,7 +87,7 @@ export default App.factory('metadata', function($http, ide) {
   metadata.scheduleLoadDocMetaFromServer = function(docId) {
     if (ide.$scope.permissionsLevel === 'readOnly') {
       // The POST request is blocked for users without write permission.
-      // The user will not be able to consume the meta data for edits any ways.
+      // The user will not be able to consume the meta data for edits anyways.
       return
     }
 

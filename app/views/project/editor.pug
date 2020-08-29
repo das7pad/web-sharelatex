@@ -101,8 +101,8 @@ block content
 						include ./editor/_binary-file
 						include ./editor/_history
 
-			.ui-layout-east
-				if !isRestrictedTokenMember
+			if !isRestrictedTokenMember
+				.ui-layout-east
 					include ./editor/_chat
 
 	include ./editor/_hotkeys

@@ -108,6 +108,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     )
   }
 
+  // .getMessages will generate an empty response for anonymous users.
   webRouter.get('/system/messages', SystemMessageController.getMessages)
 
   webRouter.get(
