@@ -5,7 +5,6 @@ const modulePath = '../../../../app/src/Features/User/UserController.js'
 const SandboxedModule = require('sandboxed-module')
 const OError = require('@overleaf/o-error')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
-const HttpErrors = require('@overleaf/o-error/http')
 
 describe('UserController', function() {
   beforeEach(function() {
@@ -126,7 +125,6 @@ describe('UserController', function() {
         '@overleaf/metrics': { inc() {} },
         '../Errors/Errors': Errors,
         '@overleaf/o-error': OError,
-        '@overleaf/o-error/http': HttpErrors,
         '../Email/EmailHandler': (this.EmailHandler = {
           sendEmail: sinon.stub(),
           promises: { sendEmail: sinon.stub().resolves() }
@@ -432,7 +430,7 @@ describe('UserController', function() {
     describe('when changeEmailAddress yields an error', function() {
       it('should pass on an error and not send a success status', function(done) {
         this.req.body.email = this.newEmail.toUpperCase()
-        this.UserUpdater.changeEmailAddress.callsArgWith(2, new Error())
+        this.UserUpdater.changeEmailAddress.callsArgWith(2, new OError())
         this.HttpErrorHandler.legacyInternal = sinon.spy(
           (req, res, message, error) => {
             expect(req).to.exist

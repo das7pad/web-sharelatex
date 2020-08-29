@@ -3,6 +3,7 @@ const sinon = require('sinon')
 const { expect } = require('chai')
 const SandboxedModule = require('sandboxed-module')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
+const OError = require('@overleaf/o-error')
 
 const MODULE_PATH = '../../../../app/src/Features/FileStore/FileStoreHandler.js'
 
@@ -281,10 +282,13 @@ describe('FileStoreHandler', function() {
     })
 
     it('should wrap the error if there is one', function(done) {
-      const error = 'my error'
+      const error = new Error('my error')
       this.request.callsArgWith(1, error)
       this.handler.deleteProject(this.projectId, err => {
-        assert.equal(err.cause, error)
+        expect(OError.getFullStack(err)).to.match(
+          /something went wrong deleting a project in filestore/
+        )
+        expect(OError.getFullStack(err)).to.match(/my error/)
         done()
       })
     })
@@ -490,7 +494,7 @@ describe('FileStoreHandler', function() {
     })
 
     it('should return the err', function(done) {
-      const error = 'errrror'
+      const error = new Error('error')
       this.request.callsArgWith(1, error)
       this.handler.copyFile(
         this.projectId,

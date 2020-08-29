@@ -37,7 +37,7 @@
   ],
   "dependencies": {
     "@overleaf/metrics": "https://github.com/das7pad/metrics-sharelatex/archive/314238a72d2d91d3b912f4deab4a8be97a99552f.tar.gz",
-    "@overleaf/o-error": "^2.1.0",
+    "@overleaf/o-error": "^3.0.0",
     "archiver": "4.0.1",
     "async": "0.6.2",
     "basic-auth-connect": "^1.0.0",

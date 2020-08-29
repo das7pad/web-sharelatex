@@ -13,6 +13,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
+const OError = require('@overleaf/o-error')
 const metrics = require('@overleaf/metrics')
 const { db, ObjectId } = require('../../infrastructure/mongojs')
 const async = require('async')
@@ -117,7 +118,10 @@ const ProjectGetter = {
 
     return db.projects.find(query, projection, function(err, project) {
       if (err != null) {
-        logger.warn({ err, query, projection }, 'error getting project')
+        OError.tag(err, 'error getting project', {
+          query,
+          projection
+        })
         return callback(err)
       }
       return callback(null, project != null ? project[0] : undefined)

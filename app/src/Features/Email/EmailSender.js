@@ -29,10 +29,9 @@ function getClient() {
         require('nodemailer-ses-transport')(emailParameters)
       )
     } else if (emailParameters.sendgridApiKey) {
-      throw new OError({
-        message:
-          'sendgridApiKey configuration option is deprecated, use SMTP instead'
-      })
+      throw new OError(
+        'sendgridApiKey configuration option is deprecated, use SMTP instead'
+      )
     } else if (emailParameters.MandrillApiKey) {
       logger.log('using mandril for email')
       client = nodemailer.createTransport(
@@ -80,7 +79,7 @@ async function sendEmail(options) {
         },
         'rate limit hit for sending email, not sending'
       )
-      throw new OError({ message: 'rate limit hit sending email' })
+      throw new OError('rate limit hit sending email')
     }
     metrics.inc('email')
     const sendMailOptions = {
@@ -97,9 +96,7 @@ async function sendEmail(options) {
     }
     await client.sendMail(sendMailOptions)
   } catch (err) {
-    throw new OError({
-      message: 'error sending message'
-    }).withCause(err)
+    throw new OError('error sending message').withCause(err)
   }
 }
 

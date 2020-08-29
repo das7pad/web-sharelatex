@@ -30,7 +30,6 @@ const Modules = require('./Modules')
 const Views = require('./Views')
 
 const ErrorController = require('../Features/Errors/ErrorController')
-const HttpErrorController = require('../Features/Errors/HttpErrorController')
 const HttpErrorHandler = require('../Features/Errors/HttpErrorHandler')
 const UserSessionsManager = require('../Features/User/UserSessionsManager')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
@@ -225,7 +224,6 @@ if (enableApiRouter || notDefined(enableApiRouter)) {
   logger.info('providing api router')
   app.use(privateApiRouter)
   app.use(Validation.errorMiddleware)
-  app.use(HttpErrorController.handleError)
   app.use(ErrorController.handleApiError)
 }
 
@@ -247,12 +245,10 @@ if (enableWebRouter || notDefined(enableWebRouter)) {
 
   app.use(publicApiRouter) // public API goes with web router for public access
   app.use(Validation.errorMiddleware)
-  app.use(HttpErrorController.handleError)
   app.use(ErrorController.handleApiError)
 
   app.use(webRouter)
   app.use(Validation.errorMiddleware)
-  app.use(HttpErrorController.handleError)
   app.use(ErrorController.handleError)
 
   if (app.get('env') === 'test') {

@@ -1,4 +1,5 @@
 const logger = require('logger-sharelatex')
+const OError = require('@overleaf/o-error')
 const metrics = require('@overleaf/metrics')
 const async = require('async')
 const { db, ObjectId } = require('../../infrastructure/mongojs')
@@ -24,15 +25,21 @@ const UserUpdater = {
       UserUpdater.updateUser(
         { _id: userId, 'emails.email': email },
         { $unset: { 'emails.$.affiliationUnchecked': 1 } },
-        (error, updated) => {
-          if (error || (updated && updated.nModified === 0)) {
-            logger.error(
-              { userId, email },
-              'could not remove affiliationUnchecked flag for user on create'
+        error => {
+          if (error) {
+            callback(
+              OError.tag(
+                error,
+                'could not remove affiliationUnchecked flag for user on create',
+                {
+                  userId,
+                  email
+                }
+              )
             )
-            return callback(error)
+          } else {
+            callback()
           }
-          return callback(error, updated)
         }
       )
     })
@@ -102,10 +109,7 @@ const UserUpdater = {
 
       addAffiliation(userId, newEmail, affiliationOptions, error => {
         if (error != null) {
-          logger.warn(
-            { error },
-            'problem adding affiliation while adding email'
-          )
+          OError.tag(error, 'problem adding affiliation while adding email')
           return callback(error)
         }
 
@@ -121,7 +125,7 @@ const UserUpdater = {
         }
         UserUpdater.updateUser(userId, update, error => {
           if (error != null) {
-            logger.warn({ error }, 'problem updating users emails')
+            OError.tag(error, 'problem updating users emails')
             return callback(error)
           }
           callback()
@@ -139,7 +143,7 @@ const UserUpdater = {
     }
     removeAffiliation(userId, email, error => {
       if (error != null) {
-        logger.warn({ error }, 'problem removing affiliation')
+        OError.tag(error, 'problem removing affiliation')
         return callback(error)
       }
 
@@ -147,7 +151,7 @@ const UserUpdater = {
       const update = { $pull: { emails: { email } } }
       UserUpdater.updateUser(query, update, (error, res) => {
         if (error != null) {
-          logger.warn({ error }, 'problem removing users email')
+          OError.tag(error, 'problem removing users email')
           return callback(error)
         }
         if (res.n === 0) {
@@ -222,10 +226,7 @@ const UserUpdater = {
     logger.log({ userId, email }, 'confirming user email')
     addAffiliation(userId, email, { confirmedAt }, error => {
       if (error != null) {
-        logger.warn(
-          { error },
-          'problem adding affiliation while confirming email'
-        )
+        OError.tag(error, 'problem adding affiliation while confirming email')
         return callback(error)
       }
 
