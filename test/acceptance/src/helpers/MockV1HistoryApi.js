@@ -48,9 +48,11 @@ module.exports = MockV1HistoryApi = {
         }
         res.header('content-disposition', 'attachment; name=project.zip')
         res.header('content-type', 'application/octet-stream')
-        if (req.params.version === '42') {return res.send(
-          `Mock zip for ${req.params.project_id} at version ${req.params.version}`
-        )}
+        if (req.params.version === '42') {
+          return res.send(
+            `Mock zip for ${req.params.project_id} at version ${req.params.version}`
+          )
+        }
         function writeChunk() {
           res.write('chunk' + MockV1HistoryApi.sentChunks++)
         }
