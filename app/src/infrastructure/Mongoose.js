@@ -11,7 +11,7 @@ if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
   )
 }
 
-mongoose.connect(Settings.mongo.url, {
+const connectionPromise = mongoose.connect(Settings.mongo.url, {
   poolSize: POOL_SIZE,
   config: { autoIndex: false },
   useUnifiedTopology: !!Settings.mongo.useUnifiedTopology,
@@ -50,5 +50,12 @@ mongoose.plugin(schema => {
 })
 
 mongoose.Promise = global.Promise
+
+async function getNativeDb() {
+  const connection = await connectionPromise
+  return connection.db
+}
+
+mongoose.getNativeDb = getNativeDb
 
 module.exports = mongoose

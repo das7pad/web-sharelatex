@@ -36,33 +36,11 @@ export default App.factory('settings', (ide, eventTracking) => ({
   },
 
   saveProjectSettings(data) {
-    // Tracking code.
-    for (const key of Array.from(Object.keys(data))) {
-      const changedSetting = key
-      const changedSettingVal = data[key]
-      eventTracking.sendMB('project-setting-changed', {
-        changedSetting,
-        changedSettingVal
-      })
-    }
-    // End of tracking code.
-
     data._csrf = window.csrfToken
     return ide.$http.post(`/project/${ide.project_id}/settings`, data)
   },
 
   saveProjectAdminSettings(data) {
-    // Tracking code.
-    for (const key of Array.from(Object.keys(data))) {
-      const changedSetting = key
-      const changedSettingVal = data[key]
-      eventTracking.sendMB('project-admin-setting-changed', {
-        changedSetting,
-        changedSettingVal
-      })
-    }
-    // End of tracking code.
-
     data._csrf = window.csrfToken
     return ide.$http.post(`/project/${ide.project_id}/settings/admin`, data)
   }
