@@ -19,7 +19,7 @@
     "test:unit": "npm run test:unit:app",
     "test:frontend": "NODE_ENV=test mocha --recursive --exit --grep=$MOCHA_GREP --require test/frontend/bootstrap.js test/frontend modules/*/test/frontend",
     "test:karma": "karma start",
-    "test:karma:single": "karma start --single-run",
+    "test:karma:single": "karma start --no-auto-watch --single-run",
     "start": "node $NODE_APP_OPTIONS app.js",
     "nodemon": "nodemon --config nodemon.json",
     "webpack": "webpack-dev-server --config webpack.config.dev.js",
