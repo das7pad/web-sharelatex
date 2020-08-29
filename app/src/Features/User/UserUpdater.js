@@ -11,12 +11,20 @@ const {
 } = require('../Institutions/InstitutionsAPI')
 const Features = require('../../infrastructure/Features')
 const FeaturesUpdater = require('../Subscription/FeaturesUpdater')
+const EmailHandler = require('../Email/EmailHandler')
 const EmailHelper = require('../Helpers/EmailHelper')
 const Errors = require('../Errors/Errors')
 const NewsletterManager = require('../Newsletter/NewsletterManager')
 const RecurlyWrapper = require('../Subscription/RecurlyWrapper')
+const UserAuditLogHandler = require('./UserAuditLogHandler')
 
-async function setDefaultEmailAddress(userId, email, allowUnconfirmed) {
+async function setDefaultEmailAddress(
+  userId,
+  email,
+  allowUnconfirmed,
+  auditLog,
+  sendSecurityAlert
+) {
   email = EmailHelper.parseEmail(email)
   if (email == null) {
     throw new Error('invalid email')
@@ -39,6 +47,17 @@ async function setDefaultEmailAddress(userId, email, allowUnconfirmed) {
     throw new Errors.UnconfirmedEmailError()
   }
 
+  await UserAuditLogHandler.promises.addEntry(
+    userId,
+    'change-primary-email',
+    auditLog.initiatorId,
+    auditLog.ipAddress,
+    {
+      newPrimaryEmail: email,
+      oldPrimaryEmail: oldEmail
+    }
+  )
+
   const query = { _id: userId, 'emails.email': email }
   const update = { $set: { email } }
   const res = await UserUpdater.promises.updateUser(query, update)
@@ -46,6 +65,25 @@ async function setDefaultEmailAddress(userId, email, allowUnconfirmed) {
   // this should not happen
   if (res.n === 0) {
     throw new Error('email update error')
+  }
+
+  if (sendSecurityAlert) {
+    // send email to both old and new primary email
+    const emailOptions = {
+      actionDescribed: `the primary email address on your account was changed to ${email}`,
+      action: 'change of primary email address'
+    }
+    const toOld = Object.assign({}, emailOptions, { to: oldEmail })
+    const toNew = Object.assign({}, emailOptions, { to: email })
+    try {
+      await EmailHandler.promises.sendEmail('securityAlert', toOld)
+      await EmailHandler.promises.sendEmail('securityAlert', toNew)
+    } catch (error) {
+      logger.error(
+        { err: error, userId },
+        'could not send security alert email when primary email changed'
+      )
+    }
   }
 
   try {
@@ -115,7 +153,7 @@ const UserUpdater = {
   // default email and removing the old email.  Prefer manipulating multiple
   // emails and the default rather than calling this method directly
   //
-  changeEmailAddress(userId, newEmail, callback) {
+  changeEmailAddress(userId, newEmail, auditLog, callback) {
     newEmail = EmailHelper.parseEmail(newEmail)
     if (newEmail == null) {
       return callback(new Error('invalid email'))
@@ -130,7 +168,15 @@ const UserUpdater = {
             cb(error)
           }),
         cb => UserUpdater.addEmailAddress(userId, newEmail, cb),
-        cb => UserUpdater.setDefaultEmailAddress(userId, newEmail, true, cb),
+        cb =>
+          UserUpdater.setDefaultEmailAddress(
+            userId,
+            newEmail,
+            true,
+            auditLog,
+            true,
+            cb
+          ),
         cb => UserUpdater.removeEmailAddress(userId, oldEmail, cb)
       ],
       callback

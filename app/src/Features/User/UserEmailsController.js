@@ -119,13 +119,24 @@ const UserEmailsController = {
     if (!email) {
       return res.sendStatus(422)
     }
-    UserUpdater.setDefaultEmailAddress(userId, email, false, err => {
-      if (err) {
-        return UserEmailsController._handleEmailError(err, req, res, next)
+    const auditLog = {
+      initiatorId: userId,
+      ipAddress: req.ip
+    }
+    UserUpdater.setDefaultEmailAddress(
+      userId,
+      email,
+      false,
+      auditLog,
+      true,
+      err => {
+        if (err) {
+          return UserEmailsController._handleEmailError(err, req, res, next)
+        }
+        AuthenticationController.setInSessionUser(req, { email: email })
+        res.sendStatus(200)
       }
-      AuthenticationController.setInSessionUser(req, { email: email })
-      res.sendStatus(200)
-    })
+    )
   },
 
   endorse(req, res, next) {
