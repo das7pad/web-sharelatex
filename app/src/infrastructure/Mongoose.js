@@ -17,6 +17,7 @@ mongoose.connect(Settings.mongo.url, {
   useUnifiedTopology: !!Settings.mongo.useUnifiedTopology,
   useNewUrlParser: true,
   useFindAndModify: false,
+  socketTimeoutMS: Settings.mongo.socketTimeoutMS,
   appname: 'web'
 })
 
