@@ -23,6 +23,6 @@ describe('Bonus', function() {
     expect(response.statusCode).to.equal(200)
 
     const dom = cheerio.load(response.body)
-    expect(dom('.bonus-status').text()).to.match(/You've introduced 1 person/)
+    expect(dom('.bonus-status').html()).to.match(/you_introed_small_number/)
   })
 })
