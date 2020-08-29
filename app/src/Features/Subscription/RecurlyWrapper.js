@@ -15,7 +15,6 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let RecurlyWrapper
 const OError = require('@overleaf/o-error')
 const crypto = require('crypto')
 const request = require('request')
@@ -25,8 +24,30 @@ const logger = require('logger-sharelatex')
 const Async = require('async')
 const Errors = require('../Errors/Errors')
 const SubscriptionErrors = require('./Errors')
+const { promisify } = require('util')
 
-module.exports = RecurlyWrapper = {
+function updateAccountEmailAddress(accountId, newEmail, callback) {
+  const data = {
+    email: newEmail
+  }
+  const requestBody = RecurlyWrapper._buildXml('account', data)
+
+  RecurlyWrapper.apiRequest(
+    {
+      url: `accounts/${accountId}`,
+      method: 'PUT',
+      body: requestBody
+    },
+    (error, response, body) => {
+      if (error != null) {
+        return callback(error)
+      }
+      RecurlyWrapper._parseAccountXml(body, callback)
+    }
+  )
+}
+
+const RecurlyWrapper = {
   apiUrl: Settings.apis.recurly.url || 'https://api.recurly.com/v2',
 
   _paypal: {
@@ -587,26 +608,7 @@ module.exports = RecurlyWrapper = {
     )
   },
 
-  updateAccountEmailAddress(accountId, newEmail, callback) {
-    const data = {
-      email: newEmail
-    }
-    const requestBody = RecurlyWrapper._buildXml('account', data)
-
-    RecurlyWrapper.apiRequest(
-      {
-        url: `accounts/${accountId}`,
-        method: 'PUT',
-        body: requestBody
-      },
-      (error, response, body) => {
-        if (error != null) {
-          return callback(error)
-        }
-        RecurlyWrapper._parseAccountXml(body, callback)
-      }
-    )
-  },
+  updateAccountEmailAddress,
 
   getAccountActiveCoupons(accountId, callback) {
     return RecurlyWrapper.apiRequest(
@@ -1052,6 +1054,12 @@ module.exports = RecurlyWrapper = {
     return builder.buildObject(data)
   }
 }
+
+RecurlyWrapper.promises = {
+  updateAccountEmailAddress: promisify(updateAccountEmailAddress)
+}
+
+module.exports = RecurlyWrapper
 
 function getCustomFieldsFromSubscriptionDetails(subscriptionDetails) {
   if (!subscriptionDetails.ITMCampaign) {

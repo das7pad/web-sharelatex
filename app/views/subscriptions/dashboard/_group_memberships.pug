@@ -10,7 +10,7 @@ div(ng-controller="GroupMembershipController")
 					p
 						em(ng-non-bindable) #{groupSubscription.teamNotice}
 				span 
-					button.btn.btn-danger.text-capitalise(ng-click="removeSelfFromGroup('"+groupSubscription.admin_id._id+"')") {{translate("leave_group")}}
+					button.btn.btn-danger.text-capitalise(ng-click="removeSelfFromGroup('"+groupSubscription._id+"')") {{translate("leave_group")}}
 			hr
 
 script(type='text/ng-template', id='LeaveGroupModalTemplate')
