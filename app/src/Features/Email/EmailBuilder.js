@@ -541,9 +541,7 @@ templates.userOnboardingEmail = NoCTAEmailTemplate({
   },
   message(opts) {
     return `\
-Thanks for signing up for ${
-      settings.appName
-    } recently. We hope you've been finding it useful!
+Thanks for signing up for ${settings.appName} recently. We hope you've been finding it useful!
 Here are some key features to help you get the most out of the service:
 
 <a href="https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding">Learn LaTeX in 30 minutes</a>: In this tutorial we provide a quick and easy first introduction to LaTeX with no prior knowledge required. By the time you are finished, you will have written your first LaTeX document!
