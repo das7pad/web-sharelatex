@@ -2,10 +2,17 @@
   "presets": [
     "@babel/react",
     ["@babel/env", {
-      "modules": false,
       "useBuiltIns": "usage",
       "corejs": { "version": 3 }
     }]
   ],
-  "plugins": ["angularjs-annotate"]
+  "plugins": ["angularjs-annotate"],
+  "env": {
+    "test": {
+      "presets": [
+        "@babel/react",
+        "@babel/env"
+      ]
+    }
+  }
 }

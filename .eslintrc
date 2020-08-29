@@ -60,7 +60,7 @@
     },
     {
       // Frontend test specific rules
-      "files": ["**/test/frontend/**/*.js", "**/test/frontend/import_tests.js"],
+      "files": ["**/test/karma/**/*.js", "**/test/karma/import_tests.js"],
       "globals": {
         "expect": true,
         "$": true

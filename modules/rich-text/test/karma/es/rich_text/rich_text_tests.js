@@ -1,6 +1,6 @@
 /* global sinon */
 
-import fixture from '../../../../../../test/frontend/support/fixture'
+import fixture from '../../../../../../test/karma/support/fixture'
 import { stubMathJax, teardownMathJax } from '../support/stub_mathjax'
 import { Editor } from '../../../../frontend/js/rich_text_editor'
 

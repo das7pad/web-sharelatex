@@ -48,13 +48,23 @@ services:
       - /app/data:uid=1000,gid=1000
 
   test_frontend:
+    image: node:12.18.3
+    user: node
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: npm run test:frontend
+    environment:
+      MOCHA_GREP: ${MOCHA_GREP}
+
+  test_karma:
     build:
       context: .
       dockerfile: Dockerfile.frontend
     volumes:
       - .:/app
     working_dir: /app
-    command: npm run test:frontend:single
+    command: npm run test:karma:single
   mongo:
     image: mongo
     tmpfs: /data

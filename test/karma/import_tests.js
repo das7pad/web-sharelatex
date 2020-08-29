@@ -50,7 +50,7 @@ insertMeta('ol-staticPath', '/base/public')
  * because Angular cannot find the controller/directive under test.
  */
 
-// Import from the top-level any JS files within a test/frontend
+// Import from the top-level any JS files within a test/karma
 // directory
-const context = require.context('../../', true, /test\/frontend\/.*\.js$/)
+const context = require.context('../../', true, /test\/karma\/.*\.js$/)
 context.keys().forEach(context)

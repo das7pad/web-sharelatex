@@ -69,13 +69,32 @@ services:
       - /app/data:uid=1000,gid=1000
 
   test_frontend:
+    image: ${IMAGE_CI}-dev
+    user: node
+    entrypoint:
+      - npx
+      - mocha
+      - --exit
+      - --recursive
+      - --file
+      - test/frontend/bootstrap.js
+      - --reporter
+      - xunit
+      - --reporter-options
+    command:
+      - output=/home/node/jsdom.xml,suiteName='JSDOM Tests'
+      - test/frontend
+    volumes:
+      - ./output:/home/node:z
+
+  test_karma:
     build:
       context: .
       dockerfile: Dockerfile.frontend.ci
       args:
         - IMAGE_CI
     working_dir: /app
-    command: npm run test:frontend:single
+    command: npm run test:karma:single
     user: node
     volumes:
       - ./output:/home/node:z

@@ -1,6 +1,6 @@
 /* global sinon */
 
-import fixture from '../../../../../../test/frontend/support/fixture'
+import fixture from '../../../../../../test/karma/support/fixture'
 import { Editor } from '../../../../frontend/js/rich_text_editor'
 import * as TextWrapping from '../../../../frontend/js/key_bindings/text_wrapping'
 

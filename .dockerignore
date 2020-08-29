@@ -93,6 +93,7 @@
 !/test/smoke/src
 !/test/unit/src
 !/test/frontend
+!/test/karma
 # app #
 #######
 

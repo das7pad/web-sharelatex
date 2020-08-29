@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import CodeMirror from 'codemirror'
 
-import fixture from '../../../../../../test/frontend/support/fixture'
+import fixture from '../../../../../../test/karma/support/fixture'
 import { Editor } from '../../../../frontend/js/rich_text_editor'
 
 const FIXTURE_HTML = `<div class="rich-text">

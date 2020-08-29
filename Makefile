@@ -181,7 +181,6 @@ FRONTEND_DOCKER_COMPOSE ?= \
 	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
 
 build_test_frontend:
-	$(FRONTEND_DOCKER_COMPOSE) build test_frontend
 
 test: test_frontend
 test_frontend: test_frontend_build_run
@@ -194,7 +193,26 @@ test_frontend_run:
 
 clean_test_acceptance: clean_test_frontend
 clean_test_frontend:
-	$(FRONTEND_DOCKER_COMPOSE) down --rmi local
+	$(FRONTEND_DOCKER_COMPOSE) down
+
+KARMA_DOCKER_COMPOSE ?= \
+	COMPOSE_PROJECT_NAME=karma_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
+
+build_test_karma:
+	$(KARMA_DOCKER_COMPOSE) build test_karma
+
+test: test_karma
+test_karma: test_karma_build_run
+test_karma_build_run: build_test_karma
+test_karma_build_run: test_karma_run
+
+test_karma_run:
+	$(KARMA_DOCKER_COMPOSE) run --rm test_karma
+	$(KARMA_DOCKER_COMPOSE) down -t 0
+
+clean_test_acceptance: clean_test_karma
+clean_test_karma:
+	$(KARMA_DOCKER_COMPOSE) down --rmi local
 
 build_app:
 

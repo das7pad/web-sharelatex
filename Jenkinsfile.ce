@@ -162,12 +162,12 @@ pipeline {
           }
         }
 
-        stage('Frontend Tests') {
+        stage('JSDOM Tests') {
           agent {
             label 'sharelatex'
           }
           environment {
-            SUFFIX = '-test-frontend'
+            SUFFIX = '-test-jsdom'
           }
           steps {
             sh 'make prepare_ci_stage'
@@ -175,10 +175,32 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/frontend.xml')])
+              xunit(tools: [JUnit(pattern: 'output/jsdom.xml')])
             }
             cleanup {
               sh 'make clean_test_frontend'
+              sh 'make clean_ci_stage'
+            }
+          }
+        }
+
+        stage('Karma Tests') {
+          agent {
+            label 'sharelatex'
+          }
+          environment {
+            SUFFIX = '-test-karma'
+          }
+          steps {
+            sh 'make prepare_ci_stage'
+            sh 'make test_karma_build_run'
+          }
+          post {
+            always {
+              xunit(tools: [JUnit(pattern: 'output/karma.xml')])
+            }
+            cleanup {
+              sh 'make clean_test_karma'
               sh 'make clean_ci_stage'
             }
           }
