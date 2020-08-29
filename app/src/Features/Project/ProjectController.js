@@ -880,7 +880,8 @@ const ProjectController = {
               wsUrl,
               showSupport: Features.hasFeature('support'),
               gaOptimize: enableOptimize,
-              customOptimizeEvent: true
+              customOptimizeEvent: true,
+              experimentId: Settings.experimentId
             })
             timer.done()
           }
