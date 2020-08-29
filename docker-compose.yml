@@ -12,6 +12,7 @@ services:
     working_dir: /app
     environment:
       MOCHA_GREP: ${MOCHA_GREP}
+      NODE_OPTIONS: "--unhandled-rejections=strict"
     command: npm run test:unit
     user: node
 
@@ -35,6 +36,7 @@ services:
       LINKED_URL_PROXY: 'http://localhost:6543'
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
       NODE_ENV: test
+      NODE_OPTIONS: "--unhandled-rejections=strict"
     user: node
     depends_on:
       - mongo
@@ -56,6 +58,7 @@ services:
     command: npm run test:frontend
     environment:
       MOCHA_GREP: ${MOCHA_GREP}
+      NODE_OPTIONS: "--unhandled-rejections=strict"
 
   test_karma:
     build:
@@ -65,6 +68,8 @@ services:
       - .:/app
     working_dir: /app
     command: npm run test:karma:single
+    environment:
+      NODE_OPTIONS: "--unhandled-rejections=strict"
   mongo:
     image: mongo
     tmpfs: /data
