@@ -104,9 +104,7 @@ describe('EmailBuilder', function() {
         this.email = 'example@overleaf.com'
         this.opts = {
           to: this.email,
-          actionDescribed: `an Institutional SSO account at Overleaf University was linked to your account ${
-            this.email
-          }`,
+          actionDescribed: `an Institutional SSO account at Overleaf University was linked to your account ${this.email}`,
           action: 'institutional SSO account linked'
         }
         this.email = this.EmailBuilder.buildEmail('securityAlert', this.opts)

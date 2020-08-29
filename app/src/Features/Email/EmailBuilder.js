@@ -565,16 +565,10 @@ templates.securityAlert = NoCTAEmailTemplate({
       isPlainText
     )
     return [
-      `We are writing to let you know that ${
-        opts.actionDescribed
-      } on ${dateFormatted} at ${timeFormatted} GMT.`,
+      `We are writing to let you know that ${opts.actionDescribed} on ${dateFormatted} at ${timeFormatted} GMT.`,
       `If this was you, you can ignore this email.`,
-      `If this was not you, we recommend getting in touch with our support team at ${
-        settings.adminEmail
-      } to report this as potentially suspicious activity on your account.`,
-      `We also encourage you to read our ${helpLink} to keeping your ${
-        settings.appName
-      } account safe.`
+      `If this was not you, we recommend getting in touch with our support team at ${settings.adminEmail} to report this as potentially suspicious activity on your account.`,
+      `We also encourage you to read our ${helpLink} to keeping your ${settings.appName} account safe.`
     ]
   }
 })
