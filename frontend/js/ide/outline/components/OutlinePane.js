@@ -13,12 +13,9 @@ function OutlinePane({ isTexFile, outline, projectId, jumpToLine, onToggle }) {
   })
   const isOpen = isTexFile && expanded
 
-  useEffect(
-    () => {
-      onToggle(isOpen)
-    },
-    [isOpen]
-  )
+  useEffect(() => {
+    onToggle(isOpen)
+  }, [isOpen])
 
   const expandCollapseIconClasses = classNames('fa', 'outline-caret-icon', {
     'fa-angle-down': isOpen,
