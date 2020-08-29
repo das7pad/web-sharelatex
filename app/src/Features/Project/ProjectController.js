@@ -33,6 +33,7 @@ const BrandVariationsHandler = require('../BrandVariations/BrandVariationsHandle
 const { getUserAffiliations } = require('../Institutions/InstitutionsAPI')
 const UserController = require('../User/UserController')
 const SpellingHandler = require('../Spelling/SpellingHandler')
+const AnalyticsManager = require('../Analytics/AnalyticsManager')
 
 const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
   if (!affiliation.institution) return false
@@ -789,6 +790,12 @@ const ProjectController = {
 
             const enableOptimize =
               !!Settings.experimentId && !user.features.zotero
+
+            if (userId) {
+              AnalyticsManager.recordEvent(userId, 'project-opened', {
+                projectId: project._id
+              })
+            }
 
             const IS_IEEE = brandVariation && brandVariation.brand_id === 15
             let overallThemes = []

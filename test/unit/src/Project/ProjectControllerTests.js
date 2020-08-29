@@ -200,7 +200,8 @@ describe('ProjectController', function() {
         },
         '../ThirdPartyDataStore/TpdsProjectFlusher': this.TpdsProjectFlusher,
         '../Spelling/SpellingHandler': this.SpellingHandler,
-        '../../models/Project': {}
+        '../../models/Project': {},
+        '../Analytics/AnalyticsManager': { recordEvent: () => {} }
       }
     })
 
