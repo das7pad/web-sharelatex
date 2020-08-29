@@ -154,7 +154,8 @@ const UserSchema = new Schema({
     createdAt: { type: Date },
     enrolledAt: { type: Date },
     secret: { type: String }
-  }
+  },
+  onboardingEmailSentAt: { type: Date }
 })
 
 exports.User = mongoose.model('User', UserSchema)
