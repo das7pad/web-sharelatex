@@ -1,6 +1,8 @@
 const module = angular.module('storage', [])
-module.value('localStorage', factory(localStorage))
-module.value('sessionStorage', factory(sessionStorage))
+export const localStorage = factory(window.localStorage)
+module.value('localStorage', localStorage)
+export const sessionStorage = factory(window.sessionStorage)
+module.value('sessionStorage', sessionStorage)
 
 /*
   Storage access can throw browser exceptions, for example if it is full
