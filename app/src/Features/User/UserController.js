@@ -69,9 +69,7 @@ async function changePassword(req, res, next) {
 
   const emailOptions = {
     to: user.email,
-    actionDescribed: `your password has been changed on your account ${
-      user.email
-    }`,
+    actionDescribed: `your password has been changed on your account ${user.email}`,
     action: 'password changed'
   }
   EmailHandler.sendEmail('securityAlert', emailOptions, error => {
