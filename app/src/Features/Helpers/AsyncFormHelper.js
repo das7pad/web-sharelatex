@@ -1,3 +1,7 @@
+const {
+  acceptsJson
+} = require('../../infrastructure/RequestContentTypeDetection')
+
 module.exports = {
   redirect
 }
@@ -5,7 +9,7 @@ module.exports = {
 // redirect the request via headers or JSON response depending on the request
 // format
 function redirect(req, res, redir) {
-  if ((req.headers.accept || '').match(/^application\/json/)) {
+  if (acceptsJson(req)) {
     res.json({ redir })
   } else {
     res.redirect(redir)

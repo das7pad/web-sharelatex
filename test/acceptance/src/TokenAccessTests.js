@@ -10,6 +10,8 @@ require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockProjectHistoryApi')
 
+const expectErrorResponse = require('./helpers/expectErrorResponse')
+
 const tryEditorAccess = (user, projectId, test, callback) =>
   async.series(
     [
@@ -216,10 +218,7 @@ describe('TokenAccess', function() {
             tryEditorAccess(
               this.other1,
               this.projectId,
-              (response, body) => {
-                expect(response.statusCode).to.equal(302)
-                expect(body).to.match(/.*\/restricted.*/)
-              },
+              expectErrorResponse.restricted.html,
               cb
             )
           },
@@ -273,10 +272,7 @@ describe('TokenAccess', function() {
             tryEditorAccess(
               this.other1,
               this.projectId,
-              (response, body) => {
-                expect(response.statusCode).to.equal(302)
-                expect(body).to.match(/.*\/restricted.*/)
-              },
+              expectErrorResponse.restricted.html,
               cb
             )
           },
@@ -377,10 +373,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               ),
             // token goes nowhere
@@ -401,10 +394,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               ),
             cb =>
@@ -456,10 +446,7 @@ describe('TokenAccess', function() {
             tryEditorAccess(
               this.anon,
               this.projectId,
-              (response, body) => {
-                expect(response.statusCode).to.equal(302)
-                expect(body).to.match(/.*\/restricted.*/)
-              },
+              expectErrorResponse.restricted.html,
               cb
             ),
           cb =>
@@ -519,10 +506,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.anon,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               ),
             // should not allow the user to access read-only token
@@ -543,10 +527,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.anon,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               ),
             // should not allow the user to join the project
@@ -601,11 +582,7 @@ describe('TokenAccess', function() {
             tryEditorAccess(
               this.other1,
               this.projectId,
-              (response, body) => {
-                expect(response.statusCode).to.equal(302)
-                expect(response.headers.location).to.match(/\/restricted.*/)
-                expect(body).to.match(/.*\/restricted.*/)
-              },
+              expectErrorResponse.restricted.html,
               cb
             ),
           cb =>
@@ -687,11 +664,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(response.headers.location).to.match(/\/restricted.*/)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               ),
             cb => {
@@ -800,10 +773,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                (response, body) => {},
                 cb
               )
             },
@@ -824,10 +794,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               )
             },
@@ -882,10 +849,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.anon,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               ),
             cb =>
@@ -960,10 +924,7 @@ describe('TokenAccess', function() {
               tryEditorAccess(
                 this.anon,
                 this.projectId,
-                (response, body) => {
-                  expect(response.statusCode).to.equal(302)
-                  expect(body).to.match(/.*\/restricted.*/)
-                },
+                expectErrorResponse.restricted.html,
                 cb
               ),
             cb =>
@@ -1016,10 +977,7 @@ describe('TokenAccess', function() {
                 tryEditorAccess(
                   this.anon,
                   this.projectId,
-                  (response, body) => {
-                    expect(response.statusCode).to.equal(302)
-                    expect(body).to.match(/.*\/restricted.*/)
-                  },
+                  expectErrorResponse.restricted.html,
                   cb
                 ),
               cb =>
@@ -1038,10 +996,7 @@ describe('TokenAccess', function() {
                 tryEditorAccess(
                   this.anon,
                   this.projectId,
-                  (response, body) => {
-                    expect(response.statusCode).to.equal(302)
-                    expect(body).to.match(/.*\/restricted.*/)
-                  },
+                  expectErrorResponse.restricted.html,
                   cb
                 ),
               cb =>
@@ -1238,10 +1193,7 @@ describe('TokenAccess', function() {
             tryEditorAccess(
               this.other2,
               this.projectId,
-              (response, body) => {
-                expect(response.statusCode).to.equal(302)
-                expect(body).to.match(/.*\/restricted.*/)
-              },
+              expectErrorResponse.restricted.html,
               cb
             ),
           cb =>

@@ -9,6 +9,8 @@ require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockProjectHistoryApi')
 
+const expectErrorResponse = require('./helpers/expectErrorResponse')
+
 function tryReadAccess(user, projectId, test, callback) {
   async.series(
     [
@@ -191,17 +193,7 @@ function expectNoReadAccess(user, projectId, options, callback) {
   async.series(
     [
       cb =>
-        tryReadAccess(
-          user,
-          projectId,
-          (response, body) => {
-            expect(response.statusCode).to.equal(302)
-            expect(response.headers.location).to.match(
-              new RegExp(options.redirect_to)
-            )
-          },
-          cb
-        ),
+        tryReadAccess(user, projectId, expectErrorResponse.restricted.html, cb),
       cb =>
         tryContentAccess(
           user,
@@ -231,12 +223,7 @@ function expectNoSettingsWriteAccess(user, projectId, options, callback) {
   trySettingsWriteAccess(
     user,
     projectId,
-    (response, body) => {
-      expect(response.statusCode).to.equal(302)
-      expect(response.headers.location).to.match(
-        new RegExp(options.redirect_to)
-      )
-    },
+    expectErrorResponse.restricted.json,
     callback
   )
 }
@@ -256,10 +243,7 @@ function expectNoAnonymousAdminAccess(user, projectId, callback) {
   tryAdminAccess(
     user,
     projectId,
-    (response, body) => {
-      expect(response.statusCode).to.equal(302)
-      expect(response.headers.location).to.match(/^\/login/)
-    },
+    expectErrorResponse.requireLogin.json,
     callback
   )
 }
