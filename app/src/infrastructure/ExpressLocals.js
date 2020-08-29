@@ -23,8 +23,6 @@ const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
 module.exports = function(app, webRouter) {
   app.locals.EXTERNAL_AUTHENTICATION_SYSTEM_USED =
     Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
-  app.locals.gaToken = Settings.analytics.ga.token
-  app.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
   app.locals.hasFeature = Features.hasFeature
   app.locals.moduleIncludes = Modules.moduleIncludes
   app.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
