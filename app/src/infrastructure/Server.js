@@ -25,7 +25,7 @@ const LocalStrategy = require('passport-local').Strategy
 const ReferalConnect = require('../Features/Referal/ReferalConnect')
 const RedirectManager = require('./RedirectManager')
 const ProxyManager = require('./ProxyManager')
-const translations = require('translations-sharelatex').setup(Settings.i18n)
+const translations = require('./Translations')
 const Modules = require('./Modules')
 const Views = require('./Views')
 
