@@ -77,6 +77,7 @@
     "requestretry": "^1.13.0",
     "rolling-rate-limiter": "^0.1.11",
     "sanitize-html": "^1.27.4",
+    "scroll-into-view-if-needed": "^2.2.25",
     "settings-sharelatex": "https://github.com/das7pad/settings-sharelatex/archive/d0797834438df2d102798a64602adf2f71ac8e48.tar.gz",
     "underscore": "1.6.0",
     "url-parse": "^1.4.7",

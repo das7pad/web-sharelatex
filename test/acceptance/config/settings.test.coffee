@@ -19,6 +19,7 @@ module.exports =
 	enabledLinkedFileTypes: 'url,project_file,project_output_file,mendeley,zotero'.split(',')
 
 	httpAuthUsers: httpAuthUsers
+	adminDomains: ['example.com']
 
 	apis:
 		web:

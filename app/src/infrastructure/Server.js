@@ -191,6 +191,8 @@ webRouter.use(function(req, res, next) {
   }
 })
 
+webRouter.use(AuthenticationController.validateAdmin)
+
 // add security headers using Helmet
 const noCacheMiddleware = require('nocache')()
 webRouter.use(function(req, res, next) {

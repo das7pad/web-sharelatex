@@ -16,6 +16,7 @@
 let CompileController
 const contentDisposition = require('content-disposition')
 const Metrics = require('@overleaf/metrics')
+const OError = require('@overleaf/o-error')
 const ProjectGetter = require('../Project/ProjectGetter')
 const CompileManager = require('./CompileManager')
 const ClsiManager = require('./ClsiManager')
@@ -464,7 +465,7 @@ module.exports = CompileController = {
     return ClsiCookieManager.getCookieJar(project_id, function(err, jar) {
       let qs
       if (err != null) {
-        logger.warn({ err }, 'error getting cookie jar for clsi request')
+        OError.tag(err, 'error getting cookie jar for clsi request')
         return callback(err)
       }
       // expand any url parameter passed in as {url:..., qs:...}

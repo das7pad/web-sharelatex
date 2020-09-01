@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createRef, useRef } from 'react'
 import PropTypes from 'prop-types'
+import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed'
 import classNames from 'classnames'
 import OutlineList from './OutlineList'
 
@@ -39,7 +40,11 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
   }
 
   function handleOutlineItemLinkClick() {
-    jumpToLine(outlineItem.line)
+    jumpToLine(outlineItem.line, false)
+  }
+
+  function handleOutlineItemLinkDoubleClick() {
+    jumpToLine(outlineItem.line, true)
   }
 
   useEffect(() => {
@@ -49,7 +54,8 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
     isHighlightedRef.current = isNowHighlighted
 
     if (!wasHighlighted && isNowHighlighted) {
-      titleElementRef.current.scrollIntoView({
+      scrollIntoViewIfNeeded(titleElementRef.current, {
+        scrollMode: 'if-needed',
         block: 'center'
       })
     }
@@ -69,6 +75,7 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
         <button
           className={itemLinkClasses}
           onClick={handleOutlineItemLinkClick}
+          onDoubleClick={handleOutlineItemLinkDoubleClick}
           ref={titleElementRef}
         >
           {outlineItem.title}

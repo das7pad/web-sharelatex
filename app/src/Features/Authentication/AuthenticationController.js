@@ -1,4 +1,5 @@
 const AuthenticationManager = require('./AuthenticationManager')
+const OError = require('@overleaf/o-error')
 const LoginRateLimiter = require('../Security/LoginRateLimiter')
 const UserUpdater = require('../User/UserUpdater')
 const Metrics = require('@overleaf/metrics')
@@ -327,6 +328,37 @@ const AuthenticationController = {
     }
   },
 
+  validateAdmin(req, res, next) {
+    const adminDomains = Settings.adminDomains
+    if (
+      !adminDomains ||
+      !(Array.isArray(adminDomains) && adminDomains.length)
+    ) {
+      return next()
+    }
+    const user = AuthenticationController.getSessionUser(req)
+    if (!(user && user.isAdmin)) {
+      return next()
+    }
+    const email = user.email
+    if (email == null) {
+      return next(
+        new OError('[ValidateAdmin] Admin user without email address', {
+          userId: user._id
+        })
+      )
+    }
+    if (!adminDomains.find(domain => email.endsWith(`@${domain}`))) {
+      return next(
+        new OError('[ValidateAdmin] Admin user with invalid email domain', {
+          email: email,
+          userId: user._id
+        })
+      )
+    }
+    return next()
+  },
+
   httpAuth: basicAuth(function(user, pass) {
     const expectedPassword = Settings.httpAuthUsers[user]
     const isValid =
@@ -443,7 +475,9 @@ function _afterLoginSessionSetup(req, user, callback) {
   }
   req.login(user, function(err) {
     if (err) {
-      logger.warn({ user_id: user._id, err }, 'error from req.login')
+      OError.tag(err, 'error from req.login', {
+        user_id: user._id
+      })
       return callback(err)
     }
     // Regenerate the session to get a new sessionID (cookie value) to
@@ -451,10 +485,9 @@ function _afterLoginSessionSetup(req, user, callback) {
     const oldSession = req.session
     req.session.destroy(function(err) {
       if (err) {
-        logger.warn(
-          { user_id: user._id, err },
-          'error when trying to destroy old session'
-        )
+        OError.tag(err, 'error when trying to destroy old session', {
+          user_id: user._id
+        })
         return callback(err)
       }
       req.sessionStore.generate(req)
@@ -468,10 +501,9 @@ function _afterLoginSessionSetup(req, user, callback) {
       }
       req.session.save(function(err) {
         if (err) {
-          logger.warn(
-            { user_id: user._id },
-            'error saving regenerated session after login'
-          )
+          OError.tag(err, 'error saving regenerated session after login', {
+            user_id: user._id
+          })
           return callback(err)
         }
         UserSessionsManager.trackSession(user, req.sessionID, function() {})
