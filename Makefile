@@ -231,6 +231,20 @@ build_views: $(VIEW_FILES)
 $(VIEW_FILES): generated/views/%.js:
 	node app/src/infrastructure/Views.js $*
 
+build_lngs_full:
+	node build/translations
+
+LNGS = $(patsubst locales/%.json,generated/lng/%.js,$(wildcard locales/*.json))
+build_lng: $(LNGS)
+$(LNGS): $(wildcard build/translations/*.js)
+$(LNGS): locales/en.json
+$(LNGS): generated/lng/%.js: locales/%.json
+	node build/translations $*
+
+webpack_production:
+	$(MAKE) --no-print-directory -j build_lng
+	npm run webpack:production
+
 build_dev_deps: clean_build_artifacts
 	docker build \
 		--cache-from $(IMAGE_CI)-dev-deps-cache \
@@ -277,6 +291,7 @@ build_prod: clean_build_artifacts
 			app/templates \
 			app/views \
 			config \
+			generated/lng/ \
 			generated/views/ \
 			modules/*/app/ \
 			modules/*/index.js \

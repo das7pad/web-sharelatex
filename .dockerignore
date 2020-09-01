@@ -66,9 +66,13 @@
 !/app.js
 !/app
 
+!/build/translations/*.js
+
 !/frontend/fonts
 !/frontend/js
 !/frontend/stylesheets
+
+!/locales/*.json
 
 !/modules
 /modules/*/Makefile

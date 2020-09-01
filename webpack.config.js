@@ -6,6 +6,7 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const AutoPrefixer = require('autoprefixer')
 
+const GENERATED = path.join(__dirname, 'generated')
 const NODE_MODULES = path.join(__dirname, 'node_modules')
 const MODULES_PATH = path.join(__dirname, '/modules')
 const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
@@ -19,8 +20,7 @@ const entryPoints = {
 }
 
 require('glob')
-  .sync(`${NODE_MODULES}/translations-sharelatex/lng/*.js`)
-  .map(file => file.replace(NODE_MODULES + '/', ''))
+  .sync(`${GENERATED}/lng/*.js`)
   .forEach(file => {
     entryPoints[`t/${path.basename(file, '.js')}`] = file
   })

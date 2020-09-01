@@ -329,6 +329,11 @@ module.exports = settings =
 		subdomainLang:
 			www: {lngCode:"en", url: siteUrl}
 		defaultLng: "en"
+		loadLocalesFromDisk:(
+			if process.env.LOAD_LOCALES_FROM_DISK != undefined
+			then process.env.LOAD_LOCALES_FROM_DISK == 'true'
+			else process.env.NODE_ENV == 'production'
+		)
 
 	# Spelling languages
 	# ------------------

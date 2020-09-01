@@ -16,7 +16,7 @@ const async = require('async')
 const express = require('express')
 const path = require('path')
 const Settings = require('settings-sharelatex')
-const translations = require('translations-sharelatex').setup(Settings.i18n)
+const translations = require('../../../../../app/src/infrastructure/Translations')
 const {
   db,
   ObjectId

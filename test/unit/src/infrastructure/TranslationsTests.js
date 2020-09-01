@@ -1,3 +1,4 @@
+const accepts = require('accepts')
 const { expect } = require('chai')
 const SandboxedModule = require('sandboxed-module')
 
@@ -10,9 +11,9 @@ describe('Translations', function() {
         'settings-sharelatex': {
           i18n: {
             subdomainLang: {
-              www: { lngCode: 'en', url: 'www.sharelatex.com' },
-              fr: { lngCode: 'fr', url: 'fr.sharelatex.com' },
-              da: { lngCode: 'da', url: 'da.sharelatex.com' }
+              www: { lngCode: 'en', url: 'https://www.sharelatex.com' },
+              fr: { lngCode: 'fr', url: 'http://fr.sharelatex.com' },
+              da: { lngCode: 'da', url: 'https://da.sharelatex.com' }
             }
           }
         }
@@ -23,9 +24,15 @@ describe('Translations', function() {
       originalUrl: "doesn'tmatter.sharelatex.com/login",
       headers: {
         'accept-language': ''
+      },
+      query: {},
+      acceptsLanguages: function() {
+        const accept = accepts(this)
+        return accept.languages.apply(accept, arguments)
       }
     }
     this.res = {
+      locals: {},
       getHeader: () => {},
       setHeader: () => {}
     }

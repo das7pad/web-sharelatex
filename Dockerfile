@@ -30,6 +30,10 @@ USER node
 
 FROM dev as webpack
 USER root
+
+# generate the translations modules -- used by backend and frontend
+RUN /docker_cleanup.sh make build_lngs_full
+
 RUN /docker_cleanup.sh npm run webpack:production
 
 # precompile views
