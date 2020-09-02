@@ -21,7 +21,7 @@ const SandboxedModule = require('sandboxed-module')
 describe('OpenInOverleafMiddleware', function() {
   beforeEach(function() {
     this.snip = 'snippy snippy snap snap'
-    this.Csrf = { validateRequest: sinon.stub().callsArgWith(1, true) }
+    this.Csrf = { validateRequest: sinon.stub().callsArgWith(1, null) }
     this.AuthenticationController = {
       isUserLoggedIn: sinon.stub().returns(true),
       setRedirectInSession: sinon.stub()
@@ -69,7 +69,7 @@ describe('OpenInOverleafMiddleware', function() {
     })
 
     it('renders the gateway for submission if the user is logged in but the csrf is invalid', function() {
-      this.Csrf.validateRequest = sinon.stub().callsArgWith(1, false)
+      this.Csrf.validateRequest = sinon.stub().callsArgWith(1, new Error())
       this.OpenInOverleafMiddleware.middleware(this.req, this.res, this.next)
       sinon.assert.calledWith(
         this.OpenInOverleafMiddleware._renderGateway,
