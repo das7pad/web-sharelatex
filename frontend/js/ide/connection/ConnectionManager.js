@@ -14,7 +14,6 @@ import SocketIoShim from './SocketIoShim'
 
 let ConnectionManager
 const ONEHOUR = 1000 * 60 * 60
-let transport = 'handshake'
 
 export default ConnectionManager = (function() {
   ConnectionManager = class ConnectionManager {
@@ -32,7 +31,7 @@ export default ConnectionManager = (function() {
       this.prototype.MAX_RECONNECT_GRACEFULLY_INTERVAL = 45 * 1000
     }
 
-    constructor(ide, $scope, eventTracking) {
+    constructor(ide, $scope) {
       this.ide = ide
       this.$scope = $scope
       this.wsUrl = ide.wsUrl || null // websocket url (if defined)
@@ -132,45 +131,6 @@ export default ConnectionManager = (function() {
         'connect timeout': 30 * 1000,
         'force new connection': true
       })
-      const socket = this.ide.socket
-      socket.on('error', reportTransportError)
-      socket.on('connect_failed', reportTransportError)
-      socket.on('connecting', name => {
-        transport = name
-        socket.removeListener('error', reportTransportError)
-        socket.on('error', reportTransportError)
-      })
-      socket.on('connectionAccepted', () => {
-        // we have reached the real-time layer. ignore errors from now on.
-        socket.removeListener('error', reportTransportError)
-        socket.removeListener('connect_failed', reportTransportError)
-      })
-      function reportTransportError(error) {
-        socket.removeListener('error', reportTransportError)
-        socket.removeListener('connect_failed', reportTransportError)
-        if (typeof error === 'undefined') {
-          error = 'undefined'
-        } else if (typeof error !== 'string') {
-          try {
-            error = JSON.stringify(error)
-          } catch (e) {
-            error = `JSON_serialize_failed: ${e.message}`
-          }
-        }
-        if (transport === 'websocket' && error === '{"isTrusted":true}') {
-          error = 'hidden'
-        } else if (error.indexOf('<title>500') !== -1) {
-          error = '500'
-        } else if (error.indexOf('<title>502') !== -1) {
-          error = '502'
-        } else if (error.indexOf('<title>503') !== -1) {
-          error = '503'
-        } else if (error.length > 97) {
-          error = error.slice(0, 97) + '...'
-        }
-        eventTracking.sendMBSampled('socket-io-error', { transport, error })
-      }
-      this.ide.socket.reportTransportError = reportTransportError
 
       // handle network-level websocket errors (e.g. failed dns lookups)
 
@@ -428,6 +388,18 @@ Something went wrong connecting to your project. Please refresh if this continue
         data,
         (err, project, permissionsLevel, protocolVersion) => {
           if (err != null || project == null) {
+            err = err || {}
+            if (err.code === 'ProjectNotFound') {
+              // A stale browser tab tried to join a deleted project.
+              // Reloading the page will render a 404.
+              this.ide
+                .showGenericMessageModal(
+                  'Project has been deleted',
+                  'This project has been deleted by the owner.'
+                )
+                .result.then(() => location.reload(true))
+              return
+            }
             if (err.code === 'TooManyRequests') {
               sl_console.log(
                 `[joinProject ${connectionId}] retrying: ${err.message}`
@@ -594,10 +566,6 @@ Something went wrong connecting to your project. Please refresh if this continue
       }
       this.ide.socket.on('error', handleFailure)
       this.ide.socket.on('connect', handleSuccess)
-      const reportTransportError = this.ide.socket.reportTransportError
-      this.ide.socket.on('error', reportTransportError)
-      this.ide.socket.on('connect_failed', reportTransportError)
-      transport = 'handshake'
 
       // use socket.io connect() here to make a single attempt, the
       // reconnect() method makes multiple attempts

@@ -50,7 +50,7 @@ describe('ProjectStructureMongoLock', function() {
         holdingAccount: false,
         email: 'test@example.com'
       }
-      UserCreator.createNewUser(userDetails, (err, user) => {
+      UserCreator.createNewUser(userDetails, {}, (err, user) => {
         this.user = user
         if (err != null) {
           throw err

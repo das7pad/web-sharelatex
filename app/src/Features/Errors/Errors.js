@@ -109,7 +109,8 @@ class SAMLSessionDataMissing extends BackwardCompatibleError {
       this.tryAgain = false
       this.message = `Your account settings at your institution prevent us from accessing your email address. You will need to make your email address public at your institution in order to link with ${settings.appName}. Please contact your IT department if you have any questions.`
     } else if (!institutionEmail) {
-      this.message = 'Unable to confirm your institution email.'
+      this.message =
+        'Unable to confirm your institutional email address. The institutional identity provider did not provide an email address in the expected attribute. Please contact us if this keeps happening.'
     }
   }
 }
@@ -171,6 +172,8 @@ class InvalidQueryError extends OErrorV2CompatibleError {
 
 class ProjectIsArchivedOrTrashedError extends BackwardCompatibleError {}
 
+class AffiliationError extends OError {}
+
 module.exports = {
   OError,
   BackwardCompatibleError,
@@ -201,5 +204,6 @@ module.exports = {
   UserNotCollaboratorError,
   DocHasRangesError,
   InvalidQueryError,
-  ProjectIsArchivedOrTrashedError
+  ProjectIsArchivedOrTrashedError,
+  AffiliationError
 }
