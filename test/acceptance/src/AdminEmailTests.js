@@ -24,7 +24,8 @@ describe('AdminEmails', function() {
       this.badUser.login(err => {
         expect(err).to.not.exist
         this.badUser.getProjectListPage((err, statusCode) => {
-          expect(err).to.exist
+          expect(err).to.not.exist
+          expect(statusCode).to.equal(500)
           done()
         })
       })
