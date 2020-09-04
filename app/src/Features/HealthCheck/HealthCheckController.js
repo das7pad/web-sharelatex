@@ -99,7 +99,7 @@ function runSmokeTest(res) {
     })
     .catch(err => {
       if (!(err instanceof smokeTests.Failure)) {
-        err = new smokeTests.Failure('low level error', stats)
+        err = new smokeTests.Failure('low level error', stats).withCause(err)
       }
       const { failureMessage } = err.info
       delete err.info.failureMessage
