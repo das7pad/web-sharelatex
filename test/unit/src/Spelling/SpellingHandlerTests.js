@@ -13,16 +13,19 @@ const SPELLING_URL = 'http://spelling.service.test'
 
 describe('SpellingHandler', function() {
   let userId, word, dictionary, dictionaryString, request, SpellingHandler
+  let requestRetry
 
   beforeEach(function() {
     userId = 'wombat'
     word = 'potato'
     dictionary = ['wombaat', 'woombat']
     dictionaryString = JSON.stringify(dictionary)
-    request = {
+    requestRetry = {
       get: sinon
         .stub()
-        .yields(null, { statusCode: 200, body: dictionaryString }),
+        .yields(null, { statusCode: 200, body: dictionaryString })
+    }
+    request = {
       post: sinon.stub().yields(null, { statusCode: 204 }),
       delete: sinon.stub().yields(null, { statusCode: 204 })
     }
@@ -30,6 +33,7 @@ describe('SpellingHandler', function() {
     SpellingHandler = SandboxedModule.require(modulePath, {
       requires: {
         request: request,
+        requestretry: { defaults: () => requestRetry },
         'logger-sharelatex': {
           warn() {},
           error() {},
@@ -45,7 +49,7 @@ describe('SpellingHandler', function() {
   describe('getUserDictionary', function() {
     it('calls the spelling API', function(done) {
       SpellingHandler.getUserDictionary(userId, () => {
-        expect(request.get).to.have.been.calledWith({
+        expect(requestRetry.get).to.have.been.calledWith({
           url: 'http://spelling.service.test/v20200714/user/wombat',
           timeout: TIMEOUT
         })
@@ -62,7 +66,7 @@ describe('SpellingHandler', function() {
     })
 
     it('returns an error when the request fails', function(done) {
-      request.get = sinon.stub().yields(new Error('ugh'))
+      requestRetry.get = sinon.stub().yields(new Error('ugh'))
       SpellingHandler.getUserDictionary(userId, err => {
         expect(err).to.exist
         done()

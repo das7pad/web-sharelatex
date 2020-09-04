@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken')
 const request = require('request')
+const requestRetry = require('requestretry').defaults({
+  maxAttempts: 3,
+  retryDelay: 10
+})
 const Settings = require('settings-sharelatex')
 const OError = require('@overleaf/o-error')
 
@@ -17,7 +21,7 @@ module.exports = {
 
   getUserDictionary(userId, callback) {
     const url = `${Settings.apis.spelling.url}/v20200714/user/${userId}`
-    request.get({ url: url, timeout: TIMEOUT }, (error, response) => {
+    requestRetry.get({ url: url, timeout: TIMEOUT }, (error, response) => {
       if (error) {
         return callback(
           OError.tag(error, 'error getting user dictionary', { error, userId })
