@@ -29,6 +29,7 @@ describe('NotificationsHandler', function() {
 
   beforeEach(function() {
     this.request = sinon.stub().callsArgWith(1)
+    this.requestRetry = sinon.stub().callsArgWith(1)
     return (this.handler = SandboxedModule.require(modulePath, {
       globals: {
         console: console
@@ -38,6 +39,7 @@ describe('NotificationsHandler', function() {
           apis: { notifications: { url: notificationUrl } }
         },
         request: this.request,
+        requestretry: { defaults: () => this.requestRetry },
         'logger-sharelatex': {
           log() {},
           err() {}
@@ -49,7 +51,7 @@ describe('NotificationsHandler', function() {
   describe('getUserNotifications', function() {
     it('should get unread notifications', function(done) {
       const stubbedNotifications = [{ _id: notification_id, user_id }]
-      this.request.callsArgWith(
+      this.requestRetry.callsArgWith(
         1,
         null,
         { statusCode: 200 },
@@ -65,7 +67,7 @@ describe('NotificationsHandler', function() {
             timeout: 1000,
             method: 'GET'
           }
-          this.request.calledWith(getOpts).should.equal(true)
+          this.requestRetry.calledWith(getOpts).should.equal(true)
           return done()
         }
       )

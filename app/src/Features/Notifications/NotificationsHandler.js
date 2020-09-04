@@ -11,8 +11,13 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
+const OError = require('@overleaf/o-error')
 const settings = require('settings-sharelatex')
 const request = require('request')
+const requestRetry = require('requestretry').defaults({
+  maxAttempts: 3,
+  retryDelay: 10
+})
 const logger = require('logger-sharelatex')
 
 const oneSecond = 1000
@@ -24,6 +29,8 @@ const makeRequest = function(opts, callback) {
       : undefined) == null
   ) {
     return callback(null, { statusCode: 200 })
+  } else if (opts.method === 'GET') {
+    return requestRetry(opts, callback)
   } else {
     return request(opts, callback)
   }
@@ -43,10 +50,14 @@ module.exports = {
     }
     return makeRequest(opts, function(err, res, unreadNotifications) {
       const statusCode = res != null ? res.statusCode : 500
-      if (err != null || statusCode !== 200) {
-        const e = new Error(
-          `something went wrong getting notifications, ${err}, ${statusCode}`
-        )
+      if (err) {
+        OError.tag(err, 'something went wrong getting notifications')
+      } else if (statusCode !== 200) {
+        err = new OError('non success statusCode from notifications', {
+          statusCode
+        })
+      }
+      if (err) {
         logger.err({ err }, 'something went wrong getting notifications')
         return callback(null, [])
       } else {
