@@ -68,6 +68,7 @@ describe('InstitutionsManager', function() {
 
     return (this.InstitutionsManager = SandboxedModule.require(modulePath, {
       globals: {
+        process,
         console: console
       },
       requires: {
