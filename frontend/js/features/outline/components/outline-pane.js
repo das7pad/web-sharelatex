@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import classNames from 'classnames'
-import { Trans } from 'react-i18next'
+import { Trans } from '../../../components/trans'
 import { t } from '../../../misc/t'
 
 import OutlineRoot from './outline-root'
