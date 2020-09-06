@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import classNames from 'classnames'
-import { useTranslation, Trans } from 'react-i18next'
+import { Trans } from 'react-i18next'
+import { t } from '../../../misc/t'
 
 import OutlineRoot from './outline-root'
 import { localStorage } from '../../../modules/storage'
@@ -16,8 +17,6 @@ function OutlinePane({
   eventTracking,
   highlightedLine
 }) {
-  const { t } = useTranslation()
-
   const storageKey = `file_outline.expanded.${projectId}`
   const [expanded, setExpanded] = useState(() => {
     const storedExpandedState = localStorage(storageKey) !== false

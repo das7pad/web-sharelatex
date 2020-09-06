@@ -1,12 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
+import { t } from '../../../misc/t'
 
 import OutlineList from './outline-list'
 
 function OutlineRoot({ outline, jumpToLine, highlightedLine }) {
-  const { t } = useTranslation()
-
   return (
     <div>
       {outline.length ? (
