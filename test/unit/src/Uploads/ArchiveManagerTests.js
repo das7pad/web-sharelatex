@@ -55,8 +55,7 @@ describe('ArchiveManager', function() {
         }),
         'logger-sharelatex': this.logger,
         '@overleaf/metrics': this.metrics,
-        fs: (this.fs = {}),
-        'fs-extra': (this.fse = {}),
+        fs: (this.fs = { mkdir: sinon.stub().callsArg(2) }),
         './ArchiveErrors': ArchiveErrors
       }
     })
@@ -81,7 +80,7 @@ describe('ArchiveManager', function() {
           .callsArgWith(1, null, this.readStream)
         this.writeStream = new events.EventEmitter()
         this.fs.createWriteStream = sinon.stub().returns(this.writeStream)
-        this.fse.ensureDir = sinon.stub().callsArg(1)
+        this.fs.mkdir = sinon.stub().callsArg(2)
         this.ArchiveManager.extractZipArchive(
           this.source,
           this.destination,
@@ -112,7 +111,6 @@ describe('ArchiveManager', function() {
           .callsArgWith(1, null, this.readStream)
         this.writeStream = new events.EventEmitter()
         this.fs.createWriteStream = sinon.stub().returns(this.writeStream)
-        this.fse.ensureDir = sinon.stub().callsArg(1)
         this.ArchiveManager.extractZipArchive(
           this.source,
           this.destination,
@@ -278,7 +276,6 @@ describe('ArchiveManager', function() {
         this.zipfile.openReadStream = sinon
           .stub()
           .callsArgWith(1, null, this.readStream)
-        this.fse.ensureDir = sinon.stub().callsArg(1)
         this.ArchiveManager.extractZipArchive(
           this.source,
           this.destination,
@@ -302,10 +299,8 @@ describe('ArchiveManager', function() {
       })
 
       it('should treat the backslashes as a directory separator when creating the directory', function() {
-        this.fse.ensureDir.should.be.calledWith(`${this.destination}/wombat`)
-        return this.fse.ensureDir.should.be.calledWith(
-          `${this.destination}/potato`
-        )
+        this.fs.mkdir.should.be.calledWith(`${this.destination}/wombat`)
+        this.fs.mkdir.should.be.calledWith(`${this.destination}/potato`)
       })
 
       it('should treat the backslashes as a directory separator when creating the file', function() {
@@ -378,7 +373,6 @@ describe('ArchiveManager', function() {
           .callsArgWith(1, null, this.readStream)
         this.writeStream = new events.EventEmitter()
         this.fs.createWriteStream = sinon.stub().returns(this.writeStream)
-        this.fse.ensureDir = sinon.stub().callsArg(1)
         this.ArchiveManager.extractZipArchive(
           this.source,
           this.destination,
@@ -416,7 +410,6 @@ describe('ArchiveManager', function() {
           .callsArgWith(1, null, this.readStream)
         this.writeStream = new events.EventEmitter()
         this.fs.createWriteStream = sinon.stub().returns(this.writeStream)
-        this.fse.ensureDir = sinon.stub().callsArg(1)
         this.ArchiveManager.extractZipArchive(
           this.source,
           this.destination,

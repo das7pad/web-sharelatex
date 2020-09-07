@@ -1,6 +1,6 @@
 'use strict'
 
-const fs = require('fs-extra')
+const { promises: fs } = require('fs')
 const xml2js = require('xml2js')
 
 const UKAMFEntity = require('./ukamf-entity')
