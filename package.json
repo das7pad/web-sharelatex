@@ -117,7 +117,7 @@
     "expose-loader": "^0.7.5",
     "file-loader": "^5.0.2",
     "fuse.js": "^3.0.0",
-    "jquery": "^2.2.4",
+    "jquery": "^3.5.1",
     "jsdom": "^16.2.2",
     "jsdom-global": "^3.0.2",
     "karma": "^5.0.2",
