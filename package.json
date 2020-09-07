@@ -79,7 +79,6 @@
     "sanitize-html": "^1.27.4",
     "settings-sharelatex": "https://github.com/das7pad/settings-sharelatex/archive/d0797834438df2d102798a64602adf2f71ac8e48.tar.gz",
     "underscore": "1.6.0",
-    "url-parse": "^1.4.7",
     "utf-8-validate": "^5.0.2",
     "uuid": "^3.0.1",
     "valid-url": "^1.0.9",

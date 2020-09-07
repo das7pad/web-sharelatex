@@ -16,7 +16,7 @@
 let OpenInOverleafController
 const logger = require('logger-sharelatex')
 const Path = require('path')
-const URL = require('url-parse')
+const { URL } = require('url')
 const async = require('async')
 const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
 const ProjectCreationHandler = require('../../../../app/src/Features/Project/ProjectCreationHandler')
@@ -344,8 +344,11 @@ module.exports = OpenInOverleafController = {
   _getMainFileCommentFromSnipRequest(req) {
     let comment = ''
     if (req.body.comment !== 'none') {
-      const referrer = new URL(req.body.referrer || '')
-      if (referrer.hostname && referrer.hostname.match(/texample\.net$/)) {
+      let referrer
+      try {
+        referrer = new URL(req.body.referrer || '')
+      } catch (e) {}
+      if (referrer && referrer.host.match(/texample\.net$/)) {
         comment = OpenInOverleafHelper.snippetFileComment('texample')
       } else {
         comment = OpenInOverleafHelper.snippetFileComment('default')
