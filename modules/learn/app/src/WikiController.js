@@ -247,10 +247,10 @@ module.exports = WikiController = {
     }
     // width and alt below are Linked_images, but we are not using this and causes a JS error
     page.content = __guard__(page != null ? page.content : undefined, x3 =>
-      x3.replace(/width='{{{width}}}'/g, '')
+      x3.replace(/width=['"]{{{width}}}['"]/g, '')
     )
     page.content = __guard__(page != null ? page.content : undefined, x4 =>
-      x4.replace(/alt='{{{alt}}}'/g, '')
+      x4.replace(/alt=['"]{{{alt}}}['"]/g, '')
     )
     return res.render(viewPath, {
       page,
