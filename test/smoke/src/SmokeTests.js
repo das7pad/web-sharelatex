@@ -1,10 +1,7 @@
-const { Agent } = require('http')
-const { createConnection } = require('net')
-const { promisify } = require('util')
 const OError = require('@overleaf/o-error')
-const requestModule = require('request')
 const Settings = require('@overleaf/settings')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
+const getRequest = require('./request')
 
 class SmokeTestFailure extends OError {
   constructor(message, stats) {
@@ -13,28 +10,7 @@ class SmokeTestFailure extends OError {
 }
 const Failure = SmokeTestFailure
 
-// send requests to web router if this is the api process
-const OWN_PORT = Settings.port || Settings.internal.web.port || 3000
-const PORT = (Settings.web && Settings.web.web_router_port) || OWN_PORT
 const STEP_TIMEOUT = Settings.smokeTest.stepTimeout
-
-// like the curl option `--resolve DOMAIN:PORT:127.0.0.1`
-class LocalhostAgent extends Agent {
-  createConnection(options, callback) {
-    return createConnection(PORT, '127.0.0.1', callback)
-  }
-}
-
-// degrade the 'HttpOnly; Secure;' flags of the cookie
-class InsecureCookieJar extends requestModule.jar().constructor {
-  setCookie(...args) {
-    const cookie = super.setCookie(...args)
-    cookie.secure = false
-    cookie.httpOnly = false
-    return cookie
-  }
-}
-
 const ANGULAR_PROJECT_CONTROLLER_REGEX = /controller="ProjectPageController"/
 const CSRF_REGEX = /<meta id="ol-csrfToken" content="(.+?)">/
 const PROJECT_ID_REGEX = new RegExp(
@@ -97,15 +73,8 @@ async function runSmokeTest(stats) {
     lastStep = step
   }
 
-  const request = promisify(
-    requestModule.defaults({
-      agent: new LocalhostAgent(),
-      baseUrl: `http://smoke${Settings.cookieDomain}/`,
-      headers: { 'X-Forwarded-Proto': 'https' },
-      jar: new InsecureCookieJar(),
-      timeout: STEP_TIMEOUT
-    })
-  )
+  const request = getRequest(STEP_TIMEOUT)
+
   completeStep('init')
 
   async function getCsrfTokenFor(endpoint) {
