@@ -120,11 +120,12 @@ async function runSmokeTest(stats) {
 
   async function cleanup() {
     const logoutCsrfToken = await getCsrfTokenFor('logout')
-    return request({
+    const response = await request({
       method: 'POST',
       url: 'logout',
       json: { _csrf: logoutCsrfToken }
     })
+    assertHasStatusCode(response, 302)
   }
 
   const loginCsrfToken = await getCsrfTokenFor('login')
