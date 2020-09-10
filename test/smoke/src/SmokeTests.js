@@ -44,7 +44,7 @@ const TITLE_REGEX = /<title>Your Projects - .*, Online LaTeX Editor<\/title>/
 function _parseCsrf(body) {
   const match = CSRF_REGEX.exec(body)
   if (!match) {
-    throw new Error('No meta element for csrfToken found.')
+    throw new Error('Cannot find csrfToken in HTML.')
   }
   return match[1]
 }
