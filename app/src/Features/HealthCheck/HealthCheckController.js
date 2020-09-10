@@ -101,9 +101,7 @@ function runSmokeTest(res) {
       if (!(err instanceof smokeTests.Failure)) {
         err = new smokeTests.Failure('low level error', stats).withCause(err)
       }
-      const { failureMessage } = err.info
-      delete err.info.failureMessage
       logger.err({ err }, 'health check failed')
-      res.status(500).send(prettyJSON({ stats, error: failureMessage }))
+      res.status(500).send(prettyJSON({ stats, error: err.message }))
     })
 }

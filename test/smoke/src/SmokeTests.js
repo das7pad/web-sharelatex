@@ -9,8 +9,7 @@ const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
 
 class SmokeTestFailure extends OError {
   constructor(message, stats) {
-    const info = { stats, failureMessage: message }
-    super(message, info)
+    super(message, { stats })
   }
 }
 const Failure = SmokeTestFailure
