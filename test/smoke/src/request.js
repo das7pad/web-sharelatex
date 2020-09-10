@@ -29,7 +29,7 @@ module.exports = function(timeout) {
   return promisify(
     request.defaults({
       agent: new LocalhostAgent(),
-      baseUrl: `http://smoke${Settings.cookieDomain}/`,
+      baseUrl: `http://smoke${Settings.cookieDomain}`,
       headers: {
         // emulate the header of a https proxy
         // express wont emit a 'Secure;' cookie on a plain-text connection.
