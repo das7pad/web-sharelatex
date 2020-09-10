@@ -65,9 +65,6 @@ async function runSmokeTest(stats) {
         'X-Forwarded-Proto': 'https'
       },
       jar: new InsecureCookieJar(),
-      qs: {
-        setLng: 'en'
-      },
       timeout: STEP_TIMEOUT
     })
   )
