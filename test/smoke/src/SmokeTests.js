@@ -77,6 +77,12 @@ async function cleanupRateLimits() {
     ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
   ])
 }
+function assertHasStatusCode(response, expected) {
+  const { statusCode: actual } = response
+  if (actual !== expected) {
+    throw new OError('unexpected response code', { actual, expected })
+  }
+}
 
 module.exports = runSmokeTest
 module.exports.Failure = Failure
@@ -103,9 +109,7 @@ async function runSmokeTest(stats) {
   async function getCsrfTokenFor(endpoint) {
     try {
       const response = await request({ url: endpoint })
-      if (response.statusCode !== 200) {
-        throw new Error(`unexpected response code: ${response.statusCode}`)
-      }
+      assertHasStatusCode(response, 200)
       return _parseCsrf(response.body)
     } catch (err) {
       throw new Failure('error fetching csrf token', stats).withCause(err)
@@ -149,9 +153,7 @@ async function runSmokeTest(stats) {
     if (body && body.message && body.message.type === 'error') {
       throw new Error(body.message.text)
     }
-    if (response.statusCode !== 200) {
-      throw new Error(`unexpected response code: ${response.statusCode}`)
-    }
+    assertHasStatusCode(response, 200)
   } catch (err) {
     throw new Failure('login failed', stats).withCause(err)
   } finally {
@@ -162,9 +164,7 @@ async function runSmokeTest(stats) {
     const response = await request({
       uri: `project/${Settings.smokeTest.projectId}`
     })
-    if (response.statusCode !== 200) {
-      throw new Error(`unexpected response code: ${response.statusCode}`)
-    }
+    assertHasStatusCode(response, 200)
     const body = response.body
     if (typeof body !== 'string') {
       throw new Error('body is not of type string')
@@ -185,9 +185,7 @@ async function runSmokeTest(stats) {
 
   try {
     const response = await request({ uri: 'project' })
-    if (response.statusCode !== 200) {
-      throw new Error(`unexpected response code: ${response.statusCode}`)
-    }
+    assertHasStatusCode(response, 200)
     const body = response.body
     if (typeof body !== 'string') {
       throw new Error('body is not of type string')
