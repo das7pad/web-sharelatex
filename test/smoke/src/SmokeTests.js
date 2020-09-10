@@ -54,8 +54,11 @@ module.exports.Failure = Failure
 async function runSmokeTest(stats) {
   let step
   let lastStep = stats.start
-  const steps = []
-  stats.steps = steps
+  function completeStep(key) {
+    step = Date.now()
+    stats.steps.push({ [key]: step - lastStep })
+    lastStep = step
+  }
 
   const request = promisify(
     requestModule.defaults({
@@ -68,10 +71,7 @@ async function runSmokeTest(stats) {
       timeout: STEP_TIMEOUT
     })
   )
-
-  step = Date.now()
-  steps.push({ init: step - lastStep })
-  lastStep = step
+  completeStep('init')
 
   async function cleanupRateLimits() {
     let timeoutCleanupRateLimits
@@ -104,11 +104,7 @@ async function runSmokeTest(stats) {
             ).withCause(err)
           })
       ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
-    ]).finally(() => {
-      step = Date.now()
-      steps.push({ cleanupRateLimits: step - lastStep })
-      lastStep = step
-    })
+    ]).finally(() => completeStep('cleanupRateLimits'))
   }
 
   async function getCsrfTokenFor(endpoint) {
@@ -119,13 +115,7 @@ async function runSmokeTest(stats) {
         }
         return _parseCsrf(response.body)
       })
-      .finally(() => {
-        step = Date.now()
-        const logEntry = {}
-        logEntry['getCsrfTokenFor/' + endpoint] = step - lastStep
-        steps.push(logEntry)
-        lastStep = step
-      })
+      .finally(() => completeStep('getCsrfTokenFor/' + endpoint))
       .catch(err => {
         throw new Failure('error fetching csrf token', stats).withCause(err)
       })
@@ -165,11 +155,7 @@ async function runSmokeTest(stats) {
         throw new Error(`unexpected response code: ${response.statusCode}`)
       }
     })
-    .finally(() => {
-      step = Date.now()
-      steps.push({ login: step - lastStep })
-      lastStep = step
-    })
+    .finally(() => completeStep('login'))
     .catch(err => {
       throw new Failure('login failed', stats).withCause(err)
     })
@@ -193,11 +179,7 @@ async function runSmokeTest(stats) {
         throw new Error('project page html does not have project_id')
       }
     })
-    .finally(() => {
-      step = Date.now()
-      steps.push({ loadEditor: step - lastStep })
-      lastStep = step
-    })
+    .finally(() => completeStep('loadEditor'))
     .catch(err => {
       cleanup().catch(() => {})
       throw new Failure('loading editor failed', stats).withCause(err)
@@ -224,21 +206,14 @@ async function runSmokeTest(stats) {
         throw new Error('body does not have correct angular controller')
       }
     })
-    .finally(() => {
-      step = Date.now()
-      steps.push({ loadProjectDashboard: step - lastStep })
-      lastStep = step
-    })
+    .finally(() => completeStep('loadProjectDashboard'))
     .catch(err => {
       cleanup().catch(() => {})
       throw new Failure('loading project list failed', stats).withCause(err)
     })
 
   await cleanup()
-    .finally(() => {
-      step = Date.now()
-      steps.push({ logout: step - lastStep })
-    })
+    .finally(() => completeStep('logout'))
     .catch(err => {
       throw new Failure('logout failed', stats).withCause(err)
     })

@@ -88,7 +88,7 @@ function prettyJSON(blob) {
 }
 function runSmokeTest(res) {
   res.contentType('application/json')
-  const stats = { start: new Date() }
+  const stats = { start: new Date(), steps: [] }
   smokeTests(stats)
     .finally(() => {
       stats.end = new Date()
