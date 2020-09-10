@@ -42,9 +42,6 @@ const PROJECT_ID_REGEX = new RegExp(
 )
 const TITLE_REGEX = /<title>Your Projects - .*, Online LaTeX Editor<\/title>/
 function _parseCsrf(body) {
-  if (typeof body !== 'string') {
-    throw new Error('Body is not of type string.')
-  }
   const match = CSRF_REGEX.exec(body)
   if (!match) {
     throw new Error('No meta element for csrfToken found.')
