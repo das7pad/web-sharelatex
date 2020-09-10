@@ -35,7 +35,12 @@ class InsecureCookieJar extends requestModule.jar().constructor {
   }
 }
 
+const ANGULAR_PROJECT_CONTROLLER_REGEX = /controller="ProjectPageController"/
 const CSRF_REGEX = /<meta id="ol-csrfToken" content="(.+?)">/
+const PROJECT_ID_REGEX = new RegExp(
+  `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
+)
+const TITLE_REGEX = /<title>Your Projects - .*, Online LaTeX Editor<\/title>/
 function _parseCsrf(body) {
   if (typeof body !== 'string') {
     throw new Error('Body is not of type string.')
@@ -166,15 +171,7 @@ async function runSmokeTest(stats) {
       uri: `project/${Settings.smokeTest.projectId}`
     })
     assertHasStatusCode(response, 200)
-    const body = response.body
-    if (typeof body !== 'string') {
-      throw new Error('body is not of type string')
-    }
-    if (
-      !body.includes(
-        `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
-      )
-    ) {
+    if (!PROJECT_ID_REGEX.test(response.body)) {
       throw new Error('project page html does not have project_id')
     }
   } catch (err) {
@@ -187,14 +184,10 @@ async function runSmokeTest(stats) {
   try {
     const response = await request({ uri: 'project' })
     assertHasStatusCode(response, 200)
-    const body = response.body
-    if (typeof body !== 'string') {
-      throw new Error('body is not of type string')
-    }
-    if (!/<title>Your Projects - .*, Online LaTeX Editor<\/title>/.test(body)) {
+    if (!TITLE_REGEX.test(response.body)) {
       throw new Error('body does not have correct title')
     }
-    if (!body.includes('ProjectPageController')) {
+    if (!ANGULAR_PROJECT_CONTROLLER_REGEX.test(response.body)) {
       throw new Error('body does not have correct angular controller')
     }
   } catch (err) {
