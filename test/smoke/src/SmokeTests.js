@@ -114,7 +114,10 @@ async function runSmokeTest(stats) {
       assertHasStatusCode(response, 200)
       return _parseCsrf(response.body)
     } catch (err) {
-      throw new Failure('error fetching csrf token', stats).withCause(err)
+      throw new Failure(
+        `error fetching csrf token on /${endpoint}`,
+        stats
+      ).withCause(err)
     } finally {
       completeStep('getCsrfTokenFor/' + endpoint)
     }
