@@ -79,30 +79,29 @@ async function runSmokeTest(stats) {
 
   async function getCsrfTokenFor(endpoint) {
     try {
-      const response = await request({ url: endpoint })
+      const response = await request(endpoint)
       assertHasStatusCode(response, 200)
       return _parseCsrf(response.body)
     } catch (err) {
       throw new Failure(
-        `error fetching csrf token on /${endpoint}`,
+        `error fetching csrf token on ${endpoint}`,
         stats
       ).withCause(err)
     } finally {
-      completeStep('getCsrfTokenFor/' + endpoint)
+      completeStep('getCsrfTokenFor' + endpoint)
     }
   }
 
   async function cleanup() {
-    const logoutCsrfToken = await getCsrfTokenFor('logout')
-    const response = await request({
+    const logoutCsrfToken = await getCsrfTokenFor('/logout')
+    const response = await request('/logout', {
       method: 'POST',
-      url: 'logout',
       json: { _csrf: logoutCsrfToken }
     })
     assertHasStatusCode(response, 302)
   }
 
-  const loginCsrfToken = await getCsrfTokenFor('login')
+  const loginCsrfToken = await getCsrfTokenFor('/login')
   try {
     await cleanupRateLimits()
   } catch (err) {
@@ -112,9 +111,8 @@ async function runSmokeTest(stats) {
   }
 
   try {
-    const response = await request({
+    const response = await request('/login', {
       method: 'POST',
-      url: 'login',
       json: {
         _csrf: loginCsrfToken,
         email: Settings.smokeTest.user,
@@ -136,9 +134,7 @@ async function runSmokeTest(stats) {
   }
 
   try {
-    const response = await request({
-      uri: `project/${Settings.smokeTest.projectId}`
-    })
+    const response = await request(`/project/${Settings.smokeTest.projectId}`)
     assertHasStatusCode(response, 200)
     if (!PROJECT_ID_REGEX.test(response.body)) {
       throw new Error('project page html does not have project_id')
@@ -151,7 +147,7 @@ async function runSmokeTest(stats) {
   }
 
   try {
-    const response = await request({ uri: 'project' })
+    const response = await request('/project')
     assertHasStatusCode(response, 200)
     if (!TITLE_REGEX.test(response.body)) {
       throw new Error('body does not have correct title')
