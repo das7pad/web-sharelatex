@@ -216,5 +216,4 @@ async function runSmokeTest(stats) {
     .catch(err => {
       throw new Failure('logout failed', stats).withCause(err)
     })
-  return stats
 }
