@@ -94,7 +94,7 @@ function runSmokeTest(res) {
       stats.end = new Date()
       stats.duration = stats.end - stats.start
     })
-    .then(stats => {
+    .then(() => {
       res.status(200).send(prettyJSON({ stats }))
     })
     .catch(err => {
