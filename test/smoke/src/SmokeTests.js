@@ -4,7 +4,6 @@ const { promisify } = require('util')
 const OError = require('@overleaf/o-error')
 const requestModule = require('request')
 const Settings = require('settings-sharelatex')
-const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
 
 class SmokeTestFailure extends OError {
@@ -48,6 +47,37 @@ function _parseCsrf(body) {
   return match[1]
 }
 
+async function clearRateLimit(endpointName, subject) {
+  try {
+    await RateLimiter.promises.clearRateLimit(endpointName, subject)
+  } catch (err) {
+    throw new OError('error clearing rate limit').withCause(err)
+  }
+}
+async function clearLoginRateLimit() {
+  await clearRateLimit('login', Settings.smokeTest.user)
+}
+async function clearOpenProjectRateLimit() {
+  await clearRateLimit(
+    'open-project',
+    `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`
+  )
+}
+async function cleanupRateLimits() {
+  let timeoutCleanupRateLimits
+  await Promise.race([
+    new Promise((resolve, reject) => {
+      timeoutCleanupRateLimits = setTimeout(() => {
+        reject(new OError('cleanupRateLimits timed out'))
+      }, STEP_TIMEOUT)
+    }),
+    Promise.all([
+      clearLoginRateLimit(),
+      clearOpenProjectRateLimit()
+    ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
+  ])
+}
+
 module.exports = runSmokeTest
 module.exports.Failure = Failure
 async function runSmokeTest(stats) {
@@ -70,52 +100,18 @@ async function runSmokeTest(stats) {
   )
   completeStep('init')
 
-  async function cleanupRateLimits() {
-    let timeoutCleanupRateLimits
-    await Promise.race([
-      new Promise((resolve, reject) => {
-        timeoutCleanupRateLimits = setTimeout(
-          reject,
-          STEP_TIMEOUT,
-          new Failure('cleanupRateLimits timed out', stats)
-        )
-      }),
-      Promise.all([
-        LoginRateLimiter.promises
-          .recordSuccessfulLogin(Settings.smokeTest.user)
-          .catch(err => {
-            throw new Failure(
-              'error clearing login failure rate limit',
-              stats
-            ).withCause(err)
-          }),
-        RateLimiter.promises
-          .clearRateLimit(
-            'open-project',
-            `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`
-          )
-          .catch(err => {
-            throw new Failure(
-              'error clearing open-project rate limit',
-              stats
-            ).withCause(err)
-          })
-      ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
-    ]).finally(() => completeStep('cleanupRateLimits'))
-  }
-
   async function getCsrfTokenFor(endpoint) {
-    return request({ url: endpoint })
-      .then(response => {
-        if (response.statusCode !== 200) {
-          throw new Error(`unexpected response code: ${response.statusCode}`)
-        }
-        return _parseCsrf(response.body)
-      })
-      .finally(() => completeStep('getCsrfTokenFor/' + endpoint))
-      .catch(err => {
-        throw new Failure('error fetching csrf token', stats).withCause(err)
-      })
+    try {
+      const response = await request({ url: endpoint })
+      if (response.statusCode !== 200) {
+        throw new Error(`unexpected response code: ${response.statusCode}`)
+      }
+      return _parseCsrf(response.body)
+    } catch (err) {
+      throw new Failure('error fetching csrf token', stats).withCause(err)
+    } finally {
+      completeStep('getCsrfTokenFor/' + endpoint)
+    }
   }
 
   async function cleanup() {
@@ -128,88 +124,92 @@ async function runSmokeTest(stats) {
   }
 
   const loginCsrfToken = await getCsrfTokenFor('login')
-  await cleanupRateLimits()
-  await request({
-    method: 'POST',
-    url: 'login',
-    json: {
-      _csrf: loginCsrfToken,
-      email: Settings.smokeTest.user,
-      password: Settings.smokeTest.password
+  try {
+    await cleanupRateLimits()
+  } catch (err) {
+    throw new Failure('error clearing rate limits', stats).withCause(err)
+  } finally {
+    completeStep('cleanupRateLimits')
+  }
+
+  try {
+    const response = await request({
+      method: 'POST',
+      url: 'login',
+      json: {
+        _csrf: loginCsrfToken,
+        email: Settings.smokeTest.user,
+        password: Settings.smokeTest.password
+      }
+    })
+    const body = response.body
+    // login success and login failure both receive a status code of 200
+    // see the frontend logic on how to handle the response:
+    //   frontend/js/directives/asyncForm.js -> submitRequest
+    if (body && body.message && body.message.type === 'error') {
+      throw new Error(body.message.text)
     }
-  })
-    .then(response => {
-      const body = response.body
-      // login success and login failure both receive a status code of 200
-      // see the frontend logic on how to handle the response:
-      //   frontend/js/directives/asyncForm.js -> submitRequest
-      if (body && body.message && body.message.type === 'error') {
-        throw new Error(body.message.text)
-      }
-      if (response.statusCode !== 200) {
-        throw new Error(`unexpected response code: ${response.statusCode}`)
-      }
+    if (response.statusCode !== 200) {
+      throw new Error(`unexpected response code: ${response.statusCode}`)
+    }
+  } catch (err) {
+    throw new Failure('login failed', stats).withCause(err)
+  } finally {
+    completeStep('login')
+  }
+
+  try {
+    const response = await request({
+      uri: `project/${Settings.smokeTest.projectId}`
     })
-    .finally(() => completeStep('login'))
-    .catch(err => {
-      throw new Failure('login failed', stats).withCause(err)
-    })
+    if (response.statusCode !== 200) {
+      throw new Error(`unexpected response code: ${response.statusCode}`)
+    }
+    const body = response.body
+    if (typeof body !== 'string') {
+      throw new Error('body is not of type string')
+    }
+    if (
+      !body.includes(
+        `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
+      )
+    ) {
+      throw new Error('project page html does not have project_id')
+    }
+  } catch (err) {
+    cleanup().catch(() => {})
+    throw new Failure('loading editor failed', stats).withCause(err)
+  } finally {
+    completeStep('loadEditor')
+  }
 
-  await request({ uri: `project/${Settings.smokeTest.projectId}` })
-    .then(response => {
-      if (response.statusCode !== 200) {
-        throw new Error(`unexpected response code: ${response.statusCode}`)
-      }
+  try {
+    const response = await request({ uri: 'project' })
+    if (response.statusCode !== 200) {
+      throw new Error(`unexpected response code: ${response.statusCode}`)
+    }
+    const body = response.body
+    if (typeof body !== 'string') {
+      throw new Error('body is not of type string')
+    }
+    if (!/<title>Your Projects - .*, Online LaTeX Editor<\/title>/.test(body)) {
+      throw new Error('body does not have correct title')
+    }
+    if (!body.includes('ProjectPageController')) {
+      throw new Error('body does not have correct angular controller')
+    }
+  } catch (err) {
+    cleanup().catch(() => {})
+    throw new Failure('loading project list failed', stats).withCause(err)
+  } finally {
+    completeStep('loadProjectDashboard')
+  }
 
-      const body = response.body
-      if (typeof body !== 'string') {
-        throw new Error('body is not of type string')
-      }
-
-      if (
-        !body.includes(
-          `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
-        )
-      ) {
-        throw new Error('project page html does not have project_id')
-      }
-    })
-    .finally(() => completeStep('loadEditor'))
-    .catch(err => {
-      cleanup().catch(() => {})
-      throw new Failure('loading editor failed', stats).withCause(err)
-    })
-
-  await request({ uri: 'project' })
-    .then(response => {
-      if (response.statusCode !== 200) {
-        throw new Error(`unexpected response code: ${response.statusCode}`)
-      }
-
-      const body = response.body
-      if (typeof body !== 'string') {
-        throw new Error('body is not of type string')
-      }
-
-      if (
-        !/<title>Your Projects - .*, Online LaTeX Editor<\/title>/.test(body)
-      ) {
-        throw new Error('body does not have correct title')
-      }
-
-      if (!body.includes('ProjectPageController')) {
-        throw new Error('body does not have correct angular controller')
-      }
-    })
-    .finally(() => completeStep('loadProjectDashboard'))
-    .catch(err => {
-      cleanup().catch(() => {})
-      throw new Failure('loading project list failed', stats).withCause(err)
-    })
-
-  await cleanup()
-    .finally(() => completeStep('logout'))
-    .catch(err => {
-      throw new Failure('logout failed', stats).withCause(err)
-    })
+  try {
+    await cleanup()
+  } catch (err) {
+    throw new Failure('logout failed', stats).withCause(err)
+  } finally {
+    completeStep('logout')
+  }
 }
