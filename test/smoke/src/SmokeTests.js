@@ -63,9 +63,7 @@ async function runSmokeTest(stats) {
     requestModule.defaults({
       agent: new LocalhostAgent(),
       baseUrl: `http://smoke${Settings.cookieDomain}/`,
-      headers: {
-        'X-Forwarded-Proto': 'https'
-      },
+      headers: { 'X-Forwarded-Proto': 'https' },
       jar: new InsecureCookieJar(),
       timeout: STEP_TIMEOUT
     })
@@ -125,9 +123,7 @@ async function runSmokeTest(stats) {
     return request({
       method: 'POST',
       url: 'logout',
-      json: {
-        _csrf: logoutCsrfToken
-      }
+      json: { _csrf: logoutCsrfToken }
     })
   }
 
