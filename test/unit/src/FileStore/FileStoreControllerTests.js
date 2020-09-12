@@ -13,11 +13,13 @@ describe('FileStoreController', function() {
     }
     this.ProjectLocator = { findElement: sinon.stub() }
     this.Errors = { NotFoundError: sinon.stub() }
+    this.pipeline = sinon.stub()
     this.controller = SandboxedModule.require(MODULE_PATH, {
       globals: {
         console: console
       },
       requires: {
+        stream: { pipeline: this.pipeline },
         'settings-sharelatex': this.settings,
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
@@ -28,7 +30,9 @@ describe('FileStoreController', function() {
         './FileStoreHandler': this.FileStoreHandler
       }
     })
-    this.stream = {}
+    this.getReq = { on: sinon.stub() }
+    this.getResp = { statusCode: 200, headers: {} }
+    this.getReq.on.withArgs('response').callsArgWith(1, this.getResp)
     this.projectId = '2k3j1lk3j21lk3j'
     this.fileId = '12321kklj1lk3jk12'
     this.req = {
@@ -43,6 +47,7 @@ describe('FileStoreController', function() {
     }
     this.res = {
       set: sinon.stub().returnsThis(),
+      sendStatus: sinon.stub(),
       setHeader: sinon.stub(),
       attachment: sinon.stub(),
       status: sinon.stub().returnsThis()
@@ -52,12 +57,12 @@ describe('FileStoreController', function() {
 
   describe('getFile', function() {
     beforeEach(function() {
-      this.FileStoreHandler.getFileStream.callsArgWith(3, null, this.stream)
+      this.FileStoreHandler.getFileStream.callsArgWith(3, null, this.getReq)
       this.ProjectLocator.findElement.callsArgWith(1, null, this.file)
     })
 
     it('should call the file store handler with the project_id file_id and any query string', function(done) {
-      this.stream.pipe = des => {
+      this.FileStoreHandler.getFileStream.callsFake(() => {
         this.FileStoreHandler.getFileStream
           .calledWith(
             this.req.params.Project_id,
@@ -66,20 +71,20 @@ describe('FileStoreController', function() {
           )
           .should.equal(true)
         done()
-      }
+      })
       this.controller.getFile(this.req, this.res)
     })
 
     it('should pipe to res', function(done) {
-      this.stream.pipe = des => {
+      this.pipeline.callsFake((src, des) => {
         des.should.equal(this.res)
         done()
-      }
+      })
       this.controller.getFile(this.req, this.res)
     })
 
     it('should get the file from the db', function(done) {
-      this.stream.pipe = des => {
+      this.pipeline.callsFake(() => {
         const opts = {
           project_id: this.projectId,
           element_id: this.fileId,
@@ -87,15 +92,15 @@ describe('FileStoreController', function() {
         }
         this.ProjectLocator.findElement.calledWith(opts).should.equal(true)
         done()
-      }
+      })
       this.controller.getFile(this.req, this.res)
     })
 
     it('should flag the response body as attachment', function(done) {
-      this.stream.pipe = des => {
+      this.pipeline.callsFake(() => {
         this.res.attachment.calledWith(this.file.name).should.equal(true)
         done()
-      }
+      })
       this.controller.getFile(this.req, this.res)
     })
 
@@ -113,12 +118,12 @@ describe('FileStoreController', function() {
 
         describe('from a non-ios browser', function() {
           it('should not set Content-Type', function(done) {
-            this.stream.pipe = des => {
+            this.pipeline.callsFake(() => {
               this.res.setHeader
                 .calledWith('Content-Type', 'text/plain')
                 .should.equal(false)
               done()
-            }
+            })
             this.controller.getFile(this.req, this.res)
           })
         })
@@ -133,12 +138,12 @@ describe('FileStoreController', function() {
           })
 
           it("should set Content-Type to 'text/plain'", function(done) {
-            this.stream.pipe = des => {
+            this.pipeline.callsFake(() => {
               this.res.setHeader
                 .calledWith('Content-Type', 'text/plain')
                 .should.equal(true)
               done()
-            }
+            })
             this.controller.getFile(this.req, this.res)
           })
         })
@@ -153,12 +158,12 @@ describe('FileStoreController', function() {
           })
 
           it("should set Content-Type to 'text/plain'", function(done) {
-            this.stream.pipe = des => {
+            this.pipeline.callsFake(() => {
               this.res.setHeader
                 .calledWith('Content-Type', 'text/plain')
                 .should.equal(true)
               done()
-            }
+            })
             this.controller.getFile(this.req, this.res)
           })
         })
@@ -188,12 +193,12 @@ describe('FileStoreController', function() {
             })
 
             it('Should not set the Content-type', function(done) {
-              this.stream.pipe = des => {
+              this.pipeline.callsFake(() => {
                 this.res.setHeader
                   .calledWith('Content-Type', 'text/plain')
                   .should.equal(false)
                 done()
-              }
+              })
               this.controller.getFile(this.req, this.res)
             })
           })

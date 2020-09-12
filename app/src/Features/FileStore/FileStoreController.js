@@ -1,3 +1,4 @@
+const { pipeline } = require('stream')
 const logger = require('logger-sharelatex')
 
 const FileStoreHandler = require('./FileStoreHandler')
@@ -22,7 +23,7 @@ module.exports = {
         }
         FileStoreHandler.getFileStream(projectId, fileId, queryString, function(
           err,
-          stream
+          readReq
         ) {
           if (err) {
             logger.err(
@@ -31,12 +32,25 @@ module.exports = {
             )
             return res.sendStatus(500)
           }
-          // mobile safari will try to render html files, prevent this
-          if (isMobileSafari(userAgent) && isHtml(file)) {
-            res.setHeader('Content-Type', 'text/plain')
-          }
-          res.attachment(file.name)
-          stream.pipe(res)
+          readReq.on('error', () => {
+            // The error is logged in FileStoreHandler.
+            res.sendStatus(500)
+          })
+          readReq.on('response', function(response) {
+            // mobile safari will try to render html files, prevent this
+            if (isMobileSafari(userAgent) && isHtml(file)) {
+              res.setHeader('Content-Type', 'text/plain')
+            }
+            res.attachment(file.name)
+            pipeline(response, res, err => {
+              if (err) {
+                logger.warn(
+                  { err, projectId, fileId, queryString },
+                  'proxying error for downloading file'
+                )
+              }
+            })
+          })
         })
       }
     )
