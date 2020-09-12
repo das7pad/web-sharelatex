@@ -46,6 +46,7 @@ describe('FileStoreController', function() {
       }
     }
     this.res = {
+      append: sinon.stub(),
       set: sinon.stub().returnsThis(),
       sendStatus: sinon.stub(),
       setHeader: sinon.stub(),
@@ -124,6 +125,36 @@ describe('FileStoreController', function() {
       it('should send a 500', function(done) {
         this.res.sendStatus.callsFake(code => {
           expect(code).to.equal(500)
+          done()
+        })
+        this.controller.getFile(this.req, this.res)
+      })
+    })
+
+    describe('when filestore emits x-served-by header', function() {
+      beforeEach(function() {
+        this.getResp.headers['x-served-by'] = 'some-filestore-pod'
+      })
+
+      it('should extend the X-Served-By header', function(done) {
+        this.pipeline.callsFake(() => {
+          this.res.append
+            .calledWith('X-Served-By', 'some-filestore-pod')
+            .should.equal(true)
+          done()
+        })
+        this.controller.getFile(this.req, this.res)
+      })
+    })
+
+    describe('when filestore does not emit x-served-by header', function() {
+      beforeEach(function() {
+        delete this.getResp.headers['x-served-by']
+      })
+
+      it('should not extend the X-Served-By header', function(done) {
+        this.pipeline.callsFake(() => {
+          this.res.append.calledWith('X-Served-By').should.equal(false)
           done()
         })
         this.controller.getFile(this.req, this.res)

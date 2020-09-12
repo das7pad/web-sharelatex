@@ -37,6 +37,9 @@ module.exports = {
             res.sendStatus(500)
           })
           readReq.on('response', function(response) {
+            const fileStorePod = response.headers['x-served-by']
+            if (fileStorePod) res.append('X-Served-By', fileStorePod)
+
             const { statusCode } = response
             if (statusCode !== 200) {
               logger.err(
