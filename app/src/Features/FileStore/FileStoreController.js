@@ -37,6 +37,14 @@ module.exports = {
             res.sendStatus(500)
           })
           readReq.on('response', function(response) {
+            const { statusCode } = response
+            if (statusCode !== 200) {
+              logger.err(
+                { err, projectId, fileId, queryString, statusCode },
+                'unexpected response status for downloading file'
+              )
+              return res.sendStatus(500)
+            }
             // mobile safari will try to render html files, prevent this
             if (isMobileSafari(userAgent) && isHtml(file)) {
               res.setHeader('Content-Type', 'text/plain')

@@ -104,6 +104,32 @@ describe('FileStoreController', function() {
       this.controller.getFile(this.req, this.res)
     })
 
+    describe('when filestore responds with a 500', function() {
+      beforeEach(function() {
+        this.getResp.statusCode = 500
+      })
+      it('should send a 500', function(done) {
+        this.res.sendStatus.callsFake(code => {
+          expect(code).to.equal(500)
+          done()
+        })
+        this.controller.getFile(this.req, this.res)
+      })
+    })
+
+    describe('when filestore responds with a 404', function() {
+      beforeEach(function() {
+        this.getResp.statusCode = 404
+      })
+      it('should send a 500', function(done) {
+        this.res.sendStatus.callsFake(code => {
+          expect(code).to.equal(500)
+          done()
+        })
+        this.controller.getFile(this.req, this.res)
+      })
+    })
+
     // Test behaviour around handling html files
     ;['.html', '.htm', '.xhtml'].forEach(extension => {
       describe(`with a '${extension}' file extension`, function() {
