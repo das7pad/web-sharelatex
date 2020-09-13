@@ -1,5 +1,6 @@
 const { pipeline } = require('stream')
 const logger = require('logger-sharelatex')
+const Settings = require('settings-sharelatex')
 
 const FileStoreHandler = require('./FileStoreHandler')
 const ProjectLocator = require('../Project/ProjectLocator')
@@ -37,8 +38,10 @@ module.exports = {
             res.sendStatus(500)
           })
           readReq.on('response', function(response) {
-            const fileStorePod = response.headers['x-served-by']
-            if (fileStorePod) res.append('X-Served-By', fileStorePod)
+            for (const name of Settings.apis.filestore.passthroughHeaders) {
+              const passThroughValue = response.headers[name]
+              if (passThroughValue) res.append(name, passThroughValue)
+            }
 
             const { statusCode } = response
             if (statusCode !== 200) {

@@ -161,6 +161,8 @@ module.exports = settings =
 			url: "http://localhost:3011"
 		filestore:
 			url: "http://#{process.env['FILESTORE_HOST'] or 'localhost'}:3009"
+			passthroughHeaders: (
+				process.env['FILESTORE_PASSTHROUGH_HEADERS'] || '').split(',')
 		clsi:
 			url: "http://#{process.env['CLSI_HOST'] or 'localhost'}:3013"
 			# url: "http://#{process.env['CLSI_LB_HOST']}:3014"

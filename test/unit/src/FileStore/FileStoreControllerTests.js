@@ -14,6 +14,13 @@ describe('FileStoreController', function() {
     this.ProjectLocator = { findElement: sinon.stub() }
     this.Errors = { NotFoundError: sinon.stub() }
     this.pipeline = sinon.stub()
+    this.settings = {
+      apis: {
+        filestore: {
+          passthroughHeaders: []
+        }
+      }
+    }
     this.controller = SandboxedModule.require(MODULE_PATH, {
       globals: {
         console: console
@@ -131,33 +138,36 @@ describe('FileStoreController', function() {
       })
     })
 
-    describe('when filestore emits x-served-by header', function() {
-      beforeEach(function() {
-        this.getResp.headers['x-served-by'] = 'some-filestore-pod'
-      })
-
-      it('should extend the X-Served-By header', function(done) {
-        this.pipeline.callsFake(() => {
-          this.res.append
-            .calledWith('X-Served-By', 'some-filestore-pod')
-            .should.equal(true)
-          done()
+    describe('passthroughHeaders with x-served-by', function() {
+      describe('when filestore emits x-served-by header', function() {
+        beforeEach(function() {
+          this.settings.apis.filestore.passthroughHeaders = ['x-served-by']
+          this.getResp.headers['x-served-by'] = 'some-filestore-pod'
         })
-        this.controller.getFile(this.req, this.res)
-      })
-    })
 
-    describe('when filestore does not emit x-served-by header', function() {
-      beforeEach(function() {
-        delete this.getResp.headers['x-served-by']
-      })
-
-      it('should not extend the X-Served-By header', function(done) {
-        this.pipeline.callsFake(() => {
-          this.res.append.calledWith('X-Served-By').should.equal(false)
-          done()
+        it('should extend the X-Served-By header', function(done) {
+          this.pipeline.callsFake(() => {
+            this.res.append
+              .calledWith('x-served-by', 'some-filestore-pod')
+              .should.equal(true)
+            done()
+          })
+          this.controller.getFile(this.req, this.res)
         })
-        this.controller.getFile(this.req, this.res)
+      })
+
+      describe('when filestore does not emit x-served-by header', function() {
+        beforeEach(function() {
+          delete this.getResp.headers['x-served-by']
+        })
+
+        it('should not extend the X-Served-By header', function(done) {
+          this.pipeline.callsFake(() => {
+            this.res.append.calledWith('x-served-by').should.equal(false)
+            done()
+          })
+          this.controller.getFile(this.req, this.res)
+        })
       })
     })
 
