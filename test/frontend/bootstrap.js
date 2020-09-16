@@ -9,5 +9,4 @@ require('jsdom-global/register')
 const chai = require('chai')
 chai.use(require('sinon-chai'))
 
-window.i18n = { currentLangCode: 'en' }
-require('../../frontend/js/i18n')
+require('../../build/translations/generator').generateModuleInMemory('en')
