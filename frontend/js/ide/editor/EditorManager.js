@@ -29,6 +29,7 @@ export default EditorManager = (function() {
 
     constructor(ide, $scope, localStorage) {
       this.ide = ide
+      this.editorOpenDocEpoch = 0 // track pending document loads
       this.$scope = $scope
       this.localStorage = localStorage
       this.$scope.editor = {
@@ -179,6 +180,12 @@ export default EditorManager = (function() {
 
       this.$scope.editor.opening = true
       return this._openNewDocument(doc, (error, sharejs_doc) => {
+        if (error && error.message === 'another document was loaded') {
+          sl_console.log(
+            `[openDoc] another document was loaded while ${doc.id} was loading`
+          )
+          return
+        }
         if (error != null) {
           this.ide.showGenericMessageModal(
             'Error opening document',
@@ -217,10 +224,16 @@ export default EditorManager = (function() {
         current_sharejs_doc.leaveAndCleanUp()
         this._unbindFromDocumentEvents(current_sharejs_doc)
       }
-
+      const editorOpenDocEpoch = ++this.editorOpenDocEpoch
       return new_sharejs_doc.join(error => {
         if (error != null) {
           return callback(error)
+        }
+        if (this.editorOpenDocEpoch !== editorOpenDocEpoch) {
+          sl_console.log(
+            `[openNewDocument] editorOpenDocEpoch mismatch ${this.editorOpenDocEpoch} vs ${editorOpenDocEpoch}`
+          )
+          return callback(new Error('another document was loaded'))
         }
         this._bindToDocumentEvents(doc, new_sharejs_doc)
         return callback(null, new_sharejs_doc)

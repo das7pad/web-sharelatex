@@ -1,4 +1,8 @@
 {
+  "hide_outline": "Hide File outline",
+  "show_outline": "Show File outline",
+  "expand": "Expand",
+  "collapse": "Collapse",
   "file_outline": "File outline",
   "the_file_outline_is_a_new_feature_click_the_icon_to_learn_more": "The <0>File outline</0> is a new feature. Click the icon to learn more",
   "we_cant_find_any_sections_or_subsections_in_this_file": "We can’t find any sections or subsections in this file",
@@ -693,7 +697,7 @@
   "interested_in_cheaper_plan": "Would you be interested in the cheaper <strong>__price__</strong> student plan?",
   "session_expired_redirecting_to_login": "Session Expired. Redirecting to login page in __seconds__ seconds",
   "maximum_files_uploaded_together": "Maximum __max__ files uploaded together",
-  "too_many_files_uploaded_throttled_short_period": "Too many files uploaded, your uploads have been throttled for short period.",
+  "too_many_files_uploaded_throttled_short_period": "Too many files uploaded, your uploads have been throttled for short period. Please wait 15 minutes and try again.",
   "compile_larger_projects": "Compile larger projects",
   "upgrade_to_get_feature": "Upgrade to get __feature__, plus:",
   "new_group": "New Group",

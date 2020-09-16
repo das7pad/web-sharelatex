@@ -2,6 +2,7 @@ import React, { useState, useEffect, createRef, useRef } from 'react'
 import PropTypes from 'prop-types'
 import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed'
 import classNames from 'classnames'
+import { t } from '../../../misc/t'
 import OutlineList from './outline-list'
 
 function getChildrenLines(children) {
@@ -30,9 +31,11 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
     !expanded &&
     getChildrenLines(outlineItem.children).includes(highlightedLine)
 
+  const isHighlighted =
+    highlightedLine === outlineItem.line || hasHighlightedChild
+
   const itemLinkClasses = classNames('outline-item-link', {
-    'outline-item-link-highlight':
-      highlightedLine === outlineItem.line || hasHighlightedChild
+    'outline-item-link-highlight': isHighlighted
   })
 
   function handleExpandCollapseClick() {
@@ -49,25 +52,31 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
 
   useEffect(() => {
     const wasHighlighted = isHighlightedRef.current
-    const isNowHighlighted = highlightedLine === outlineItem.line
+    isHighlightedRef.current = isHighlighted
 
-    isHighlightedRef.current = isNowHighlighted
-
-    if (!wasHighlighted && isNowHighlighted) {
+    if (!wasHighlighted && isHighlighted) {
       scrollIntoViewIfNeeded(titleElementRef.current, {
         scrollMode: 'if-needed',
         block: 'center'
       })
     }
-  }, [highlightedLine, titleElementRef, isHighlightedRef])
+  }, [isHighlighted, titleElementRef, isHighlightedRef]) // don't set the aria-expanded attribute when there are no children
+  const ariaExpandedValue = outlineItem.children ? expanded : undefined
 
   return (
-    <li className={mainItemClasses}>
+    <li
+      className={mainItemClasses}
+      aria-expanded={ariaExpandedValue}
+      role="treeitem"
+      aria-current={isHighlighted}
+      aria-label={outlineItem.title}
+    >
       <div className="outline-item-row">
         {outlineItem.children ? (
           <button
             className="outline-item-expand-collapse-btn"
             onClick={handleExpandCollapseClick}
+            aria-label={expanded ? t('collapse') : t('expand')}
           >
             <i className={expandCollapseIconClasses} />
           </button>
@@ -97,7 +106,7 @@ OutlineItem.propTypes = {
   outlineItem: PropTypes.exact({
     line: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
-    level: PropTypes.number.isRequired,
+    level: PropTypes.number,
     children: PropTypes.array
   }).isRequired,
   jumpToLine: PropTypes.func.isRequired,

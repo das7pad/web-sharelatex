@@ -11,7 +11,11 @@
     "test": {
       "presets": [
         "@babel/react",
-        "@babel/env"
+        ["@babel/env", {
+            "targets": {"node": "10.21"},
+            "useBuiltIns": "usage",
+            "corejs": { "version": 3 }
+          }]
       ]
     }
   }
