@@ -62,21 +62,16 @@ module.exports = Modules = {
   loadViewIncludes() {
     this.viewIncludes.clear()
     for (const module of this.modules) {
-      Object.entries(module.viewIncludes || {}).forEach(([view, partial]) => {
-        if (!this.viewIncludes.has(view)) {
-          this.viewIncludes.set(view, [])
+      Object.entries(module.viewIncludes || {}).forEach(
+        ([viewInclude, partial]) => {
+          if (!this.viewIncludes.has(viewInclude)) {
+            this.viewIncludes.set(viewInclude, [])
+          }
+          const view = Path.join(module.path, 'app/views', partial)
+          const template = Views.getTemplate(view)
+          this.viewIncludes.get(viewInclude).push(template)
         }
-        const filePath = Path.join(module.path, 'app/views', partial + '.pug')
-        let template = Views.getTemplate(filePath)
-        if (!template) {
-          const pug = require('pug')
-          template = pug.compileFile(filePath, {
-            doctype: 'html',
-            compileDebug: Settings.debugPugTemplates
-          })
-        }
-        this.viewIncludes.get(view).push(template)
-      })
+      )
     }
   },
 

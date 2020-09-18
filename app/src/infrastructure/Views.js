@@ -1,115 +1,52 @@
-const logger = require('logger-sharelatex')
 const glob = require('glob')
 const Settings = require('settings-sharelatex')
-const fs = require('fs')
 const Path = require('path')
 
-// Generate list of view names from app/views
+function getBuiltViewList() {
+  const ROOT = Path.join(__dirname, '../../..')
+  const GENERATED_VIEWS = Path.join(__dirname, '../../../generated/views')
 
-const viewList = glob
-  .sync('{,modules/*/}app/views/**/*.pug', {
-    ignore: ['**/_*.pug', '**/_*/**/*.pug']
-  })
-  .map(x => x.replace(/\.pug$/, '')) // strip trailing .pug extension
-
-const GENERATED_VIEWS = Path.join(__dirname, '../../../generated/views')
-
-function compileFile(filename) {
-  const pug = require('pug')
-  return pug.compileFile(Path.resolve(filename), {
-    cache: true,
-    compileDebug: Settings.debugPugTemplates
+  function getView(file) {
+    return file.replace(GENERATED_VIEWS, ROOT).replace(/\.js/, '')
+  }
+  return glob.sync(`${GENERATED_VIEWS}/**/*.js`).map(builtViewPath => {
+    return { view: getView(builtViewPath), builtViewPath }
   })
 }
 
-const templates = new Map()
+const preloadedTemplates = new Map()
 module.exports = {
-  _generateTemplateModule(view) {
-    const filename = view + '.pug'
-    return (
-      "const pug = require('pug-runtime');module.exports = template;" +
-      compileFile(filename).toString()
-    )
+  generateTemplate(view) {
+    // block compiles at runtime when there are existing preloaded templates
+    if (preloadedTemplates.size) {
+      throw new Error(`template not preloaded: ${view}`)
+    }
+    return require('../../../build/views/generator').generateModuleInMemory({
+      view,
+      cache: false,
+      debug: Settings.debugPugTemplates
+    })
   },
-  persistGeneratedTemplate(view) {
-    const body = this._generateTemplateModule(view)
-    const dest = Path.join(GENERATED_VIEWS, view + '.js')
-    fs.mkdirSync(Path.dirname(dest), { recursive: true, mode: 0o755 })
-    fs.writeFileSync(dest, body, { mode: 0o644 })
-  },
-  persistGeneratedTemplates() {
-    viewList.forEach(this.persistGeneratedTemplate.bind(this))
-  },
-  getTemplate(path) {
-    return templates.get(path)
+  getTemplate(view) {
+    return preloadedTemplates.get(view + '.pug') || this.generateTemplate(view)
   },
   loadPrecompiledViews(app) {
     app.engines['.pug'] = (path, locals, callback) => {
-      const template = templates.get(path)
+      const template = preloadedTemplates.get(path)
       // express already has a try/catch around us
       callback(null, template(locals))
     }
 
-    viewList.forEach(view => {
-      const filename = view + '.pug'
-      templates.set(
-        Path.resolve(filename),
-        require(Path.join(GENERATED_VIEWS, view + '.js'))
-      )
+    getBuiltViewList().forEach(({ view, builtViewPath }) => {
+      preloadedTemplates.set(view + '.pug', require(builtViewPath))
     })
   },
 
-  precompileView(view) {
-    const filename = view + '.pug'
-    compileFile(filename)
-    logger.log({ view }, 'compiled')
-  },
   precompileViews(app) {
-    const startTime = Date.now()
-    let success = 0
-    let failures = 0
-    viewList.forEach(view => {
-      try {
-        this.precompileView(view)
-        success++
-      } catch (err) {
-        logger.error({ view, err: err.message }, 'error compiling')
-        failures++
-      }
+    require('../../../build/views').processViews({
+      write: false,
+      cache: true,
+      debug: Settings.debugPugTemplates
     })
-    logger.log(
-      { timeTaken: Date.now() - startTime, failures, success },
-      'compiled templates'
-    )
-    return failures
-  }
-}
-
-if (!module.parent) {
-  if (process.argv.length === 3) {
-    try {
-      module.exports.precompileView(process.argv[2])
-    } catch (err) {
-      logger.fatal({ err }, 'compile failed')
-      process.exit(1)
-    }
-    try {
-      module.exports.persistGeneratedTemplate(process.argv[2])
-    } catch (err) {
-      logger.fatal({ err }, 'persisting failing')
-      process.exit(2)
-    }
-    process.exit(0)
-  }
-
-  if (module.exports.precompileViews()) {
-    logger.fatal({}, 'compile failed')
-    process.exit(1)
-  }
-  try {
-    module.exports.persistGeneratedTemplates()
-  } catch (err) {
-    logger.fatal({ err }, 'persisting failing')
-    process.exit(2)
   }
 }

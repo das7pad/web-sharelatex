@@ -67,6 +67,7 @@
 !/app
 
 !/build/translations/*.js
+!/build/views/*.js
 
 !/frontend/fonts
 !/frontend/js

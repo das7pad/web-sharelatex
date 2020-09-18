@@ -224,12 +224,12 @@ VIEW_FILES:=$(shell \
 )
 
 build_views_full:
-	node app/src/infrastructure/Views.js
+	node build/views
 
 build_views: $(VIEW_FILES)
 .PHONY: $(VIEW_FILES)
 $(VIEW_FILES): generated/views/%.js:
-	node app/src/infrastructure/Views.js $*
+	node build/views $*
 
 build_lngs_full:
 	node build/translations
