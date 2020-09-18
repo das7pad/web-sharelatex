@@ -325,6 +325,21 @@ describe('TranslationsForked', function() {
           ).to.equal('https://da.sharelatex.com/login?someKey=someValue')
         })
       })
+
+      describe('open redirect', function() {
+        beforeEach(function(done) {
+          this.req.originalUrl = '//evil.com'
+          this.translations(this.req, this.res, done)
+        })
+        it('should not send the user off the site', function() {
+          expect(
+            this.res.locals.getTranslationUrl({
+              lngCode: 'da',
+              url: 'https://da.sharelatex.com'
+            })
+          ).to.equal('https://da.sharelatex.com//evil.com')
+        })
+      })
     })
 
     describe('singleDomainMultipleLng', function() {
@@ -444,6 +459,20 @@ describe('TranslationsForked', function() {
         })
       })
 
+      describe('open redirect', function() {
+        beforeEach(function(done) {
+          this.req.originalUrl = '//evil.com?setGlobalLng=da'
+          this.req.query.setGlobalLng = 'da'
+          this.res.redirect.callsFake(() => done())
+          this.translations(this.req, this.res, () => {})
+        })
+        it('should keep the user on the site', function() {
+          expect(this.res.redirect).to.have.been.calledWith(
+            'https://www.sharelatex.com//evil.com'
+          )
+        })
+      })
+
       describe('getTranslationUrl', function() {
         describe('with not query params', function() {
           beforeEach(function(done) {
@@ -473,6 +502,21 @@ describe('TranslationsForked', function() {
             ).to.equal(
               'https://www.sharelatex.com/login?someKey=someValue&setGlobalLng=da'
             )
+          })
+        })
+
+        describe('open redirect', function() {
+          beforeEach(function(done) {
+            this.req.originalUrl = '//evil.com'
+            this.translations(this.req, this.res, done)
+          })
+          it('should not send the user off the site', function() {
+            expect(
+              this.res.locals.getTranslationUrl({
+                lngCode: 'da',
+                url: 'https://da.sharelatex.com'
+              })
+            ).to.equal('https://da.sharelatex.com//evil.com?setGlobalLng=da')
           })
         })
       })

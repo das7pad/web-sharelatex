@@ -32,7 +32,7 @@ const Translations = {
 
     function setLangBasedOnDomainMiddleware(req, res, next) {
       res.locals.getTranslationUrl = spec => {
-        return new URL(req.originalUrl, spec.url).href
+        return spec.url + req.originalUrl
       }
 
       // prefer host and then fallback language over browser hint
@@ -41,7 +41,7 @@ const Translations = {
     }
     function setLangBasedOnSessionOrQueryParam(req, res, next) {
       res.locals.getTranslationUrl = spec => {
-        const url = new URL(req.originalUrl, spec.url)
+        const url = new URL(spec.url + req.originalUrl)
         // add the setGlobalLng query parameter while preserving other params
         url.searchParams.append('setGlobalLng', spec.lngCode)
         return url.href
@@ -51,7 +51,7 @@ const Translations = {
         const { lngCode, url } = subdomainLang.get(req.query.setGlobalLng)
         req.session.lng = lngCode
         // cleanup the setGlobalLng query parameter and preserve other params
-        const parsedURL = new URL(req.originalUrl, url)
+        const parsedURL = new URL(url + req.originalUrl)
         parsedURL.searchParams.delete('setGlobalLng')
         return res.redirect(parsedURL.href)
       }
