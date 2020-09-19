@@ -193,6 +193,7 @@ function getCspMiddleware() {
   function generateCSP(cfg) {
     const SELF = "'self'"
     const baseUri = [SELF]
+    const childSrc = []
     const connectSrc = [SELF]
     const defaultSrc = []
     const fontSrc = [SELF, 'about:']
@@ -280,7 +281,8 @@ function getCspMiddleware() {
       prefetchSrc.length = 0
     }
 
-    // backwards compatibility
+    // backwards compatibility -- csp level 3 directives
+    childSrc.push(...workerSrc)
     defaultSrc.push(...prefetchSrc)
 
     let policyAmend = ['block-all-mixed-content']
@@ -289,6 +291,7 @@ function getCspMiddleware() {
     }
     return Object.entries({
       'base-uri': baseUri,
+      'child-src': childSrc,
       'connect-src': connectSrc,
       'default-src': defaultSrc,
       'font-src': fontSrc,
