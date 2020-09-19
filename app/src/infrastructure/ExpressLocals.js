@@ -192,11 +192,15 @@ function getCspMiddleware() {
 
   function generateCSP(cfg) {
     const SELF = "'self'"
+    const baseUri = [SELF]
     const connectSrc = [SELF]
     const defaultSrc = []
     const fontSrc = [SELF, 'about:']
+    const formAction = [SELF]
+    const frameAncestors = []
     const frameSrc = []
     const imgSrc = [SELF, 'data:', 'blob:']
+    const manifestSrc = [SELF]
     const prefetchSrc = [SELF]
     const scriptSrc = [SELF]
     const styleSrc = [SELF, "'unsafe-inline'"]
@@ -273,31 +277,30 @@ function getCspMiddleware() {
       defaultSrc.push(...prefetchSrc)
     } else {
       prefetchSrc.length = 0
-      prefetchSrc.push("'none'")
-    }
-    if (!defaultSrc.length) {
-      defaultSrc.push("'none'")
     }
 
     let policyAmend = ['block-all-mixed-content']
     if (csp.reportURL) {
       policyAmend.push(`report-uri ${csp.reportURL}`)
     }
-    return [
-      "base-uri 'self'",
-      `connect-src ${connectSrc.join(' ')}`,
-      `default-src ${defaultSrc.join(' ')}`,
-      `font-src ${fontSrc.join(' ')}`,
-      "form-action 'self'",
-      "frame-ancestors 'none'",
-      `frame-src ${frameSrc.join(' ') || "'none'"}`,
-      `img-src ${imgSrc.join(' ')}`,
-      "manifest-src 'self'",
-      `prefetch-src ${prefetchSrc.join(' ')}`,
-      `script-src ${scriptSrc.join(' ')}`,
-      `style-src ${styleSrc.join(' ')}`,
-      `worker-src ${workerSrc.join(' ')}`
-    ]
+    return Object.entries({
+      'base-uri': baseUri,
+      'connect-src': connectSrc,
+      'default-src': defaultSrc,
+      'font-src': fontSrc,
+      'form-action': formAction,
+      'frame-ancestors': frameAncestors,
+      'frame-src': frameSrc,
+      'img-src': imgSrc,
+      'manifest-src': manifestSrc,
+      'prefetch-src': prefetchSrc,
+      'script-src': scriptSrc,
+      'style-src': styleSrc,
+      'worker-src': workerSrc
+    })
+      .map(([directive, origins]) => {
+        return `${directive} ${origins.join(' ') || "'none'"}`
+      })
       .concat(policyAmend)
       .join('; ')
   }
