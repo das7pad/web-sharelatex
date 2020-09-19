@@ -252,7 +252,6 @@ function getCspMiddleware() {
       prefetchSrc.push(cdnOrigin)
       scriptSrc.push(cdnOrigin)
       styleSrc.push(cdnOrigin)
-      workerSrc.push(cdnOrigin)
     }
 
     if (cfg.needsCompilesAccess && compilesOrigin) {
