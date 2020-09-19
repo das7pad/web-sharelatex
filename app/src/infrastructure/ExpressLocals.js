@@ -201,7 +201,7 @@ function getCspMiddleware() {
     const frameSrc = []
     const imgSrc = [SELF, 'data:', 'blob:']
     const manifestSrc = []
-    const prefetchSrc = [SELF]
+    const prefetchSrc = []
     const scriptSrc = [SELF]
     const styleSrc = [SELF, "'unsafe-inline'"]
     const workerSrc = [SELF]
