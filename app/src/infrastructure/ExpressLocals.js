@@ -276,12 +276,12 @@ function getCspMiddleware() {
       })
     }
 
-    if (cfg.needsPrefetch) {
-      // backwards compatibility
-      defaultSrc.push(...prefetchSrc)
-    } else {
+    if (!cfg.needsPrefetch) {
       prefetchSrc.length = 0
     }
+
+    // backwards compatibility
+    defaultSrc.push(...prefetchSrc)
 
     let policyAmend = ['block-all-mixed-content']
     if (csp.reportURL) {
