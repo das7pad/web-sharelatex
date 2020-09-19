@@ -259,8 +259,12 @@ function getCspMiddleware() {
       styleSrc.push(cdnOrigin)
     }
 
-    if (cfg.needsCompilesAccess && compilesOrigin) {
-      connectSrc.push(compilesOrigin)
+    if (cfg.needsCompilesAccess) {
+      if (compilesOrigin) {
+        connectSrc.push(compilesOrigin)
+      }
+      // native pdf viewer
+      frameSrc.push(compilesOrigin || SELF)
     }
 
     if (cfg.needsSocketIo) {
