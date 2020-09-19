@@ -191,15 +191,16 @@ function getCspMiddleware() {
   )
 
   function generateCSP(cfg) {
-    const connectSrc = ["'self'"]
+    const SELF = "'self'"
+    const connectSrc = [SELF]
     const defaultSrc = []
-    const fontSrc = ["'self'", 'about:']
+    const fontSrc = [SELF, 'about:']
     const frameSrc = []
-    const imgSrc = ["'self'", 'data:', 'blob:']
-    const prefetchSrc = ["'self'"]
-    const scriptSrc = ["'self'"]
-    const styleSrc = ["'self'", "'unsafe-inline'"]
-    const workerSrc = ["'self'"]
+    const imgSrc = [SELF, 'data:', 'blob:']
+    const prefetchSrc = [SELF]
+    const scriptSrc = [SELF]
+    const styleSrc = [SELF, "'unsafe-inline'"]
+    const workerSrc = [SELF]
 
     if (sentryOrigin) {
       connectSrc.push(sentryOrigin)
