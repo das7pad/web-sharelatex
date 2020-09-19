@@ -280,6 +280,9 @@ function getCspMiddleware() {
     if (!cfg.needsPrefetch) {
       prefetchSrc.length = 0
     }
+    if (!cfg.needsWorker) {
+      workerSrc.length = 0
+    }
 
     // backwards compatibility -- csp level 3 directives
     childSrc.push(...workerSrc)
@@ -318,7 +321,8 @@ function getCspMiddleware() {
     connectCDN: true,
     needsCompilesAccess: true,
     needsPrefetch: true,
-    needsSocketIo: true
+    needsSocketIo: true,
+    needsWorker: true
   })
   const CSP_LAUNCHPAD = generateCSP({
     connectCDN: true,
