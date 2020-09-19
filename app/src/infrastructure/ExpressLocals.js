@@ -278,13 +278,12 @@ function getCspMiddleware() {
       defaultSrc.push("'none'")
     }
 
-    let policyAmend = []
+    let policyAmend = ['block-all-mixed-content']
     if (csp.reportURL) {
       policyAmend.push(`report-uri ${csp.reportURL}`)
     }
     return [
       "base-uri 'self'",
-      'block-all-mixed-content',
       `connect-src ${connectSrc.join(' ')}`,
       `default-src ${defaultSrc.join(' ')}`,
       `font-src ${fontSrc.join(' ')}`,
