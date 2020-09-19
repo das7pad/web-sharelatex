@@ -278,23 +278,28 @@ function getCspMiddleware() {
       defaultSrc.push("'none'")
     }
 
-    let policyAmend = ''
+    let policyAmend = []
     if (csp.reportURL) {
-      policyAmend += `; report-uri ${csp.reportURL}`
+      policyAmend.push(`report-uri ${csp.reportURL}`)
     }
-    return `base-uri 'self'; block-all-mixed-content; connect-src ${connectSrc.join(
-      ' '
-    )}; default-src ${defaultSrc.join(' ')}; font-src ${fontSrc.join(
-      ' '
-    )}; form-action 'self'; frame-ancestors 'none'; frame-src ${frameSrc.join(
-      ' '
-    ) || "'none'"}; img-src ${imgSrc.join(
-      ' '
-    )}; manifest-src 'self'; prefetch-src ${prefetchSrc.join(
-      ' '
-    )};  script-src ${scriptSrc.join(' ')}; style-src ${styleSrc.join(
-      ' '
-    )}; worker-src ${workerSrc.join(' ')}${policyAmend}`
+    return [
+      "base-uri 'self'",
+      'block-all-mixed-content',
+      `connect-src ${connectSrc.join(' ')}`,
+      `default-src ${defaultSrc.join(' ')}`,
+      `font-src ${fontSrc.join(' ')}`,
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+      `frame-src ${frameSrc.join(' ') || "'none'"}`,
+      `img-src ${imgSrc.join(' ')}`,
+      "manifest-src 'self'",
+      `prefetch-src ${prefetchSrc.join(' ')}`,
+      `script-src ${scriptSrc.join(' ')}`,
+      `style-src ${styleSrc.join(' ')}`,
+      `worker-src ${workerSrc.join(' ')}`
+    ]
+      .concat(policyAmend)
+      .join('; ')
   }
 
   const CSP_DEFAULT = generateCSP({})
