@@ -157,8 +157,12 @@ const AuthenticationManager = {
           _id: ObjectId(userId.toString())
         },
         {
-          $set: { hashedPassword: hash },
-          $unset: { password: true }
+          $set: {
+            hashedPassword: hash
+          },
+          $unset: {
+            password: true
+          }
         },
         function(updateError, result) {
           if (updateError) {

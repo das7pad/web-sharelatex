@@ -296,7 +296,7 @@ const UserUpdater = {
         }
       }
       if (Features.hasFeature('affiliations')) {
-        update.$unset = {
+        update['$unset'] = {
           'emails.$.affiliationUnchecked': 1
         }
       }

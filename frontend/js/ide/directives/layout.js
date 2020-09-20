@@ -174,7 +174,7 @@ export default App.directive('layout', ($parse, $compile, ide) => ({
         element.layout().resizeAll()
 
         if (attrs.resizeOn != null) {
-          for (const event of Array.from(attrs.resizeOn.split(','))) {
+          for (let event of Array.from(attrs.resizeOn.split(','))) {
             scope.$on(event, () => onExternalResize())
           }
         }

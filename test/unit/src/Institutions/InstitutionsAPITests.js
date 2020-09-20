@@ -37,7 +37,9 @@ describe('InstitutionsAPI', function() {
       },
       requires: {
         'logger-sharelatex': this.logger,
-        '@overleaf/metrics': { timeAsyncMethod: sinon.stub() },
+        '@overleaf/metrics': {
+          timeAsyncMethod: sinon.stub()
+        },
         'settings-sharelatex': this.settings,
         request: this.request,
         '../Notifications/NotificationsBuilder': {
@@ -120,8 +122,8 @@ describe('InstitutionsAPI', function() {
           }/institution_licences`
           requestOptions.url.should.equal(expectedUrl)
           requestOptions.method.should.equal('GET')
-          requestOptions.body.start_date.should.equal(startDate)
-          requestOptions.body.end_date.should.equal(endDate)
+          requestOptions.body['start_date'].should.equal(startDate)
+          requestOptions.body['end_date'].should.equal(endDate)
           requestOptions.body.lag.should.equal('monthly')
           body.should.equal(responseBody)
           return done()

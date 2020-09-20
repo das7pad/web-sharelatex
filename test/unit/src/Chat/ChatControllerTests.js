@@ -38,7 +38,9 @@ describe('ChatController', function() {
       },
       requires: {
         'settings-sharelatex': this.settings,
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         './ChatApiHandler': this.ChatApiHandler,
         '../Editor/EditorRealTimeController': this.EditorRealTimeController,
         '../Authentication/AuthenticationController': this
@@ -55,6 +57,7 @@ describe('ChatController', function() {
     }
     this.res = {
       json: sinon.stub(),
+      send: sinon.stub(),
       sendStatus: sinon.stub()
     }
   })
@@ -146,7 +149,7 @@ describe('ChatController', function() {
       }
       sinon.spy(this.UserInfoManager, 'getPersonalInfo')
       return (this.UserInfoController.formatPersonalInfo = user => ({
-        formatted: user.mock
+        formatted: user['mock']
       }))
     })
 

@@ -36,11 +36,15 @@ describe('Subscription Locator Tests', function() {
         console: console
       },
       requires: {
-        '../../models/Subscription': { Subscription: this.Subscription },
+        '../../models/Subscription': {
+          Subscription: this.Subscription
+        },
         '../../models/DeletedSubscription': {
           DeletedSubscription: this.DeletedSubscription
         },
-        'logger-sharelatex': { log() {} }
+        'logger-sharelatex': {
+          log() {}
+        }
       }
     }))
   })

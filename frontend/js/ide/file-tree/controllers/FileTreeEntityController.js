@@ -155,7 +155,7 @@ export default App.controller('DeleteEntityModalController', function(
 
   $scope.delete = function() {
     $scope.state.inflight = true
-    for (const entity of Array.from($scope.entities)) {
+    for (let entity of Array.from($scope.entities)) {
       ide.fileTreeManager.deleteEntity(entity)
     }
     return $modalInstance.close()

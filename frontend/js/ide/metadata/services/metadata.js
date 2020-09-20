@@ -42,7 +42,7 @@ export default App.factory('metadata', function($http, ide) {
     _.flattenDeep(
       (() => {
         const result = []
-        for (const docId in state.documents) {
+        for (let docId in state.documents) {
           const meta = state.documents[docId]
           result.push(meta.labels)
         }
@@ -52,9 +52,9 @@ export default App.factory('metadata', function($http, ide) {
 
   metadata.getAllPackages = function() {
     const packageCommandMapping = {}
-    for (const _docId in state.documents) {
+    for (let _docId in state.documents) {
       const meta = state.documents[_docId]
-      for (const packageName in meta.packages) {
+      for (let packageName in meta.packages) {
         const commandSnippets = meta.packages[packageName]
         packageCommandMapping[packageName] = commandSnippets
       }
@@ -70,7 +70,7 @@ export default App.factory('metadata', function($http, ide) {
         if (data.projectMeta) {
           return (() => {
             const result = []
-            for (const docId in data.projectMeta) {
+            for (let docId in data.projectMeta) {
               const docMeta = data.projectMeta[docId]
               result.push((state.documents[docId] = docMeta))
             }

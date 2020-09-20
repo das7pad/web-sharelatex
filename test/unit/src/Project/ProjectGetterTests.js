@@ -39,8 +39,12 @@ describe('ProjectGetter', function() {
           }),
           ObjectId
         },
-        '@overleaf/metrics': { timeAsyncMethod: sinon.stub() },
-        '../../models/Project': { Project: (this.Project = {}) },
+        '@overleaf/metrics': {
+          timeAsyncMethod: sinon.stub()
+        },
+        '../../models/Project': {
+          Project: (this.Project = {})
+        },
         '../../models/DeletedProject': {
           DeletedProject: this.DeletedProject
         },

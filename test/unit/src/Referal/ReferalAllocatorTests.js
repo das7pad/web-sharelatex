@@ -13,7 +13,9 @@ describe('ReferalAllocator', function() {
         console: console
       },
       requires: {
-        '../../models/User': { User: (this.User = {}) },
+        '../../models/User': {
+          User: (this.User = {})
+        },
         '../Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
         'settings-sharelatex': (this.Settings = {}),
         'logger-sharelatex': {

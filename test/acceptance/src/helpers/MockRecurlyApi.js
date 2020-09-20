@@ -121,7 +121,7 @@ module.exports = MockRecurlyApi = {
     app.get('/accounts/:id/redemptions', (req, res, next) => {
       const redemptions = this.redemptions[req.params.id] || []
       let redemptionsListXml = ''
-      for (const redemption of Array.from(redemptions)) {
+      for (let redemption of Array.from(redemptions)) {
         redemptionsListXml += `\
 <redemption>
 	<state>${redemption.state}</state>

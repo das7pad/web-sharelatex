@@ -49,7 +49,7 @@ describe('SettingsPage', function() {
   })
 
   it('update main email address', function(done) {
-    const newEmail = `foo${Math.random()}@bar.com`
+    const newEmail = 'foo@bar.com'
     return this.user.updateSettings({ email: newEmail }, error => {
       should.not.exist(error)
       return this.user.get((error, user) => {

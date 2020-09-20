@@ -29,9 +29,15 @@ describe('UserMembershipsHandler', function() {
         console: console
       },
       requires: {
-        '../../models/Institution': { Institution: this.Institution },
-        '../../models/Subscription': { Subscription: this.Subscription },
-        '../../models/Publisher': { Publisher: this.Publisher }
+        '../../models/Institution': {
+          Institution: this.Institution
+        },
+        '../../models/Subscription': {
+          Subscription: this.Subscription
+        },
+        '../../models/Publisher': {
+          Publisher: this.Publisher
+        }
       }
     }))
   })

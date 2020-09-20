@@ -37,13 +37,12 @@ describe('CollaboratorsInviteHandler', function() {
           this.deleteOne = sinon.stub()
           this.countDocuments = sinon.stub()
         }
-
         constructor(options) {
           if (options == null) {
             options = {}
           }
           this._id = ObjectId()
-          for (const k in options) {
+          for (let k in options) {
             const v = options[k]
             this[k] = v
           }

@@ -36,7 +36,9 @@ describe('UserInfoController', function() {
         './UserGetter': this.UserGetter,
         './UserUpdater': this.UserUpdater,
         './UserDeleter': this.UserDeleter,
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub()
         })

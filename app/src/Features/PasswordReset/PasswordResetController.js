@@ -73,10 +73,10 @@ module.exports = {
     }
     RateLimiter.addCount(opts, (err, canContinue) => {
       if (err != null) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
       }
       if (!canContinue) {
-        return res.status(429).json({
+        return res.status(429).send({
           message: req.i18n.translate('rate_limit_hit_wait')
         })
       }
@@ -86,17 +86,17 @@ module.exports = {
             { err },
             'failed to generate and email password reset token'
           )
-          res.status(500).json({ message: err.message })
+          res.status(500).send({ message: err.message })
         } else if (status === 'primary') {
-          res.status(200).json({
+          res.status(200).send({
             message: { text: req.i18n.translate('password_reset_email_sent') }
           })
         } else if (status === 'secondary') {
-          res.status(404).json({
+          res.status(404).send({
             message: req.i18n.translate('secondary_email_password_reset')
           })
         } else {
-          res.status(404).json({
+          res.status(404).send({
             message: req.i18n.translate('cant_find_email')
           })
         }

@@ -62,7 +62,9 @@ describe('SubscriptionGroupController', function() {
       },
       requires: {
         './SubscriptionGroupHandler': this.GroupHandler,
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         './SubscriptionLocator': this.SubscriptionLocator,
         '../Authentication/AuthenticationController': this
           .AuthenticationController

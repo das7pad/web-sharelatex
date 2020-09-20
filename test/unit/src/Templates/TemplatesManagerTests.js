@@ -35,7 +35,9 @@ describe('TemplatesManager', function() {
     this.request = sinon.stub().returns({
       pipe() {},
       on() {},
-      response: { statusCode: 200 }
+      response: {
+        statusCode: 200
+      }
     })
     this.fs = {
       unlink: sinon.stub(),
@@ -96,7 +98,9 @@ describe('TemplatesManager', function() {
             host: this.v1Url
           }
         },
-        uuid: { v4: () => this.uuid },
+        uuid: {
+          v4: () => this.uuid
+        },
         request: this.request,
         fs: this.fs,
         '../../models/Project': { Project: this.Project }

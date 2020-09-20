@@ -52,7 +52,9 @@ describe('TemplatesController', function() {
       },
       session: {
         templateData: 'template-data',
-        user: { _id: this.user_id }
+        user: {
+          _id: this.user_id
+        }
       }
     }
     return (this.res = { redirect: sinon.stub() })

@@ -65,7 +65,9 @@ describe('TpdsUpdateHandler', function() {
         '../Project/ProjectRootDocManager': this.rootDocManager,
         '../Uploads/FileTypeManager': this.FileTypeManager,
         '../Cooldown/CooldownManager': this.CooldownManager,
-        'logger-sharelatex': { log() {} }
+        'logger-sharelatex': {
+          log() {}
+        }
       }
     })
     this.user_id = 'dsad29jlkjas'

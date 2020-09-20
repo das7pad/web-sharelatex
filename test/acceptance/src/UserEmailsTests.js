@@ -12,7 +12,6 @@ describe('UserEmails', function() {
   beforeEach(function(done) {
     this.user = new User()
     this.user.login(done)
-    return (this.newEmail = `newly-added-email${Math.random()}@example.com`)
   })
 
   describe('confirming an email', function() {
@@ -26,7 +25,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails',
                 json: {
-                  email: this.newEmail
+                  email: 'newly-added-email@example.com'
                 }
               },
               (error, response, body) => {
@@ -59,7 +58,9 @@ describe('UserEmails', function() {
                 expect(error).to.not.exist
                 // There should only be one confirmation token at the moment
                 expect(tokens.length).to.equal(1)
-                expect(tokens[0].data.email).to.equal(this.newEmail)
+                expect(tokens[0].data.email).to.equal(
+                  'newly-added-email@example.com'
+                )
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
                 ;({ token } = tokens[0])
                 cb()
@@ -118,7 +119,7 @@ describe('UserEmails', function() {
       let token1 = null
       let token2 = null
       this.user2 = new User()
-      this.email = `duplicate-email${Math.random()}@example.com`
+      this.email = 'duplicate-email@example.com'
       async.series(
         [
           cb => this.user2.login(cb),
@@ -254,7 +255,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails',
                 json: {
-                  email: (this.email = `expired-token-email${Math.random()}@example.com`)
+                  email: (this.email = 'expired-token-email@example.com')
                 }
               },
               (error, response, body) => {
@@ -327,7 +328,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails',
                 json: {
-                  email: (this.email = `reconfirmation-email${Math.random()}@example.com`)
+                  email: 'reconfirmation-email@example.com'
                 }
               },
               (error, response, body) => {
@@ -348,7 +349,9 @@ describe('UserEmails', function() {
                 expect(error).to.not.exist
                 // There should only be one confirmation token at the moment
                 expect(tokens.length).to.equal(1)
-                expect(tokens[0].data.email).to.equal(this.email)
+                expect(tokens[0].data.email).to.equal(
+                  'reconfirmation-email@example.com'
+                )
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
                 cb()
               }
@@ -360,7 +363,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails/resend_confirmation',
                 json: {
-                  email: this.email
+                  email: 'reconfirmation-email@example.com'
                 }
               },
               (error, response, body) => {
@@ -381,9 +384,13 @@ describe('UserEmails', function() {
                 expect(error).to.not.exist
                 // There should be two tokens now
                 expect(tokens.length).to.equal(2)
-                expect(tokens[0].data.email).to.equal(this.email)
+                expect(tokens[0].data.email).to.equal(
+                  'reconfirmation-email@example.com'
+                )
                 expect(tokens[0].data.user_id).to.equal(this.user._id)
-                expect(tokens[1].data.email).to.equal(this.email)
+                expect(tokens[1].data.email).to.equal(
+                  'reconfirmation-email@example.com'
+                )
                 expect(tokens[1].data.user_id).to.equal(this.user._id)
                 cb()
               }
@@ -456,7 +463,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails/resend_confirmation',
                 json: {
-                  email: `non-matching-email${Math.random()}@example.com`
+                  email: 'non-matching-email@example.com'
                 }
               },
               (error, response, body) => {
@@ -496,7 +503,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails',
                 json: {
-                  email: (this.email = `new-confirmed-default${Math.random()}@example.com`)
+                  email: 'new-confirmed-default@example.com'
                 }
               },
               (error, response, body) => {
@@ -510,7 +517,7 @@ describe('UserEmails', function() {
             // Mark the email as confirmed
             db.users.update(
               {
-                'emails.email': this.email
+                'emails.email': 'new-confirmed-default@example.com'
               },
               {
                 $set: {
@@ -526,7 +533,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails/default',
                 json: {
-                  email: this.email
+                  email: 'new-confirmed-default@example.com'
                 }
               },
               (error, response, body) => {
@@ -577,7 +584,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails',
                 json: {
-                  email: (this.email = `new-unconfirmed-default${Math.random()}@example.com`)
+                  email: 'new-unconfirmed-default@example.com'
                 }
               },
               (error, response, body) => {
@@ -593,7 +600,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails/default',
                 json: {
-                  email: this.email
+                  email: 'new-unconfirmed-default@example.com'
                 }
               },
               (error, response, body) => {
@@ -641,7 +648,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails',
                 json: {
-                  email: (this.email = `new-confirmed-default-in-v1${Math.random()}@example.com`)
+                  email: 'new-confirmed-default-in-v1@example.com'
                 }
               },
               (error, response, body) => {
@@ -655,7 +662,7 @@ describe('UserEmails', function() {
             // Mark the email as confirmed
             db.users.update(
               {
-                'emails.email': this.email
+                'emails.email': 'new-confirmed-default-in-v1@example.com'
               },
               {
                 $set: {
@@ -671,7 +678,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails/default',
                 json: {
-                  email: this.email
+                  email: 'new-confirmed-default-in-v1@example.com'
                 }
               },
               (error, response, body) => {
@@ -691,9 +698,7 @@ describe('UserEmails', function() {
     })
 
     it('should not return an error if the email exists in v1', function(done) {
-      MockV1Api.existingEmails.push(
-        (this.email = `exists-in-v1${Math.random()}@example.com`)
-      )
+      MockV1Api.existingEmails.push('exists-in-v1@example.com')
       async.series(
         [
           cb => {
@@ -715,7 +720,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails',
                 json: {
-                  email: this.email
+                  email: 'exists-in-v1@example.com'
                 }
               },
               (error, response, body) => {
@@ -729,7 +734,7 @@ describe('UserEmails', function() {
             // Mark the email as confirmed
             db.users.update(
               {
-                'emails.email': this.email
+                'emails.email': 'exists-in-v1@example.com'
               },
               {
                 $set: {
@@ -745,7 +750,7 @@ describe('UserEmails', function() {
                 method: 'POST',
                 url: '/user/emails/default',
                 json: {
-                  email: this.email
+                  email: 'exists-in-v1@example.com'
                 }
               },
               (error, response, body) => {

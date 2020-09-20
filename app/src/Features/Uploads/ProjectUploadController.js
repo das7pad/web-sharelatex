@@ -25,7 +25,9 @@ const multer = require('multer')
 
 const upload = multer({
   dest: Settings.path.uploadFolder,
-  limits: { fileSize: Settings.maxUploadSize }
+  limits: {
+    fileSize: Settings.maxUploadSize
+  }
 })
 
 module.exports = ProjectUploadController = {
@@ -58,7 +60,7 @@ module.exports = ProjectUploadController = {
             })
           }
         } else {
-          return res.json({ success: true, project_id: project._id })
+          return res.send({ success: true, project_id: project._id })
         }
       }
     )
@@ -75,7 +77,7 @@ module.exports = ProjectUploadController = {
         { projectId: project_id, fileName: name },
         'bad name when trying to upload file'
       )
-      return res.json({ success: false })
+      return res.send({ success: false })
     }
     const user_id = AuthenticationController.getLoggedInUserId(req)
 
@@ -106,15 +108,15 @@ module.exports = ProjectUploadController = {
               error: req.i18n.translate('invalid_filename')
             })
           } else if (error.message === 'project_has_too_many_files') {
-            return res.json({
+            return res.send({
               success: false,
               error: req.i18n.translate('project_has_too_many_files')
             })
           } else {
-            return res.json({ success: false })
+            return res.send({ success: false })
           }
         } else {
-          return res.json({
+          return res.send({
             success: true,
             entity_id: entity != null ? entity._id : undefined,
             entity_type: entity != null ? entity.type : undefined

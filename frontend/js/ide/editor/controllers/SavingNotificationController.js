@@ -39,7 +39,7 @@ export default App.controller('SavingNotificationController', function(
     let newUnsavedCount = 0
     let maxUnsavedSeconds = 0
 
-    for (const doc_id in Document.openDocs) {
+    for (let doc_id in Document.openDocs) {
       const doc = Document.openDocs[doc_id]
       const saving = doc.pollSavedStatus()
       if (!saving) {

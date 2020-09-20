@@ -14,9 +14,13 @@ const DeletedDocSchema = new Schema({
 
 const DeletedFileSchema = new Schema({
   name: String,
-  created: { type: Date },
+  created: {
+    type: Date
+  },
   linkedFileData: { type: Schema.Types.Mixed },
-  hash: { type: String },
+  hash: {
+    type: String
+  },
   deletedAt: { type: Date }
 })
 

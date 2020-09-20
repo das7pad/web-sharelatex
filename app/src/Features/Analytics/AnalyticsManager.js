@@ -49,7 +49,7 @@ const prepareAnalyticsRequest = function(options) {
 // make the request to analytics after checking and preparing it.
 // request happens asynchronously in the background and will be retried on error
 const makeAnalyticsBackgroundRequest = function(userId, options, callback) {
-  const { error, skip } = checkAnalyticsRequest(userId)
+  let { error, skip } = checkAnalyticsRequest(userId)
   if (error || skip) {
     return callback(error)
   }

@@ -1,4 +1,4 @@
-const UserMembershipAuthorization = {
+let UserMembershipAuthorization = {
   hasStaffAccess(requiredStaffAccess) {
     return req => {
       if (!req.user) {

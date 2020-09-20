@@ -47,7 +47,7 @@ describe('SubscriptionUpdater', function() {
       .stub()
       .callsArgWith(2, null, this.subscription)
 
-    const subscription = this.subscription
+    let subscription = this.subscription
     this.SubscriptionModel = class {
       constructor(opts) {
         // Always return our mock subscription when creating a new one
@@ -98,7 +98,9 @@ describe('SubscriptionUpdater', function() {
         console: console
       },
       requires: {
-        '../../models/Subscription': { Subscription: this.SubscriptionModel },
+        '../../models/Subscription': {
+          Subscription: this.SubscriptionModel
+        },
         './UserFeaturesUpdater': this.UserFeaturesUpdater,
         './SubscriptionLocator': this.SubscriptionLocator,
         '../User/UserGetter': this.UserGetter,

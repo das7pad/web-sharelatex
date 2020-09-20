@@ -75,9 +75,15 @@ describe('UserMembershipHandler', function() {
         './UserMembershipViewModel': this.UserMembershipViewModel,
         '../User/UserGetter': this.UserGetter,
         '../Errors/Errors': Errors,
-        '../../models/Institution': { Institution: this.Institution },
-        '../../models/Subscription': { Subscription: this.Subscription },
-        '../../models/Publisher': { Publisher: this.Publisher },
+        '../../models/Institution': {
+          Institution: this.Institution
+        },
+        '../../models/Subscription': {
+          Subscription: this.Subscription
+        },
+        '../../models/Publisher': {
+          Publisher: this.Publisher
+        },
         'logger-sharelatex': {
           log() {},
           err() {}

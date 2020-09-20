@@ -47,7 +47,9 @@ describe('EmailSender', function() {
           warn() {},
           err() {}
         },
-        '@overleaf/metrics': { inc() {} }
+        '@overleaf/metrics': {
+          inc() {}
+        }
       }
     })
 

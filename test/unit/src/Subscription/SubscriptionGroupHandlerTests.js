@@ -90,11 +90,15 @@ describe('SubscriptionGroupHandler', function() {
         console: console
       },
       requires: {
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         '../User/UserCreator': this.UserCreator,
         './SubscriptionUpdater': this.SubscriptionUpdater,
         './SubscriptionLocator': this.SubscriptionLocator,
-        '../../models/Subscription': { Subscription: this.Subscription },
+        '../../models/Subscription': {
+          Subscription: this.Subscription
+        },
         '../User/UserGetter': this.UserGetter,
         './LimitationsManager': this.LimitationsManager,
         '../Security/OneTimeTokenHandler': this.OneTimeTokenHandler,

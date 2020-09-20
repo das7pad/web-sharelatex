@@ -34,10 +34,16 @@ describe('OneTimeTokenHandler', function() {
       },
       requires: {
         'settings-sharelatex': this.settings,
-        'logger-sharelatex': { log() {} },
-        crypto: { randomBytes: () => this.stubbedToken },
+        'logger-sharelatex': {
+          log() {}
+        },
+        crypto: {
+          randomBytes: () => this.stubbedToken
+        },
         '../Errors/Errors': Errors,
-        '../../infrastructure/mongojs': { db: (this.db = { tokens: {} }) }
+        '../../infrastructure/mongojs': {
+          db: (this.db = { tokens: {} })
+        }
       }
     }))
   })

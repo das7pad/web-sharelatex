@@ -400,8 +400,8 @@ const commonDomains = [
   'foxmail'
 ]
 
-for (const domain of commonDomains) {
-  for (const tld of commonTLDs) {
+for (let domain of commonDomains) {
+  for (let tld of commonTLDs) {
     domainsBlackList[`${domain}.${tld}`] = true
   }
 }

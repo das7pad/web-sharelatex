@@ -33,7 +33,9 @@ describe('ProxyManager', function() {
       },
       requires: {
         'settings-sharelatex': this.settings,
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         request: this.request
       }
     })

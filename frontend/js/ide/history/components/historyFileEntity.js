@@ -16,7 +16,7 @@ const historyFileEntityController = function($scope, $element, $attrs) {
   const ctrl = this
   ctrl.hasOperation = false
   ctrl.getRenameTooltip = i18nRenamedStr => {
-    const [simplifiedOldPathname, simplifiedPathname] = _getSimplifiedPaths(
+    let [simplifiedOldPathname, simplifiedPathname] = _getSimplifiedPaths(
       ctrl.fileEntity.oldPathname,
       ctrl.fileEntity.pathname
     )
@@ -39,9 +39,9 @@ const historyFileEntityController = function($scope, $element, $attrs) {
   }
 
   const _getSimplifiedPaths = (path1, path2) => {
-    const path1Parts = path1.split('/')
-    const path2Parts = path2.split('/')
-    const maxIterations = Math.min(path1Parts.length, path2Parts.length) - 1
+    let path1Parts = path1.split('/')
+    let path2Parts = path2.split('/')
+    let maxIterations = Math.min(path1Parts.length, path2Parts.length) - 1
     for (
       var commonPartIndex = 0;
       commonPartIndex < maxIterations;

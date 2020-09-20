@@ -70,7 +70,9 @@ describe('ProjectDetailsHandler', function() {
       },
       requires: {
         './ProjectGetter': this.ProjectGetter,
-        '../../models/Project': { Project: this.ProjectModel },
+        '../../models/Project': {
+          Project: this.ProjectModel
+        },
         '../User/UserGetter': this.UserGetter,
         '../ThirdPartyDataStore/TpdsUpdateSender': this.TpdsUpdateSender,
         'logger-sharelatex': {

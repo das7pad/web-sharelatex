@@ -191,7 +191,7 @@ export default App.controller('UserAffiliationsController', function(
     _monitorRequest(
       UserAffiliationsDataService.setDefaultUserEmail(userEmail.email)
     ).then(function() {
-      for (const email of $scope.userEmails || []) {
+      for (let email of $scope.userEmails || []) {
         email.default = false
       }
       userEmail.default = true

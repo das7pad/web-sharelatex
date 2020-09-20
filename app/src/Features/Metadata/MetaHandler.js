@@ -79,7 +79,7 @@ module.exports = MetaHandler = {
     const label_re = MetaHandler.labelRegex()
     const package_re = MetaHandler.usepackageRegex()
     const req_package_re = MetaHandler.ReqPackageRegex()
-    for (const line of Array.from(lines)) {
+    for (let line of Array.from(lines)) {
       var labelMatch
       var clean, messy, packageMatch
       while ((labelMatch = label_re.exec(line))) {
@@ -117,7 +117,7 @@ module.exports = MetaHandler = {
 
   extractMetaFromProjectDocs(projectDocs) {
     const projectMeta = {}
-    for (const _path in projectDocs) {
+    for (let _path in projectDocs) {
       const doc = projectDocs[_path]
       projectMeta[doc._id] = MetaHandler.extractMetaFromDoc(doc.lines)
     }

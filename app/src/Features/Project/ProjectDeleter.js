@@ -109,7 +109,7 @@ async function restoreProject(projectId) {
 
 async function archiveProject(projectId, userId) {
   try {
-    const project = await Project.findOne({ _id: projectId }).exec()
+    let project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -131,7 +131,7 @@ async function archiveProject(projectId, userId) {
 
 async function unarchiveProject(projectId, userId) {
   try {
-    const project = await Project.findOne({ _id: projectId }).exec()
+    let project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -154,7 +154,7 @@ async function unarchiveProject(projectId, userId) {
 
 async function trashProject(projectId, userId) {
   try {
-    const project = await Project.findOne({ _id: projectId }).exec()
+    let project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -180,7 +180,7 @@ async function trashProject(projectId, userId) {
 
 async function untrashProject(projectId, userId) {
   try {
-    const project = await Project.findOne({ _id: projectId }).exec()
+    let project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -264,7 +264,7 @@ async function deleteProject(projectId, options = {}) {
 }
 
 async function undeleteProject(projectId, options = {}) {
-  const deletedProject = await DeletedProject.findOne({
+  let deletedProject = await DeletedProject.findOne({
     'deleterData.deletedProjectId': projectId
   }).exec()
 
@@ -276,7 +276,7 @@ async function undeleteProject(projectId, options = {}) {
     throw new Errors.NotFoundError('project_too_old_to_restore')
   }
 
-  const restored = new Project(deletedProject.project)
+  let restored = new Project(deletedProject.project)
 
   if (options.userId) {
     restored.owner_ref = options.userId

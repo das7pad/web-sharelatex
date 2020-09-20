@@ -169,7 +169,7 @@ App.controller('IdeController', function(
 
   ide.validFileRegex = '^[^*/]*$' // Don't allow * and /
 
-  const useFallbackWebsocket =
+  let useFallbackWebsocket =
     window.location &&
     window.location.search &&
     window.location.search.match(/ws=fallback/)

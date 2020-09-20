@@ -23,7 +23,7 @@ LinkedUrlProxy.get('/', (req, res, next) => {
 describe('LinkedFiles', function() {
   let projectOne, projectOneId, projectOneRootFolderId
   let projectTwo, projectTwoId, projectTwoRootFolderId
-  const sourceDocName = 'test.txt'
+  let sourceDocName = 'test.txt'
   let owner
 
   before(function(done) {

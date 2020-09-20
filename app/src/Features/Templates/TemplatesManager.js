@@ -170,7 +170,7 @@ const TemplatesManager = {
 
   promises: {
     async fetchFromV1(templateId) {
-      const { body, statusCode } = await requestPromise({
+      let { body, statusCode } = await requestPromise({
         baseUrl: settings.apis.v1.url,
         url: `/api/v2/templates/${templateId}`,
         method: 'GET',

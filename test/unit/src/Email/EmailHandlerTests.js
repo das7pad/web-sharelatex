@@ -28,7 +28,9 @@ describe('EmailHandler', function() {
         './EmailBuilder': this.EmailBuilder,
         './EmailSender': this.EmailSender,
         'settings-sharelatex': this.Settings,
-        'logger-sharelatex': { log() {} }
+        'logger-sharelatex': {
+          log() {}
+        }
       }
     })
   })

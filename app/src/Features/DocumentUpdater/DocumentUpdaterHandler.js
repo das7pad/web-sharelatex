@@ -131,7 +131,6 @@ function getProjectDocsIfMatch(projectId, projectStateHash, callback) {
   // If the project state hasn't changed, we can get all the latest
   // docs from redis via the docupdater. Otherwise we will need to
   // fall back to getting them from mongo.
-
   const timer = new metrics.Timer('get-project-docs')
   const url = `${
     settings.apis.documentupdater.url

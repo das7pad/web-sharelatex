@@ -83,7 +83,9 @@ describe('SubscriptionHandler', function() {
       requires: {
         './RecurlyWrapper': this.RecurlyWrapper,
         'settings-sharelatex': this.Settings,
-        '../../models/User': { User: this.User },
+        '../../models/User': {
+          User: this.User
+        },
         './SubscriptionUpdater': this.SubscriptionUpdater,
         'logger-sharelatex': { log() {} },
         './LimitationsManager': this.LimitationsManager,

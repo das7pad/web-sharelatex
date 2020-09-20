@@ -206,7 +206,7 @@ const UserController = {
           { deleterUser: user, ipAddress: req.ip },
           err => {
             if (err) {
-              const errorData = {
+              let errorData = {
                 message: 'error while deleting user account',
                 info: { userId }
               }

@@ -2,7 +2,7 @@ import App from '../../base'
 import getMeta from '../../utils/meta'
 
 App.controller('NotificationsController', function($scope, $http) {
-  for (const notification of $scope.notifications || []) {
+  for (let notification of $scope.notifications || []) {
     notification.hide = false
   }
 
@@ -96,7 +96,7 @@ App.controller('EmailNotificationController', function(
     }
     return false
   }
-  for (const userEmail of $scope.userEmails) {
+  for (let userEmail of $scope.userEmails) {
     userEmail.hide = false
   }
 

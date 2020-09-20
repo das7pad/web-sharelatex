@@ -7,7 +7,8 @@ describe('UserHandler', function() {
   beforeEach(function() {
     this.user = {
       _id: '12390i',
-      email: 'bob@bob.com'
+      email: 'bob@bob.com',
+      remove: sinon.stub().callsArgWith(0)
     }
 
     this.TeamInvitesHandler = {

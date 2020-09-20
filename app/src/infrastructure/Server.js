@@ -253,10 +253,6 @@ if (enableWebRouter || notDefined(enableWebRouter)) {
   app.use(Validation.errorMiddleware)
   app.use(ErrorController.handleError)
 
-  if (app.get('env') === 'test') {
-    app.enable('view cache')
-  }
-
   Modules.loadViewIncludes(app)
 }
 

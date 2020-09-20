@@ -52,6 +52,7 @@ async function add(req, res, next) {
   }
 
   await _sendSecurityAlertEmail(user, email)
+
   await UserEmailsConfirmationHandler.promises.sendConfirmationEmail(
     userId,
     email

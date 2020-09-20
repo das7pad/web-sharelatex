@@ -48,7 +48,9 @@ describe('TpdsController', function() {
           info() {},
           err() {}
         },
-        '@overleaf/metrics': { inc() {} }
+        '@overleaf/metrics': {
+          inc() {}
+        }
       }
     })
 

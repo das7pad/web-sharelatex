@@ -127,7 +127,7 @@ export default App.controller('NewSubscriptionController', function(
     $scope.monthlyBilling = pricing.items.plan.period.length === 1
 
     $scope.availableCurrencies = {}
-    for (const currencyCode in pricing.items.plan.price) {
+    for (let currencyCode in pricing.items.plan.price) {
       if (MultiCurrencyPricing.plans[currencyCode]) {
         $scope.availableCurrencies[currencyCode] =
           MultiCurrencyPricing.plans[currencyCode]

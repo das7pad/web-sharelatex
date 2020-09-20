@@ -15,9 +15,9 @@ const trackChangesModuleAvailable = fs.existsSync(
 
 function externalAuthenticationSystemUsed() {
   return (
-    Settings.ldap != null ||
-    Settings.enableSaml ||
-    (Settings.overleaf != null ? Settings.overleaf.oauth : undefined) != null
+    !!Settings.ldap ||
+    !!Settings.enableSaml ||
+    !!(Settings.overleaf && Settings.overleaf.oauth)
   )
 }
 

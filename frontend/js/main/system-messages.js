@@ -10,6 +10,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../base'
+import { localStorage } from '../modules/storage'
+
 const MESSAGE_POLL_INTERVAL = 15 * 60 * 1000
 // Controller for messages (array)
 App.controller('SystemMessagesController', ($http, $scope) => {
@@ -43,8 +45,7 @@ App.controller('SystemMessagesController', ($http, $scope) => {
 
 export default App.controller('SystemMessageController', function(
   $scope,
-  $sce,
-  localStorage
+  $sce
 ) {
   $scope.hidden = localStorage(`systemMessage.hide.${$scope.message._id}`)
   $scope.protected = $scope.message._id === 'protected'

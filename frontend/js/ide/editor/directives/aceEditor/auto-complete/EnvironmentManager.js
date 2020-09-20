@@ -199,10 +199,10 @@ class EnvironmentManager {
     }
 
     const parsedItemsMap = {}
-    for (const environment of Array.from(customEnvironments)) {
+    for (let environment of Array.from(customEnvironments)) {
       parsedItemsMap[environment.name] = environment
     }
-    for (const command of Array.from(beginCommands)) {
+    for (let command of Array.from(beginCommands)) {
       parsedItemsMap[command.name] = command
     }
     const parsedItems = _.values(parsedItemsMap)

@@ -246,10 +246,9 @@ const ProjectController = {
     const { projectName } = req.body
     logger.log({ projectId, projectName }, 'cloning project')
     if (!AuthenticationController.isUserLoggedIn(req)) {
-      return res.json({ redir: '/register' })
+      return res.send({ redir: '/register' })
     }
     const currentUser = AuthenticationController.getSessionUser(req)
-    // eslint-disable-next-line camelcase
     const { first_name: firstName, last_name: lastName, email } = currentUser
     ProjectDuplicator.duplicate(
       currentUser,
@@ -263,11 +262,10 @@ const ProjectController = {
           })
           return next(err)
         }
-        res.json({
+        res.send({
           name: project.name,
           project_id: project._id,
           owner_ref: project.owner_ref,
-          // eslint-disable-next-line camelcase
           owner: {
             first_name: firstName,
             last_name: lastName,
@@ -305,7 +303,7 @@ const ProjectController = {
         if (err != null) {
           return next(err)
         }
-        res.json({
+        res.send({
           project_id: project._id,
           owner_ref: project.owner_ref,
           owner: {
@@ -791,7 +789,8 @@ const ProjectController = {
             metrics.inc(metricName)
 
             const enableOptimize =
-              !!Settings.experimentId && user.features && !user.features.zotero
+              !!Settings.experimentId &&
+              (user.features && !user.features.zotero)
 
             if (userId) {
               AnalyticsManager.recordEvent(userId, 'project-opened', {
@@ -1054,7 +1053,7 @@ const ProjectController = {
       affiliations = []
     }
     const portalTemplates = []
-    for (const aff of affiliations) {
+    for (let aff of affiliations) {
       if (
         aff.portal &&
         aff.portal.slug &&

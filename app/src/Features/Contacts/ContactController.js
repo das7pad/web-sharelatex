@@ -66,12 +66,8 @@ module.exports = ContactsController = {
             if (error != null) {
               return next(error)
             }
-            if (additional_contacts) {
-              contacts = contacts.concat(
-                ...Array.from(additional_contacts || [])
-              )
-            }
-            return res.json({
+            contacts = contacts.concat(...Array.from(additional_contacts || []))
+            return res.send({
               contacts
             })
           })

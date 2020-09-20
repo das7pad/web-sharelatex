@@ -28,7 +28,9 @@ describe('LockManager - trying the lock', function() {
         console: console
       },
       requires: {
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         './RedisWrapper': {
           client: () => {
             return {
@@ -47,7 +49,9 @@ describe('LockManager - trying the lock', function() {
             slowExecutionThreshold: 5000
           }
         },
-        '@overleaf/metrics': { inc() {} }
+        '@overleaf/metrics': {
+          inc() {}
+        }
       }
     })
     this.callback = sinon.stub()

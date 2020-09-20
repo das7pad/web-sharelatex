@@ -16,9 +16,9 @@ class TrackChangesAdapter {
 
   clearAnnotations() {
     const session = this.editor.getSession()
-    for (const change_id in this.changeIdToMarkerIdMap) {
+    for (let change_id in this.changeIdToMarkerIdMap) {
       const markers = this.changeIdToMarkerIdMap[change_id]
-      for (const marker_name in markers) {
+      for (let marker_name in markers) {
         const marker_id = markers[marker_name]
         session.removeMarker(marker_id)
       }

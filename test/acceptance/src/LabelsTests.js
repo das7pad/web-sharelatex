@@ -59,7 +59,7 @@ describe('Labels', function() {
       version
     })
 
-    this.owner.request(
+    return this.owner.request(
       {
         method: 'GET',
         url: `/project/${this.project_id}/labels`,
@@ -74,14 +74,13 @@ describe('Labels', function() {
         return done()
       }
     )
-    return null
   })
 
   it('creating a label', function(done) {
     const comment = 'a label comment'
     const version = 3
 
-    this.owner.request(
+    return this.owner.request(
       {
         method: 'POST',
         url: `/project/${this.project_id}/labels`,
@@ -99,7 +98,6 @@ describe('Labels', function() {
         return done()
       }
     )
-    return null
   })
 
   it('deleting a label', function(done) {
@@ -112,7 +110,7 @@ describe('Labels', function() {
       version
     })
 
-    this.owner.request(
+    return this.owner.request(
       {
         method: 'DELETE',
         url: `/project/${this.project_id}/labels/${label_id}`,
@@ -129,6 +127,5 @@ describe('Labels', function() {
         return done()
       }
     )
-    return null
   })
 })

@@ -51,7 +51,7 @@ module.exports = CaptchaMiddleware = {
               { statusCode: response.statusCode, body },
               'failed recaptcha siteverify request'
             )
-            return res.status(400).json({
+            return res.status(400).send({
               errorReason: 'cannot_verify_user_not_robot',
               message: {
                 text:

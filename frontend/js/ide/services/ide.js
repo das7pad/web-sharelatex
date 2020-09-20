@@ -56,7 +56,7 @@ App.factory('ide', function($http, queuedHttp, $modal, $q, $filter, $timeout) {
     meta.recent_events = this.recentEvents
     const errorObj = {}
     if (typeof error === 'object') {
-      for (const key of Array.from(Object.getOwnPropertyNames(error))) {
+      for (let key of Array.from(Object.getOwnPropertyNames(error))) {
         errorObj[key] = error[key]
       }
     } else if (typeof error === 'string') {

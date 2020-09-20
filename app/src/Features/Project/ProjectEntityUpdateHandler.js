@@ -1121,7 +1121,7 @@ const ProjectEntityUpdateHandler = {
   ),
 
   mkdirp: wrapWithLock(function(projectId, path, callback) {
-    for (const folder of path.split('/')) {
+    for (let folder of path.split('/')) {
       if (folder.length > 0 && !SafePath.isCleanFilename(folder)) {
         return callback(new Errors.InvalidNameError('invalid element name'))
       }
@@ -1135,7 +1135,7 @@ const ProjectEntityUpdateHandler = {
   }),
 
   mkdirpWithExactCase: wrapWithLock(function(projectId, path, callback) {
-    for (const folder of path.split('/')) {
+    for (let folder of path.split('/')) {
       if (folder.length > 0 && !SafePath.isCleanFilename(folder)) {
         return callback(new Errors.InvalidNameError('invalid element name'))
       }
@@ -1404,10 +1404,10 @@ const ProjectEntityUpdateHandler = {
     } else if (entityType.indexOf('folder') !== -1) {
       changes = { oldDocs: [], oldFiles: [] }
       const _recurseFolder = (folder, folderPath) => {
-        for (const doc of folder.docs) {
+        for (let doc of folder.docs) {
           changes.oldDocs.push({ doc, path: Path.join(folderPath, doc.name) })
         }
-        for (const file of folder.fileRefs) {
+        for (let file of folder.fileRefs) {
           changes.oldFiles.push({
             file,
             path: Path.join(folderPath, file.name)

@@ -30,7 +30,9 @@ describe('EditorRealTimeController', function() {
         '../../infrastructure/RedisWrapper': {
           client: () => this.rclient
         },
-        '../../infrastructure/Server': { io: (this.io = {}) },
+        '../../infrastructure/Server': {
+          io: (this.io = {})
+        },
         'settings-sharelatex': { redis: {} },
         '@overleaf/metrics': this.Metrics,
         crypto: (this.crypto = {

@@ -351,7 +351,7 @@ describe('ProjectController', function() {
 
   describe('cloneProject', function() {
     it('should call the project duplicator', function(done) {
-      this.res.json = json => {
+      this.res.send = json => {
         this.ProjectDuplicator.duplicate
           .calledWith(this.user, this.project_id, this.projectName)
           .should.equal(true)
@@ -365,7 +365,7 @@ describe('ProjectController', function() {
   describe('newProject', function() {
     it('should call the projectCreationHandler with createExampleProject', function(done) {
       this.req.body.template = 'example'
-      this.res.json = json => {
+      this.res.send = json => {
         this.ProjectCreationHandler.createExampleProject
           .calledWith(this.user._id, this.projectName)
           .should.equal(true)
@@ -379,7 +379,7 @@ describe('ProjectController', function() {
 
     it('should call the projectCreationHandler with createBasicProject', function(done) {
       this.req.body.template = 'basic'
-      this.res.json = json => {
+      this.res.send = json => {
         this.ProjectCreationHandler.createExampleProject.called.should.equal(
           false
         )

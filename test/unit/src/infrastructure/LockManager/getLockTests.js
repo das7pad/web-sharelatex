@@ -31,7 +31,9 @@ describe('LockManager - getting the lock', function() {
         console: console
       },
       requires: {
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         './RedisWrapper': {
           client() {
             return { auth() {} }

@@ -64,7 +64,9 @@ describe('ProjectCreationHandler', function() {
         console: console
       },
       requires: {
-        '../../models/User': { User: this.User },
+        '../../models/User': {
+          User: this.User
+        },
         '../../models/Project': { Project: this.ProjectModel },
         '../../models/Folder': { Folder: this.FolderModel },
         '../History/HistoryManager': this.HistoryManager,

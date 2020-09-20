@@ -15,7 +15,6 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-
 import App from '../../../base'
 
 export default App.factory('chatMessages', function($http, ide) {
@@ -159,6 +158,7 @@ export default App.factory('chatMessages', function($http, ide) {
 
   return chat
 })
+
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null
     ? transform(value)

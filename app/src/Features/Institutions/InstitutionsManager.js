@@ -158,7 +158,7 @@ var checkFeatures = function(institutionId, users) {
     }
   }
   users.forEach(function(user) {
-    const isSSOEntitled = SAMLIdentityManager.userHasEntitlement(
+    let isSSOEntitled = SAMLIdentityManager.userHasEntitlement(
       user,
       institutionId
     )

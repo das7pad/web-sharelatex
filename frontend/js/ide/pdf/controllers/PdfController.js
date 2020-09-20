@@ -265,7 +265,7 @@ App.controller('PdfController', function(
     const url = `/project/${$scope.project_id}/compile`
     const params = {}
     if (options.isAutoCompileOnLoad || options.isAutoCompileOnChange) {
-      params.auto_compile = true
+      params['auto_compile'] = true
     }
     // if the previous run was a check, clear the error logs
     if ($scope.check) {
@@ -558,9 +558,9 @@ App.controller('PdfController', function(
     }
 
     function accumulateResults(newEntries) {
-      for (const key of ['all', 'errors', 'warnings']) {
+      for (let key of ['all', 'errors', 'warnings']) {
         if (newEntries.type != null) {
-          for (const entry of newEntries[key]) {
+          for (let entry of newEntries[key]) {
             entry.type = newEntries.type
           }
         }
@@ -581,7 +581,7 @@ App.controller('PdfController', function(
     function processChkTex(log) {
       const errors = []
       const warnings = []
-      for (const line of log.split('\n')) {
+      for (let line of log.split('\n')) {
         var m
         if ((m = line.match(/^(\S+):(\d+):(\d+): (Error|Warning): (.*)/))) {
           const result = {
@@ -693,7 +693,7 @@ App.controller('PdfController', function(
     if (doc == null) {
       return null
     }
-    for (const line of doc.split('\n')) {
+    for (let line of doc.split('\n')) {
       if (/^[^%]*\\documentclass/.test(line)) {
         return ide.editorManager.getCurrentDocId()
       }

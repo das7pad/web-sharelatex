@@ -375,7 +375,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
         if (error != null) {
           throw error
         }
-        const expectedFeatures = Object.assign(settings.defaultFeatures, {
+        let expectedFeatures = Object.assign(settings.defaultFeatures, {
           github: true,
           trackChanges: true
         })

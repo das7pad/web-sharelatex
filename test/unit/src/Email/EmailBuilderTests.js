@@ -21,7 +21,9 @@ describe('EmailBuilder', function() {
       },
       requires: {
         'settings-sharelatex': this.settings,
-        'logger-sharelatex': { log() {} }
+        'logger-sharelatex': {
+          log() {}
+        }
       }
     })
   })

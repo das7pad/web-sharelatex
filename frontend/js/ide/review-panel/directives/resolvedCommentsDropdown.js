@@ -77,7 +77,7 @@ export default App.directive('resolvedCommentsDropdown', () => ({
           result.push(
             (() => {
               const result1 = []
-              for (const entryId in docEntries) {
+              for (let entryId in docEntries) {
                 const entry = docEntries[entryId]
                 if (
                   entry.type === 'comment' &&

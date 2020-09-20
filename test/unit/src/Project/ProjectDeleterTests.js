@@ -451,7 +451,7 @@ describe('ProjectDeleter', function() {
 
   describe('archiveProject', function() {
     beforeEach(function() {
-      const archived = [ObjectId(this.user._id)]
+      let archived = [ObjectId(this.user._id)]
       this.ProjectHelper.calculateArchivedArray.returns(archived)
 
       this.ProjectMock.expects('findOne')
@@ -493,7 +493,7 @@ describe('ProjectDeleter', function() {
 
   describe('unarchiveProject', function() {
     beforeEach(function() {
-      const archived = [ObjectId(this.user._id)]
+      let archived = [ObjectId(this.user._id)]
       this.ProjectHelper.calculateArchivedArray.returns(archived)
 
       this.ProjectMock.expects('findOne')
@@ -529,7 +529,7 @@ describe('ProjectDeleter', function() {
 
   describe('trashProject', function() {
     beforeEach(function() {
-      const archived = [ObjectId(this.user._id)]
+      let archived = [ObjectId(this.user._id)]
       this.ProjectHelper.calculateArchivedArray.returns(archived)
 
       this.ProjectMock.expects('findOne')

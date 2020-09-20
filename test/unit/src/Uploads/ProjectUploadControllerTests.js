@@ -109,12 +109,10 @@ describe('ProjectUploadController', function() {
       })
 
       it('should return a successful response to the FileUploader client', function() {
-        return expect(this.res.body).to.equal(
-          JSON.stringify({
-            success: true,
-            project_id: this.project_id
-          })
-        )
+        return expect(this.res.body).to.deep.equal({
+          success: true,
+          project_id: this.project_id
+        })
       })
 
       it('should record the time taken to do the upload', function() {
@@ -211,13 +209,11 @@ describe('ProjectUploadController', function() {
       })
 
       it('should return a successful response to the FileUploader client', function() {
-        return expect(this.res.body).to.equal(
-          JSON.stringify({
-            success: true,
-            entity_id: this.entity._id,
-            entity_type: 'file'
-          })
-        )
+        return expect(this.res.body).to.deep.equal({
+          success: true,
+          entity_id: this.entity._id,
+          entity_type: 'file'
+        })
       })
 
       it('should time the request', function() {
@@ -238,11 +234,9 @@ describe('ProjectUploadController', function() {
       })
 
       it('should return an unsuccessful response to the FileUploader client', function() {
-        return expect(this.res.body).to.equal(
-          JSON.stringify({
-            success: false
-          })
-        )
+        return expect(this.res.body).to.deep.equal({
+          success: false
+        })
       })
     })
 
@@ -255,12 +249,10 @@ describe('ProjectUploadController', function() {
       })
 
       it('should return an unsuccessful response to the FileUploader client', function() {
-        return expect(this.res.body).to.equal(
-          JSON.stringify({
-            success: false,
-            error: 'project_has_too_many_files'
-          })
-        )
+        return expect(this.res.body).to.deep.equal({
+          success: false,
+          error: 'project_has_too_many_files'
+        })
       })
     })
 
@@ -271,11 +263,9 @@ describe('ProjectUploadController', function() {
       })
 
       it('should return a a non success response', function() {
-        return expect(this.res.body).to.equal(
-          JSON.stringify({
-            success: false
-          })
-        )
+        return expect(this.res.body).to.deep.equal({
+          success: false
+        })
       })
     })
   })

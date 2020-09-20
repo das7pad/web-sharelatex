@@ -44,7 +44,9 @@ describe('DocumentUpdaterHandler', function() {
         'settings-sharelatex': this.settings,
         'logger-sharelatex': { log() {}, error() {}, warn() {} },
         '../Project/ProjectEntityHandler': this.projectEntityHandler,
-        '../../models/Project': { Project: (this.Project = {}) },
+        '../../models/Project': {
+          Project: (this.Project = {})
+        },
         '../../Features/Project/ProjectLocator': {},
         '@overleaf/metrics': {
           Timer: class {

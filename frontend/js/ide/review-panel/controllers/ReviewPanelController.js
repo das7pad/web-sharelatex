@@ -47,7 +47,7 @@ export default App.controller('ReviewPanelController', function(
       if ((project.owner != null ? project.owner.id : undefined) === user_id) {
         return UserTypes.MEMBER
       }
-      for (const member of Array.from(project.members)) {
+      for (let member of Array.from(project.members)) {
         if (member._id === user_id) {
           return UserTypes.MEMBER
         }
@@ -101,7 +101,7 @@ export default App.controller('ReviewPanelController', function(
 
   window.addEventListener('beforeunload', function() {
     const collapsedStates = {}
-    for (const doc in $scope.reviewPanel.overview.docsCollapsedState) {
+    for (let doc in $scope.reviewPanel.overview.docsCollapsedState) {
       const state = $scope.reviewPanel.overview.docsCollapsedState[doc]
       if (state) {
         collapsedStates[doc] = state
@@ -149,7 +149,7 @@ export default App.controller('ReviewPanelController', function(
     if (($scope.project != null ? $scope.project.members : undefined) != null) {
       return (() => {
         const result = []
-        for (const member of Array.from(members)) {
+        for (let member of Array.from(members)) {
           if (member.privileges === 'readAndWrite') {
             result.push(
               ($scope.reviewPanel.formattedProjectMembers[
@@ -329,7 +329,7 @@ export default App.controller('ReviewPanelController', function(
       const entries =
         $scope.reviewPanel.entries[$scope.editor.open_doc_id] || {}
       const permEntries = {}
-      for (const entry in entries) {
+      for (let entry in entries) {
         const entryData = entries[entry]
         if (!['add-comment', 'bulk-actions'].includes(entry)) {
           permEntries[entry] = entryData
@@ -354,7 +354,7 @@ export default App.controller('ReviewPanelController', function(
       const docs = response.data
       return (() => {
         const result = []
-        for (const doc of Array.from(docs)) {
+        for (let doc of Array.from(docs)) {
           if ($scope.reviewPanel.overview.docsCollapsedState[doc.id] == null) {
             $scope.reviewPanel.overview.docsCollapsedState[doc.id] = false
           }
@@ -463,7 +463,7 @@ export default App.controller('ReviewPanelController', function(
       ensureThreadsAreLoaded()
     }
 
-    for (const comment of Array.from(rangesTracker.comments)) {
+    for (let comment of Array.from(rangesTracker.comments)) {
       var new_comment
       changed = true
       delete delete_changes[comment.id]
@@ -493,7 +493,7 @@ export default App.controller('ReviewPanelController', function(
       }
     }
 
-    for (const change_id in delete_changes) {
+    for (let change_id in delete_changes) {
       const _ = delete_changes[change_id]
       changed = true
       delete entries[change_id]
@@ -548,7 +548,7 @@ export default App.controller('ReviewPanelController', function(
       }
     }
 
-    for (const id in entries) {
+    for (let id in entries) {
       const entry = entries[id]
       let isChangeEntryAndWithinSelection = false
       if (
@@ -585,7 +585,7 @@ export default App.controller('ReviewPanelController', function(
       }
 
       if (isChangeEntryAndWithinSelection) {
-        for (const entry_id of Array.from(entry.entry_ids)) {
+        for (let entry_id of Array.from(entry.entry_ids)) {
           $scope.reviewPanel.selectedEntryIds.push(entry_id)
         }
         $scope.reviewPanel.nVisibleSelectedChanges++
@@ -823,7 +823,7 @@ export default App.controller('ReviewPanelController', function(
     if (thread == null) {
       return
     }
-    for (const message of Array.from(thread.messages)) {
+    for (let message of Array.from(thread.messages)) {
       if (message.id === comment_id) {
         message.content = content
       }
@@ -938,7 +938,7 @@ export default App.controller('ReviewPanelController', function(
     }
     $scope.reviewPanel.trackChangesOnForEveryone = newValue
     const { project } = $scope
-    for (const member of Array.from(project.members)) {
+    for (let member of Array.from(project.members)) {
       _setUserTCState(member._id, newValue, isLocal)
     }
     _setGuestsTCState(newValue, isLocal)
@@ -964,7 +964,7 @@ export default App.controller('ReviewPanelController', function(
       data.on = true
     } else {
       data.on_for = {}
-      for (const userId in $scope.reviewPanel.trackChangesState) {
+      for (let userId in $scope.reviewPanel.trackChangesState) {
         const userState = $scope.reviewPanel.trackChangesState[userId]
         data.on_for[userId] = userState.value
       }
@@ -984,7 +984,7 @@ export default App.controller('ReviewPanelController', function(
       const { project } = $scope
       $scope.reviewPanel.trackChangesOnForEveryone = false
       _setGuestsTCState(state.__guests__ === true)
-      for (const member of Array.from(project.members)) {
+      for (let member of Array.from(project.members)) {
         _setUserTCState(
           member._id,
           state[member._id] != null ? state[member._id] : false
@@ -1072,7 +1072,10 @@ export default App.controller('ReviewPanelController', function(
     }
     const { project } = ide.$scope
     if (project.features.trackChanges) {
-      applyTrackChangesStateToClient(window.trackChangesState || false)
+      if (window.trackChangesState == null) {
+        window.trackChangesState = false
+      }
+      applyTrackChangesStateToClient(window.trackChangesState)
     } else {
       applyTrackChangesStateToClient(false)
     }
@@ -1112,7 +1115,7 @@ export default App.controller('ReviewPanelController', function(
         }
         return (() => {
           const result = []
-          for (const user of Array.from(users)) {
+          for (let user of Array.from(users)) {
             if (user.id != null) {
               result.push(($scope.users[user.id] = formatUser(user)))
             } else {
@@ -1144,7 +1147,7 @@ export default App.controller('ReviewPanelController', function(
         }
         for (thread_id in threads) {
           const thread = threads[thread_id]
-          for (const comment of Array.from(thread.messages)) {
+          for (let comment of Array.from(thread.messages)) {
             formatComment(comment)
           }
           if (thread.resolved_by_user != null) {

@@ -45,7 +45,7 @@ module.exports = MockDocStoreApi = {
     app.get('/project/:project_id/doc', (req, res, next) => {
       const docs = (() => {
         const result = []
-        for (const doc_id in this.docs[req.params.project_id]) {
+        for (let doc_id in this.docs[req.params.project_id]) {
           const doc = this.docs[req.params.project_id][doc_id]
           result.push(doc)
         }

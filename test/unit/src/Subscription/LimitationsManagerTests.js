@@ -61,7 +61,9 @@ describe('LimitationsManager', function() {
         '../Collaborators/CollaboratorsGetter': (this.CollaboratorsGetter = {}),
         '../Collaborators/CollaboratorsInviteHandler': (this.CollaboratorsInviteHandler = {}),
         './V1SubscriptionManager': (this.V1SubscriptionManager = {}),
-        'logger-sharelatex': { log() {} }
+        'logger-sharelatex': {
+          log() {}
+        }
       }
     }))
   })

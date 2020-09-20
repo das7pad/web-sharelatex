@@ -20,7 +20,9 @@ describe('UserCreator', function() {
         console: console
       },
       requires: {
-        '../../models/User': { User: this.UserModel },
+        '../../models/User': {
+          User: this.UserModel
+        },
         'logger-sharelatex': (this.Logger = {
           error: sinon.stub()
         }),

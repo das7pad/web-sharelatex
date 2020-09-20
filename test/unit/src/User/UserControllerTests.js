@@ -93,7 +93,9 @@ describe('UserController', function() {
         './UserGetter': this.UserGetter,
         './UserDeleter': this.UserDeleter,
         './UserUpdater': this.UserUpdater,
-        '../../models/User': { User: this.User },
+        '../../models/User': {
+          User: this.User
+        },
         '../Newsletter/NewsletterManager': this.NewsLetterManager,
         './UserRegistrationHandler': this.UserRegistrationHandler,
         '../Authentication/AuthenticationController': this
@@ -122,7 +124,9 @@ describe('UserController', function() {
           err() {},
           error: sinon.stub()
         }),
-        '@overleaf/metrics': { inc() {} },
+        '@overleaf/metrics': {
+          inc() {}
+        },
         '../Errors/Errors': Errors,
         '@overleaf/o-error': OError,
         '../Email/EmailHandler': (this.EmailHandler = {

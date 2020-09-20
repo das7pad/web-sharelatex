@@ -69,12 +69,12 @@ class AutoCompleteManager {
           )
           if (match) {
             // eslint-disable-next-line no-unused-vars
-            const commandName = match[1]
+            let commandName = match[1]
             const graphicsPaths = Preamble.getGraphicsPaths()
             const result = []
-            for (const graphic of Graphics.getGraphicsFiles()) {
+            for (let graphic of Graphics.getGraphicsFiles()) {
               let { path } = graphic
-              for (const graphicsPath of graphicsPaths) {
+              for (let graphicsPath of graphicsPaths) {
                 if (path.indexOf(graphicsPath) === 0) {
                   path = path.slice(graphicsPath.length)
                   break
@@ -103,10 +103,10 @@ class AutoCompleteManager {
             // eslint-disable-next-line no-unused-vars
             const commandName = match[1]
             const result = []
-            for (const file of Files.getTeXFiles()) {
+            for (let file of Files.getTeXFiles()) {
               if (file.id !== this.$scope.docId && !file.deleted && file.path) {
                 const { path } = file
-                const cleanPath = path.replace(/(.+)\.tex$/i, '$1')
+                let cleanPath = path.replace(/(.+)\.tex$/i, '$1')
                 result.push({
                   caption: `\\${commandName}{${path}}`,
                   value: `\\${commandName}{${cleanPath}}`,
@@ -141,7 +141,7 @@ class AutoCompleteManager {
                 score: 60
               })
             }
-            for (const label of metadataManager.getAllLabels()) {
+            for (let label of metadataManager.getAllLabels()) {
               result.push({
                 caption: `\\${commandName}{${label}}`,
                 value: `\\${commandName}{${label}}`,
@@ -261,8 +261,7 @@ class AutoCompleteManager {
     const match = change.lines[0].match(/\\(\w+){}/)
     if (
       change.action === 'insert' &&
-      match &&
-      match[1] &&
+      (match && match[1]) &&
       // eslint-disable-next-line max-len
       /(begin|end|[a-zA-Z]*ref|usepackage|[a-z]*cite[a-z]*|input|include)/.test(
         match[1]
@@ -414,6 +413,7 @@ class AutoCompleteManager {
       Autocomplete.startCommand = {
         name: 'startAutocomplete',
         exec: editor => {
+          let filtered
           if (!editor.completer) {
             editor.completer = new Autocomplete()
           }
@@ -428,7 +428,7 @@ class AutoCompleteManager {
           )
           container.css({ 'font-size': this.$scope.fontSize + 'px' })
           // Dynamically set width of autocomplete popup
-          const filtered =
+          filtered =
             editor.completer.completions &&
             editor.completer.completions.filtered
           if (filtered) {

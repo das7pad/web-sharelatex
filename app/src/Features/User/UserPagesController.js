@@ -162,7 +162,7 @@ const UserPagesController = {
   _translateProviderDescriptions(providers, req) {
     const result = {}
     if (providers) {
-      for (const provider in providers) {
+      for (let provider in providers) {
         const data = providers[provider]
         data.description = req.i18n.translate(
           String(data.descriptionKey),

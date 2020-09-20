@@ -30,7 +30,9 @@ describe('AuthorizationManager', function() {
         '../Collaborators/CollaboratorsGetter': (this.CollaboratorsGetter = {}),
         '../Collaborators/CollaboratorsHandler': (this.CollaboratorsHandler = {}),
         '../Project/ProjectGetter': (this.ProjectGetter = {}),
-        '../../models/User': { User: (this.User = {}) },
+        '../../models/User': {
+          User: (this.User = {})
+        },
         '../Errors/Errors': Errors,
         '../TokenAccess/TokenAccessHandler': (this.TokenAccessHandler = {
           validateTokenForAnonymousAccess: sinon

@@ -51,7 +51,9 @@ describe('UserUpdater', function() {
       requires: {
         'logger-sharelatex': this.logger,
         '../../infrastructure/mongojs': this.mongojs,
-        '@overleaf/metrics': { timeAsyncMethod: sinon.stub() },
+        '@overleaf/metrics': {
+          timeAsyncMethod: sinon.stub()
+        },
         './UserGetter': this.UserGetter,
         '../Institutions/InstitutionsAPI': (this.InstitutionsAPI = {
           addAffiliation: this.addAffiliation,

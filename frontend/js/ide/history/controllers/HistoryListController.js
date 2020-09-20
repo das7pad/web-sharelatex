@@ -61,7 +61,7 @@ App.controller('HistoryListController', function($scope, $modal, ide) {
     $scope.history.selection.updates = []
     return (() => {
       const result = []
-      for (const update of Array.from($scope.history.updates)) {
+      for (let update of Array.from($scope.history.updates)) {
         var inSelection
         if (update.selectedTo) {
           inSelection = true
@@ -140,7 +140,7 @@ App.controller('HistoryListController', function($scope, $modal, ide) {
   $scope.resetHoverState = () =>
     (() => {
       const result = []
-      for (const update of Array.from($scope.history.updates)) {
+      for (let update of Array.from($scope.history.updates)) {
         delete update.hoverSelectedFrom
         delete update.hoverSelectedTo
         result.push(delete update.inHoverSelection)
@@ -159,7 +159,7 @@ export default App.controller('HistoryListItemController', function(
 ) {
   $scope.$watch('update.selectedFrom', function(selectedFrom, oldSelectedFrom) {
     if (selectedFrom) {
-      for (const update of Array.from($scope.history.updates)) {
+      for (let update of Array.from($scope.history.updates)) {
         if (update !== $scope.update) {
           update.selectedFrom = false
         }
@@ -170,7 +170,7 @@ export default App.controller('HistoryListItemController', function(
 
   $scope.$watch('update.selectedTo', function(selectedTo, oldSelectedTo) {
     if (selectedTo) {
-      for (const update of Array.from($scope.history.updates)) {
+      for (let update of Array.from($scope.history.updates)) {
         if (update !== $scope.update) {
           update.selectedTo = false
         }

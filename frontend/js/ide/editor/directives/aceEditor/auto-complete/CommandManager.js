@@ -22,7 +22,6 @@ class Parser {
     // Ignore single letter commands since auto complete is moot then.
     this.prototype.commandRegex = /\\([a-zA-Z]{2,})/
   }
-
   constructor(doc, prefix) {
     this.doc = doc
     this.prefix = prefix
@@ -152,7 +151,7 @@ export default (CommandManager = class CommandManager {
 
     const packages = this.metadataManager.getAllPackages()
     const packageCommands = []
-    for (const pkg in packages) {
+    for (let pkg in packages) {
       const snippets = packages[pkg]
       for (snippet of Array.from(snippets)) {
         packageCommands.push(snippet)
@@ -164,7 +163,7 @@ export default (CommandManager = class CommandManager {
     const parser = new Parser(doc, prefix)
     const commands = parser.parse()
     let completions = []
-    for (const command of Array.from(commands)) {
+    for (let command of Array.from(commands)) {
       if (!commandNames[command[0]]) {
         let caption = `\\${command[0]}`
         const score = caption === prefix ? 99 : 50

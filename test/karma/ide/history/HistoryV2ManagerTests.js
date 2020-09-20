@@ -171,13 +171,9 @@ export default describe('HistoryV2Manager', function() {
   })
 
   it('should keep history updates after performing a soft reset', function() {
-    const historyScopeWithUpdates = Object.assign(
-      {},
-      this.defaultHistoryScope,
-      {
-        updates: this.sampleUpdates
-      }
-    )
+    let historyScopeWithUpdates = Object.assign({}, this.defaultHistoryScope, {
+      updates: this.sampleUpdates
+    })
     this.$scope.history.updates = this.sampleUpdates
     this.historyManager.softReset()
     expect(this.$scope.history).to.deep.equal(historyScopeWithUpdates)

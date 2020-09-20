@@ -56,7 +56,7 @@ App.controller('SearchWikiController', function($scope, algoliaSearch, $modal) {
     const lines = content.split('\n')
     // Only show the lines that have a highlighted match
     const matching_lines = []
-    for (const line of Array.from(lines)) {
+    for (let line of Array.from(lines)) {
       if (!/^\[edit\]/.test(line)) {
         content += line + '\n'
         if (/<em>/.test(line)) {

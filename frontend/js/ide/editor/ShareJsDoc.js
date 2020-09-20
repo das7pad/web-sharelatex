@@ -30,7 +30,6 @@ export default (ShareJsDoc = (function() {
 
       this.prototype.FATAL_OP_TIMEOUT = 30000
     }
-
     constructor(doc_id, docLines, version, socket) {
       super()
       // Dencode any binary bits of data
@@ -252,11 +251,9 @@ export default (ShareJsDoc = (function() {
     getSnapshot() {
       return this._doc.snapshot
     }
-
     getVersion() {
       return this._doc.version
     }
-
     getType() {
       return this.type
     }
@@ -290,11 +287,9 @@ export default (ShareJsDoc = (function() {
     getInflightOp() {
       return this._doc.inflightOp
     }
-
     getPendingOp() {
       return this._doc.pendingOp
     }
-
     getRecentAck() {
       // check if we have received an ack recently (within a factor of two of the single user flush delay)
       return (
@@ -302,12 +297,11 @@ export default (ShareJsDoc = (function() {
         new Date() - this.lastAcked < 2 * SINGLE_USER_FLUSH_DELAY
       )
     }
-
     getOpSize(op) {
       // compute size of an op from its components
       // (total number of characters inserted and deleted)
       let size = 0
-      for (const component of Array.from(op || [])) {
+      for (let component of Array.from(op || [])) {
         if ((component != null ? component.i : undefined) != null) {
           size += component.i.length
         }
@@ -321,7 +315,6 @@ export default (ShareJsDoc = (function() {
     attachToAce(ace) {
       return this._doc.attach_ace(ace, false, window.maxDocLength)
     }
-
     detachFromAce() {
       return typeof this._doc.detach_ace === 'function'
         ? this._doc.detach_ace()
@@ -331,13 +324,11 @@ export default (ShareJsDoc = (function() {
     attachToCM(cm) {
       return this._doc.attach_cm(cm, false)
     }
-
     detachFromCM() {
       return typeof this._doc.detach_cm === 'function'
         ? this._doc.detach_cm()
         : undefined
     } // If we're waiting for the project to join, try again in 0.5 seconds
-
     _startInflightOpTimeout(update) {
       this._startFatalTimeoutTimer(update)
       var retryOp = () => {
@@ -382,7 +373,6 @@ export default (ShareJsDoc = (function() {
         return clearTimeout(timer)
       }) // 30 seconds
     }
-
     _startFatalTimeoutTimer(update) {
       // If an op doesn't get acked within FATAL_OP_TIMEOUT, something has
       // gone unrecoverably wrong (the op will have been retried multiple times)

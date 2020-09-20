@@ -388,7 +388,7 @@ App.directive('aceEditor', function(
       }
 
       if (attrs.resizeOn != null) {
-        for (const event of Array.from(attrs.resizeOn.split(','))) {
+        for (let event of Array.from(attrs.resizeOn.split(','))) {
           scope.$on(event, function() {
             scope.$applyAsync(() => {
               const previousScreenPosition = getCursorScreenPosition()

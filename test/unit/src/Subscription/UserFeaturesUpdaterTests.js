@@ -27,8 +27,12 @@ describe('UserFeaturesUpdater', function() {
         console: console
       },
       requires: {
-        '../../models/User': { User: this.User },
-        'logger-sharelatex': { log() {} }
+        '../../models/User': {
+          User: this.User
+        },
+        'logger-sharelatex': {
+          log() {}
+        }
       }
     }))
   })

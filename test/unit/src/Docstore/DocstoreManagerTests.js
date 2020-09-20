@@ -24,7 +24,9 @@ describe('DocstoreManager', function() {
         console: console
       },
       requires: {
-        request: { defaults: this.requestDefaults },
+        request: {
+          defaults: this.requestDefaults
+        },
         'settings-sharelatex': (this.settings = {
           apis: {
             docstore: {

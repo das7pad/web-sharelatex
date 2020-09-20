@@ -38,7 +38,7 @@ module.exports = ProjectZipStreamManager = {
     callback(null, archive)
 
     const jobs = []
-    for (const project_id of Array.from(project_ids || [])) {
+    for (let project_id of Array.from(project_ids || [])) {
       ;(project_id =>
         jobs.push(callback =>
           ProjectGetter.getProject(project_id, { name: true }, function(
@@ -122,7 +122,7 @@ module.exports = ProjectZipStreamManager = {
         return callback(error)
       }
       const jobs = []
-      for (const path in docs) {
+      for (let path in docs) {
         const doc = docs[path]
         ;(function(path, doc) {
           if (path[0] === '/') {
@@ -148,7 +148,7 @@ module.exports = ProjectZipStreamManager = {
         return callback(error)
       }
       const jobs = []
-      for (const path in files) {
+      for (let path in files) {
         const file = files[path]
         ;((path, file) =>
           jobs.push(callback =>

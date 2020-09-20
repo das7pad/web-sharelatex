@@ -15,6 +15,8 @@ import App from '../../../base'
 export default App.controller(
   'HistoryV2ToolbarController',
   ($scope, $modal, ide, eventTracking, waitFor) => {
+    let openEntity
+
     $scope.currentUpdate = null
     $scope.currentLabel = null
 
@@ -27,7 +29,7 @@ export default App.controller(
       showOnlyLabels: false
     }
 
-    const _deregistershowOnlyLabelsWatcher = $scope.$watch(
+    let _deregistershowOnlyLabelsWatcher = $scope.$watch(
       'history.showOnlyLabels',
       showOnlyLabels => {
         if (showOnlyLabels != null) {
@@ -101,7 +103,7 @@ export default App.controller(
       })
     }
 
-    function openEntity(data) {
+    openEntity = function(data) {
       const { id, type } = data
       return waitFor(() => ide.fileTreeManager.findEntityById(id), 3000)
         .then(function(entity) {

@@ -18,7 +18,9 @@ describe('Referal handler', function() {
           log() {},
           err() {}
         },
-        '../../models/User': { User: this.User }
+        '../../models/User': {
+          User: this.User
+        }
       }
     })
     this.user_id = '12313'

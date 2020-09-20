@@ -433,7 +433,7 @@ describe('Subscriptions', function() {
         })
         MockV1Api.setAffiliations([
           {
-            email: (this.emailConfirmed = `confirmed-affiliation-email${Math.random()}@stanford.example.edu`),
+            email: 'confirmed-affiliation-email@stanford.example.edu',
             licence: 'pro_plus',
             department: 'Math',
             role: 'Prof',
@@ -444,7 +444,7 @@ describe('Subscriptions', function() {
             }
           },
           {
-            email: (this.emailUnconfirmed = `unconfirmed-affiliation-email${Math.random()}@harvard.example.edu`),
+            email: 'unconfirmed-affiliation-email@harvard.example.edu',
             licence: 'pro_plus',
             institution: {
               name: 'Harvard',
@@ -452,7 +452,7 @@ describe('Subscriptions', function() {
             }
           },
           {
-            email: (this.emailConfirmedMIT = `confirmed-affiliation-email${Math.random()}@mit.example.edu`),
+            email: 'confirmed-affiliation-email@mit.example.edu',
             licence: 'pro_plus',
             institution: { name: 'MIT', confirmed: false }
           }
@@ -463,19 +463,34 @@ describe('Subscriptions', function() {
               return this.user.setV1Id(v1Id, cb)
             },
             cb => {
-              return this.user.addEmail(this.emailUnconfirmed, cb)
+              return this.user.addEmail(
+                'unconfirmed-affiliation-email@harvard.example.edu',
+                cb
+              )
             },
             cb => {
-              return this.user.addEmail(this.emailConfirmed, cb)
+              return this.user.addEmail(
+                'confirmed-affiliation-email@stanford.example.edu',
+                cb
+              )
             },
             cb => {
-              return this.user.confirmEmail(this.emailConfirmed, cb)
+              return this.user.confirmEmail(
+                'confirmed-affiliation-email@stanford.example.edu',
+                cb
+              )
             },
             cb => {
-              return this.user.addEmail(this.emailConfirmedMIT, cb)
+              return this.user.addEmail(
+                'confirmed-affiliation-email@mit.example.edu',
+                cb
+              )
             },
             cb => {
-              return this.user.confirmEmail(this.emailConfirmedMIT, cb)
+              return this.user.confirmEmail(
+                'confirmed-affiliation-email@mit.example.edu',
+                cb
+              )
             }
           ],
           error => {

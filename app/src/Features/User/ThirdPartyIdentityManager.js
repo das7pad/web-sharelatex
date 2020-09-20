@@ -67,7 +67,9 @@ function link(
   }
   const query = {
     _id: userId,
-    'thirdPartyIdentifiers.providerId': { $ne: providerId }
+    'thirdPartyIdentifiers.providerId': {
+      $ne: providerId
+    }
   }
   const update = {
     $push: {

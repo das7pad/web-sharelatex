@@ -32,7 +32,6 @@ describe('ProjectHistoryHandler', function() {
         static initClass() {
           this.prototype.rootFolder = [this.rootFolder]
         }
-
         constructor(options) {
           this._id = project_id
           this.name = 'project_name_here'
@@ -57,7 +56,9 @@ describe('ProjectHistoryHandler', function() {
           err() {}
         }),
         'settings-sharelatex': (this.Settings = {}),
-        '../../models/Project': { Project: this.ProjectModel },
+        '../../models/Project': {
+          Project: this.ProjectModel
+        },
         './ProjectDetailsHandler': (this.ProjectDetailsHandler = {}),
         '../History/HistoryManager': (this.HistoryManager = {}),
         './ProjectEntityUpdateHandler': (this.ProjectEntityUpdateHandler = {})

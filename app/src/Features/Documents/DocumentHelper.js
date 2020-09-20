@@ -1,7 +1,6 @@
 /* eslint-disable
     max-len,
     no-cond-assign,
-    no-useless-escape,
 */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
@@ -20,7 +19,7 @@ module.exports = DocumentHelper = {
     }
     const TITLE_WITH_CURLY_BRACES = /\\[tT]itle\*?\s*{([^}]+)}/
     const TITLE_WITH_SQUARE_BRACES = /\\[tT]itle\s*\[([^\]]+)\]/
-    for (const line of Array.from(
+    for (let line of Array.from(
       DocumentHelper._getLinesFromContent(content, maxContentToScan)
     )) {
       var match
@@ -40,7 +39,7 @@ module.exports = DocumentHelper = {
     if (maxContentToScan == null) {
       maxContentToScan = 30000
     }
-    for (const line of Array.from(
+    for (let line of Array.from(
       DocumentHelper._getLinesFromContent(content, maxContentToScan)
     )) {
       // We've had problems with this regex locking up CPU.
@@ -65,7 +64,7 @@ module.exports = DocumentHelper = {
       .replace(/\\(?:[a-zA-Z]+|.|)/g, '')
       .replace(/{}|~/g, ' ')
       .replace(/[${}]/g, '')
-      .replace(/\ +/g, ' ')
+      .replace(/ +/g, ' ')
       .trim()
   },
 

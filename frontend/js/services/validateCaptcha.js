@@ -14,7 +14,7 @@ import App from '../base'
 export default App.factory('validateCaptcha', function() {
   let _recaptchaCallbacks = []
   const onRecaptchaSubmit = function(token) {
-    for (const cb of _recaptchaCallbacks) {
+    for (let cb of _recaptchaCallbacks) {
       cb(token)
     }
     _recaptchaCallbacks = []

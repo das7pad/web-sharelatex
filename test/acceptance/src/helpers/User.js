@@ -6,7 +6,7 @@ const UserUpdater = require('../../../../app/src/Features/User/UserUpdater')
 const AuthenticationManager = require('../../../../app/src/Features/Authentication/AuthenticationManager')
 const { promisify } = require('util')
 
-let count = Math.random()
+let count = 0
 
 class User {
   constructor(options) {
@@ -135,7 +135,7 @@ class User {
 
   setFeatures(features, callback) {
     const update = {}
-    for (const key in features) {
+    for (let key in features) {
       const value = features[key]
       update[`features.${key}`] = value
     }
@@ -356,7 +356,7 @@ class User {
               name,
               options,
               response.statusCode,
-              response.headers.location,
+              response.headers['location'],
               body
             ])
           )

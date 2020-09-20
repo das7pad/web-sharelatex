@@ -109,7 +109,7 @@ export default (HighlightsManager = class HighlightsManager {
     this._clearMarkers()
     this._clearLabels()
 
-    for (const annotation of Array.from(this.$scope.highlights || [])) {
+    for (let annotation of Array.from(this.$scope.highlights || [])) {
       ;(annotation => {
         const colorScheme = ColorManager.getColorScheme(
           annotation.hue,
@@ -252,7 +252,7 @@ export default (HighlightsManager = class HighlightsManager {
       let highlightsAfter = 0
       this.lastHiddenHighlightBefore = null
       this.firstHiddenHighlightAfter = null
-      for (const annotation of Array.from(this.$scope.highlights || [])) {
+      for (let annotation of Array.from(this.$scope.highlights || [])) {
         const range = annotation.highlight || annotation.strikeThrough
         if (range == null) {
           continue
@@ -281,7 +281,7 @@ export default (HighlightsManager = class HighlightsManager {
   scrollToFirstHighlight() {
     return (() => {
       const result = []
-      for (const annotation of Array.from(this.$scope.highlights || [])) {
+      for (let annotation of Array.from(this.$scope.highlights || [])) {
         const range = annotation.highlight || annotation.strikeThrough
         if (range == null) {
           continue
@@ -294,7 +294,7 @@ export default (HighlightsManager = class HighlightsManager {
   }
 
   _clearMarkers() {
-    for (const marker_id of Array.from(this.markerIds)) {
+    for (let marker_id of Array.from(this.markerIds)) {
       this.editor.getSession().removeMarker(marker_id)
     }
     return (this.markerIds = [])

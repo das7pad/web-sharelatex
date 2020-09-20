@@ -9,15 +9,11 @@ describe('Sessions', function() {
   beforeEach(function(done) {
     this.timeout(20000)
     this.user1 = new User()
-    this.site_admin = new User({ email: `admin${Math.random()}@example.com` })
+    this.site_admin = new User({ email: 'admin@example.com' })
     async.series(
       [cb => this.user1.login(cb), cb => this.user1.logout(cb)],
       done
     )
-  })
-
-  afterEach(function(done) {
-    return this.user1.logout(() => done())
   })
 
   describe('one session', function() {

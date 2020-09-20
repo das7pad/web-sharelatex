@@ -26,7 +26,6 @@ export default (EditorManager = (function() {
     static initClass() {
       this.prototype._syncTimeout = null
     }
-
     constructor(ide, $scope, localStorage) {
       this.ide = ide
       this.editorOpenDocEpoch = 0 // track pending document loads
@@ -320,7 +319,6 @@ export default (EditorManager = (function() {
     stopIgnoringExternalUpdates() {
       return (this._ignoreExternalUpdates = false)
     }
-
     _syncTrackChangesState(doc) {
       let tryToggle
       if (doc == null) {

@@ -187,7 +187,7 @@ const AuthenticationController = {
     if (!sessionUser) {
       return
     }
-    for (const key in props) {
+    for (let key in props) {
       const value = props[key]
       sessionUser[key] = value
     }
@@ -360,7 +360,7 @@ const AuthenticationController = {
   },
 
   httpAuth: basicAuth(function(user, pass) {
-    const expectedPassword = Settings.httpAuthUsers[user]
+    let expectedPassword = Settings.httpAuthUsers[user]
     const isValid =
       expectedPassword &&
       expectedPassword.length === pass.length &&

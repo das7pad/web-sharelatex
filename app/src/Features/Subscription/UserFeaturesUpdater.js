@@ -4,7 +4,7 @@ module.exports = {
   updateFeatures(userId, features, callback) {
     const conditions = { _id: userId }
     const update = {}
-    for (const key in features) {
+    for (let key in features) {
       const value = features[key]
       update[`features.${key}`] = value
     }

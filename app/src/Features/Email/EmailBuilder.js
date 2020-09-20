@@ -73,7 +73,7 @@ function NoCTAEmailTemplate(content) {
 ${content.greeting(opts)}
 
 ${content.message(opts, true).join('\r\n\r\n')}
-  
+
 Regards,
 The ${settings.appName} Team - ${settings.siteUrl}\
 `
@@ -409,8 +409,7 @@ templates.userOnboardingEmail = NoCTAEmailTemplate({
     return [
       `Thanks for signing up for ${
         settings.appName
-      } recently. We hope you've been finding it useful!
-Here are some key features to help you get the most out of the service:`,
+      } recently. We hope you've been finding it useful! Here are some key features to help you get the most out of the service:`,
       `${learnLatexLink}: In this tutorial we provide a quick and easy first introduction to LaTeX with no prior knowledge required. By the time you are finished, you will have written your first LaTeX document!`,
       `${templatesLinks}: If you're looking for a template or example to get started, we've a large selection available in our template gallery, including CVs, project reports, journal articles and more.`,
       `${collaboratorsLink}: One of the key features of Overleaf is the ability to share projects and collaborate on them with other users. Find out how to share your projecs with your colleagues in this quick how-to guide.`,

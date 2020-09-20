@@ -13,7 +13,9 @@ describe('ReferalFeatures', function() {
         console: console
       },
       requires: {
-        '../../models/User': { User: (this.User = {}) },
+        '../../models/User': {
+          User: (this.User = {})
+        },
         'settings-sharelatex': (this.Settings = {}),
         'logger-sharelatex': {
           log() {},

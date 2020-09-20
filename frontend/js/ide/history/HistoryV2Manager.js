@@ -43,7 +43,6 @@ export default (HistoryManager = (function() {
       this.prototype.MAX_RECENT_UPDATES_TO_SELECT = 5
       this.prototype.BATCH_SIZE = 10
     }
-
     constructor(ide, $scope, localStorage) {
       this.labelCurrentVersion = this.labelCurrentVersion.bind(this)
       this.deleteLabel = this.deleteLabel.bind(this)
@@ -75,7 +74,7 @@ export default (HistoryManager = (function() {
       }
 
       this.$scope.isHistoryLoading = () => {
-        const selection = this.$scope.history.selection
+        let selection = this.$scope.history.selection
         return (
           this.$scope.history.loadingFileTree ||
           (this.$scope.history.viewMode === HistoryViewModes.POINT_IN_TIME &&
@@ -106,7 +105,6 @@ export default (HistoryManager = (function() {
         HistoryViewModes.POINT_IN_TIME
       )
     }
-
     _getShowOnlyLabelsUserPref() {
       return this.localStorage(this._localStorageShowOnlyLabelsProjKey) || false
     }
@@ -119,7 +117,6 @@ export default (HistoryManager = (function() {
         this.localStorage(this._localStorageViewModeProjKey, viewModeUserPref)
       }
     }
-
     _setShowOnlyLabelsUserPref(showOnlyLabelsUserPref) {
       this.localStorage(
         this._localStorageShowOnlyLabelsProjKey,
@@ -157,7 +154,7 @@ export default (HistoryManager = (function() {
         labels: null,
         loadingFileTree: true
       }
-      const _deregisterFeatureWatcher = this.$scope.$watch(
+      let _deregisterFeatureWatcher = this.$scope.$watch(
         'project.features.versioning',
         hasVersioning => {
           if (hasVersioning != null) {
@@ -226,21 +223,21 @@ export default (HistoryManager = (function() {
     }
 
     setHoverFrom(fromV) {
-      const selection = this.$scope.history.selection
+      let selection = this.$scope.history.selection
       selection.hoveredRange.fromV = fromV
       selection.hoveredRange.toV = selection.range.toV
       this.$scope.history.hoveringOverListSelectors = true
     }
 
     setHoverTo(toV) {
-      const selection = this.$scope.history.selection
+      let selection = this.$scope.history.selection
       selection.hoveredRange.toV = toV
       selection.hoveredRange.fromV = selection.range.fromV
       this.$scope.history.hoveringOverListSelectors = true
     }
 
     resetHover() {
-      const selection = this.$scope.history.selection
+      let selection = this.$scope.history.selection
       selection.hoveredRange.toV = null
       selection.hoveredRange.fromV = null
       this.$scope.history.hoveringOverListSelectors = false
@@ -282,7 +279,7 @@ export default (HistoryManager = (function() {
 
     _loadFileTree(toV, fromV) {
       let url = `/project/${this.$scope.project_id}/filetree/diff`
-      const selection = this.$scope.history.selection
+      let selection = this.$scope.history.selection
       const query = [`from=${fromV}`, `to=${toV}`]
       url += `?${query.join('&')}`
 
@@ -304,7 +301,7 @@ export default (HistoryManager = (function() {
         .get(url, { timeout: this._loadFileTreeRequestCanceller.promise })
         .then(response => {
           this.$scope.history.selection.files = response.data.diff
-          for (const file of this.$scope.history.selection.files) {
+          for (let file of this.$scope.history.selection.files) {
             if (file.newPathname != null) {
               file.oldPathname = file.pathname
               file.pathname = file.newPathname
@@ -338,12 +335,12 @@ export default (HistoryManager = (function() {
     }
 
     autoSelectFile() {
-      const selectedPathname = null
-      const files = this.$scope.history.selection.files
+      let selectedPathname = null
+      let files = this.$scope.history.selection.files
       let fileToSelect = null
       let previouslySelectedFile = null
       let previouslySelectedFileHasOp = false
-      const filesWithOps = this._getFilesWithOps()
+      let filesWithOps = this._getFilesWithOps()
       const orderedOpTypes = ['edited', 'added', 'renamed', 'removed']
 
       if (this._previouslySelectedPathname != null) {
@@ -357,8 +354,8 @@ export default (HistoryManager = (function() {
       if (previouslySelectedFile != null && previouslySelectedFileHasOp) {
         fileToSelect = previouslySelectedFile
       } else {
-        for (const opType of orderedOpTypes) {
-          const fileWithMatchingOpType = _.find(filesWithOps, {
+        for (let opType of orderedOpTypes) {
+          let fileWithMatchingOpType = _.find(filesWithOps, {
             operation: opType
           })
           if (fileWithMatchingOpType != null) {
@@ -372,13 +369,13 @@ export default (HistoryManager = (function() {
           if (previouslySelectedFile != null) {
             fileToSelect = previouslySelectedFile
           } else {
-            const mainFile = _.find(files, function(file) {
+            let mainFile = _.find(files, function(file) {
               return /main\.tex$/.test(file.pathname)
             })
             if (mainFile != null) {
               fileToSelect = mainFile
             } else {
-              const anyTeXFile = _.find(files, function(file) {
+              let anyTeXFile = _.find(files, function(file) {
                 return /\.tex$/.test(file.pathname)
               })
               if (anyTeXFile != null) {
@@ -397,7 +394,7 @@ export default (HistoryManager = (function() {
     _getFilesWithOps() {
       let filesWithOps
       if (this.$scope.history.viewMode === HistoryViewModes.POINT_IN_TIME) {
-        const currentUpdate = this.getUpdateForVersion(
+        let currentUpdate = this.getUpdateForVersion(
           this.$scope.history.selection.range.toV
         )
         filesWithOps = []
@@ -454,7 +451,7 @@ export default (HistoryManager = (function() {
         return
       }
 
-      const toV = this.$scope.history.updates[0].toV
+      let toV = this.$scope.history.updates[0].toV
       let fromV = null
 
       let indexOfLastUpdateNotByMe = 0
@@ -478,7 +475,7 @@ export default (HistoryManager = (function() {
         return
       }
       let versionToSelect = this.$scope.history.updates[0].toV
-      const range = this.$scope.history.selection.range
+      let range = this.$scope.history.selection.range
       if (
         range.toV != null &&
         range.fromV != null &&
@@ -508,7 +505,7 @@ export default (HistoryManager = (function() {
     }
 
     selectVersionForPointInTime(version) {
-      const selection = this.$scope.history.selection
+      let selection = this.$scope.history.selection
       if (
         selection.range.toV !== version &&
         selection.range.fromV !== version
@@ -520,7 +517,7 @@ export default (HistoryManager = (function() {
     }
 
     selectVersionsForCompare(toV, fromV) {
-      const range = this.$scope.history.selection.range
+      let range = this.$scope.history.selection.range
       if (range.toV !== toV || range.fromV !== fromV) {
         range.toV = toV
         range.fromV = fromV
@@ -563,7 +560,7 @@ export default (HistoryManager = (function() {
         return
       }
 
-      for (const update of Array.from(this.$scope.history.updates)) {
+      for (let update of Array.from(this.$scope.history.updates)) {
         if (update.toV === labelToSelect.version) {
           updateToSelect = update
           break
@@ -573,7 +570,7 @@ export default (HistoryManager = (function() {
       if (updateToSelect != null) {
         this.selectVersionForPointInTime(updateToSelect.toV)
       } else {
-        const selection = this.$scope.history.selection
+        let selection = this.$scope.history.selection
         selection.range.toV = labelToSelect.version
         selection.range.fromV = labelToSelect.version
         this.loadFileTreeForVersion(labelToSelect.version)
@@ -581,7 +578,7 @@ export default (HistoryManager = (function() {
     }
 
     getUpdateForVersion(version) {
-      for (const update of this.$scope.history.updates) {
+      for (let update of this.$scope.history.updates) {
         if (update.toV === version) {
           return update
         }
@@ -589,7 +586,7 @@ export default (HistoryManager = (function() {
     }
 
     autoSelectLabelsForComparison() {
-      const labels = this.$scope.history.labels
+      let labels = this.$scope.history.labels
       let nLabels = 0
       if (Array.isArray(labels)) {
         nLabels = labels.length
@@ -917,7 +914,7 @@ export default (HistoryManager = (function() {
       const iterable = updates || []
       for (let i = 0; i < iterable.length; i++) {
         const update = iterable[i]
-        for (const user of Array.from(update.meta.users || [])) {
+        for (let user of Array.from(update.meta.users || [])) {
           if (user != null) {
             user.hue = ColorManager.getHueForUserId(user.id)
           }
@@ -992,7 +989,7 @@ export default (HistoryManager = (function() {
     }
 
     _updateContainsUserId(update, user_id) {
-      for (const user of Array.from(update.meta.users)) {
+      for (let user of Array.from(update.meta.users)) {
         if ((user != null ? user.id : undefined) === user_id) {
           return true
         }

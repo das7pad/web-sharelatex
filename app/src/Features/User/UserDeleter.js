@@ -36,7 +36,7 @@ async function deleteUser(userId, options = {}) {
   }
 
   try {
-    const user = await User.findById(userId).exec()
+    let user = await User.findById(userId).exec()
     logger.log({ user }, 'deleting user')
 
     await ensureCanDeleteUser(user)
@@ -62,7 +62,7 @@ async function deleteMongoUser(userId) {
 }
 
 async function expireDeletedUser(userId) {
-  const deletedUser = await DeletedUser.findOne({
+  let deletedUser = await DeletedUser.findOne({
     'deleterData.deletedUserId': userId
   }).exec()
 
@@ -73,7 +73,7 @@ async function expireDeletedUser(userId) {
 
 async function expireDeletedUsersAfterDuration() {
   const DURATION = 90
-  const deletedUsers = await DeletedUser.find({
+  let deletedUsers = await DeletedUser.find({
     'deleterData.deletedAt': {
       $lt: new Date(moment().subtract(DURATION, 'days'))
     },

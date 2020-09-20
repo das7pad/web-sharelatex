@@ -44,9 +44,13 @@ describe('UserGetter', function() {
         console: console
       },
       requires: {
-        'logger-sharelatex': { log() {} },
+        'logger-sharelatex': {
+          log() {}
+        },
         '../../infrastructure/mongojs': this.Mongo,
-        '@overleaf/metrics': { timeAsyncMethod: sinon.stub() },
+        '@overleaf/metrics': {
+          timeAsyncMethod: sinon.stub()
+        },
         'settings-sharelatex': settings,
         '../Institutions/InstitutionsAPI': {
           getUserAffiliations: this.getUserAffiliations

@@ -29,7 +29,7 @@ export default App.controller('FileTreeRootFolderController', function(
 
     const ids = rootFolder.children.map(entity => entity.id)
 
-    for (const dropped_entity of Array.from(entities)) {
+    for (let dropped_entity of Array.from(entities)) {
       if (!ids.includes(dropped_entity.id)) {
         try {
           ide.fileTreeManager.moveEntity(dropped_entity, rootFolder)

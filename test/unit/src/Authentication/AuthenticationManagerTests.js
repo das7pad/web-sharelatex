@@ -17,7 +17,9 @@ describe('AuthenticationManager', function() {
         console: console
       },
       requires: {
-        '../../models/User': { User: (this.User = {}) },
+        '../../models/User': {
+          User: (this.User = {})
+        },
         '../../infrastructure/mongojs': {
           db: (this.db = { users: {} }),
           ObjectId
@@ -619,7 +621,9 @@ describe('AuthenticationManager', function() {
           $set: {
             hashedPassword: this.hashedPassword
           },
-          $unset: { password: true }
+          $unset: {
+            password: true
+          }
         })
       })
 
