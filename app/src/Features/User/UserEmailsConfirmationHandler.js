@@ -36,7 +36,9 @@ function sendConfirmationEmail(userId, email, emailTemplate, callback) {
       }
       const emailOptions = {
         to: email,
-        confirmEmailUrl: `${settings.siteUrl}/user/emails/confirm?token=${token}`,
+        confirmEmailUrl: `${
+          settings.siteUrl
+        }/user/emails/confirm?token=${token}`,
         sendingUser_id: userId
       }
       EmailHandler.sendEmail(emailTemplate, emailOptions, callback)

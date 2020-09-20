@@ -11,15 +11,18 @@ if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
   )
 }
 
-const connectionPromise = mongoose.connect(Settings.mongo.url, {
-  poolSize: POOL_SIZE,
-  config: { autoIndex: false },
-  useUnifiedTopology: !!Settings.mongo.useUnifiedTopology,
-  useNewUrlParser: true,
-  useFindAndModify: false,
-  socketTimeoutMS: Settings.mongo.socketTimeoutMS,
-  appname: 'web'
-})
+const connectionPromise = mongoose.connect(
+  Settings.mongo.url,
+  {
+    poolSize: POOL_SIZE,
+    config: { autoIndex: false },
+    useUnifiedTopology: !!Settings.mongo.useUnifiedTopology,
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    socketTimeoutMS: Settings.mongo.socketTimeoutMS,
+    appname: 'web'
+  }
+)
 
 mongoose.connection.on('connected', () =>
   logger.log(

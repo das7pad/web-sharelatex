@@ -38,8 +38,8 @@ DeletedProject.find({}, (error, deletedProjects) => {
           'deleterData.deletedProjectLastUpdatedAt': src.lastUpdated
         }
 
-        Object.keys(values).forEach(key =>
-          values[key] === undefined ? delete values[key] : ''
+        Object.keys(values).forEach(
+          key => (values[key] === undefined ? delete values[key] : '')
         )
 
         DeletedProject.findOneAndUpdate(

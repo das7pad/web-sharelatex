@@ -27,7 +27,7 @@ import './controllers/FileTreeFolderController'
 import './controllers/FileTreeRootFolderController'
 let FileTreeManager
 
-export default FileTreeManager = class FileTreeManager {
+export default (FileTreeManager = class FileTreeManager {
   constructor(ide, $scope) {
     this.ide = ide
     this.$scope = $scope
@@ -746,7 +746,7 @@ export default FileTreeManager = class FileTreeManager {
     this._deleteEntityFromScope(entity, { moveToDeleted: false })
     return parent_folder.children.push(entity)
   }
-}
+})
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null

@@ -306,7 +306,9 @@ describe('CompileController', function() {
         return this.CompileController.proxyToClsi
           .calledWith(
             this.project_id,
-            `/project/${this.project_id}/user/${this.user_id}/output/output.pdf`,
+            `/project/${this.project_id}/user/${
+              this.user_id
+            }/output/output.pdf`,
             this.req,
             this.res,
             this.next
@@ -327,7 +329,9 @@ describe('CompileController', function() {
         return this.CompileController.proxyToClsi
           .calledWith(
             this.project_id,
-            `/project/${this.project_id}/user/${this.user_id}/build/${this.buildId}/output/output.pdf`,
+            `/project/${this.project_id}/user/${this.user_id}/build/${
+              this.buildId
+            }/output/output.pdf`,
             this.req,
             this.res,
             this.next
@@ -370,7 +374,9 @@ describe('CompileController', function() {
         file: this.file
       }
       this.req.body = {}
-      this.expected_url = `/project/${this.submission_id}/build/${this.build_id}/output/${this.file}`
+      this.expected_url = `/project/${this.submission_id}/build/${
+        this.build_id
+      }/output/${this.file}`
       return (this.CompileController.proxyToClsiWithLimits = sinon.stub())
     })
 

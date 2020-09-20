@@ -30,8 +30,8 @@ ${content.message(opts).trim()}
 ${content.ctaText(opts)}: ${content.ctaURL(opts)}
 
 ${(typeof content.secondaryMessage === 'function'
-  ? content.secondaryMessage(opts).trim()
-  : undefined) || ''}
+        ? content.secondaryMessage(opts).trim()
+        : undefined) || ''}
 
 Regards,
 The ${settings.appName} Team - ${settings.siteUrl}\
@@ -124,7 +124,9 @@ Click here to set your password and log in:\
 `
   },
   secondaryMessage() {
-    return `If you have any questions or problems, please contact ${settings.adminEmail}`
+    return `If you have any questions or problems, please contact ${
+      settings.adminEmail
+    }`
   },
   ctaText() {
     return 'Set password'
@@ -140,7 +142,9 @@ templates.canceledSubscription = CTAEmailTemplate({
   },
   message() {
     return `\
-We are sorry to see you cancelled your ${settings.appName} premium subscription. Would you mind giving us some feedback on what the site is lacking at the moment via this quick survey?\
+We are sorry to see you cancelled your ${
+      settings.appName
+    } premium subscription. Would you mind giving us some feedback on what the site is lacking at the moment via this quick survey?\
 `
   },
   secondaryMessage() {
@@ -265,7 +269,9 @@ templates.verifyEmailToJoinTeam = CTAEmailTemplate({
     )} has invited you to join a team on ${settings.appName}`
   },
   message(opts) {
-    return `Please click the button below to join the team and enjoy the benefits of an upgraded ${settings.appName} account.`
+    return `Please click the button below to join the team and enjoy the benefits of an upgraded ${
+      settings.appName
+    } account.`
   },
   ctaText(opts) {
     return 'Join now'
@@ -318,7 +324,9 @@ templates.ownershipTransferConfirmationPreviousOwner = NoCTAEmailTemplate({
       : `<b>${projectName}</b>`
     return [
       `As per your request, we have made ${nameAndEmail} the owner of ${projectNameDisplay}.`,
-      `If you haven't asked to change the owner of ${projectNameDisplay}, please get in touch with us via ${settings.adminEmail}.`
+      `If you haven't asked to change the owner of ${projectNameDisplay}, please get in touch with us via ${
+        settings.adminEmail
+      }.`
     ]
   }
 })
@@ -369,17 +377,23 @@ templates.userOnboardingEmail = NoCTAEmailTemplate({
   message(opts, isPlainText) {
     const learnLatexLink = EmailMessageHelper.displayLink(
       'Learn LaTeX in 30 minutes',
-      `${settings.siteUrl}/learn/latex/Learn_LaTeX_in_30_minutes?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
+      `${
+        settings.siteUrl
+      }/learn/latex/Learn_LaTeX_in_30_minutes?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
       isPlainText
     )
     const templatesLinks = EmailMessageHelper.displayLink(
       'Find a beautiful template',
-      `${settings.siteUrl}/latex/templates?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
+      `${
+        settings.siteUrl
+      }/latex/templates?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
       isPlainText
     )
     const collaboratorsLink = EmailMessageHelper.displayLink(
       'Work with your collaborators',
-      `${settings.siteUrl}/learn/how-to/Sharing_a_project?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
+      `${
+        settings.siteUrl
+      }/learn/how-to/Sharing_a_project?utm_source=overleaf&utm_medium=email&utm_campaign=onboarding`,
       isPlainText
     )
     const siteLink = EmailMessageHelper.displayLink(
@@ -393,7 +407,9 @@ templates.userOnboardingEmail = NoCTAEmailTemplate({
       isPlainText
     )
     return [
-      `Thanks for signing up for ${settings.appName} recently. We hope you've been finding it useful!
+      `Thanks for signing up for ${
+        settings.appName
+      } recently. We hope you've been finding it useful!
 Here are some key features to help you get the most out of the service:`,
       `${learnLatexLink}: In this tutorial we provide a quick and easy first introduction to LaTeX with no prior knowledge required. By the time you are finished, you will have written your first LaTeX document!`,
       `${templatesLinks}: If you're looking for a template or example to get started, we've a large selection available in our template gallery, including CVs, project reports, journal articles and more.`,
@@ -438,8 +454,12 @@ templates.securityAlert = NoCTAEmailTemplate({
       `We are writing to let you know that ${actionDescribed} on ${dateFormatted} at ${timeFormatted} GMT.`,
       ...message,
       `If this was you, you can ignore this email.`,
-      `If this was not you, we recommend getting in touch with our support team at ${settings.adminEmail} to report this as potentially suspicious activity on your account.`,
-      `We also encourage you to read our ${helpLink} to keeping your ${settings.appName} account safe.`
+      `If this was not you, we recommend getting in touch with our support team at ${
+        settings.adminEmail
+      } to report this as potentially suspicious activity on your account.`,
+      `We also encourage you to read our ${helpLink} to keeping your ${
+        settings.appName
+      } account safe.`
     ]
   }
 })

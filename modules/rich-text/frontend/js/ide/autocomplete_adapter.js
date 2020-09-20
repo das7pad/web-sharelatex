@@ -16,7 +16,7 @@ import Environments from '../../../../../frontend/js/ide/editor/directives/aceEd
 
 let AutocompleteAdapter
 
-export default AutocompleteAdapter = class AutocompleteAdapter {
+export default (AutocompleteAdapter = class AutocompleteAdapter {
   constructor($scope, metadata, bibtexReferences) {
     this.onChange = this.onChange.bind(this)
     this.$scope = $scope
@@ -62,4 +62,4 @@ export default AutocompleteAdapter = class AutocompleteAdapter {
       return this.metadata.scheduleLoadDocMetaFromServer(this.$scope.docId)
     }
   }
-}
+})

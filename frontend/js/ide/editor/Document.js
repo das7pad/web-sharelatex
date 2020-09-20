@@ -22,7 +22,7 @@ import ShareJsDoc from './ShareJsDoc'
 import RangesTracker from '../review-panel/RangesTracker'
 let Document
 
-export default Document = (function() {
+export default (Document = (function() {
   Document = class Document extends EventEmitter {
     static initClass() {
       this.prototype.MAX_PENDING_OP_SIZE = 64
@@ -729,7 +729,7 @@ export default Document = (function() {
   }
   Document.initClass()
   return Document
-})()
+})())
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null

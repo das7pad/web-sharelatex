@@ -691,7 +691,9 @@ describe('UserController', function() {
         this.res.json.callsFake(() => {
           const expectedArg = {
             to: this.user.email,
-            actionDescribed: `your password has been changed on your account ${this.user.email}`,
+            actionDescribed: `your password has been changed on your account ${
+              this.user.email
+            }`,
             action: 'password changed'
           }
           const emailCall = this.EmailHandler.sendEmail.lastCall

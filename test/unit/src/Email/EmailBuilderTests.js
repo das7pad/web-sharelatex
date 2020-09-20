@@ -102,12 +102,18 @@ describe('EmailBuilder', function() {
     describe('securityAlert', function() {
       before(function() {
         this.message = 'more details about the action'
-        this.messageHTML = `<br /><span style="text-align:center" class="a-class"><b><i>${this.message}</i></b></span>`
+        this.messageHTML = `<br /><span style="text-align:center" class="a-class"><b><i>${
+          this.message
+        }</i></b></span>`
         this.messageNotAllowedHTML = `<div></div>${this.messageHTML}`
 
         this.actionDescribed = 'an action described'
-        this.actionDescribedHTML = `<br /><span style="text-align:center" class="a-class"><b><i>${this.actionDescribed}</i></b>`
-        this.actionDescribedNotAllowedHTML = `<div></div>${this.actionDescribedHTML}`
+        this.actionDescribedHTML = `<br /><span style="text-align:center" class="a-class"><b><i>${
+          this.actionDescribed
+        }</i></b>`
+        this.actionDescribedNotAllowedHTML = `<div></div>${
+          this.actionDescribedHTML
+        }`
 
         this.opts = {
           to: this.email,

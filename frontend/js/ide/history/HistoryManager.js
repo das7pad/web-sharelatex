@@ -22,7 +22,7 @@ import './controllers/HistoryDiffController'
 import './directives/infiniteScroll'
 let HistoryManager
 
-export default HistoryManager = (function() {
+export default (HistoryManager = (function() {
   HistoryManager = class HistoryManager {
     static initClass() {
       this.prototype.BATCH_SIZE = 10
@@ -111,7 +111,9 @@ export default HistoryManager = (function() {
     }
 
     fetchNextBatchOfUpdates() {
-      let url = `/project/${this.ide.project_id}/updates?min_count=${this.BATCH_SIZE}`
+      let url = `/project/${this.ide.project_id}/updates?min_count=${
+        this.BATCH_SIZE
+      }`
       if (this.$scope.history.nextBeforeTimestamp != null) {
         url += `&before=${this.$scope.history.nextBeforeTimestamp}`
       }
@@ -197,7 +199,9 @@ export default HistoryManager = (function() {
     }
 
     restoreDiff(diff) {
-      const url = `/project/${this.$scope.project_id}/doc/${diff.doc.id}/version/${diff.fromV}/restore`
+      const url = `/project/${this.$scope.project_id}/doc/${
+        diff.doc.id
+      }/version/${diff.fromV}/restore`
       return this.ide.$http.post(url, { _csrf: window.csrfToken })
     }
 
@@ -386,4 +390,4 @@ export default HistoryManager = (function() {
   }
   HistoryManager.initClass()
   return HistoryManager
-})()
+})())

@@ -20,7 +20,7 @@ import './controllers/OnlineUsersController'
 
 let OnlineUsersManager
 
-export default OnlineUsersManager = (function() {
+export default (OnlineUsersManager = (function() {
   OnlineUsersManager = class OnlineUsersManager {
     static initClass() {
       this.prototype.cursorUpdateInterval = 500
@@ -171,4 +171,4 @@ export default OnlineUsersManager = (function() {
   }
   OnlineUsersManager.initClass()
   return OnlineUsersManager
-})()
+})())

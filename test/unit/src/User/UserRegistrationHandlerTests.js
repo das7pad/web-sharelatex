@@ -293,7 +293,9 @@ describe('UserRegistrationHandler', function() {
         return this.EmailHandler.sendEmail
           .calledWith('registered', {
             to: this.user.email,
-            setNewPasswordUrl: `${this.settings.siteUrl}/user/activate?token=${this.token}&user_id=${this.user_id}`
+            setNewPasswordUrl: `${this.settings.siteUrl}/user/activate?token=${
+              this.token
+            }&user_id=${this.user_id}`
           })
           .should.equal(true)
       })
@@ -303,7 +305,9 @@ describe('UserRegistrationHandler', function() {
           .calledWith(
             null,
             this.user,
-            `${this.settings.siteUrl}/user/activate?token=${this.token}&user_id=${this.user_id}`
+            `${this.settings.siteUrl}/user/activate?token=${
+              this.token
+            }&user_id=${this.user_id}`
           )
           .should.equal(true)
       })

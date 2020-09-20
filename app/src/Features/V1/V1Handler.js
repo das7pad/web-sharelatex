@@ -93,7 +93,9 @@ module.exports = V1Handler = {
           return callback(null, true)
         } else {
           err = new Error(
-            `Unexpected status from v1 password reset api: ${response.statusCode}`
+            `Unexpected status from v1 password reset api: ${
+              response.statusCode
+            }`
           )
           return callback(err, false)
         }

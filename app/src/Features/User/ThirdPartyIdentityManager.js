@@ -91,7 +91,9 @@ function link(
       const emailOptions = {
         to: res.email,
         action: `${providerName} account linked`,
-        actionDescribed: `${indefiniteArticle} ${providerName} account was linked to your account ${res.email}`
+        actionDescribed: `${indefiniteArticle} ${providerName} account was linked to your account ${
+          res.email
+        }`
       }
       EmailHandler.sendEmail('securityAlert', emailOptions, error => {
         if (error != null) {
@@ -147,7 +149,9 @@ function unlink(userId, providerId, callback) {
       const emailOptions = {
         to: res.email,
         action: `${providerName} account no longer linked`,
-        actionDescribed: `${indefiniteArticle} ${providerName} account is no longer linked to your account ${res.email}`
+        actionDescribed: `${indefiniteArticle} ${providerName} account is no longer linked to your account ${
+          res.email
+        }`
       }
       EmailHandler.sendEmail('securityAlert', emailOptions, error => {
         if (error != null) {

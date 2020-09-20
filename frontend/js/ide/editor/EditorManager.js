@@ -21,7 +21,7 @@ import './directives/toggleSwitch'
 import './controllers/SavingNotificationController'
 let EditorManager
 
-export default EditorManager = (function() {
+export default (EditorManager = (function() {
   EditorManager = class EditorManager {
     static initClass() {
       this.prototype._syncTimeout = null
@@ -231,7 +231,9 @@ export default EditorManager = (function() {
         }
         if (this.editorOpenDocEpoch !== editorOpenDocEpoch) {
           sl_console.log(
-            `[openNewDocument] editorOpenDocEpoch mismatch ${this.editorOpenDocEpoch} vs ${editorOpenDocEpoch}`
+            `[openNewDocument] editorOpenDocEpoch mismatch ${
+              this.editorOpenDocEpoch
+            } vs ${editorOpenDocEpoch}`
           )
           return callback(new Error('another document was loaded'))
         }
@@ -352,4 +354,4 @@ export default EditorManager = (function() {
   }
   EditorManager.initClass()
   return EditorManager
-})()
+})())

@@ -37,7 +37,7 @@ import './components/historyFileTree'
 import './components/historyFileEntity'
 let HistoryManager
 
-export default HistoryManager = (function() {
+export default (HistoryManager = (function() {
   HistoryManager = class HistoryManager {
     static initClass() {
       this.prototype.MAX_RECENT_UPDATES_TO_SELECT = 5
@@ -52,8 +52,12 @@ export default HistoryManager = (function() {
       this.$scope = $scope
       this.localStorage = localStorage
       this.$scope.HistoryViewModes = HistoryViewModes
-      this._localStorageViewModeProjKey = `history.userPrefs.viewMode.${$scope.project_id}`
-      this._localStorageShowOnlyLabelsProjKey = `history.userPrefs.showOnlyLabels.${$scope.project_id}`
+      this._localStorageViewModeProjKey = `history.userPrefs.viewMode.${
+        $scope.project_id
+      }`
+      this._localStorageShowOnlyLabelsProjKey = `history.userPrefs.showOnlyLabels.${
+        $scope.project_id
+      }`
       this._previouslySelectedPathname = null
       this._loadFileTreeRequestCanceller = null
       this.hardReset()
@@ -604,7 +608,9 @@ export default HistoryManager = (function() {
         return
       }
 
-      let updatesURL = `/project/${this.ide.project_id}/updates?min_count=${this.BATCH_SIZE}`
+      let updatesURL = `/project/${this.ide.project_id}/updates?min_count=${
+        this.BATCH_SIZE
+      }`
       if (this.$scope.history.nextBeforeTimestamp != null) {
         updatesURL += `&before=${this.$scope.history.nextBeforeTimestamp}`
       }
@@ -996,7 +1002,7 @@ export default HistoryManager = (function() {
   }
   HistoryManager.initClass()
   return HistoryManager
-})()
+})())
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null

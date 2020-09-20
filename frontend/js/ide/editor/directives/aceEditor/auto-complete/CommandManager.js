@@ -139,7 +139,7 @@ class Parser {
 }
 Parser.initClass()
 
-export default CommandManager = class CommandManager {
+export default (CommandManager = class CommandManager {
   constructor(metadataManager) {
     this.metadataManager = metadataManager
   }
@@ -232,7 +232,7 @@ export default CommandManager = class CommandManager {
       }
     })
   }
-}
+})
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null

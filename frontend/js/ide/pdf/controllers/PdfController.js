@@ -536,7 +536,9 @@ App.controller('PdfController', function(
         // FIXME clean this up when we have file.urls out consistently
         opts.url = file.url
       } else if (file && file.build) {
-        opts.url = `/project/${$scope.project_id}/build/${file.build}/output/${name}`
+        opts.url = `/project/${$scope.project_id}/build/${
+          file.build
+        }/output/${name}`
       } else {
         opts.url = `/project/${$scope.project_id}/output/${name}`
       }

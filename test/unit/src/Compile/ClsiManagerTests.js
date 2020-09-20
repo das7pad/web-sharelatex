@@ -93,13 +93,17 @@ describe('ClsiManager', function() {
             status: (this.status = 'success'),
             outputFiles: [
               {
-                url: `${this.settings.apis.clsi.url}/project/${this.project_id}/user/${this.user_id}/build/1234/output/output.pdf`,
+                url: `${this.settings.apis.clsi.url}/project/${
+                  this.project_id
+                }/user/${this.user_id}/build/1234/output/output.pdf`,
                 path: 'output.pdf',
                 type: 'pdf',
                 build: 1234
               },
               {
-                url: `${this.settings.apis.clsi.url}/project/${this.project_id}/user/${this.user_id}/build/1234/output/output.log`,
+                url: `${this.settings.apis.clsi.url}/project/${
+                  this.project_id
+                }/user/${this.user_id}/build/1234/output/output.log`,
                 path: 'output.log',
                 type: 'log',
                 build: 1234
@@ -130,13 +134,17 @@ describe('ClsiManager', function() {
       it('should call the callback with the status and output files', function() {
         const outputFiles = [
           {
-            url: `/project/${this.project_id}/user/${this.user_id}/build/1234/output/output.pdf`,
+            url: `/project/${this.project_id}/user/${
+              this.user_id
+            }/build/1234/output/output.pdf`,
             path: 'output.pdf',
             type: 'pdf',
             build: 1234
           },
           {
-            url: `/project/${this.project_id}/user/${this.user_id}/build/1234/output/output.log`,
+            url: `/project/${this.project_id}/user/${
+              this.user_id
+            }/build/1234/output/output.log`,
             path: 'output.log',
             type: 'log',
             build: 1234
@@ -292,13 +300,17 @@ describe('ClsiManager', function() {
             status: (this.status = 'success'),
             outputFiles: [
               {
-                url: `${this.settings.apis.clsi.url}/project/${this.submission_id}/build/1234/output/output.pdf`,
+                url: `${this.settings.apis.clsi.url}/project/${
+                  this.submission_id
+                }/build/1234/output/output.pdf`,
                 path: 'output.pdf',
                 type: 'pdf',
                 build: 1234
               },
               {
-                url: `${this.settings.apis.clsi.url}/project/${this.submission_id}/build/1234/output/output.log`,
+                url: `${this.settings.apis.clsi.url}/project/${
+                  this.submission_id
+                }/build/1234/output/output.log`,
                 path: 'output.log',
                 type: 'log',
                 build: 1234
@@ -409,7 +421,9 @@ describe('ClsiManager', function() {
         this.ClsiManager._makeRequest
           .calledWith(this.project_id, {
             method: 'DELETE',
-            url: `${this.settings.apis.clsi.url}/project/${this.project_id}/user/${this.user_id}`
+            url: `${this.settings.apis.clsi.url}/project/${
+              this.project_id
+            }/user/${this.user_id}`
           })
           .should.equal(true)
       })
@@ -540,7 +554,9 @@ describe('ClsiManager', function() {
               },
               {
                 path: 'images/image.png',
-                url: `${this.settings.apis.filestore.url}/project/${this.project_id}/file/${this.file_1._id}`,
+                url: `${this.settings.apis.filestore.url}/project/${
+                  this.project_id
+                }/file/${this.file_1._id}`,
                 modified: this.file_1.created.getTime()
               }
             ]
@@ -846,7 +862,9 @@ describe('ClsiManager', function() {
       })
 
       it('should send the request to the CLSI', function() {
-        const url = `${this.settings.apis.clsi.url}/project/${this.project_id}/user/${this.user_id}/compile`
+        const url = `${this.settings.apis.clsi.url}/project/${
+          this.project_id
+        }/user/${this.user_id}/compile`
         this.ClsiManager._makeRequest
           .calledWith(this.project_id, {
             method: 'POST',
@@ -920,7 +938,9 @@ describe('ClsiManager', function() {
         this.ClsiManager._makeRequest
           .calledWith(this.project_id, {
             method: 'GET',
-            url: `http://clsi.example.com/project/${this.project_id}/user/${this.user_id}/wordcount`,
+            url: `http://clsi.example.com/project/${this.project_id}/user/${
+              this.user_id
+            }/wordcount`,
             qs: { file: 'rootfile.text', image: undefined }
           })
           .should.equal(true)
@@ -946,7 +966,9 @@ describe('ClsiManager', function() {
         this.ClsiManager._makeRequest
           .calledWith(this.project_id, {
             method: 'GET',
-            url: `http://clsi.example.com/project/${this.project_id}/user/${this.user_id}/wordcount`,
+            url: `http://clsi.example.com/project/${this.project_id}/user/${
+              this.user_id
+            }/wordcount`,
             qs: { file: 'main.tex', image: undefined }
           })
           .should.equal(true)
@@ -970,7 +992,9 @@ describe('ClsiManager', function() {
         this.ClsiManager._makeRequest
           .calledWith(this.project_id, {
             method: 'GET',
-            url: `http://clsi.example.com/project/${this.project_id}/user/${this.user_id}/wordcount`,
+            url: `http://clsi.example.com/project/${this.project_id}/user/${
+              this.user_id
+            }/wordcount`,
             qs: { file: 'main.tex', image: this.image }
           })
           .should.equal(true)

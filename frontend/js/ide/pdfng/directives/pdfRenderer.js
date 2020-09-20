@@ -482,13 +482,15 @@ export default App.factory('PDFRenderer', function(
                   ? self.errorCallback(error)
                   : undefined
             )
-            return page.getAnnotations().then(
-              annotations => annotationsLayer.setAnnotations(annotations),
-              error =>
-                typeof self.errorCallback === 'function'
-                  ? self.errorCallback(error)
-                  : undefined
-            )
+            return page
+              .getAnnotations()
+              .then(
+                annotations => annotationsLayer.setAnnotations(annotations),
+                error =>
+                  typeof self.errorCallback === 'function'
+                    ? self.errorCallback(error)
+                    : undefined
+              )
           })
           .catch(function(error) {
             // page render failed

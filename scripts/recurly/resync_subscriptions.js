@@ -42,7 +42,9 @@ const ScriptLogger = {
 
   printProgress: () => {
     console.warn(
-      `Subscriptions checked: ${ScriptLogger.checkedSubscriptionsCount}. Mismatches: ${ScriptLogger.mismatchSubscriptionsCount}`
+      `Subscriptions checked: ${
+        ScriptLogger.checkedSubscriptionsCount
+      }. Mismatches: ${ScriptLogger.mismatchSubscriptionsCount}`
     )
   },
 

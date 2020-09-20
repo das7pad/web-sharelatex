@@ -232,7 +232,9 @@ App.controller('UploadFileModalController', function(
     var decreseTimeout = () =>
       $timeout(function() {
         if ($scope.secondsToRedirect === 0) {
-          return ($window.location.href = `/login?redir=/project/${ide.project_id}`)
+          return ($window.location.href = `/login?redir=/project/${
+            ide.project_id
+          }`)
         } else {
           decreseTimeout()
           return ($scope.secondsToRedirect = $scope.secondsToRedirect - 1)

@@ -106,7 +106,9 @@ module.exports = {
             if (plan == null) {
               return cb(
                 new Error(
-                  `No plan found for planCode '${personalSubscription.planCode}'`
+                  `No plan found for planCode '${
+                    personalSubscription.planCode
+                  }'`
                 )
               )
             }

@@ -12,7 +12,7 @@
 let CursorPositionAdapter
 const VIEWPORT_MARGIN = 10
 
-export default CursorPositionAdapter = class CursorPositionAdapter {
+export default (CursorPositionAdapter = class CursorPositionAdapter {
   constructor(editor) {
     this.getCursor = this.getCursor.bind(this)
     this.editor = editor
@@ -67,4 +67,4 @@ export default CursorPositionAdapter = class CursorPositionAdapter {
   }
 
   gotoOffset() {}
-}
+})

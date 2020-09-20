@@ -22,7 +22,7 @@ import ShareJs from 'libs/sharejs'
 let ShareJsDoc
 const SINGLE_USER_FLUSH_DELAY = 1000 // ms
 
-export default ShareJsDoc = (function() {
+export default (ShareJsDoc = (function() {
   ShareJsDoc = class ShareJsDoc extends EventEmitter {
     static initClass() {
       this.prototype.INFLIGHT_OP_TIMEOUT = 5000 // Retry sending ops after 5 seconds without an ack
@@ -429,7 +429,7 @@ export default ShareJsDoc = (function() {
   }
   ShareJsDoc.initClass()
   return ShareJsDoc
-})()
+})())
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null

@@ -204,7 +204,9 @@ module.exports = ReferencesHandler = {
                 return callback(null, data)
               } else {
                 err = new Error(
-                  `references api responded with non-success code: ${res.statusCode}`
+                  `references api responded with non-success code: ${
+                    res.statusCode
+                  }`
                 )
                 return callback(err)
               }

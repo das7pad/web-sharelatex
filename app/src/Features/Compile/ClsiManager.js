@@ -591,7 +591,9 @@ const ClsiManager = {
   },
 
   getOutputFileStream(projectId, userId, buildId, outputFilePath, callback) {
-    const url = `${Settings.apis.clsi.url}/project/${projectId}/user/${userId}/build/${buildId}/output/${outputFilePath}`
+    const url = `${
+      Settings.apis.clsi.url
+    }/project/${projectId}/user/${userId}/build/${buildId}/output/${outputFilePath}`
     ClsiCookieManager.getCookieJar(projectId, (err, jar) => {
       if (err != null) {
         return callback(
@@ -771,7 +773,9 @@ const ClsiManager = {
       path = path.replace(/^\//, '') // Remove leading /
       resources.push({
         path,
-        url: `${Settings.apis.filestore.url}/project/${project._id}/file/${file._id}`,
+        url: `${Settings.apis.filestore.url}/project/${project._id}/file/${
+          file._id
+        }`,
         modified: file.created != null ? file.created.getTime() : undefined
       })
     }

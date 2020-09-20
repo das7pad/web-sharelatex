@@ -69,7 +69,9 @@ async function changePassword(req, res, next) {
 
   const emailOptions = {
     to: user.email,
-    actionDescribed: `your password has been changed on your account ${user.email}`,
+    actionDescribed: `your password has been changed on your account ${
+      user.email
+    }`,
     action: 'password changed'
   }
   EmailHandler.sendEmail('securityAlert', emailOptions, error => {
@@ -110,7 +112,9 @@ async function clearSessions(req, res, next) {
   ])
   const emailOptions = {
     to: user.email,
-    actionDescribed: `active sessions were cleared on your account ${user.email}`,
+    actionDescribed: `active sessions were cleared on your account ${
+      user.email
+    }`,
     action: 'active sessions cleared'
   }
 
