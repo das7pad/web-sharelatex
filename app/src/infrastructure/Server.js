@@ -135,8 +135,7 @@ Modules.applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter)
 
 webRouter.csrf = new Csrf()
 webRouter.use(webRouter.csrf.middleware)
-webRouter.use(translations.expressMiddlewear)
-webRouter.use(translations.setLangBasedOnDomainMiddlewear)
+webRouter.use(translations.middleware)
 
 // Measure expiry from last request, not last login
 webRouter.use(function(req, res, next) {

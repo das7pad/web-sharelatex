@@ -3,9 +3,6 @@ const Settings =
 const { URL } = require('url')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
-const LNG_TO_SPEC = new Map(
-  Object.entries(Settings.i18n.subdomainLang).filter(entry => !entry[1].hide)
-)
 
 const Features = require('./Features')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
@@ -43,8 +40,6 @@ module.exports = function(app, webRouter) {
         return req.i18n.translate(key, vars)
       }
       res.locals.translate.has = req.i18n.translate.has
-      res.locals.recomendSubdomain = LNG_TO_SPEC.get(req.showUserOtherLng)
-      res.locals.currentLngCode = req.lng
 
       res.locals.csrfToken = req.csrfToken()
 

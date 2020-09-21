@@ -9,7 +9,7 @@ const MODULE_PATH = '../../../../app/src/infrastructure/Translations.js'
 
 describe('TranslationsForked', function() {
   const subdomainLang = Object.fromEntries(
-    ['cn', 'da', 'de', 'es', 'fr', 'pt', 'ru']
+    ['zh-CN', 'da', 'de', 'es', 'fr', 'pt', 'ru']
       .map(lang => {
         return [
           lang,
@@ -29,7 +29,7 @@ describe('TranslationsForked', function() {
     const options = {
       subdomainLang
     }
-    this.translations = SandboxedModule.require(MODULE_PATH, {
+    this.Translations = SandboxedModule.require(MODULE_PATH, {
       requires: { 'settings-sharelatex': { i18n: options } },
       globals: { process }
     })
@@ -64,16 +64,15 @@ describe('TranslationsForked', function() {
 
   describe('without any provided options', function() {
     beforeEach(function() {
-      this.translationsModule = SandboxedModule.require(MODULE_PATH, {
+      this.Translations = SandboxedModule.require(MODULE_PATH, {
         requires: { 'settings-sharelatex': { i18n: {} } },
         globals: { process }
       })
-      this.translations = this.translationsModule
     })
 
     it('should be able to translate', function() {
       expect(
-        this.translations.i18n.translate(
+        this.Translations.i18n.translate(
           'not_found_error_from_the_supplied_url'
         )
       ).to.exist.and.to.not.equal('not_found_error_from_the_supplied_url')
@@ -140,7 +139,7 @@ describe('TranslationsForked', function() {
         Object.values(subdomainLang).forEach(langSpec => {
           it(`should translate for lang=${langSpec.lngCode}`, function(done) {
             this.req.headers.host = new URL(langSpec.url).host
-            this.translations(this.req, this.res, () => {
+            this.Translations.middleware(this.req, this.res, () => {
               const actual = this.res.locals.translate(
                 testSpec.key,
                 cloneVars(testSpec.vars)
@@ -158,25 +157,6 @@ describe('TranslationsForked', function() {
       })
     })
 
-    describe('when setLng is set and the host header is www', function() {
-      Object.values(subdomainLang).forEach(langSpec => {
-        it(`should translate for lang=${langSpec.lngCode}`, function(done) {
-          this.req.headers.host = new URL(subdomainLang.www.url).host
-          this.req.query.setLng = langSpec.lngCode
-          this.translations(this.req, this.res, () => {
-            const actual = this.res.locals.translate(
-              'beta_program_badge_description'
-            )
-            const expected = this.mockedTranslate(
-              langSpec.lngCode,
-              'beta_program_badge_description'
-            )
-            expect(actual).to.equal(expected)
-            done()
-          })
-        })
-      })
-    })
     describe('perf', function() {
       function bench(numOfMiddlewareInvocations, keys) {
         Object.values(subdomainLang).forEach(langSpec => {
@@ -186,12 +166,12 @@ describe('TranslationsForked', function() {
             function eventuallyCallDone() {
               if (!--doneCounter) done()
             }
-            this.req.headers.host = new URL(subdomainLang.www.url).host
-            this.req.query.setLng = langSpec.lngCode
+            this.req.headers.host = new URL(langSpec.url).host
+            const middleware = this.Translations.middleware
             let i = doneCounter
             if (i === 1) {
               while (i--) {
-                this.translations(this.req, this.res, () => {
+                middleware(this.req, this.res, () => {
                   for (const key of keys) {
                     const actual = this.res.locals.translate(key)
                     const expected = this.mockedTranslate(langSpec.lngCode, key)
@@ -202,7 +182,7 @@ describe('TranslationsForked', function() {
               }
             } else {
               // validate once
-              this.translations(this.req, this.res, () => {
+              middleware(this.req, this.res, () => {
                 for (const key of keys) {
                   const actual = this.res.locals.translate(key)
                   const expected = this.mockedTranslate(langSpec.lngCode, key)
@@ -210,7 +190,7 @@ describe('TranslationsForked', function() {
                 }
               })
               while (i--) {
-                this.translations(this.req, this.res, () => {
+                middleware(this.req, this.res, () => {
                   for (const key of keys) {
                     this.res.locals.translate(key)
                   }
@@ -270,18 +250,20 @@ describe('TranslationsForked', function() {
   describe('setLangBasedOnDomainMiddleware', function() {
     it('should set the lang to french if the domain is fr', function(done) {
       this.req.headers.host = 'fr.sharelatex.com'
-      this.translations(this.req, this.res, () => {
+      this.Translations.middleware(this.req, this.res, () => {
         expect(this.req.lng).to.equal('fr')
         done()
       })
     })
 
-    describe('showUserOtherLng', function() {
+    describe('suggestedLanguageSubdomainConfig', function() {
       it('should set it to true if the languge based on headers is different to lng', function(done) {
         this.req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
         this.req.headers.host = 'fr.sharelatex.com'
-        this.translations(this.req, this.res, () => {
-          expect(this.req.showUserOtherLng).to.equal('da')
+        this.Translations.middleware(this.req, this.res, () => {
+          expect(
+            this.res.locals.suggestedLanguageSubdomainConfig.lngCode
+          ).to.equal('da')
           done()
         })
       })
@@ -289,8 +271,8 @@ describe('TranslationsForked', function() {
       it('should not set prop', function(done) {
         this.req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
         this.req.headers.host = 'da.sharelatex.com'
-        this.translations(this.req, this.res, () => {
-          expect(this.req.showUserOtherLng).to.not.exist
+        this.Translations.middleware(this.req, this.res, () => {
+          expect(this.res.locals.suggestedLanguageSubdomainConfig).to.not.exist
           done()
         })
       })
@@ -300,7 +282,7 @@ describe('TranslationsForked', function() {
       describe('with not query params', function() {
         beforeEach(function(done) {
           this.req.originalUrl = '/login'
-          this.translations(this.req, this.res, done)
+          this.Translations.middleware(this.req, this.res, done)
         })
         it('should set the setGlobalLng query param', function() {
           expect(
@@ -314,7 +296,7 @@ describe('TranslationsForked', function() {
       describe('with additional query params', function() {
         beforeEach(function(done) {
           this.req.originalUrl = '/login?someKey=someValue'
-          this.translations(this.req, this.res, done)
+          this.Translations.middleware(this.req, this.res, done)
         })
         it('should preserve the query param', function() {
           expect(
@@ -329,7 +311,7 @@ describe('TranslationsForked', function() {
       describe('open redirect', function() {
         beforeEach(function(done) {
           this.req.originalUrl = '//evil.com'
-          this.translations(this.req, this.res, done)
+          this.Translations.middleware(this.req, this.res, done)
         })
         it('should not send the user off the site', function() {
           expect(
@@ -351,7 +333,7 @@ describe('TranslationsForked', function() {
             da: { lngCode: 'da', url: 'https://www.sharelatex.com' }
           }
         }
-        this.translations = SandboxedModule.require(MODULE_PATH, {
+        this.Translations = SandboxedModule.require(MODULE_PATH, {
           requires: { 'settings-sharelatex': { i18n: options } },
           globals: { process }
         })
@@ -359,7 +341,7 @@ describe('TranslationsForked', function() {
 
       describe('when nothing is set', function() {
         beforeEach(function(done) {
-          this.translations(this.req, this.res, done)
+          this.Translations.middleware(this.req, this.res, done)
         })
         it('should not set a lng in the session', function() {
           expect(this.req.session.lng).to.not.exist
@@ -368,14 +350,14 @@ describe('TranslationsForked', function() {
           expect(this.req.lng).to.equal('en')
         })
         it('should not suggest anything', function() {
-          expect(this.req.showUserOtherLng).to.not.exist
+          expect(this.res.locals.suggestedLanguageSubdomainConfig).to.not.exist
         })
       })
 
       describe('when the browser sends hints', function() {
         beforeEach(function(done) {
           this.req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
-          this.translations(this.req, this.res, done)
+          this.Translations.middleware(this.req, this.res, done)
         })
         it('should not set a lng in the session', function() {
           expect(this.req.session.lng).to.not.exist
@@ -384,7 +366,9 @@ describe('TranslationsForked', function() {
           expect(this.req.lng).to.equal('en')
         })
         it('should suggest the language from the browser hint', function() {
-          expect(this.req.showUserOtherLng).to.equal('da')
+          expect(
+            this.res.locals.suggestedLanguageSubdomainConfig.lngCode
+          ).to.equal('da')
         })
       })
 
@@ -392,7 +376,7 @@ describe('TranslationsForked', function() {
         beforeEach(function(done) {
           this.req.session.lng = 'fr'
           this.req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
-          this.translations(this.req, this.res, done)
+          this.Translations.middleware(this.req, this.res, done)
         })
         it('should preserve lng=fr in the session', function() {
           expect(this.req.session.lng).to.equal('fr')
@@ -401,7 +385,9 @@ describe('TranslationsForked', function() {
           expect(this.req.lng).to.equal('fr')
         })
         it('should suggest the language from the browser hint', function() {
-          expect(this.req.showUserOtherLng).to.equal('da')
+          expect(
+            this.res.locals.suggestedLanguageSubdomainConfig.lngCode
+          ).to.equal('da')
         })
       })
 
@@ -409,7 +395,7 @@ describe('TranslationsForked', function() {
         beforeEach(function(done) {
           this.req.session.lng = 'fr'
           this.req.headers['accept-language'] = 'fr, en-gb;q=0.8, en;q=0.7'
-          this.translations(this.req, this.res, done)
+          this.Translations.middleware(this.req, this.res, done)
         })
         it('should preserve lng=fr in the session', function() {
           expect(this.req.session.lng).to.equal('fr')
@@ -418,7 +404,7 @@ describe('TranslationsForked', function() {
           expect(this.req.lng).to.equal('fr')
         })
         it('should not suggest any other language', function() {
-          expect(this.req.showUserOtherLng).to.not.exist
+          expect(this.res.locals.suggestedLanguageSubdomainConfig).to.not.exist
         })
       })
 
@@ -427,7 +413,7 @@ describe('TranslationsForked', function() {
           beforeEach(function(done) {
             this.req.query.setGlobalLng = lng
             this.res.redirect.callsFake(() => done())
-            this.translations(this.req, this.res, () => {})
+            this.Translations.middleware(this.req, this.res, () => {})
           })
           it('should send the user back', function() {
             expect(this.res.redirect).to.have.been.calledWith(
@@ -447,7 +433,7 @@ describe('TranslationsForked', function() {
           this.req.originalUrl = '/login?setGlobalLng=da&someKey=someValue'
           this.req.query.setGlobalLng = 'da'
           this.res.redirect.callsFake(() => done())
-          this.translations(this.req, this.res, () => {})
+          this.Translations.middleware(this.req, this.res, () => {})
         })
         it('should send the user back and preserve the query param', function() {
           expect(this.res.redirect).to.have.been.calledWith(
@@ -464,7 +450,7 @@ describe('TranslationsForked', function() {
           this.req.originalUrl = '//evil.com?setGlobalLng=da'
           this.req.query.setGlobalLng = 'da'
           this.res.redirect.callsFake(() => done())
-          this.translations(this.req, this.res, () => {})
+          this.Translations.middleware(this.req, this.res, () => {})
         })
         it('should keep the user on the site', function() {
           expect(this.res.redirect).to.have.been.calledWith(
@@ -477,7 +463,7 @@ describe('TranslationsForked', function() {
         describe('with not query params', function() {
           beforeEach(function(done) {
             this.req.originalUrl = '/login'
-            this.translations(this.req, this.res, done)
+            this.Translations.middleware(this.req, this.res, done)
           })
           it('should set the setGlobalLng query param', function() {
             expect(
@@ -491,7 +477,7 @@ describe('TranslationsForked', function() {
         describe('with additional query params', function() {
           beforeEach(function(done) {
             this.req.originalUrl = '/login?someKey=someValue'
-            this.translations(this.req, this.res, done)
+            this.Translations.middleware(this.req, this.res, done)
           })
           it('should preserve the query param', function() {
             expect(
@@ -508,7 +494,7 @@ describe('TranslationsForked', function() {
         describe('open redirect', function() {
           beforeEach(function(done) {
             this.req.originalUrl = '//evil.com'
-            this.translations(this.req, this.res, done)
+            this.Translations.middleware(this.req, this.res, done)
           })
           it('should not send the user off the site', function() {
             expect(

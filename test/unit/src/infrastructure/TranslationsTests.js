@@ -5,14 +5,19 @@ const SandboxedModule = require('sandboxed-module')
 const MODULE_PATH = '../../../../app/src/infrastructure/Translations.js'
 
 describe('Translations', function() {
+  let req, res, translations
+  function runMiddlewares(cb) {
+    translations.middleware(req, res, cb)
+  }
+
   beforeEach(function() {
-    this.translations = SandboxedModule.require(MODULE_PATH, {
+    translations = SandboxedModule.require(MODULE_PATH, {
       requires: {
         'settings-sharelatex': {
           i18n: {
             subdomainLang: {
               www: { lngCode: 'en', url: 'https://www.sharelatex.com' },
-              fr: { lngCode: 'fr', url: 'http://fr.sharelatex.com' },
+              fr: { lngCode: 'fr', url: 'https://fr.sharelatex.com' },
               da: { lngCode: 'da', url: 'https://da.sharelatex.com' }
             }
           }
@@ -20,8 +25,8 @@ describe('Translations', function() {
       }
     })
 
-    this.req = {
-      originalUrl: "doesn'tmatter.sharelatex.com/login",
+    req = {
+      url: '/',
       headers: {
         'accept-language': ''
       },
@@ -31,7 +36,7 @@ describe('Translations', function() {
         return accept.languages.apply(accept, arguments)
       }
     }
-    this.res = {
+    res = {
       locals: {},
       getHeader: () => {},
       setHeader: () => {}
@@ -40,28 +45,26 @@ describe('Translations', function() {
 
   describe('translate', function() {
     beforeEach(function(done) {
-      this.req.url = 'www.sharelatex.com/login'
-      this.translations.expressMiddleware(this.req, this.res, done)
+      runMiddlewares(done)
     })
 
     it('works', function() {
-      expect(this.req.i18n.t('give_feedback')).to.equal('Give feedback')
+      expect(req.i18n.t('give_feedback')).to.equal('Give feedback')
     })
 
     it('has translate alias', function() {
-      expect(this.req.i18n.translate('give_feedback')).to.equal('Give feedback')
+      expect(req.i18n.translate('give_feedback')).to.equal('Give feedback')
     })
   })
 
   describe('interpolation', function() {
     beforeEach(function(done) {
-      this.req.url = 'www.sharelatex.com/login'
-      this.translations.expressMiddleware(this.req, this.res, done)
+      runMiddlewares(done)
     })
 
     it('works', function() {
       expect(
-        this.req.i18n.t('please_confirm_email', {
+        req.i18n.t('please_confirm_email', {
           emailAddress: 'foo@example.com'
         })
       ).to.equal(
@@ -73,7 +76,7 @@ describe('Translations', function() {
       // This translation string has a problematic interpolation followed by a
       // dash: `__len__-day`
       expect(
-        this.req.i18n.t('faq_how_does_free_trial_works_answer', {
+        req.i18n.t('faq_how_does_free_trial_works_answer', {
           appName: 'Overleaf',
           len: '5'
         })
@@ -84,7 +87,7 @@ describe('Translations', function() {
 
     it('disables escaping', function() {
       expect(
-        this.req.i18n.t('admin_user_created_message', {
+        req.i18n.t('admin_user_created_message', {
           link: 'http://google.com'
         })
       ).to.equal(
@@ -93,88 +96,34 @@ describe('Translations', function() {
     })
   })
 
-  describe('query string detection', function() {
-    it('sets the language to french if the setLng query string is fr', function(done) {
-      this.req.originalUrl = 'www.sharelatex.com/login?setLng=fr'
-      this.req.url = 'www.sharelatex.com/login'
-      this.req.query = { setLng: 'fr' }
-      this.req.headers.host = 'www.sharelatex.com'
-      this.translations.expressMiddleware(this.req, this.res, () => {
-        this.translations.setLangBasedOnDomainMiddleware(
-          this.req,
-          this.res,
-          () => {
-            expect(this.req.lng).to.equal('fr')
-            done()
-          }
-        )
-      })
-    })
-  })
-
   describe('setLangBasedOnDomainMiddleware', function() {
     it('should set the lang to french if the domain is fr', function(done) {
-      this.req.url = 'fr.sharelatex.com/login'
-      this.req.headers.host = 'fr.sharelatex.com'
-      this.translations.expressMiddleware(this.req, this.res, () => {
-        this.translations.setLangBasedOnDomainMiddleware(
-          this.req,
-          this.res,
-          () => {
-            expect(this.req.lng).to.equal('fr')
-            done()
-          }
-        )
+      req.headers.host = 'fr.sharelatex.com'
+      runMiddlewares(() => {
+        expect(req.lng).to.equal('fr')
+        done()
       })
     })
 
-    it('ignores domain if setLng query param is set', function(done) {
-      this.req.originalUrl = 'fr.sharelatex.com/login?setLng=en'
-      this.req.url = 'fr.sharelatex.com/login'
-      this.req.query = { setLng: 'en' }
-      this.req.headers.host = 'fr.sharelatex.com'
-      this.translations.expressMiddleware(this.req, this.res, () => {
-        this.translations.setLangBasedOnDomainMiddleware(
-          this.req,
-          this.res,
-          () => {
-            expect(this.req.lng).to.equal('en')
-            done()
-          }
-        )
-      })
-    })
-
-    describe('showUserOtherLng', function() {
-      it('should set showUserOtherLng=true if the detected lang is different to subdomain lang', function(done) {
-        this.req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
-        this.req.url = 'fr.sharelatex.com/login'
-        this.req.headers.host = 'fr.sharelatex.com'
-        this.translations.expressMiddleware(this.req, this.res, () => {
-          this.translations.setLangBasedOnDomainMiddleware(
-            this.req,
-            this.res,
-            () => {
-              expect(this.req.showUserOtherLng).to.equal('da')
-              done()
-            }
+    describe('suggestedLanguageSubdomainConfig', function() {
+      it('should set suggestedLanguageSubdomainConfig if the detected lang is different to subdomain lang', function(done) {
+        req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
+        req.headers.host = 'fr.sharelatex.com'
+        runMiddlewares(() => {
+          expect(res.locals.suggestedLanguageSubdomainConfig).to.exist
+          expect(res.locals.suggestedLanguageSubdomainConfig.lngCode).to.equal(
+            'da'
           )
+          done()
         })
       })
 
-      it('should not set showUserOtherLng if the detected lang is the same as subdomain lang', function(done) {
-        this.req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
-        this.req.url = 'da.sharelatex.com/login'
-        this.req.headers.host = 'da.sharelatex.com'
-        this.translations.expressMiddleware(this.req, this.res, () => {
-          this.translations.setLangBasedOnDomainMiddleware(
-            this.req,
-            this.res,
-            () => {
-              expect(this.req.showUserOtherLng).to.not.exist
-              done()
-            }
-          )
+      it('should not set suggestedLanguageSubdomainConfig if the detected lang is the same as subdomain lang', function(done) {
+        req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
+        req.headers.host = 'da.sharelatex.com'
+        runMiddlewares(() => {
+          expect(res.locals.suggestedLanguageSubdomainConfig).to.not.exist
+          done()
         })
       })
     })

@@ -1,7 +1,7 @@
 const Settings = require('settings-sharelatex')
 const { URL } = require('url')
 
-function loadAll(availableLngCodes = []) {
+function loadAll(availableLanguageCodes = []) {
   function getModule(lng) {
     if (Settings.i18n.loadLocalesFromDisk) {
       return require(`../../../generated/lng/${lng}`)
@@ -10,24 +10,30 @@ function loadAll(availableLngCodes = []) {
       return Generator.generateModuleInMemory(lng)
     }
   }
-  return new Map(availableLngCodes.map(lng => [lng, getModule(lng)]))
+  return new Map(availableLanguageCodes.map(lng => [lng, getModule(lng)]))
 }
 
-const options = Settings.i18n || {}
-
-const subdomainLang = new Map(Object.entries(options.subdomainLang || {}))
-const availableLngCodes = []
+const fallbackLanguageCode = Settings.i18n.defaultLng || 'en'
+const availableLanguageCodes = []
 const availableHosts = new Map()
-subdomainLang.forEach(function(spec) {
-  availableLngCodes.push(spec.lngCode)
+const subdomainConfigs = new Map()
+Object.values(Settings.i18n.subdomainLang || {}).forEach(function(spec) {
+  availableLanguageCodes.push(spec.lngCode)
+  // prebuild a host->lngCode mapping for the usage at runtime in the
+  //  middleware
   availableHosts.set(new URL(spec.url).host, spec.lngCode)
-})
 
-const fallbackLng = options.defaultLng || 'en'
-if (!availableLngCodes.includes(fallbackLng)) {
-  availableLngCodes.push(fallbackLng)
+  // prebuild a lngCode -> language config mapping; some subdomains should
+  //  not appear in the language picker
+  if (!spec.hide) {
+    subdomainConfigs.set(spec.lngCode, spec)
+  }
+})
+if (!availableLanguageCodes.includes(fallbackLanguageCode)) {
+  // always load the fallback locale
+  availableLanguageCodes.push(fallbackLanguageCode)
 }
-const allLocales = loadAll(availableLngCodes)
+const allLocales = loadAll(availableLanguageCodes)
 
 function setLangBasedOnDomainMiddleware(req, res, next) {
   res.locals.getTranslationUrl = spec => {
@@ -35,7 +41,7 @@ function setLangBasedOnDomainMiddleware(req, res, next) {
   }
 
   // prefer host and then fallback language over browser hint
-  req.language = availableHosts.get(req.headers.host) || fallbackLng
+  req.language = availableHosts.get(req.headers.host) || fallbackLanguageCode
   postprocess(req, res, next)
 }
 function setLangBasedOnSessionOrQueryParam(req, res, next) {
@@ -46,8 +52,8 @@ function setLangBasedOnSessionOrQueryParam(req, res, next) {
     return url.href
   }
 
-  if (req.query.setGlobalLng && subdomainLang.has(req.query.setGlobalLng)) {
-    const { lngCode, url } = subdomainLang.get(req.query.setGlobalLng)
+  if (req.query.setGlobalLng && subdomainConfigs.has(req.query.setGlobalLng)) {
+    const { lngCode, url } = subdomainConfigs.get(req.query.setGlobalLng)
     req.session.lng = lngCode
     // cleanup the setGlobalLng query parameter and preserve other params
     const parsedURL = new URL(url + req.originalUrl)
@@ -56,46 +62,36 @@ function setLangBasedOnSessionOrQueryParam(req, res, next) {
   }
 
   // prefer session and then fallback language over browser hint
-  req.language = req.session.lng || fallbackLng
+  req.language = req.session.lng || fallbackLanguageCode
   postprocess(req, res, next)
 }
 
 const singleDomainMultipleLng =
-  typeof options.singleDomainMultipleLng === 'boolean'
-    ? options.singleDomainMultipleLng
-    : availableHosts.size === 1 && availableLngCodes.length !== 1
+  typeof Settings.i18n.singleDomainMultipleLng === 'boolean'
+    ? Settings.i18n.singleDomainMultipleLng
+    : availableHosts.size === 1 && availableLanguageCodes.length !== 1
 const middleware = singleDomainMultipleLng
   ? setLangBasedOnSessionOrQueryParam
   : setLangBasedOnDomainMiddleware
 
 function postprocess(req, res, next) {
-  if (req.query.setLng) {
-    // Developers/Users can override the language per request
-    if (!availableLngCodes.includes(req.query.setLng)) {
-      return res.status(400).json({ message: 'invalid lngCode' })
-    }
-    req.language = req.query.setLng
-  }
-
-  const browserLanguage = req.acceptsLanguages(availableLngCodes)
+  const browserLanguage = req.acceptsLanguages(availableLanguageCodes)
   if (browserLanguage && browserLanguage !== req.language) {
     // 'accept-language' header and fallbackLng mismatch
     // 'accept-language' header and host header mismatch
     // 'accept-language' header and ?setGlobalLng mismatch
-    // 'accept-language' header and ?setLng mismatch
-    req.showUserOtherLng = browserLanguage
+    res.locals.suggestedLanguageSubdomainConfig = subdomainConfigs.get(
+      browserLanguage
+    )
   }
 
-  req.lng = req.locale = req.language
+  req.lng = req.locale = res.locals.currentLngCode = req.language
   req.i18n = {}
   req.i18n.t = req.i18n.translate = allLocales.get(req.language)
   next()
 }
 
-// backwards compatibility
-middleware.expressMiddleware = middleware.expressMiddlewear = middleware
-middleware.setLangBasedOnDomainMiddlewear = (req, res, next) => next()
-middleware.setLangBasedOnDomainMiddleware = (req, res, next) => next()
-middleware.i18n = { translate: allLocales.get('en') }
-
-module.exports = middleware
+module.exports = {
+  middleware,
+  i18n: { translate: allLocales.get('en') }
+}
