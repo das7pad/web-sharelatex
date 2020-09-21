@@ -6,7 +6,7 @@ import { Trans } from '../../../components/trans'
 import { t } from '../../../misc/t'
 
 import OutlineRoot from './outline-root'
-import { localStorage } from '../../../modules/storage'
+import localStorage from '../../../infrastructure/local-storage'
 import withErrorBoundary from '../../../infrastructure/error-boundary'
 
 function OutlinePane({
@@ -20,7 +20,7 @@ function OutlinePane({
 }) {
   const storageKey = `file_outline.expanded.${projectId}`
   const [expanded, setExpanded] = useState(() => {
-    const storedExpandedState = localStorage(storageKey) !== false
+    const storedExpandedState = localStorage.getItem(storageKey) !== false
     return storedExpandedState
   })
   const isOpen = isTexFile && expanded
@@ -43,7 +43,7 @@ function OutlinePane({
 
   function handleExpandCollapseClick() {
     if (isTexFile) {
-      localStorage(storageKey, !expanded)
+      localStorage.setItem(storageKey, !expanded)
       eventTracking.sendMB(expanded ? 'outline-collapse' : 'outline-expand')
       setExpanded(!expanded)
     }
@@ -67,6 +67,7 @@ function OutlinePane({
           className="outline-header-expand-collapse-btn"
           disabled={!isTexFile}
           onClick={handleExpandCollapseClick}
+          aria-label={expanded ? t('hide_outline') : t('show_outline')}
         >
           <i className={expandCollapseIconClasses} />
           <h4 className="outline-header-name">{t('file_outline')}</h4>
