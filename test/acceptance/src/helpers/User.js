@@ -563,22 +563,17 @@ class User {
   }
 
   getUserSettingsPage(callback) {
-    this.getCsrfToken(error => {
-      if (error != null) {
-        return callback(error)
-      }
-      this.request.get(
-        {
-          url: '/user/settings'
-        },
-        (error, response, body) => {
-          if (error != null) {
-            return callback(error)
-          }
-          callback(null, response.statusCode)
+    this.request.get(
+      {
+        url: '/user/settings'
+      },
+      (error, response, body) => {
+        if (error != null) {
+          return callback(error)
         }
-      )
-    })
+        callback(null, response.statusCode)
+      }
+    )
   }
 
   activateSudoMode(callback) {
@@ -614,22 +609,17 @@ class User {
   }
 
   getProjectListPage(callback) {
-    this.getCsrfToken(error => {
-      if (error != null) {
-        return callback(error)
-      }
-      this.request.get(
-        {
-          url: '/project'
-        },
-        (error, response, body) => {
-          if (error != null) {
-            return callback(error)
-          }
-          callback(null, response.statusCode)
+    this.request.get(
+      {
+        url: '/project'
+      },
+      (error, response, body) => {
+        if (error != null) {
+          return callback(error)
         }
-      )
-    })
+        callback(null, response.statusCode)
+      }
+    )
   }
 
   isLoggedIn(callback) {
