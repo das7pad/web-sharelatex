@@ -7,6 +7,7 @@ import { t } from '../../../misc/t'
 
 import OutlineRoot from './outline-root'
 import { localStorage } from '../../../modules/storage'
+import withErrorBoundary from '../../../infrastructure/error-boundary'
 
 function OutlinePane({
   isTexFile,
@@ -107,4 +108,4 @@ OutlinePane.propTypes = {
   highlightedLine: PropTypes.number
 }
 
-export default OutlinePane
+export default withErrorBoundary(OutlinePane)
