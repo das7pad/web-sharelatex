@@ -6,6 +6,7 @@ import { Trans } from '../../../components/trans'
 import { t } from '../../../misc/t'
 
 import OutlineRoot from './outline-root'
+import Icon from '../../../shared/components/icon'
 import localStorage from '../../../infrastructure/local-storage'
 import withErrorBoundary from '../../../infrastructure/error-boundary'
 
@@ -31,11 +32,6 @@ function OutlinePane({
     },
     [isOpen]
   )
-
-  const expandCollapseIconClasses = classNames('fa', 'outline-caret-icon', {
-    'fa-angle-down': isOpen,
-    'fa-angle-right': !isOpen
-  })
 
   const headerClasses = classNames('outline-pane', {
     'outline-pane-disabled': !isTexFile
@@ -69,7 +65,10 @@ function OutlinePane({
           onClick={handleExpandCollapseClick}
           aria-label={expanded ? t('hide_outline') : t('show_outline')}
         >
-          <i className={expandCollapseIconClasses} />
+          <Icon
+            type={isOpen ? 'angle-down' : 'angle-right'}
+            classes={{ icon: 'outline-caret-icon' }}
+          />
           <h4 className="outline-header-name">{t('file_outline')}</h4>
           {expanded ? (
             <OverlayTrigger placement="top" overlay={tooltip} delayHide={100}>

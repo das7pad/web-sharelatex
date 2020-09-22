@@ -210,19 +210,19 @@ Click here to set your password and log in:\
   }
 })
 
-templates.canceledSubscription = CTAEmailTemplate({
+templates.canceledSubscription = ctaTemplate({
   subject() {
     return `${settings.appName} thoughts`
   },
   message() {
-    return `\
-We are sorry to see you cancelled your ${
-      settings.appName
-    } premium subscription. Would you mind giving us some feedback on what the site is lacking at the moment via this quick survey?\
-`
+    return [
+      `We are sorry to see you cancelled your ${
+        settings.appName
+      } premium subscription. Would you mind giving us some feedback on what the site is lacking at the moment via this quick survey?`
+    ]
   },
   secondaryMessage() {
-    return 'Thank you in advance!'
+    return ['Thank you in advance!']
   },
   ctaText() {
     return 'Leave Feedback'
@@ -232,14 +232,12 @@ We are sorry to see you cancelled your ${
   }
 })
 
-templates.reactivatedSubscription = CTAEmailTemplate({
+templates.reactivatedSubscription = ctaTemplate({
   subject() {
     return `Subscription Reactivated - ${settings.appName}`
   },
   message(opts) {
-    return `\
-Your subscription was reactivated successfully.\
-`
+    return ['Your subscription was reactivated successfully.']
   },
   ctaText() {
     return 'View Subscription Dashboard'
@@ -273,7 +271,7 @@ templates.passwordResetRequested = ctaTemplate({
   }
 })
 
-templates.confirmEmail = CTAEmailTemplate({
+templates.confirmEmail = ctaTemplate({
   subject() {
     return `Confirm Email - ${settings.appName}`
   },
@@ -281,7 +279,7 @@ templates.confirmEmail = CTAEmailTemplate({
     return 'Confirm Email'
   },
   message() {
-    return `Please confirm your email on ${settings.appName}.`
+    return [`Please confirm your email on ${settings.appName}.`]
   },
   ctaText() {
     return 'Confirm Email'
@@ -330,7 +328,7 @@ templates.projectInvite = CTAEmailTemplate({
   }
 })
 
-templates.verifyEmailToJoinTeam = CTAEmailTemplate({
+templates.verifyEmailToJoinTeam = ctaTemplate({
   subject(opts) {
     return `${_.escape(
       _formatUserNameAndEmail(opts.inviter, 'A collaborator')
@@ -342,9 +340,11 @@ templates.verifyEmailToJoinTeam = CTAEmailTemplate({
     )} has invited you to join a team on ${settings.appName}`
   },
   message(opts) {
-    return `Please click the button below to join the team and enjoy the benefits of an upgraded ${
-      settings.appName
-    } account.`
+    return [
+      `Please click the button below to join the team and enjoy the benefits of an upgraded ${
+        settings.appName
+      } account.`
+    ]
   },
   ctaText(opts) {
     return 'Join now'
@@ -354,7 +354,7 @@ templates.verifyEmailToJoinTeam = CTAEmailTemplate({
   }
 })
 
-templates.testEmail = CTAEmailTemplate({
+templates.testEmail = ctaTemplate({
   subject() {
     return `A Test Email from ${settings.appName}`
   },
@@ -365,7 +365,7 @@ templates.testEmail = CTAEmailTemplate({
     return 'Hi,'
   },
   message() {
-    return `This is a test Email from ${settings.appName}`
+    return [`This is a test Email from ${settings.appName}`]
   },
   ctaText() {
     return `Open ${settings.appName}`
