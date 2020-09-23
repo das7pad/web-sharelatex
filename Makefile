@@ -377,9 +377,9 @@ clean_stage_images:
 		$(IMAGE_CI)-dev-deps \
 		$(IMAGE_CI)-dev \
 
-compress_public: public.tar.xz
-.PHONY: public.tar.xz
-public.tar.xz:
+compress_public: public.tar.gz
+.PHONY: public.tar.gz
+public.tar.gz:
 	docker run \
 		--rm \
 		--volume $(PWD)/compress.sh:/compress.sh \
@@ -387,8 +387,8 @@ public.tar.xz:
 		--entrypoint sh \
 		$(IMAGE_CI)-webpack \
 		-c '/compress.sh && tar --create .' \
-	| xz -9e \
-	> public.tar.xz
+	| gzip -9 \
+	> public.tar.gz
 
 MODULE_DIRS := $(shell find modules -mindepth 1 -maxdepth 1 -type d -not -name '.git' )
 MODULE_MAKEFILES := $(MODULE_DIRS:=/Makefile)
