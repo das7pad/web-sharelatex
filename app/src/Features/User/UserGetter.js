@@ -1,6 +1,6 @@
+const { db, ObjectId } = require('../../infrastructure/mongojs')
 const metrics = require('@overleaf/metrics')
 const logger = require('logger-sharelatex')
-const { db, ObjectId } = require('../../infrastructure/mongojs')
 const { promisifyAll } = require('../../util/promises')
 const { getUserAffiliations } = require('../Institutions/InstitutionsAPI')
 const InstitutionsHelper = require('../Institutions/InstitutionsHelper')

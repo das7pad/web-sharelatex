@@ -17,10 +17,6 @@ const express = require('express')
 const path = require('path')
 const Settings = require('settings-sharelatex')
 const translations = require('../../../../../app/src/infrastructure/Translations')
-const {
-  db,
-  ObjectId
-} = require('../../../../../app/src/infrastructure/mongojs')
 const User = require('../../../../../test/acceptance/src/helpers/User')
 const ProjectGetter = require('../../../../../app/src/Features/Project/ProjectGetter')
 const ProjectEntityHandler = require('../../../../../app/src/Features/Project/ProjectEntityHandler')

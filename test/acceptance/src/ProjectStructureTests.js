@@ -1,5 +1,5 @@
 const { expect } = require('chai')
-const { ObjectId } = require('mongojs')
+const { ObjectId } = require('mongodb')
 const Path = require('path')
 const fs = require('fs')
 const Settings = require('settings-sharelatex')

@@ -17,9 +17,7 @@ const logger = require('logger-sharelatex')
 const _ = require('underscore')
 const Path = require('path')
 const UserGetter = require('../../../../app/src/Features/User/UserGetter')
-const mongojs = require('../../../../app/src/infrastructure/mongojs')
-const { db } = mongojs
-const { ObjectId } = mongojs
+const { db, ObjectId } = require('../../../../app/src/infrastructure/mongojs')
 const sigmaGraph = require('./SigmaJSGraph')
 
 module.exports = GraphController = {

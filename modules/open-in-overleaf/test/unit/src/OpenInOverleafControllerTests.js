@@ -18,7 +18,6 @@ const should = chai.should()
 const { expect } = chai
 const modulePath = '../../../app/src/OpenInOverleafController.js'
 const SandboxedModule = require('sandboxed-module')
-const { ObjectId } = require('mongojs')
 const Errors = require('../../../../../app/src/Features/Errors/Errors')
 const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 

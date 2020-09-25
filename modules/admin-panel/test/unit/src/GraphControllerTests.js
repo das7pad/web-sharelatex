@@ -21,7 +21,7 @@ const { expect } = chai
 const modulePath = '../../../app/src/GraphController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
-const { ObjectId } = require('mongojs')
+const { ObjectId } = require('mongodb')
 const assert = require('assert')
 const Path = require('path')
 

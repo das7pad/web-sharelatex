@@ -4,7 +4,7 @@ const sinon = require('sinon')
 const modulePath =
   '../../../../app/src/Features/Subscription/SubscriptionUpdater'
 const { assert } = require('chai')
-const { ObjectId } = require('mongoose').Types
+const { ObjectId } = require('mongodb')
 
 chai.should()
 
@@ -110,6 +110,7 @@ describe('SubscriptionUpdater', function() {
           warn() {}
         },
         'settings-sharelatex': this.Settings,
+        '../../infrastructure/mongojs': { db: {}, ObjectId },
         './FeaturesUpdater': this.FeaturesUpdater,
         '../../models/DeletedSubscription': {
           DeletedSubscription: this.DeletedSubscription

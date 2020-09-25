@@ -17,7 +17,6 @@ const { expect } = chai
 const modulePath = '../../../app/src/PublicRegistrationController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
-const { ObjectId } = require('mongojs')
 const assert = require('assert')
 
 describe('PublicRegistrationController', function() {
