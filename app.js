@@ -20,6 +20,9 @@ logger.logger.serializers.files = require('./app/src/infrastructure/LoggerSerial
 logger.logger.serializers.project = require('./app/src/infrastructure/LoggerSerializers').project
 
 metrics.memory.monitor(logger)
+const { promisify } = require('util')
+const OError = require('@overleaf/o-error')
+const { getNativeDb } = require('./app/src/infrastructure/Mongoose')
 const Server = require('./app/src/infrastructure/Server')
 
 const port = Settings.port || Settings.internal.web.port || 3000
@@ -33,12 +36,25 @@ if (!module.parent) {
       throw new Error('No API user and password provided')
     }
   }
-  Server.server.listen(port, host, function() {
-    logger.info(`web starting up, listening on ${host}:${port}`)
-    logger.info(`${require('http').globalAgent.maxSockets} sockets enabled`)
-    // wait until the process is ready before monitoring the event loop
-    metrics.event_loop.monitor(logger)
-  })
+  getNativeDb()
+    .catch(err => {
+      throw new OError('cannot connect to mongo').withCause(err)
+    })
+    .then(() =>
+      promisify(cb => Server.server.listen(port, host, cb))().catch(err => {
+        throw new OError('cannot start http server').withCause(err)
+      })
+    )
+    .then(() => {
+      logger.info(`web starting up, listening on ${host}:${port}`)
+      logger.info(`${require('http').globalAgent.maxSockets} sockets enabled`)
+      // wait until the process is ready before monitoring the event loop
+      metrics.event_loop.monitor(logger)
+    })
+    .catch(err => {
+      logger.fatal({ err }, 'startup failed exiting')
+      process.exit(1)
+    })
 }
 
 // handle SIGTERM for graceful shutdown in kubernetes
