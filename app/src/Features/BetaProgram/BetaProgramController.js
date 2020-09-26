@@ -3,6 +3,7 @@ const OError = require('@overleaf/o-error')
 const UserGetter = require('../User/UserGetter')
 const Settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
+const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const AuthenticationController = require('../Authentication/AuthenticationController')
 
 const BetaProgramController = {
@@ -16,7 +17,7 @@ const BetaProgramController = {
       if (err) {
         return next(err)
       }
-      res.redirect('/beta/participate')
+      AsyncFormHelper.redirect(req, res, '/beta/participate')
     })
   },
 
@@ -30,7 +31,7 @@ const BetaProgramController = {
       if (err) {
         return next(err)
       }
-      res.redirect('/beta/participate')
+      AsyncFormHelper.redirect(req, res, '/beta/participate')
     })
   },
 

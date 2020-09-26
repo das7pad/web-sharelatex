@@ -17,6 +17,7 @@ describe('BetaProgramController', function() {
       betaProgram: false
     }
     this.req = {
+      accepts: () => 'html',
       query: {},
       session: {
         user: this.user
@@ -49,6 +50,7 @@ describe('BetaProgramController', function() {
       }
     })
     this.res = {
+      json: sinon.stub(),
       send: sinon.stub(),
       redirect: sinon.stub(),
       render: sinon.stub()
@@ -75,6 +77,18 @@ describe('BetaProgramController', function() {
     it('should call BetaProgramHandler.optIn', function() {
       this.BetaProgramController.optIn(this.req, this.res, this.next)
       this.BetaProgramHandler.optIn.callCount.should.equal(1)
+    })
+
+    describe('ajax request', function() {
+      beforeEach(function() {
+        this.req.accepts = () => 'json'
+      })
+
+      it("should not redirect to '/beta/participate'", function() {
+        this.BetaProgramController.optIn(this.req, this.res, this.next)
+        this.res.redirect.callCount.should.equal(0)
+        this.res.json.callCount.should.equal(1)
+      })
     })
 
     describe('when BetaProgramHandler.opIn produces an error', function() {
@@ -114,6 +128,18 @@ describe('BetaProgramController', function() {
     it('should call BetaProgramHandler.optOut', function() {
       this.BetaProgramController.optOut(this.req, this.res, this.next)
       this.BetaProgramHandler.optOut.callCount.should.equal(1)
+    })
+
+    describe('ajax request', function() {
+      beforeEach(function() {
+        this.req.accepts = () => 'json'
+      })
+
+      it("should not redirect to '/beta/participate'", function() {
+        this.BetaProgramController.optOut(this.req, this.res, this.next)
+        this.res.redirect.callCount.should.equal(0)
+        this.res.json.callCount.should.equal(1)
+      })
     })
 
     describe('when BetaProgramHandler.optOut produces an error', function() {
