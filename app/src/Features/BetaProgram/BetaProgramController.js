@@ -37,7 +37,7 @@ const BetaProgramController = {
   optInPage(req, res, next) {
     const userId = AuthenticationController.getLoggedInUserId(req)
     logger.log({ user_id: userId }, 'showing beta participation page for user')
-    UserGetter.getUser(userId, function(err, user) {
+    UserGetter.getUser(userId, { betaProgram: 1 }, function(err, user) {
       if (err) {
         OError.tag(err, 'error fetching user', {
           userId

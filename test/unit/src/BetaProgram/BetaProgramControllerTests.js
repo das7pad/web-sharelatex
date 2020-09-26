@@ -136,7 +136,7 @@ describe('BetaProgramController', function() {
 
   describe('optInPage', function() {
     beforeEach(function() {
-      this.UserGetter.getUser.callsArgWith(1, null, this.user)
+      this.UserGetter.getUser.yields(null, this.user)
     })
 
     it('should render the opt-in page', function() {
@@ -148,7 +148,7 @@ describe('BetaProgramController', function() {
 
     describe('when UserGetter.getUser produces an error', function() {
       beforeEach(function() {
-        this.UserGetter.getUser.callsArgWith(1, new Error('woops'))
+        this.UserGetter.getUser.yields(new Error('woops'))
       })
 
       it('should not render the opt-in page', function() {
