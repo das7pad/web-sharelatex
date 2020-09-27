@@ -1,4 +1,14 @@
 import React, { useState } from 'react'
+import {
+  Alert,
+  FormGroup,
+  Button,
+  Col,
+  Row,
+  PageHeader,
+  Grid
+} from 'react-bootstrap'
+import Card from '../../../shared/components/card'
 import t from '../../../misc/t'
 import getMeta from '../../../utils/meta'
 
@@ -84,87 +94,87 @@ export default function BetaProgramParticipate() {
   }
   const cta = participates ? (
     <>
-      <div className={'form-group'}>
-        <a
+      <FormGroup>
+        <Button
           href="https://forms.gle/CFEsmvZQTAwHCd3X9"
           target="_blank"
           rel="noopener noreferrer"
-          className={'btn btn-primary btn-lg'}
+          bsStyle={'primary'}
+          bsSize={'lg'}
         >
           {t('give_feedback')}
-        </a>
-      </div>
-      <div className={'form-group'}>
-        <button
+        </Button>
+      </FormGroup>
+      <FormGroup>
+        <Button
           type={'submit'}
           disabled={requestStatus === REQUEST_PENDING}
-          className={'btn btn-info btn-sm'}
+          bsStyle={'info'}
+          bsSize={'sm'}
           onClick={optOut}
         >
           {t('beta_program_opt_out_action')}
-        </button>
-      </div>
+        </Button>
+      </FormGroup>
     </>
   ) : (
     <>
-      <div className={'form-group'}>
-        <button
+      <FormGroup>
+        <Button
           type={'submit'}
           disabled={requestStatus === REQUEST_PENDING}
-          className={'btn btn-primary'}
+          bsStyle={'primary'}
           onClick={optIn}
         >
           {t('beta_program_opt_in_action')}
-        </button>
-      </div>
+        </Button>
+      </FormGroup>
     </>
   )
 
   const visualRequestStatus =
     requestStatus === REQUEST_ERROR ? (
-      <div className={'alert alert-danger'}>
-        {t('error_performing_request')}
-      </div>
+      <Alert bsStyle={'danger'}>{t('error_performing_request')}</Alert>
     ) : (
       <></>
     )
 
   const cardBody = (
     <>
-      <div className={'row'}>
-        <div className={'col-md-12'}>
+      <Row>
+        <Col md={12}>
           {participateStatus}
           {howItWorks}
-        </div>
-      </div>
-      <div className={'row text-centered'}>
-        <div className={'col-md-12'}>
+        </Col>
+      </Row>
+      <Row className={'text-centered'}>
+        <Col md={12}>
           {cta}
           {visualRequestStatus}
-          <div className={'form-group'}>
-            <a href="/project" className={'btn btn-link btn-sm'}>
+          <FormGroup>
+            <Button href="/project" bsStyle={'link'} bsSize={'sm'}>
               {t('back_to_your_projects')}
-            </a>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </FormGroup>
+        </Col>
+      </Row>
     </>
   )
 
   return (
-    <div className={'container beta-opt-in-wrapper'}>
-      <div className={'row'}>
-        <div className={'col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2'}>
-          <div className={'card'}>
-            <div className={'page-header text-centered'}>
+    <Grid>
+      <Row>
+        <Col lg={8} lgOffset={2} md={10} mdOffset={1}>
+          <Card>
+            <PageHeader className={'text-centered'}>
               <h1>{t('sharelatex_beta_program')}</h1>
-            </div>
+            </PageHeader>
             <div className={'beta-opt-in'}>
-              <div className={'container-fluid'}>{cardBody}</div>
+              <Grid fluid>{cardBody}</Grid>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Card>
+        </Col>
+      </Row>
+    </Grid>
   )
 }
