@@ -1,5 +1,7 @@
 const { expect } = require('chai')
 const { exec } = require('child_process')
+const fs = require('fs')
+const Path = require('path')
 const { ObjectId } = require('../../../app/src/infrastructure/mongojs')
 
 const User = require('./helpers/User').promises
@@ -10,6 +12,19 @@ describe('ConvertArchivedState', function() {
   let projectTwo, projectTwoId
   let projectThree, projectThreeId
   let projectFour, projectFourId
+
+  before(function(done) {
+    const scriptPath = Path.join(
+      __dirname,
+      '../../../scripts/convert_archived_state.js'
+    )
+    fs.stat(scriptPath, err => {
+      if (err) {
+        this.skip()
+      }
+      done()
+    })
+  })
 
   beforeEach(async function() {
     userOne = new User()
