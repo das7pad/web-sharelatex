@@ -28,7 +28,8 @@
     "lint": "eslint --max-warnings 0 -f unix .",
     "format": "prettier-eslint '**/*.{js,less}' --list-different",
     "format:fix": "prettier-eslint '**/*.{js,less}' --write",
-    "migrations": "east"
+    "migrations": "east",
+    "storybook": "start-storybook -p 6006"
   },
   "browserslist": [
     "last 1 year",
