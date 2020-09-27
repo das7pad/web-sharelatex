@@ -14,7 +14,9 @@ export function _recursiveComponentSubstitute(chunk, components) {
     // each batch consists of three items: ['0', 'INNER', 'POST']
     const [idx, innerChunk, intermediateChunk] = parts.splice(0, 3)
     const children = _recursiveComponentSubstitute(innerChunk, components)
-    output.push(React.cloneElement(components[idx], {}, ...children))
+    output.push(
+      React.cloneElement(components[idx], { key: output.length }, ...children)
+    )
     output.push(intermediateChunk)
   }
   return output
