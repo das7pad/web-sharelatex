@@ -55,8 +55,8 @@ mongoose.plugin(schema => {
 mongoose.Promise = global.Promise
 
 async function getNativeDb() {
-  const connection = await connectionPromise
-  return connection.db
+  const mongooseInstance = await connectionPromise
+  return mongooseInstance.connection.db
 }
 
 mongoose.getNativeDb = getNativeDb
