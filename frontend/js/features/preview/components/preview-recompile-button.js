@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import { Dropdown, MenuItem } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function PreviewRecompileButton({
   compilerState: {
@@ -17,8 +17,6 @@ function PreviewRecompileButton({
   onSetDraftMode,
   onSetSyntaxCheck
 }) {
-  const { t } = useTranslation()
-
   const iconClasses = {
     recompile: classNames('fa', 'fa-refresh', {
       'fa-spin': isCompiling
