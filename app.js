@@ -24,6 +24,7 @@ const { promisify } = require('util')
 const OError = require('@overleaf/o-error')
 const { getNativeDb } = require('./app/src/infrastructure/Mongoose')
 const Server = require('./app/src/infrastructure/Server')
+const mongodb = require('./app/src/infrastructure/mongodb')
 
 const port = Settings.port || Settings.internal.web.port || 3000
 const host = Settings.internal.web.host || 'localhost'
@@ -36,7 +37,7 @@ if (!module.parent) {
       throw new Error('No API user and password provided')
     }
   }
-  getNativeDb()
+  Promise.all(getNativeDb(), mongodb.waitForDb())
     .catch(err => {
       throw new OError('cannot connect to mongo').withCause(err)
     })

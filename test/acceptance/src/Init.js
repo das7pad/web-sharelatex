@@ -1,5 +1,8 @@
 const { exec } = require('child_process')
+const { waitForDb } = require('../../../app/src/infrastructure/mongodb')
 const { db } = require('../../../app/src/infrastructure/mongojs')
+
+before(waitForDb)
 
 before(function(done) {
   this.timeout(60000)
