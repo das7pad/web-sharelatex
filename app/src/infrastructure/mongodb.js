@@ -2,10 +2,8 @@ const Settings = require('settings-sharelatex')
 const { MongoClient, ObjectId } = require('mongodb')
 const parseMongoUrl = require('parse-mongo-url')
 
-if (
-  typeof global.beforeEach === 'function' &&
-  process.argv.join(' ').match(/unit/)
-) {
+if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
+  // set by -> test/unit/bootstrap.js
   throw new Error(
     'It looks like unit tests are running, but you are connecting to Mongo. Missing a stub?'
   )
