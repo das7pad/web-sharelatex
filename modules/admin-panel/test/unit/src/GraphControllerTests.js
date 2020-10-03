@@ -44,7 +44,7 @@ describe('GraphController', function() {
           err() {}
         },
         '../../../../app/src/Features/User/UserGetter': this.UserGetter,
-        '../../../../app/src/infrastructure/mongojs': {
+        '../../../../app/src/infrastructure/mongodb': {
           db: (this.db = {
             projects: {},
             users: {}
@@ -89,8 +89,12 @@ describe('GraphController', function() {
       }
     ]
 
-    this.db.projects.find = sinon.stub().callsArgWith(2, null, this.projects)
-    this.db.users.find = sinon.stub().callsArgWith(2, null, this.users)
+    this.db.projects.find = sinon
+      .stub()
+      .returns({ toArray: sinon.stub().yields(null, this.projects) })
+    this.db.users.find = sinon
+      .stub()
+      .returns({ toArray: sinon.stub().yields(null, this.users) })
     this.UserGetter.getUser = (user_id, fields, callback) => {
       return callback(null, this.users[0])
     }

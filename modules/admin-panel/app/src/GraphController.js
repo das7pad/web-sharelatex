@@ -17,7 +17,7 @@ const logger = require('logger-sharelatex')
 const _ = require('underscore')
 const Path = require('path')
 const UserGetter = require('../../../../app/src/Features/User/UserGetter')
-const { db, ObjectId } = require('../../../../app/src/infrastructure/mongojs')
+const { db, ObjectId } = require('../../../../app/src/infrastructure/mongodb')
 const sigmaGraph = require('./SigmaJSGraph')
 
 module.exports = GraphController = {
@@ -45,10 +45,20 @@ module.exports = GraphController = {
       { readOnly_refs: { $in: idsToSearch } },
       { collaberator_refs: { $in: idsToSearch } }
     ]
-    return db.projects.find(
-      { $or: q },
-      { _id: 1, owner_ref: 1, readOnly_refs: 1, collaberator_refs: 1, name: 1 },
-      function(err, relations) {
+    db.projects
+      .find(
+        { $or: q },
+        {
+          projection: {
+            _id: 1,
+            owner_ref: 1,
+            readOnly_refs: 1,
+            collaberator_refs: 1,
+            name: 1
+          }
+        }
+      )
+      .toArray(function(err, relations) {
         if (err != null) {
           return cb(err)
         }
@@ -70,8 +80,7 @@ module.exports = GraphController = {
               }
             })
         )
-      }
-    )
+      })
   },
 
   _genGraph(relations, usersObjId, graph, cb) {
@@ -139,10 +148,16 @@ module.exports = GraphController = {
       }
     }
 
-    return db.users.find(
-      { _id: { $in: usersObjId } },
-      { first_name: 1 },
-      function(err, users) {
+    db.users
+      .find(
+        { _id: { $in: usersObjId } },
+        {
+          projection: {
+            first_name: 1
+          }
+        }
+      )
+      .toArray(function(err, users) {
         if (err != null) {
           logger.err({ err }, 'error getting users name in admin graphGen')
           return cb(err)
@@ -157,8 +172,7 @@ module.exports = GraphController = {
         }
 
         return cb(null, graph)
-      }
-    )
+      })
   },
 
   userGraph(req, res, next) {
