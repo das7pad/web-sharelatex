@@ -37,7 +37,7 @@ if (!module.parent) {
       throw new Error('No API user and password provided')
     }
   }
-  Promise.all(getNativeDb(), mongodb.waitForDb())
+  Promise.all([getNativeDb(), mongodb.waitForDb()])
     .catch(err => {
       throw new OError('cannot connect to mongo').withCause(err)
     })
