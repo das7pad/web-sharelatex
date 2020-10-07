@@ -1,6 +1,5 @@
 const Settings = require('settings-sharelatex')
 const { MongoClient, ObjectId } = require('mongodb')
-const parseMongoUrl = require('parse-mongo-url')
 
 if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
   // set by -> test/unit/bootstrap.js
@@ -24,10 +23,7 @@ async function waitForDb() {
 
 const db = {}
 async function setupDb() {
-  const internalDb = (await clientPromise).db(
-    // TODO(das7pad): remove after upgrading mongodb
-    parseMongoUrl(Settings.mongo.url).dbName
-  )
+  const internalDb = (await clientPromise).db()
 
   db.contacts = internalDb.collection('contacts')
   db.deletedProjects = internalDb.collection('deletedProjects')

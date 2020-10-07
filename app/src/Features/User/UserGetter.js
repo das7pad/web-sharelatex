@@ -1,4 +1,4 @@
-const { db, ObjectId } = require('../../infrastructure/mongodb')
+const { db } = require('../../infrastructure/mongodb')
 const metrics = require('@overleaf/metrics')
 const logger = require('logger-sharelatex')
 const { promisifyAll } = require('../../util/promises')
@@ -6,6 +6,7 @@ const { getUserAffiliations } = require('../Institutions/InstitutionsAPI')
 const InstitutionsHelper = require('../Institutions/InstitutionsHelper')
 const Errors = require('../Errors/Errors')
 const Features = require('../../infrastructure/Features')
+const { normalizeQuery, normalizeMultiQuery } = require('../Helpers/Mongo')
 
 const UserGetter = {
   getUser(query, projection, callback) {
@@ -15,7 +16,7 @@ const UserGetter = {
     }
     try {
       query = normalizeQuery(query)
-      db.users.findOne(query, projection, callback)
+      db.users.findOne(query, { projection }, callback)
     } catch (err) {
       callback(err)
     }
@@ -69,7 +70,7 @@ const UserGetter = {
       callback = projection
       projection = {}
     }
-    db.users.findOne({ email }, projection, callback)
+    db.users.findOne({ email }, { projection }, callback)
   },
 
   getUserByAnyEmail(email, projection, callback) {
@@ -80,7 +81,7 @@ const UserGetter = {
     }
     // $exists: true MUST be set to use the partial index
     const query = { emails: { $exists: true }, 'emails.email': email }
-    db.users.findOne(query, projection, (error, user) => {
+    db.users.findOne(query, { projection }, (error, user) => {
       if (error || user) {
         return callback(error, user)
       }
@@ -103,7 +104,7 @@ const UserGetter = {
         $elemMatch: { email: { $in: emails }, confirmedAt: { $exists: true } }
       }
     }
-    db.users.find(query, projection).toArray(callback)
+    db.users.find(query, { projection }).toArray(callback)
   },
 
   getUsersByV1Ids(v1Ids, projection, callback) {
@@ -112,7 +113,7 @@ const UserGetter = {
       projection = {}
     }
     const query = { 'overleaf.id': { $in: v1Ids } }
-    db.users.find(query, projection).toArray(callback)
+    db.users.find(query, { projection }).toArray(callback)
   },
 
   getUsersByHostname(hostname, projection, callback) {
@@ -125,13 +126,13 @@ const UserGetter = {
       emails: { $exists: true },
       'emails.reversedHostname': reversedHostname
     }
-    db.users.find(query, projection).toArray(callback)
+    db.users.find(query, { projection }).toArray(callback)
   },
 
   getUsers(query, projection, callback) {
     try {
-      query = normalizeQuery(query)
-      db.users.find(query, projection).toArray(callback)
+      query = normalizeMultiQuery(query)
+      db.users.find(query, { projection }).toArray(callback)
     } catch (err) {
       callback(err)
     }
@@ -145,22 +146,6 @@ const UserGetter = {
       }
       callback(error)
     })
-  }
-}
-
-function normalizeQuery(query) {
-  if (!query) {
-    throw new Error('no query provided')
-  }
-  if (typeof query === 'string') {
-    return { _id: ObjectId(query) }
-  } else if (query instanceof ObjectId) {
-    return { _id: query }
-  } else if (Array.isArray(query)) {
-    const userIds = query.map(u => ObjectId(u.toString()))
-    return { _id: { $in: userIds } }
-  } else {
-    return query
   }
 }
 

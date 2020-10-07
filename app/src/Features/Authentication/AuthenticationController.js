@@ -16,7 +16,6 @@ const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
 const UrlHelper = require('../Helpers/UrlHelper')
 const RedirectManager = require('../../infrastructure/RedirectManager')
 const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
-const SudoModeHandler = require('../SudoMode/SudoModeHandler')
 const {
   acceptsJson
 } = require('../../infrastructure/RequestContentTypeDetection')
@@ -111,16 +110,8 @@ const AuthenticationController = {
         if (err) {
           return next(err)
         }
-        SudoModeHandler.activateSudoMode(user._id, function(err) {
-          if (err) {
-            logger.err(
-              { err, user_id: user._id },
-              'Error activating Sudo Mode on login, continuing'
-            )
-          }
-          AuthenticationController._clearRedirectFromSession(req)
-          AsyncFormHelper.redirect(req, res, redir)
-        })
+        AuthenticationController._clearRedirectFromSession(req)
+        AsyncFormHelper.redirect(req, res, redir)
       })
     })
   },

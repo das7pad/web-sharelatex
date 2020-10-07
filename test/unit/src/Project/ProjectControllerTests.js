@@ -158,6 +158,7 @@ describe('ProjectController', function() {
         console: console
       },
       requires: {
+        mongodb: { ObjectId },
         'settings-sharelatex': this.settings,
         'logger-sharelatex': {
           log() {},

@@ -40,6 +40,7 @@ describe('TokenAccessHandler', function() {
         console: console
       },
       requires: {
+        mongodb: { ObjectId },
         '../../models/Project': { Project: (this.Project = {}) },
         'logger-sharelatex': { err: sinon.stub() },
         'settings-sharelatex': (this.settings = {}),

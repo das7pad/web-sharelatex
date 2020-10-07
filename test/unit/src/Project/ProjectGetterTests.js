@@ -18,6 +18,7 @@ const { expect } = chai
 const modulePath = '../../../../app/src/Features/Project/ProjectGetter'
 const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongodb')
+const { normalizeQuery } = require('../../../../app/src/Features/Helpers/Mongo')
 const { assert } = require('chai')
 
 describe('ProjectGetter', function() {
@@ -59,6 +60,7 @@ describe('ProjectGetter', function() {
             return project_id
           }
         },
+        '../Helpers/Mongo': { normalizeQuery },
         'logger-sharelatex': {
           err() {},
           log() {}
@@ -217,7 +219,7 @@ describe('ProjectGetter', function() {
           })
           return expect(
             this.db.projects.findOne.lastCall.args[1]
-          ).to.deep.equal(this.projection)
+          ).to.deep.equal({ projection: this.projection })
         })
       })
 
@@ -294,7 +296,7 @@ describe('ProjectGetter', function() {
           })
           return expect(
             this.db.projects.findOne.lastCall.args[1]
-          ).to.deep.equal(this.projection)
+          ).to.deep.equal({ projection: this.projection })
         })
       })
 

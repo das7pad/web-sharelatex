@@ -11,8 +11,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let UserMembershipViewModel
-const { ObjectId } = require('mongodb')
 const UserGetter = require('../User/UserGetter')
+const { isObjectIdInstance } = require('../Helpers/Mongo')
 
 module.exports = UserMembershipViewModel = {
   build(userOrEmail) {
@@ -27,7 +27,7 @@ module.exports = UserMembershipViewModel = {
     if (callback == null) {
       callback = function(error, viewModel) {}
     }
-    if (!(userOrIdOrEmail instanceof ObjectId)) {
+    if (!isObjectIdInstance(userOrIdOrEmail)) {
       // userOrIdOrEmail is a user or an email and can be parsed by #build
       return callback(null, UserMembershipViewModel.build(userOrIdOrEmail))
     }

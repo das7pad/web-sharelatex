@@ -77,7 +77,6 @@ describe('UserController', function() {
         revokeAllUserSessions: sinon.stub().resolves()
       }
     }
-    this.SudoModeHandler = { clearSudoMode: sinon.stub() }
     this.HttpErrorHandler = {
       badRequest: sinon.stub(),
       conflict: sinon.stub(),
@@ -115,7 +114,6 @@ describe('UserController', function() {
         }),
         './UserHandler': this.UserHandler,
         './UserSessionsManager': this.UserSessionsManager,
-        '../SudoMode/SudoModeHandler': this.SudoModeHandler,
         '../Errors/HttpErrorHandler': this.HttpErrorHandler,
         'settings-sharelatex': this.settings,
         'logger-sharelatex': (this.logger = {
@@ -497,24 +495,8 @@ describe('UserController', function() {
       this.UserController.logout(this.req, this.res)
     })
 
-    it('should clear sudo-mode', function(done) {
-      this.req.session.destroy = sinon.stub().callsArgWith(0)
-      this.SudoModeHandler.clearSudoMode = sinon.stub()
-      this.res.redirect = url => {
-        url.should.equal('/login')
-        this.SudoModeHandler.clearSudoMode.callCount.should.equal(1)
-        this.SudoModeHandler.clearSudoMode
-          .calledWith(this.user._id)
-          .should.equal(true)
-        done()
-      }
-
-      this.UserController.logout(this.req, this.res)
-    })
-
     it('should untrack session', function(done) {
       this.req.session.destroy = sinon.stub().callsArgWith(0)
-      this.SudoModeHandler.clearSudoMode = sinon.stub()
       this.res.redirect = url => {
         url.should.equal('/login')
         this.UserSessionsManager.untrackSession.callCount.should.equal(1)
@@ -530,7 +512,6 @@ describe('UserController', function() {
     it('should redirect after logout', function(done) {
       this.req.body.redirect = '/institutional-login'
       this.req.session.destroy = sinon.stub().callsArgWith(0)
-      this.SudoModeHandler.clearSudoMode = sinon.stub()
       this.res.redirect = url => {
         url.should.equal(this.req.body.redirect)
         done()
@@ -540,7 +521,6 @@ describe('UserController', function() {
 
     it('should redirect to login after logout when no redirect set', function(done) {
       this.req.session.destroy = sinon.stub().callsArgWith(0)
-      this.SudoModeHandler.clearSudoMode = sinon.stub()
       this.res.redirect = url => {
         url.should.equal('/login')
         done()
