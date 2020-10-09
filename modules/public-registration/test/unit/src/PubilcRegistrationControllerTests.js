@@ -57,7 +57,7 @@ describe('PublicRegistrationController', function() {
         '../../../../app/src/Features/Email/Layouts/PersonalEmailLayout': {},
         '../../../../app/src/Features/Email/EmailBuilder': {
           templates: { welcome: {} },
-          CTAEmailTemplate: sinon.stub()
+          ctaTemplate: sinon.stub()
         },
         '../../../../app/src/Features/Email/EmailHandler': {},
         '../../../../app/src/Features/User/UserHandler': this.UserHandler,

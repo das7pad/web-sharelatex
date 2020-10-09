@@ -28,7 +28,7 @@ const AuthenticationController = require('../../../../app/src/Features/Authentic
 const AnalyticsManager = require('../../../../app/src/Features/Analytics/AnalyticsManager')
 const settings = require('settings-sharelatex')
 
-EmailBuilder.templates.welcome = EmailBuilder.CTAEmailTemplate({
+EmailBuilder.templates.welcome = EmailBuilder.ctaTemplate({
   subject() {
     return `Welcome to ${settings.appName}`
   },
