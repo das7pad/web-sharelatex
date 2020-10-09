@@ -4,7 +4,7 @@ const MockV1Api = require('./helpers/MockV1Api')
 const User = require('./helpers/User')
 const request = require('./helpers/request')
 const settings = require('settings-sharelatex')
-const { db, ObjectId } = require('../../../app/src/infrastructure/mongojs')
+const { db, ObjectId } = require('../../../app/src/infrastructure/mongodb')
 
 require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
@@ -1029,7 +1029,7 @@ describe('TokenAccess', function() {
             expect(err).not.to.exist
             this.tokens = project.tokens
             this.owner.makePrivate(this.projectId, () => {
-              db.projects.update(
+              db.projects.updateOne(
                 { _id: project._id },
                 {
                   $set: {
@@ -1265,7 +1265,7 @@ describe('TokenAccess', function() {
             return done(err)
           }
           this.projectId = projectId
-          db.users.update(
+          db.users.updateOne(
             { _id: ObjectId(this.owner._id.toString()) },
             { $set: { 'overleaf.id': 321321 } },
             err => {
@@ -1276,7 +1276,7 @@ describe('TokenAccess', function() {
                 if (err != null) {
                   return done(err)
                 }
-                db.projects.update(
+                db.projects.updateOne(
                   { _id: ObjectId(projectId) },
                   { $set: { overleaf: { id: 1234 } } },
                   err => {
@@ -1296,7 +1296,7 @@ describe('TokenAccess', function() {
                       }
                       MockV1Api.setDocInfo(this.tokens.readAndWrite, docInfo)
                       MockV1Api.setDocInfo(this.tokens.readOnly, docInfo)
-                      db.projects.remove({ _id: ObjectId(projectId) }, done)
+                      db.projects.deleteOne({ _id: ObjectId(projectId) }, done)
                     })
                   }
                 )
