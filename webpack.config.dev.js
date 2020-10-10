@@ -1,4 +1,6 @@
 const Path = require('path')
+const { URL } = require('url')
+const Settings = require('settings-sharelatex')
 const merge = require('webpack-merge')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -28,6 +30,12 @@ module.exports = merge(base, {
     // Expose dev server as localhost with dev box
     host: '0.0.0.0',
     port: 3808,
+
+    // Server from all hosts and emit CORS headers, e.g. for fonts
+    disableHostCheck: true,
+    headers: {
+      'Access-Control-Allow-Origin': new URL(Settings.siteUrl).origin
+    },
 
     // Customise output to the (node) console
     stats: {
