@@ -22,6 +22,7 @@ describe('ExpressLocalsTests', function() {
       },
       analytics: { ga: { token: '' }, gaOptimize: { id: '' } },
       cdn: { web: { host: '' } },
+      useDevAssets: true,
       saml: { ukamf: { initPath: '/' } }
     }
     this.user_id = '386010482601212345061012'
@@ -57,8 +58,7 @@ describe('ExpressLocalsTests', function() {
       //  settings values - e.g. the availability of a cdn
       this.ExpressLocals = SandboxedModule.require(MODULE_PATH, {
         globals: {
-          console,
-          process: { env: { NODE_ENV: 'test' } }
+          console
         },
         requires: this.requires
       })

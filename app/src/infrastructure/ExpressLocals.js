@@ -9,7 +9,7 @@ const AuthenticationController = require('../Features/Authentication/Authenticat
 const Modules = require('./Modules')
 
 let webpackManifest = {}
-if (['development', 'test'].includes(process.env.NODE_ENV)) {
+if (Settings.useDevAssets) {
   webpackManifest = require('../../../public/manifest-dev.json')
 } else {
   webpackManifest = require('../../../public/manifest.json')

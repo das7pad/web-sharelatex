@@ -501,6 +501,13 @@ module.exports = settings =
 	# them.
 	cacheStaticAssets: false
 
+	# fetch assets from webpack-dev-server
+	useDevAssets: (
+		if process.env.USE_DEV_ASSETS != undefined
+		then process.env.USE_DEV_ASSETS == 'true'
+		else ['development', 'test'].includes(process.env.NODE_ENV)
+	)
+
 	# If you are running ShareLaTeX over https, set this to true to send the
 	# cookie with a secure flag (recommended).
 	secureCookie: false
