@@ -1,3 +1,4 @@
+const Path = require('path')
 const merge = require('webpack-merge')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
@@ -20,6 +21,9 @@ module.exports = merge(base, {
   devServer: {
     // Disable webpack dev server auto-reload
     inline: false,
+
+    // serve regular static files too
+    contentBase: Path.join(__dirname, 'public'),
 
     // Expose dev server as localhost with dev box
     host: '0.0.0.0',
