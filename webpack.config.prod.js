@@ -5,9 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 const base = require('./webpack.config')
 
-// Use "smart" merge: attempts to combine loaders targeting the same file type,
-// overriding the base config
-module.exports = merge.smart(
+module.exports = merge(
   base,
   {
     mode: 'production',
