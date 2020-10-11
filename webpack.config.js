@@ -70,6 +70,13 @@ module.exports = {
         ]
       },
       {
+        // work around babel/babel#12058 leading to webpack/webpack#11467
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false
+        }
+      },
+      {
         // preserve assets that are already in the output directory
         test: new RegExp(`^${path.join(__dirname, 'public')}`),
         loader: 'file-loader',
