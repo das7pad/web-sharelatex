@@ -152,7 +152,7 @@
     "sinon": "^7.5.0",
     "sinon-chai": "^3.5.0",
     "sinon-mongoose": "^2.3.0",
-    "terser-webpack-plugin": "^2.3.6",
+    "terser-webpack-plugin": "^4.2.3",
     "timekeeper": "^2.2.0",
     "val-loader": "^2.1.2",
     "webpack": "^4.44.2",
