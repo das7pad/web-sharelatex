@@ -217,6 +217,11 @@ module.exports = {
       __REACT_DEVTOOLS_GLOBAL_HOOK__: '({ isDisabled: true })'
     }),
 
+    new webpack.DefinePlugin({
+      // work around 'process' usage in algoliasearch
+      'process.env.RESET_APP_DATA_TIMER': undefined
+    }),
+
     // Prevent moment from loading (very large) locale files that aren't used
     new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/,
