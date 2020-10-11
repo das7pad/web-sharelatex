@@ -3,7 +3,6 @@ const webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
 const WebpackAssetsManifest = require('webpack-assets-manifest')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const AutoPrefixer = require('autoprefixer')
 
 const NODE_MODULES = path.join(__dirname, 'node_modules')
 const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
@@ -91,18 +90,8 @@ module.exports = {
               publicPath: '../'
             }
           },
-          {
-            loader: 'css-loader'
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: [AutoPrefixer]
-            }
-          },
-          {
-            loader: 'less-loader'
-          }
+          { loader: 'css-loader' },
+          { loader: 'less-loader' }
         ]
       },
       {

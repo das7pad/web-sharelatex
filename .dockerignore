@@ -47,6 +47,8 @@
 
 !/karma.conf.js
 
+!/postcss.config.js
+
 !/webpack.config.js
 !/webpack.config.prod.js
 !/webpack.config.test.js
