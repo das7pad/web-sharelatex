@@ -232,11 +232,7 @@ module.exports = {
           return
         }
         return spec
-      },
-      // Always write the manifest file to disk (even if in dev mode, where
-      // files are held in memory). This is needed because the server will read
-      // this file (from disk) when building the script's url
-      writeToFileEmit: true
+      }
     }),
 
     // Silence react messages in the dev-tools console
