@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
-const ManifestPlugin = require('webpack-manifest-plugin')
+const WebpackAssetsManifest = require('webpack-assets-manifest')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const AutoPrefixer = require('autoprefixer')
 
@@ -213,25 +213,30 @@ module.exports = {
   plugins: [
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames
-    new ManifestPlugin({
-      filter: function(spec) {
-        if (/cmaps/.test(spec.path)) {
+    new WebpackAssetsManifest({
+      publicPath: true,
+      customize(entry) {
+        if (/^fonts/.test(entry.key)) {
+          // omit fonts, they are loaded via css only
+          return false
+        }
+        if (/cmaps/.test(entry.value)) {
           // omit the vendored cmaps
-          return
+          return false
         }
-        if (/ace-builds/.test(spec.path)) {
+        if (/ace-builds/.test(entry.value)) {
           // omit minified ace source, they are loaded via ace internals
-          return
+          return false
         }
-        if (/sigma-master/.test(spec.path)) {
+        if (/sigma-master/.test(entry.value)) {
           // loaded via staticPath
-          return
+          return false
         }
-        if (/vendor\/mathjax/.test(spec.path)) {
+        if (/vendor\/mathjax/.test(entry.value)) {
           // booted via MathJaxBundle and then loaded via staticPath
-          return
+          return false
         }
-        return spec
+        return entry
       }
     }),
 
