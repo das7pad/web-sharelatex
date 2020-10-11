@@ -139,26 +139,21 @@ module.exports = {
       {
         // Expose jQuery and $ global variables
         test: require.resolve('jquery'),
-        use: [
-          {
-            loader: 'expose-loader',
-            options: 'jQuery'
-          },
-          {
-            loader: 'expose-loader',
-            options: '$'
-          }
-        ]
+        loader: 'expose-loader',
+        options: {
+          exposes: [
+            { globalName: '$', override: true },
+            { globalName: 'jQuery', override: true }
+          ]
+        }
       },
       {
         // Expose angular global variable
         test: require.resolve('angular'),
-        use: [
-          {
-            loader: 'expose-loader',
-            options: 'angular'
-          }
-        ]
+        loader: 'expose-loader',
+        options: {
+          exposes: [{ globalName: 'angular', override: true }]
+        }
       }
     ]
   },
