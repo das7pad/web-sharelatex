@@ -1,4 +1,3 @@
-const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
@@ -8,7 +7,6 @@ const AutoPrefixer = require('autoprefixer')
 
 const GENERATED = path.join(__dirname, 'generated')
 const NODE_MODULES = path.join(__dirname, 'node_modules')
-const MODULES_PATH = path.join(__dirname, '/modules')
 const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
 // Generate a hash of entry points, including modules
@@ -26,15 +24,12 @@ require('glob')
   })
 
 // Attempt to load frontend entry-points from modules, if they exist
-if (fs.existsSync(MODULES_PATH)) {
-  fs.readdirSync(MODULES_PATH).reduce((acc, module) => {
-    const entryPath = path.join(MODULES_PATH, module, '/frontend/js/index.js')
-    if (fs.existsSync(entryPath)) {
-      acc[module] = entryPath
-    }
-    return acc
-  }, entryPoints)
-}
+require('glob')
+  .sync('./modules/*/frontend/js/index.js')
+  .forEach(file => {
+    const moduleName = file.split('/')[2]
+    entryPoints[moduleName] = file
+  })
 
 module.exports = {
   // Defines the "entry point(s)" for the application - i.e. the file which
