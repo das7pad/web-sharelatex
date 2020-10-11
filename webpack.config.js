@@ -5,7 +5,6 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const AutoPrefixer = require('autoprefixer')
 
-const GENERATED = path.join(__dirname, 'generated')
 const NODE_MODULES = path.join(__dirname, 'node_modules')
 const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
@@ -18,7 +17,7 @@ const entryPoints = {
 }
 
 require('glob')
-  .sync(`${GENERATED}/lng/*.js`)
+  .sync('./generated/lng/*.js')
   .forEach(file => {
     entryPoints[`t/${path.basename(file, '.js')}`] = file
   })
