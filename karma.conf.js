@@ -71,6 +71,12 @@ function fakeImgMiddlewareFactory() {
     if (req.originalUrl.startsWith('/fake/')) {
       return res.end('fake img response')
     }
+    if (req.originalUrl.endsWith('style.css')) {
+      return res.end('')
+    }
+    if (req.originalUrl.toLowerCase().includes('mathjax')) {
+      return res.end('')
+    }
     next()
   }
 }
