@@ -17,10 +17,10 @@ function getBuiltViewList() {
   })
 }
 
-const preloadedTemplates = new Map()
+const PRELOADED_TEMPLATES = new Map()
 function generateTemplate(path) {
   // block compiles at runtime when there are existing preloaded templates
-  if (preloadedTemplates.size) {
+  if (PRELOADED_TEMPLATES.size) {
     throw new Error(`template not preloaded: ${path}`)
   }
   // Load the generator ad-hoc in development.
@@ -33,19 +33,19 @@ function generateTemplate(path) {
 }
 
 function getTemplate(path) {
-  return preloadedTemplates.get(path) || generateTemplate(path)
+  return PRELOADED_TEMPLATES.get(path) || generateTemplate(path)
 }
 
 function loadPrecompiledViews(app) {
   app.engines['.pug'] = function render(path, locals, callback) {
-    const template = preloadedTemplates.get(path)
+    const template = PRELOADED_TEMPLATES.get(path)
     // express already has a try/catch wrapper around this invocation.
     // There is no need for any error handling in here.
     callback(null, template(locals))
   }
 
   getBuiltViewList().forEach(({ pugViewPath, builtViewPath }) => {
-    preloadedTemplates.set(pugViewPath, require(builtViewPath))
+    PRELOADED_TEMPLATES.set(pugViewPath, require(builtViewPath))
   })
 }
 
