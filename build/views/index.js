@@ -35,7 +35,11 @@ function processViews({ write, cache, debug }) {
   let failures = 0
   getAvailableViews().forEach(view => {
     try {
-      const blob = Generator.generateModule({ view, cache, debug })
+      const blob = Generator.generateModule({
+        path: view + '.pug',
+        cache,
+        debug
+      })
       logger.log({ view }, 'generated view')
       if (write) writeFile(view, blob)
       success++

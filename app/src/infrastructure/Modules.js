@@ -67,8 +67,8 @@ module.exports = Modules = {
           if (!this.viewIncludes.has(viewInclude)) {
             this.viewIncludes.set(viewInclude, [])
           }
-          const view = Path.join(module.path, 'app/views', partial)
-          const template = Views.getTemplate(view)
+          const path = Path.join(module.path, 'app/views', partial + '.pug')
+          const template = Views.getTemplate(path)
           this.viewIncludes.get(viewInclude).push(template)
         }
       )

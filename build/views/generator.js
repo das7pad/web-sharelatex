@@ -1,16 +1,14 @@
-const Path = require('path')
 const pug = require('pug')
 
-function generateModule({ view, cache, debug }) {
+function generateModule({ path, cache, debug }) {
   return (
     "const pug = require('pug-runtime'); module.exports = template; " +
-    generateModuleInMemory({ view, cache, debug }).toString()
+    generateModuleInMemory({ path, cache, debug }).toString()
   )
 }
 
-function generateModuleInMemory({ view, cache, debug }) {
-  const file = Path.resolve(view + '.pug')
-  return pug.compileFile(file, {
+function generateModuleInMemory({ path, cache, debug }) {
+  return pug.compileFile(path, {
     cache,
     compileDebug: debug,
     doctype: 'html'
