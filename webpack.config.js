@@ -184,26 +184,14 @@ module.exports = {
     }
   },
 
-  // Split out vendored dependencies that are shared between 2 or more "real
-  // bundles" (e.g. ide.js/main.js) as a separate "libraries" bundle and ensure
-  // that they are de-duplicated from the other bundles. This allows the
-  // libraries bundle to be independently cached (as it likely will change less
-  // than the other bundles)
   optimization: {
     splitChunks: {
+      chunks: 'all',
       cacheGroups: {
-        ideLibraries: {
-          test: /(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|frontend\/js\/vendor\/libs)/,
-          name: 'ideLibraries',
-          chunks: 'initial',
-          reuseExistingChunk: true,
+        defaultVendors: {
+          test: /\/node_modules\/|\/vendor\//,
+          minChunks: 1,
           enforce: true
-        },
-        libraries: {
-          test: /[\\/]node_modules[\\/]|[\\/]frontend[\\/]js[\\/]vendor[\\/]libs[\\/]/,
-          name: 'libraries',
-          chunks: 'initial',
-          minChunks: 2
         }
       }
     }
