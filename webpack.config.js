@@ -16,11 +16,10 @@ const entryPoints = {
   'light-style': './frontend/stylesheets/light-style.less'
 }
 
-require('glob')
-  .sync('./generated/lng/*.js')
-  .forEach(file => {
-    entryPoints[`t/${path.basename(file, '.js')}`] = file
-  })
+const TRANSLATIONS_FILES = require('glob').sync('./generated/lng/*.js')
+TRANSLATIONS_FILES.forEach(file => {
+  entryPoints[`t/${path.basename(file, '.js')}`] = file
+})
 
 // Attempt to load frontend entry-points from modules, if they exist
 require('glob')
@@ -59,7 +58,7 @@ module.exports = {
         exclude: [
           /node_modules/,
           path.resolve(__dirname, 'frontend/js/vendor')
-        ],
+        ].concat(TRANSLATIONS_FILES.map(file => path.join(__dirname, file))),
         use: [
           {
             loader: 'babel-loader',
