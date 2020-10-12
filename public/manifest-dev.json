@@ -1,5 +1,36 @@
 {
   "MathJaxBundle.js": "/js/MathJaxBundle.js",
+  "entrypoints": {
+    "main": {
+      "js": [
+        "/js/libraries.js",
+        "/js/main.js"
+      ]
+    },
+    "ide": {
+      "js": [
+        "/js/libraries.js",
+        "/js/ideLibraries.js",
+        "/js/ide.js"
+      ]
+    },
+    "style": {
+      "css": [
+        "/stylesheets/style.css"
+      ],
+      "js": [
+        "/js/style.js"
+      ]
+    },
+    "light-style": {
+      "css": [
+        "/stylesheets/light-style.css"
+      ],
+      "js": [
+        "/js/light-style.js"
+      ]
+    }
+  },
   "libraries.js": "/js/libraries.js",
   "ide.js": "/js/ide.js",
   "ideLibraries.js": "/js/ideLibraries.js",

@@ -214,6 +214,7 @@ module.exports = {
     // base filenames to the generated output filenames
     new WebpackAssetsManifest({
       publicPath: true,
+      entrypoints: true,
       customize(entry) {
         if (/^fonts/.test(entry.key)) {
           // omit fonts, they are loaded via css only

@@ -69,5 +69,5 @@ html(
 
 		block foot-scripts
 			script(type='text/javascript' defer src=buildJsPath(`t/${currentLngCode}.js`))
-			script(type='text/javascript' defer src=buildJsPath('libraries.js'))
-			script(type='text/javascript' defer src=buildJsPath('main.js'))
+			each file in entrypointSources('main')
+				script(type='text/javascript' defer src=file)

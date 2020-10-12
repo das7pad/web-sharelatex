@@ -17,6 +17,15 @@ if (Settings.useDevAssets) {
 
 const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
 
+const entrypoints = new Map(
+  Object.entries(webpackManifest.entrypoints).map(
+    ([entrypoint, entrypointSpec]) => [
+      entrypoint,
+      entrypointSpec.js.map(file => staticFilesBase + file)
+    ]
+  )
+)
+
 module.exports = function(app, webRouter) {
   app.locals.EXTERNAL_AUTHENTICATION_SYSTEM_USED =
     Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
@@ -29,6 +38,7 @@ module.exports = function(app, webRouter) {
     staticFilesBase + webpackManifest[`${themeModifier || ''}style.css`]
   app.locals.buildImgPath = path => staticFilesBase + '/img/' + path
   app.locals.buildJsPath = path => staticFilesBase + webpackManifest[path]
+  app.locals.entrypointSources = entrypoint => entrypoints.get(entrypoint)
   app.locals.staticPath = path => staticFilesBase + path
 
   webRouter.use(function(req, res, next) {
