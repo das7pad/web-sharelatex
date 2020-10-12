@@ -1,4 +1,10 @@
+const fs = require('fs')
+const Path = require('path')
+const webpack = require('webpack')
+
 const webpackConfig = require('./webpack.config.test')
+const OUTPUT_PATH = webpackConfig.output.path
+
 let junitDest
 const reporters = ['mocha']
 if (process.env.HOME === '/home/node') {
@@ -29,32 +35,15 @@ module.exports = function(config) {
       'test/karma/import_tests.js': ['webpack']
     },
     frameworks: ['mocha', 'chai-sinon'],
-    // Configure webpack in the tests
-    webpack: webpackConfig,
     // Configure the webpack dev server used to serve test files
-    webpackMiddleware: {
-      // Disable file-watching -- it is of no use in CI, we use single runs.
-      // https://webpack.js.org/configuration/watch/
-      watch: false,
-      // ^ does not work when placed in webpack.config.test.
-      // webpack-dev-middleware overrides it :/
-      // v seems to be supported, according to
-      // https://www.npmjs.com/package/webpack-dev-middleware#watchoptions
-      watchOptions: {
-        ignored: [/node_modules/, /frontend/, /test/]
-      },
-
-      // Disable noisy CLI output
-      stats: 'errors-only'
-    },
     plugins: [
       require('karma-chrome-launcher'),
       require('karma-mocha'),
       require('karma-chai-sinon'),
-      require('karma-webpack'),
       require('karma-mocha-reporter'),
       require('karma-junit-reporter'),
-      { 'middleware:fake-img': ['factory', fakeImgMiddlewareFactory] }
+      { 'middleware:fake-img': ['factory', fakeImgMiddlewareFactory] },
+      { 'preprocessor:webpack': ['factory', webpackPreprocessorFactory] }
     ],
     reporters: reporters,
     junitReporter: {
@@ -78,5 +67,20 @@ function fakeImgMiddlewareFactory() {
       return res.end('')
     }
     next()
+  }
+}
+function webpackPreprocessorFactory() {
+  const compiler = webpack(webpackConfig)
+
+  return function webpackPreprocessor(content, file, done) {
+    console.error('webpack: start compiling')
+    compiler.run(error => {
+      if (error) {
+        console.error('webpack: error compiling', error)
+        return done(error)
+      }
+      console.error('webpack: done compiling')
+      fs.readFile(Path.join(OUTPUT_PATH, 'import_tests.js'), done)
+    })
   }
 }

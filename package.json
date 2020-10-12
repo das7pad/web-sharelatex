@@ -128,7 +128,6 @@
     "karma-junit-reporter": "^1.2.0",
     "karma-mocha": "^2.0.0",
     "karma-mocha-reporter": "^2.2.5",
-    "karma-webpack": "^4.0.2",
     "less": "^3.11.1",
     "less-loader": "^7.0.2",
     "less-plugin-clean-css": "^1.5.1",
