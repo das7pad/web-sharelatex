@@ -20,7 +20,12 @@ module.exports = merge(
 
     optimization: {
       // Minify JS (with Terser) and CSS (with cssnano)
-      minimizer: [new TerserPlugin(), new OptimizeCssAssetsPlugin()]
+      minimizer: [
+        new TerserPlugin({
+          exclude: /^vendor|js\/t\//
+        }),
+        new OptimizeCssAssetsPlugin()
+      ]
     },
 
     plugins: [
