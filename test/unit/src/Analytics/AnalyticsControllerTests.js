@@ -4,6 +4,7 @@ const modulePath = path.join(
   __dirname,
   '../../../../app/src/Features/Analytics/AnalyticsController'
 )
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const sinon = require('sinon')
 
 describe('AnalyticsController', function() {
@@ -29,6 +30,7 @@ describe('AnalyticsController', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors,
         './AnalyticsManager': this.AnalyticsManager,
         '../Authentication/AuthenticationController': this
           .AuthenticationController,

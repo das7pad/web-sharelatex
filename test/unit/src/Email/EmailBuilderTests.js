@@ -11,7 +11,7 @@ const MODULE_PATH = path.join(
 )
 
 describe('EmailBuilder', function() {
-  beforeEach(function() {
+  before(function() {
     this.settings = {
       appName: 'testApp',
       siteUrl: 'https://www.overleaf.com'

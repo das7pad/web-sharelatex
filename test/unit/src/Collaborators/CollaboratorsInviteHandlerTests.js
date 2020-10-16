@@ -24,6 +24,7 @@ const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const { ObjectId } = require('mongodb')
 const Crypto = require('crypto')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('CollaboratorsInviteHandler', function() {
   beforeEach(function() {
@@ -58,6 +59,7 @@ describe('CollaboratorsInviteHandler', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors,
         'settings-sharelatex': (this.settings = {}),
         '../../models/ProjectInvite': { ProjectInvite: this.ProjectInvite },
         'logger-sharelatex': (this.logger = {

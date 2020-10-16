@@ -24,6 +24,9 @@ describe('AuthenticationController', function() {
         console: console
       },
       requires: {
+        '../../infrastructure/RedirectManager': {
+          getQueryString: sinon.stub().returns('?extra_query=foo')
+        },
         '../Helpers/AsyncFormHelper': (this.AsyncFormHelper = {
           redirect: sinon.stub()
         }),

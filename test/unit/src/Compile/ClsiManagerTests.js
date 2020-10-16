@@ -3,6 +3,7 @@ const chai = require('chai')
 const { expect } = chai
 const modulePath = '../../../../app/src/Features/Compile/ClsiManager.js'
 const SandboxedModule = require('sandboxed-module')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('ClsiManager', function() {
   beforeEach(function() {
@@ -44,6 +45,7 @@ describe('ClsiManager', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors,
         'settings-sharelatex': (this.settings = {
           apis: {
             filestore: {
