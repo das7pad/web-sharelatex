@@ -4,7 +4,7 @@ import MessageList from './message-list'
 import MessageInput from './message-input'
 import InfiniteScroll from './infinite-scroll'
 import Icon from '../../../shared/components/icon'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function ChatPane({
   atEnd,
@@ -54,7 +54,6 @@ function ChatPane({
 }
 
 function LoadingSpinner() {
-  const { t } = useTranslation()
   return (
     <div className="loading">
       <Icon type="fw" modifier="refresh" spin />
@@ -64,7 +63,6 @@ function LoadingSpinner() {
 }
 
 function Placeholder() {
-  const { t } = useTranslation()
   return (
     <>
       <div className="no-messages text-center small">{t('no_messages')}</div>

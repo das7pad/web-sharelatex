@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import PreviewToolbar from './preview-toolbar'
 import PreviewLogsPane from './preview-logs-pane'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function PreviewPane({
   compilerState,
@@ -14,8 +14,6 @@ function PreviewPane({
   onToggleLogs,
   showLogs
 }) {
-  const { t } = useTranslation()
-
   const nErrors =
     compilerState.logEntries && compilerState.logEntries.errors
       ? compilerState.logEntries.errors.length

@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { useTranslation } from 'react-i18next'
 import Icon from '../../../shared/components/icon'
+import t from '../../../misc/t'
 
 function PreviewLogsToggleButton({
   onToggle,
@@ -49,7 +49,6 @@ function CompilationResultIndicator({ nErrors, nWarnings }) {
 }
 
 function LogsCompilationResultIndicator({ logType, nLogs }) {
-  const { t } = useTranslation()
   const label =
     logType === 'errors' ? t('your_project_has_errors') : t('view_warnings')
   return (
@@ -63,7 +62,6 @@ function LogsCompilationResultIndicator({ logType, nLogs }) {
 }
 
 function ViewLogsButton() {
-  const { t } = useTranslation()
   return (
     <>
       <Icon type="file-text-o" />
@@ -73,7 +71,6 @@ function ViewLogsButton() {
 }
 
 function ViewPdfButton() {
-  const { t } = useTranslation()
   return (
     <>
       <Icon type="file-pdf-o" />

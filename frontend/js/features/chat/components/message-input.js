@@ -1,10 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function MessageInput({ resetUnreadMessages, sendMessage }) {
-  const { t } = useTranslation()
-
   function handleKeyDown(event) {
     if (event.key === 'Enter') {
       event.preventDefault()
