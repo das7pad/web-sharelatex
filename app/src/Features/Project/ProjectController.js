@@ -746,7 +746,7 @@ const ProjectController = {
         )
         if (projectId) {
           if (project) {
-            let allowedFreeTrial
+            let allowedFreeTrial = true
             if (
               privilegeLevel == null ||
               privilegeLevel === PrivilegeLevels.NONE
@@ -754,12 +754,8 @@ const ProjectController = {
               return res.sendStatus(401)
             }
 
-            if (
-              subscription != null &&
-              subscription.freeTrial != null &&
-              subscription.freeTrial.expiresAt != null
-            ) {
-              allowedFreeTrial = !!subscription.freeTrial.allowed || true
+            if (subscription != null) {
+              allowedFreeTrial = false
             }
 
             let wsUrl = Settings.wsUrl
@@ -831,9 +827,7 @@ const ProjectController = {
                 last_name: user.last_name,
                 referal_id: user.referal_id,
                 signUpDate: user.signUpDate,
-                subscription: {
-                  freeTrial: { allowed: allowedFreeTrial }
-                },
+                allowedFreeTrial: allowedFreeTrial,
                 featureSwitches: user.featureSwitches,
                 features: user.features,
                 refProviders: user.refProviders,
@@ -883,7 +877,8 @@ const ProjectController = {
               gaOptimize: enableOptimize,
               customOptimizeEvent: true,
               experimentId: Settings.experimentId,
-              showNewLogsUI: req.query && req.query.new_logs_ui === 'true'
+              showNewLogsUI: req.query && req.query.new_logs_ui === 'true',
+              showNewChatUI: req.query && req.query.new_chat_ui === 'true'
             })
             timer.done()
           }
