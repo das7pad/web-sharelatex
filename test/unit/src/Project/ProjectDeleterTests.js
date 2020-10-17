@@ -131,6 +131,8 @@ describe('ProjectDeleter', function() {
 
     this.ProjectDeleter = SandboxedModule.require(modulePath, {
       requires: {
+        moment: require('moment'), // from 611ms to 157ms
+        lodash: require('lodash'),
         '../Editor/EditorRealTimeController': this.EditorRealTimeController,
         '../../models/Project': { Project: Project },
         './ProjectHelper': this.ProjectHelper,
