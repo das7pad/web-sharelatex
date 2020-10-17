@@ -156,6 +156,24 @@ clean_test_unit: clean_test_unit_app
 clean_test_unit_app:
 	$(UNIT_TEST_DOCKER_COMPOSE) down --timeout 0
 
+TEST_SUITES = $(sort $(filter-out \
+	$(wildcard test/unit/src/helpers/*), \
+	$(wildcard test/unit/src/*/*)))
+
+MOCHA_CMD_LINE = \
+	mocha \
+		--exit \
+		--file test/unit/bootstrap.js \
+		--grep=${MOCHA_GREP} \
+		--reporter spec \
+		--timeout 25000 \
+
+.PHONY: $(TEST_SUITES)
+$(TEST_SUITES):
+	$(MOCHA_CMD_LINE) $@
+
+test_unit_app_parallel: $(TEST_SUITES)
+
 ACCEPTANCE_TEST_DOCKER_COMPOSE ?= \
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
 
@@ -444,5 +462,11 @@ $(MODULE_TARGETS): $(MODULE_MAKEFILES)
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 .PHONY: $(MODULE_TARGETS)
+
+NODE_MODULES_PATH := ${PATH}:${PWD}/node_modules/.bin:/app/node_modules/.bin
+WITH_NODE_MODULES_PATH = \
+	$(TEST_SUITES) \
+
+$(WITH_NODE_MODULES_PATH): export PATH=$(NODE_MODULES_PATH)
 
 .PHONY: clean test test_unit test_acceptance test_clean build
