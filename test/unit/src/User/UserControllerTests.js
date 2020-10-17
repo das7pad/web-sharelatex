@@ -57,8 +57,6 @@ describe('UserController', function() {
         setUserPassword: sinon.stub()
       }
     }
-    this.ReferalAllocator = { allocate: sinon.stub() }
-    this.SubscriptionDomainHandler = { autoAllocate: sinon.stub() }
     this.UserUpdater = {
       changeEmailAddress: sinon.stub(),
       promises: {
@@ -104,9 +102,6 @@ describe('UserController', function() {
           EXTERNAL_AUTHENTICATION_SYSTEM_USED: false,
           hasFeature: sinon.stub()
         }),
-        '../Referal/ReferalAllocator': this.ReferalAllocator,
-        '../Subscription/SubscriptionDomainHandler': this
-          .SubscriptionDomainHandler,
         './UserAuditLogHandler': (this.UserAuditLogHandler = {
           promises: {
             addEntry: sinon.stub().resolves()

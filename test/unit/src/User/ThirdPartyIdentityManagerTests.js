@@ -26,7 +26,7 @@ describe('ThirdPartyIdentityManager', function() {
         '../../../../app/src/Features/Email/EmailHandler': (this.EmailHandler = {
           sendEmail: sinon.stub().yields()
         }),
-        Errors: (this.Errors = {
+        '../Errors/Errors': (this.Errors = {
           ThirdPartyIdentityExistsError: sinon.stub(),
           ThirdPartyUserNotFoundError: sinon.stub()
         }),

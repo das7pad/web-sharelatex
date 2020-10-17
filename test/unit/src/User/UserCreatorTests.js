@@ -1,6 +1,7 @@
 const SandboxedModule = require('sandboxed-module')
 const chai = require('chai')
 const sinon = require('sinon')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 const assert = chai.assert
 const modulePath = '../../../../app/src/Features/User/UserCreator.js'
@@ -20,6 +21,7 @@ describe('UserCreator', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors, // from 3s to 52ms
         '../../models/User': {
           User: this.UserModel
         },

@@ -88,6 +88,7 @@ describe('UserDeleter', function() {
 
     this.UserDeleter = SandboxedModule.require(modulePath, {
       requires: {
+        moment: require('moment'), // from 294ms to 164ms
         '../../models/User': { User: User },
         '../../models/DeletedUser': { DeletedUser: DeletedUser },
         '../Newsletter/NewsletterManager': this.NewsletterManager,

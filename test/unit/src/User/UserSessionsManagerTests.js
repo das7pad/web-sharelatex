@@ -67,6 +67,7 @@ describe('UserSessionsManager', function() {
         console: console
       },
       requires: {
+        underscore: require('underscore'), // from 283ms to 180ms
         'logger-sharelatex': this.logger,
         'settings-sharelatex': this.settings,
         './UserSessionsRedis': this.UserSessionsRedis,
