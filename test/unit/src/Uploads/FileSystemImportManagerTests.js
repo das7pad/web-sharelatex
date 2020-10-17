@@ -3,6 +3,7 @@ const { expect } = require('chai')
 const mockFs = require('mock-fs')
 const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongodb')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 const MODULE_PATH =
   '../../../../app/src/Features/Uploads/FileSystemImportManager.js'
@@ -32,6 +33,7 @@ describe('FileSystemImportManager', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors, // from 3s to 131ms
         '../Editor/EditorController': this.EditorController,
         'logger-sharelatex': this.logger
       }

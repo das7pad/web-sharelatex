@@ -14,6 +14,7 @@ const SandboxedModule = require('sandboxed-module')
 const assert = require('assert')
 const chai = require('chai')
 const sinon = require('sinon')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 const should = require('chai').should()
 
@@ -69,6 +70,8 @@ describe('TemplatesManager', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors, // from 2s to 546ms
+        'request-promise-native': sinon.stub(), // from 546ms to 50ms
         '../Uploads/ProjectUploadManager': this.ProjectUploadManager,
         '../Project/ProjectOptionsHandler': this.ProjectOptionsHandler,
         '../Project/ProjectRootDocManager': this.ProjectRootDocManager,
@@ -77,7 +80,6 @@ describe('TemplatesManager', function() {
           getLoggedInUserId: sinon.stub()
         }),
         '../../infrastructure/FileWriter': this.FileWriter,
-        './TemplatesPublisher': this.TemplatesPublisher,
         'logger-sharelatex': {
           log() {},
           err() {}

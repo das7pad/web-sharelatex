@@ -32,6 +32,7 @@ describe('SpellingHandler', function() {
 
     SpellingHandler = SandboxedModule.require(modulePath, {
       requires: {
+        jsonwebtoken: {},
         request: request,
         requestretry: { defaults: () => requestRetry },
         'logger-sharelatex': {

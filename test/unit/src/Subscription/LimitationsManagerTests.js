@@ -15,11 +15,11 @@
 const SandboxedModule = require('sandboxed-module')
 const sinon = require('sinon')
 require('chai').should()
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const modulePath = require('path').join(
   __dirname,
   '../../../../app/src/Features/Subscription/LimitationsManager'
 )
-const Settings = require('settings-sharelatex')
 
 describe('LimitationsManager', function() {
   beforeEach(function() {
@@ -54,6 +54,7 @@ describe('LimitationsManager', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors, // from 4s to 70ms
         '../Project/ProjectGetter': this.ProjectGetter,
         '../User/UserGetter': this.UserGetter,
         './SubscriptionLocator': this.SubscriptionLocator,

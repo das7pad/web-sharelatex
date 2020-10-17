@@ -22,6 +22,7 @@ const modulePath = path.join(
 )
 const sinon = require('sinon')
 const { expect } = require('chai')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('V1SubscriptionManager', function() {
   beforeEach(function() {
@@ -30,6 +31,7 @@ describe('V1SubscriptionManager', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors, // from 4s to 48ms
         '../User/UserGetter': (this.UserGetter = {}),
         'logger-sharelatex': {
           log: sinon.stub(),

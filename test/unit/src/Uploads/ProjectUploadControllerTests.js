@@ -48,6 +48,8 @@ describe('ProjectUploadController', function() {
         console: console
       },
       requires: {
+        multer: sinon.stub(), // from 428ms to 43ms
+        'settings-sharelatex': { path: {} },
         './ProjectUploadManager': (this.ProjectUploadManager = {}),
         './FileSystemImportManager': (this.FileSystemImportManager = {}),
         'logger-sharelatex': (this.logger = {

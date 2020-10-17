@@ -19,6 +19,7 @@ const modulePath = require('path').join(
   __dirname,
   '../../../../app/src/Features/ThirdPartyDataStore/TpdsUpdateHandler'
 )
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('TpdsUpdateHandler', function() {
   beforeEach(function() {
@@ -57,6 +58,7 @@ describe('TpdsUpdateHandler', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors, // from 1s to 26ms
         './UpdateMerger': this.updateMerger,
         './Editor/EditorController': this.editorController,
         '../Project/ProjectLocator': this.projectLocator,

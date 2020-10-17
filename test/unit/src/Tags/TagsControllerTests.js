@@ -19,6 +19,7 @@ const modulePath = require('path').join(
   __dirname,
   '../../../../app/src/Features/Tags/TagsController'
 )
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('TagsController', function() {
   const userId = '123nd3ijdks'
@@ -43,6 +44,7 @@ describe('TagsController', function() {
         console: console
       },
       requires: {
+        '../Errors/Errors': Errors, // from 2s to 29ms
         './TagsHandler': this.handler,
         'logger-sharelatex': {
           log() {},
