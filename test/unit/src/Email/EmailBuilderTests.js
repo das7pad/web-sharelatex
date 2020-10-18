@@ -2,8 +2,6 @@ const SandboxedModule = require('sandboxed-module')
 const cheerio = require('cheerio')
 const path = require('path')
 const { expect } = require('chai')
-const _ = require('underscore')
-_.templateSettings = { interpolate: /\{\{(.+?)\}\}/g }
 
 const MODULE_PATH = path.join(
   __dirname,
