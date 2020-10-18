@@ -36,7 +36,6 @@ describe('ProjectHelper', function() {
 
     this.ProjectHelper = SandboxedModule.require(MODULE_PATH, {
       requires: {
-        lodash: require('lodash'), // from 304ms to 33ms
         mongodb: { ObjectId },
         'settings-sharelatex': this.Settings
       }

@@ -34,7 +34,6 @@ describe('RestoreManager', function() {
         'settings-sharelatex': {},
         '../../infrastructure/FileWriter': (this.FileWriter = {}),
         '../Uploads/FileSystemImportManager': (this.FileSystemImportManager = {}),
-        '../Errors/Errors': Errors,
         '../Project/ProjectEntityHandler': (this.ProjectEntityHandler = {}),
         '../Editor/EditorController': (this.EditorController = {}),
         'logger-sharelatex': (this.logger = {

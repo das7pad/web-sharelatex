@@ -54,7 +54,6 @@ describe('LimitationsManager', function() {
         console: console
       },
       requires: {
-        '../Errors/Errors': Errors, // from 4s to 70ms
         '../Project/ProjectGetter': this.ProjectGetter,
         '../User/UserGetter': this.UserGetter,
         './SubscriptionLocator': this.SubscriptionLocator,

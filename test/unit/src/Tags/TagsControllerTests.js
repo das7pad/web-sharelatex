@@ -44,7 +44,6 @@ describe('TagsController', function() {
         console: console
       },
       requires: {
-        '../Errors/Errors': Errors, // from 2s to 29ms
         './TagsHandler': this.handler,
         'logger-sharelatex': {
           log() {},

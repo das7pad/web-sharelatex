@@ -31,7 +31,6 @@ describe('V1SubscriptionManager', function() {
         console: console
       },
       requires: {
-        '../Errors/Errors': Errors, // from 4s to 48ms
         '../User/UserGetter': (this.UserGetter = {}),
         'logger-sharelatex': {
           log: sinon.stub(),

@@ -83,7 +83,6 @@ describe('ProjectDetailsHandler', function() {
           err() {}
         },
         './ProjectTokenGenerator': this.ProjectTokenGenerator,
-        '../Errors/Errors': Errors,
         'settings-sharelatex': this.settings
       }
     })

@@ -88,7 +88,6 @@ describe('UserDeleter', function() {
 
     this.UserDeleter = SandboxedModule.require(modulePath, {
       requires: {
-        moment: require('moment'), // from 294ms to 164ms
         '../../models/User': { User: User },
         '../../models/DeletedUser': { DeletedUser: DeletedUser },
         '../Newsletter/NewsletterManager': this.NewsletterManager,
@@ -103,8 +102,7 @@ describe('UserDeleter', function() {
           log: sinon.stub(),
           warn: sinon.stub(),
           err: sinon.stub()
-        }),
-        '../Errors/Errors': Errors
+        })
       },
       globals: {
         console: console

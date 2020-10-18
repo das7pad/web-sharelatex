@@ -9,7 +9,6 @@ const modulePath = path.join(
 const tk = require('timekeeper')
 const { expect } = require('chai')
 const { normalizeQuery } = require('../../../../app/src/Features/Helpers/Mongo')
-const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('UserUpdater', function() {
   beforeEach(function() {
@@ -51,7 +50,6 @@ describe('UserUpdater', function() {
         console: console
       },
       requires: {
-        '../Errors/Errors': Errors, // from 3s to 162ms
         '../Helpers/Mongo': { normalizeQuery },
         'logger-sharelatex': this.logger,
         '../../infrastructure/mongodb': this.mongodb,

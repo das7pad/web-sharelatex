@@ -58,7 +58,6 @@ describe('TpdsUpdateHandler', function() {
         console: console
       },
       requires: {
-        '../Errors/Errors': Errors, // from 1s to 26ms
         './UpdateMerger': this.updateMerger,
         './Editor/EditorController': this.editorController,
         '../Project/ProjectLocator': this.projectLocator,

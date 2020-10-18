@@ -77,7 +77,6 @@ describe('CollaboratorsHandler', function() {
         '../ThirdPartyDataStore/TpdsProjectFlusher': this.TpdsProjectFlusher,
         '../Project/ProjectGetter': this.ProjectGetter,
         '../Project/ProjectHelper': this.ProjectHelper,
-        '../Errors/Errors': Errors,
         './CollaboratorsGetter': this.CollaboratorsGetter
       }
     })

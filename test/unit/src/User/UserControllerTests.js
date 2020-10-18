@@ -120,7 +120,6 @@ describe('UserController', function() {
         '@overleaf/metrics': {
           inc() {}
         },
-        '../Errors/Errors': Errors,
         '@overleaf/o-error': OError,
         '../Email/EmailHandler': (this.EmailHandler = {
           sendEmail: sinon.stub(),

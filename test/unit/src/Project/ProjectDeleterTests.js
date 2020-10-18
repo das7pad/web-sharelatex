@@ -131,8 +131,6 @@ describe('ProjectDeleter', function() {
 
     this.ProjectDeleter = SandboxedModule.require(modulePath, {
       requires: {
-        moment: require('moment'), // from 611ms to 157ms
-        lodash: require('lodash'),
         '../Editor/EditorRealTimeController': this.EditorRealTimeController,
         '../../models/Project': { Project: Project },
         './ProjectHelper': this.ProjectHelper,
@@ -147,8 +145,7 @@ describe('ProjectDeleter', function() {
         './ProjectDetailsHandler': this.ProjectDetailsHandler,
         '../../infrastructure/mongodb': { db: this.db, ObjectId },
         '../History/HistoryManager': this.HistoryManager,
-        'logger-sharelatex': this.logger,
-        '../Errors/Errors': Errors
+        'logger-sharelatex': this.logger
       },
       globals: {
         console: console

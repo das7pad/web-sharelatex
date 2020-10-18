@@ -154,14 +154,11 @@ describe('ProjectEntityUpdateHandler', function() {
         console: console
       },
       requires: {
-        async: require('async'), // from 2s to 674ms
-        lodash: require('lodash'),
         'settings-sharelatex': { validRootDocExtensions: ['tex'] }, // from 17s to 2s
         'logger-sharelatex': this.logger,
         fs: this.fs,
         '../../models/Doc': { Doc: this.DocModel },
         '../Docstore/DocstoreManager': this.DocstoreManager,
-        '../Errors/Errors': Errors,
         '../../Features/DocumentUpdater/DocumentUpdaterHandler': this
           .DocumentUpdaterHandler,
         '../../models/File': { File: this.FileModel },

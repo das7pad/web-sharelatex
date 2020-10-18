@@ -5,7 +5,6 @@ const modulePath =
 const SandboxedModule = require('sandboxed-module')
 const Path = require('path')
 const { ObjectId } = require('mongodb')
-const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('ProjectCreationHandler', function() {
   const ownerId = '4eecb1c1bffa66588e0000a1'
@@ -66,7 +65,6 @@ describe('ProjectCreationHandler', function() {
         console: console
       },
       requires: {
-        '../Errors/Errors': Errors, // from 5s to 200ms
         mongodb: { ObjectId },
         '../../models/User': {
           User: this.User

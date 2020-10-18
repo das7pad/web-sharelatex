@@ -26,7 +26,6 @@ describe('AnalyticsManager', function() {
         '../../infrastructure/FaultTolerantRequest': {
           backgroundRequest: this.backgroundRequest
         },
-        '../Errors/Errors': Errors,
         request: this.request,
         'logger-sharelatex': {
           log() {},

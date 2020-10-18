@@ -75,11 +75,9 @@ describe('UserMembershipController', function() {
           console: console
         },
         requires: {
-          json2csv: require('json2csv'), // from 107ms to 52ms
           '../Authentication/AuthenticationController': this
             .AuthenticationController,
           './UserMembershipHandler': this.UserMembershipHandler,
-          '../Errors/Errors': Errors,
           'logger-sharelatex': {
             log() {},
             err() {}

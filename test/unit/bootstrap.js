@@ -21,5 +21,31 @@ afterEach(function() {
   sinon.restore()
 })
 
+const SandboxedModule = require('sandboxed-module')
+const GLOBAL_REQUIRE_CACHE_FOR_SANDBOXED_MODULES = {
+  // Translations dependency
+  '../../../build/translations/generator': require('../../build/translations/generator'),
+  // cache p-limit for all expressify/promisifyAll users
+  '../../util/promises': require('../../app/src/util/promises'),
+  // Errors are widely used and instance checks need the exact same prototypes
+  '../Errors/Errors': require('../../app/src/Features/Errors/Errors')
+}
+const LIBRARIES = [
+  '@overleaf/o-error',
+  'async',
+  'lodash',
+  'moment',
+  'underscore',
+  'xml2js',
+  'json2csv'
+]
+LIBRARIES.forEach(lib => {
+  GLOBAL_REQUIRE_CACHE_FOR_SANDBOXED_MODULES[lib] = require(lib)
+})
+
+SandboxedModule.configure({
+  requires: GLOBAL_REQUIRE_CACHE_FOR_SANDBOXED_MODULES
+})
+
 // used by -> app/src/infrastructure/Mongoose.js
 process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING = 'true'

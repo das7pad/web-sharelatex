@@ -73,7 +73,6 @@ describe('UserEmailsController', function() {
         }),
         '../Institutions/InstitutionsAPI': this.InstitutionsAPI,
         '../Errors/HttpErrorHandler': this.HttpErrorHandler,
-        '../Errors/Errors': Errors,
         'logger-sharelatex': {
           log() {},
           err() {}

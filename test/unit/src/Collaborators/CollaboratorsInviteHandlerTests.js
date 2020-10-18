@@ -59,7 +59,6 @@ describe('CollaboratorsInviteHandler', function() {
         console: console
       },
       requires: {
-        '../Errors/Errors': Errors,
         'settings-sharelatex': (this.settings = {}),
         '../../models/ProjectInvite': { ProjectInvite: this.ProjectInvite },
         'logger-sharelatex': (this.logger = {
