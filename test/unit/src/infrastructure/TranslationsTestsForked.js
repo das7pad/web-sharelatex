@@ -158,6 +158,12 @@ describe('TranslationsForked', function() {
     })
 
     describe('perf', function() {
+      before(function() {
+        if (process.env.TEST_PERF !== 'true') {
+          this.skip()
+        }
+      })
+
       function bench(numOfMiddlewareInvocations, keys) {
         Object.values(subdomainLang).forEach(langSpec => {
           it(`should translate for lang=${langSpec.lngCode}`, function(done) {
