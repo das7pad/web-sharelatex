@@ -1,6 +1,6 @@
 const { getInflatedLocales } = require('./inflate')
 
-function moduleGenerator(locales, FIELDS, LOCALES) {
+function moduleGenerator(locales, inMemory, FIELDS, LOCALES) {
   // Browser and NodeJS compatible module
   // use ES5 syntax
   FIELDS = new RegExp('__(.+?)__', 'g')
@@ -30,13 +30,11 @@ function moduleGenerator(locales, FIELDS, LOCALES) {
 
   if (typeof window !== 'undefined') {
     window.t = window.translate = translate
+  } else if (inMemory) {
+    return translate
   } else {
-    // In theory this overwrites the generator exports via the run-time gen
-    // But this happens after the import of the module and node will ignore
-    //  any changes by then.
     module.exports = translate
   }
-  return translate
 }
 
 function generateModule(lng) {
@@ -56,7 +54,7 @@ function generateModule(lng) {
 }
 
 function generateModuleInMemory(lng) {
-  return moduleGenerator(getInflatedLocales(lng))
+  return moduleGenerator(getInflatedLocales(lng), true)
 }
 
 module.exports = {
