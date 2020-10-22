@@ -58,10 +58,7 @@ function PreviewRecompileButton({
       <button className="btn btn-recompile" onClick={onRecompile}>
         <Icon type="refresh" spin={isCompiling} />
         {isCompiling || isClearingCache ? (
-          <span className="btn-recompile-label">
-            {t('compiling')}
-            &hellip;
-          </span>
+          <span className="btn-recompile-label">{t('compiling')} &hellip;</span>
         ) : (
           <span className="btn-recompile-label">{t('recompile')}</span>
         )}
