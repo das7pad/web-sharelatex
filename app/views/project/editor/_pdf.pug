@@ -3,17 +3,21 @@ div.full-size.pdf(ng-controller="PdfController")
 		preview-pane(
 			compiler-state=`{
 				isAutoCompileOn: autocompile_enabled,
+				isClearingCache: pdf.clearingCache,
 				isCompiling: pdf.compiling,
 				isDraftModeOn: draft,
 				isSyntaxCheckOn: stop_on_validation_error,
 				logEntries: pdf.logEntries ? pdf.logEntries : {}
 			}`
+			on-clear-cache="clearCache"
 			on-recompile="recompile"
 			on-run-syntax-check-now="runSyntaxCheckNow"
 			on-set-auto-compile="setAutoCompile"
 			on-set-draft-mode="setDraftMode"
 			on-set-syntax-check="setSyntaxCheck"
 			on-toggle-logs="toggleLogs"
+			output-files="pdf.outputFiles"
+			pdf-download-url="pdf.downloadUrl"
 			show-logs="shouldShowLogs"
 		)
 	else
@@ -385,6 +389,8 @@ script(type='text/ng-template', id='clearCacheModalTemplate')
 			span {{translate("clear_cache_explanation")}}
 		p
 			span {{translate("clear_cache_is_safe")}}
+		.alert.alert-danger(ng-if="state.error")
+			span {{translate("generic_something_went_wrong")}}.
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()"

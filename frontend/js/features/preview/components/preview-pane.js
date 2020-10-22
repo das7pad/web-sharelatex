@@ -6,12 +6,15 @@ import t from '../../../misc/t'
 
 function PreviewPane({
   compilerState,
+  onClearCache,
   onRecompile,
   onRunSyntaxCheckNow,
   onSetAutoCompile,
   onSetDraftMode,
   onSetSyntaxCheck,
   onToggleLogs,
+  outputFiles,
+  pdfDownloadUrl,
   showLogs
 }) {
   const nErrors =
@@ -33,12 +36,15 @@ function PreviewPane({
         compilerState={compilerState}
         logsState={{ nErrors, nWarnings, nLogEntries }}
         showLogs={showLogs}
+        onClearCache={onClearCache}
         onRecompile={onRecompile}
         onRunSyntaxCheckNow={onRunSyntaxCheckNow}
         onSetAutoCompile={onSetAutoCompile}
         onSetDraftMode={onSetDraftMode}
         onSetSyntaxCheck={onSetSyntaxCheck}
         onToggleLogs={onToggleLogs}
+        outputFiles={outputFiles}
+        pdfDownloadUrl={pdfDownloadUrl}
       />
       <span aria-live="polite" className="sr-only">
         {nErrors && !compilerState.isCompiling
@@ -65,12 +71,15 @@ PreviewPane.propTypes = {
     isSyntaxCheckOn: PropTypes.bool.isRequired,
     logEntries: PropTypes.object.isRequired
   }),
+  onClearCache: PropTypes.func.isRequired,
   onRecompile: PropTypes.func.isRequired,
   onRunSyntaxCheckNow: PropTypes.func.isRequired,
   onSetAutoCompile: PropTypes.func.isRequired,
   onSetDraftMode: PropTypes.func.isRequired,
   onSetSyntaxCheck: PropTypes.func.isRequired,
   onToggleLogs: PropTypes.func.isRequired,
+  outputFiles: PropTypes.array,
+  pdfDownloadUrl: PropTypes.string,
   showLogs: PropTypes.bool.isRequired
 }
 

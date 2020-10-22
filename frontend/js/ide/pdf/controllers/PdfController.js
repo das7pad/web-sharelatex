@@ -20,12 +20,14 @@ App.controller('PdfController', function(
   $modal,
   synctex,
   eventTracking,
-  localStorage
+  localStorage,
+  $q
 ) {
   let autoCompile = true
 
   // pdf.view = uncompiled | pdf | errors
   $scope.pdf.view = $scope.pdf.url ? 'pdf' : 'uncompiled'
+  $scope.pdf.clearingCache = false
   $scope.shouldShowLogs = false
   $scope.wikiEnabled = window.wikiEnabled
 
@@ -506,7 +508,9 @@ App.controller('PdfController', function(
           url:
             `/project/${$scope.project_id}/output/${file.path}` +
             createQueryString(qs),
-          main: !!isOutputFile
+          main: !!isOutputFile,
+          fileName: file.path,
+          type: file.type
         })
       }
     }
@@ -796,7 +800,10 @@ App.controller('PdfController', function(
   }
 
   $scope.clearCache = function() {
-    return $http({
+    $scope.pdf.clearingCache = true
+    const deferred = $q.defer()
+
+    $http({
       url: `/project/${$scope.project_id}/output`,
       method: 'DELETE',
       params: {
@@ -806,6 +813,20 @@ App.controller('PdfController', function(
         'X-Csrf-Token': window.csrfToken
       }
     })
+      .then(function(response) {
+        $scope.pdf.clearingCache = false
+        return deferred.resolve()
+      })
+      .catch(function(response) {
+        console.error(response)
+        const error = response.data
+        $scope.pdf.clearingCache = false
+        $scope.pdf.renderingError = false
+        $scope.pdf.error = true
+        $scope.pdf.view = 'errors'
+        return deferred.reject(error)
+      })
+    return deferred.promise
   }
 
   $scope.toggleLogs = function() {
@@ -1056,14 +1077,20 @@ App.controller('PdfLogEntryController', function($scope, ide, eventTracking) {
 })
 
 App.controller('ClearCacheModalController', function($scope, $modalInstance) {
-  $scope.state = { inflight: false }
+  $scope.state = { error: false, inflight: false }
 
   $scope.clear = function() {
     $scope.state.inflight = true
-    $scope.clearCache().then(function() {
-      $scope.state.inflight = false
-      $modalInstance.close()
-    })
+    $scope
+      .clearCache()
+      .then(function() {
+        $scope.state.inflight = false
+        $modalInstance.close()
+      })
+      .catch(function() {
+        $scope.state.error = true
+        $scope.state.inflight = false
+      })
   }
 
   $scope.cancel = () => $modalInstance.dismiss('cancel')
