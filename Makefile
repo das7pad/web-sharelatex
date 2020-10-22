@@ -26,7 +26,7 @@ DOCKER_COMPOSE := docker-compose $(DOCKER_COMPOSE_FLAGS)
 export DOCKER_REGISTRY ?= local
 export SHARELATEX_DOCKER_REPOS ?= $(DOCKER_REGISTRY)/sharelatex
 
-export IMAGE_NODE ?= $(DOCKER_REGISTRY)/node:12.18.4
+export IMAGE_NODE ?= $(DOCKER_REGISTRY)/node:12.19.0
 export IMAGE_PROJECT ?= $(SHARELATEX_DOCKER_REPOS)/$(PROJECT_NAME)
 export IMAGE_BRANCH ?= $(IMAGE_PROJECT):$(BRANCH_NAME)
 export IMAGE ?= $(IMAGE_BRANCH)-$(BUILD_NUMBER)
@@ -155,24 +155,6 @@ clean_ci: clean_test_unit
 clean_test_unit: clean_test_unit_app
 clean_test_unit_app:
 	$(UNIT_TEST_DOCKER_COMPOSE) down --timeout 0
-
-TEST_SUITES = $(sort $(filter-out \
-	$(wildcard test/unit/src/helpers/*), \
-	$(wildcard test/unit/src/*/*)))
-
-MOCHA_CMD_LINE = \
-	mocha \
-		--exit \
-		--file test/unit/bootstrap.js \
-		--grep=${MOCHA_GREP} \
-		--reporter spec \
-		--timeout 25000 \
-
-.PHONY: $(TEST_SUITES)
-$(TEST_SUITES):
-	$(MOCHA_CMD_LINE) $@
-
-test_unit_app_parallel: $(TEST_SUITES)
 
 ACCEPTANCE_TEST_DOCKER_COMPOSE ?= \
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
@@ -351,7 +333,7 @@ endif
 
 pull_node:
 	docker pull $(IMAGE_NODE)
-	docker tag $(IMAGE_NODE) node:12.18.4
+	docker tag $(IMAGE_NODE) node:12.19.0
 
 pull_cache_cold:
 	docker pull $(IMAGE_CACHE_COLD)$(R_TARGET)
@@ -462,11 +444,5 @@ $(MODULE_TARGETS): $(MODULE_MAKEFILES)
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 .PHONY: $(MODULE_TARGETS)
-
-NODE_MODULES_PATH := ${PATH}:${PWD}/node_modules/.bin:/app/node_modules/.bin
-WITH_NODE_MODULES_PATH = \
-	$(TEST_SUITES) \
-
-$(WITH_NODE_MODULES_PATH): export PATH=$(NODE_MODULES_PATH)
 
 .PHONY: clean test test_unit test_acceptance test_clean build
