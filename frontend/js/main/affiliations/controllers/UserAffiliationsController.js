@@ -195,6 +195,7 @@ export default App.controller('UserAffiliationsController', function(
         email.default = false
       }
       userEmail.default = true
+      window.usersEmail = userEmail.email
     })
 
   $scope.removeUserEmail = function(userEmail) {
