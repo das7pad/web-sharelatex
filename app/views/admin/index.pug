@@ -36,22 +36,22 @@ block content
 
 							tab(heading="Close Editor")
 								.row-spaced
-									form(method='post',action='/admin/closeEditor')
-										input(name="_csrf", type="hidden", value=csrfToken)
+									form(async-form name='closeEditor' action='/admin/closeEditor')
+										form-messages(for='closeEditor' role='alert')
 										button.btn.btn-danger(type="submit") Close Editor
 									p.small Will stop anyone opening the editor. Will NOT disconnect already connected users.
 
 								.row-spaced
-									form(method='post',action='/admin/dissconectAllUsers')
-										input(name="_csrf", type="hidden", value=csrfToken)
+									form(async-form name='dissconectAllUsers' action='/admin/dissconectAllUsers')
+										form-messages(for='dissconectAllUsers' role='alert')
 										button.btn.btn-danger(type="submit") Disconnect all users
 									p.small Will force disconnect all users with the editor open. Make sure to close the editor first to avoid them reconnecting.
 
 							tab(heading="TPDS/Dropbox Management")
 								h3 Flush project to TPDS
 								.row
-									form.col-xs-6(method='post',action='/admin/flushProjectToTpds')
-										input(name="_csrf", type="hidden", value=csrfToken)
+									form.col-xs-6(async-form name='flushProjectToTpds' action='/admin/flushProjectToTpds')
+										form-messages(for='flushProjectToTpds' role='alert')
 										.form-group
 											label(for='project_id') project_id
 											input.form-control(type='text',  name='project_id', placeholder='project_id', required)
@@ -60,8 +60,8 @@ block content
 								hr
 								h3 Poll Dropbox for user
 								.row
-									form.col-xs-6(method='post',action='/admin/pollDropboxForUser')
-										input(name="_csrf", type="hidden", value=csrfToken)
+									form.col-xs-6(async-form name='pollDropboxForUser' action='/admin/pollDropboxForUser')
+									form-messages(for='pollDropboxForUser' role='alert')
 										.form-group
 											label(for='user_id') user_id
 											input.form-control(type='text',  name='user_id', placeholder='user_id', required)
