@@ -1,18 +1,21 @@
 extends ../../_layout
 
 block content
-  .editor.full-size
-    .loading-screen()
-      .loading-screen-brand-container
-        div#loadingScreen.loading-screen-brand()
+  form(async-form name='createTemplate' action='/project/new/template/' auto-submit="true")
+    .editor.full-size
+      .loading-screen()
+        .loading-screen-brand-container
+          div#loadingScreen.loading-screen-brand()
 
-      h3.loading-screen-label() {{translate("Opening template")}}
-        span.loading-screen-ellip .
-        span.loading-screen-ellip .
-        span.loading-screen-ellip .
+        form-messages(for='createTemplate' role='alert')
+        h3.loading-screen-label(
+          ng-cloak
+          ng-show="createTemplate.inflight"
+        ) {{translate("Opening template")}}
+          span.loading-screen-ellip .
+          span.loading-screen-ellip .
+          span.loading-screen-ellip .
 
-  form(id='create_form' method='POST' action='/project/new/template/' auto-submit-form)
-    input(type="hidden", name="_csrf", value=csrfToken)
     input(type="hidden" name="templateId" value=templateId)
     input(type="hidden" name="templateVersionId" value=templateVersionId)
     input(type="hidden" name="templateName" value=name)
