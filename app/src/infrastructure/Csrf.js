@@ -13,7 +13,18 @@
  */
 
 const csurf = require('csurf')
-const csrf = csurf()
+const Settings = require('@overleaf/settings')
+const csrf = csurf({
+  cookie: {
+    httpOnly: true,
+    path: '/',
+    sameSite: Settings.sameSiteCookie,
+    secure: Settings.secureCookie,
+    domain: Settings.cookieDomain,
+    maxAge: Settings.cookieSessionLength,
+    signed: true
+  }
+})
 const { promisify } = require('util')
 
 // Wrapper for `csurf` middleware that provides a list of routes that can be excluded from csrf checks.

@@ -37,7 +37,32 @@ const UserSessionsManager = require('../Features/User/UserSessionsManager')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
 
 // Init the session store
-const sessionStore = new RedisStore({ client: sessionsRedisClient })
+const sessionStore = new RedisStore({
+  client: sessionsRedisClient,
+  serializer: {
+    parse(blob) {
+      const session = JSON.parse(blob)
+      session.cookie = {
+        expires: new Date(
+          Date.now() + Settings.cookieSessionLength / 1000
+        ).toISOString(),
+        httpOnly: true,
+        originalMaxAge: Settings.cookieSessionLength,
+        path: '/',
+        sameSite: Settings.sameSiteCookie,
+        secure: Settings.secureCookie
+      }
+      console.error('parse', { blob, session })
+      return session
+    },
+    stringify(session) {
+      delete session.cookie
+      const blob = JSON.stringify(session)
+      console.error('serialize', { blob, session })
+      return blob
+    }
+  }
+})
 
 const app = express()
 
