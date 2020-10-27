@@ -831,6 +831,7 @@
   "log_in": "Log In",
   "login": "Login",
   "logging_in": "Logging in",
+  "logging_out": "Logging out",
   "forgot_your_password": "Forgot your password",
   "password_reset": "Password Reset",
   "password_reset_email_sent": "You have been sent an email to complete your password reset.",
