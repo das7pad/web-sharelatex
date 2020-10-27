@@ -7,12 +7,12 @@ block content
 				.col-md-10.col-md-offset-1
 					h3(ng-non-bindable) #{entityName} "#{entityId}" does not exists in v2
 					form(
-						enctype='application/json',
-						method='post',
-						action=''
+						async-form
+						name='createNewEntity'
 					)
-						input(name="_csrf", type="hidden", value=csrfToken)
+						form-messages(for='createNewEntity' role='alert')
 						button.btn.btn-primary.text-capitalize(
 							type="submit",
+							ng-disable='createNewEntity.inflight'
 							ng-non-bindable
 						) Create #{entityName} in v2

@@ -10,6 +10,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
+const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const AuthenticationController = require('../Authentication/AuthenticationController')
 const UserMembershipHandler = require('./UserMembershipHandler')
 const Errors = require('../Errors/Errors')
@@ -167,7 +168,7 @@ module.exports = {
       if (error != null) {
         return next(error)
       }
-      return res.redirect(entityConfig.pathsFor(entityId).index)
+      AsyncFormHelper.redirect(req, res, entityConfig.pathsFor(entityId).index)
     })
   }
 }
