@@ -12,7 +12,7 @@ App.directive('asyncForm', ($http, validateCaptcha, validateCaptchaV3) => ({
   ],
   link(scope, element, attrs) {
     let response
-    const formName = attrs.asyncForm
+    const formName = attrs.asyncForm || attrs.name
 
     scope[attrs.name].response = response = {}
     scope[attrs.name].inflight = false
