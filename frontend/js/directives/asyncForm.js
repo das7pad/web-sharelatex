@@ -1,5 +1,7 @@
 import App from '../base'
 import 'libs/passfield'
+import showFakeProgress from '../utils/loadingScreen'
+
 App.directive('asyncForm', ($http, validateCaptcha, validateCaptchaV3) => ({
   controller: [
     '$scope',
@@ -41,6 +43,9 @@ App.directive('asyncForm', ($http, validateCaptcha, validateCaptchaV3) => ({
       // clear the response object which may be referenced downstream
       Object.keys(response).forEach(field => delete response[field])
       scope[attrs.name].inflight = true
+
+      // try animating a progress page
+      showFakeProgress()
 
       // for asyncForm prevent automatic redirect to /login if
       // authentication fails, we will handle it ourselves
