@@ -1,3 +1,4 @@
+const AsyncFromHelper = require('../Helpers/AsyncFormHelper')
 const UserHandler = require('./UserHandler')
 const UserDeleter = require('./UserDeleter')
 const UserGetter = require('./UserGetter')
@@ -435,7 +436,7 @@ const UserController = {
       if (err != null) {
         return next(err)
       }
-      res.redirect(redirectUrl)
+      AsyncFromHelper.redirect(req, res, redirectUrl)
     })
   },
 

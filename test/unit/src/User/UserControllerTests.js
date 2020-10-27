@@ -5,6 +5,7 @@ const modulePath = '../../../../app/src/Features/User/UserController.js'
 const SandboxedModule = require('sandboxed-module')
 const OError = require('@overleaf/o-error')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
+const MockRequest = require('../helpers/MockRequest')
 
 describe('UserController', function() {
   beforeEach(function() {
@@ -17,7 +18,7 @@ describe('UserController', function() {
       ace: {}
     }
 
-    this.req = {
+    this.req = Object.assign(new MockRequest(), {
       user: {},
       session: {
         destroy() {},
@@ -33,7 +34,7 @@ describe('UserController', function() {
       },
       ip: '0:0:0:0',
       query: {}
-    }
+    })
 
     this.UserDeleter = { deleteUser: sinon.stub().yields() }
     this.UserGetter = {
