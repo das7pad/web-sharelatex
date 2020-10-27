@@ -13,6 +13,7 @@
 
 const metrics = require('@overleaf/metrics')
 const logger = require('logger-sharelatex')
+const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const DocumentUpdaterHandler = require('../DocumentUpdater/DocumentUpdaterHandler')
 const Settings = require('settings-sharelatex')
 const TpdsUpdateSender = require('../ThirdPartyDataStore/TpdsUpdateSender')
@@ -108,7 +109,7 @@ const AdminController = {
       if (error != null) {
         return next(error)
       }
-      return res.sendStatus(200)
+      AsyncFormHelper.redirect(req, res, '/admin')
     })
   },
 
@@ -117,7 +118,7 @@ const AdminController = {
       if (error != null) {
         return next(error)
       }
-      return res.sendStatus(200)
+      AsyncFormHelper.redirect(req, res, '/admin')
     })
   }
 }

@@ -13,15 +13,15 @@ block content
 								each message in systemMessages
 									.alert.alert-info.row-spaced(ng-non-bindable) #{message.content}
 								hr
-								form(method='post', action='/admin/messages')
-									input(name="_csrf", type="hidden", value=csrfToken)
+								form(async-form name='sendMessages' action='/admin/messages')
+									form-messages(for='sendMessages' role='alert')
 									.form-group
 										label(for="content")
 										input.form-control(name="content", type="text", placeholder="Message…", required)
 									button.btn.btn-primary(type="submit") Post Message
 								hr
-								form(method='post', action='/admin/messages/clear')
-									input(name="_csrf", type="hidden", value=csrfToken)
+								form(async-form name='clearMessages' action='/admin/messages/clear')
+									form-messages(for='clearMessages' role='alert')
 									button.btn.btn-danger(type="submit") Clear all messages
 
 
