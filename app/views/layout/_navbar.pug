@@ -93,7 +93,14 @@ nav.navbar.navbar-default.navbar-main
 									a(href="/user/subscription") {{translate('subscription')}}
 							li.divider.hidden-xs.hidden-sm
 							li
-								form(method="POST" action="/logout")
-									input(name='_csrf', type='hidden', value=csrfToken)
-									button.btn-link.text-left.dropdown-menu-button
-										| {{translate('log_out')}}
+								form(async-form name='logout' action='/logout')
+									.alert.alert-warning(
+										ng-show="logout.response.error"
+										ng-bind-html="logout.response.message.text"
+									)
+									button.btn-link.text-left.dropdown-menu-button(
+										ng-disabled='logout.inflight'
+										stop-propagation='click'
+									)
+										span(ng-hide='logout.inflight') {{translate("log_out")}}
+										span(ng-show='logout.inflight') {{translate("logging_out")}}…
