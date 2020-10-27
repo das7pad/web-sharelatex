@@ -271,10 +271,12 @@ const expectInviteRedirectToProject = (user, link, invite, callback) => {
 
 const expectAcceptInviteAndRedirect = (user, invite, callback) => {
   // should accept the invite and redirect to project
-  tryAcceptInvite(user, invite, (err, response) => {
+  tryAcceptInvite(user, invite, (err, response, data) => {
     expect(err).not.to.exist
-    expect(response.statusCode).to.equal(302)
-    expect(response.headers.location).to.equal(`/project/${invite.projectId}`)
+    expect(response.statusCode).to.equal(200)
+    expect(data)
+      .to.have.property('redir')
+      .and.to.equal(`/project/${invite.projectId}`)
     callback()
   })
 }
@@ -513,15 +515,14 @@ describe('ProjectInviteTests', function() {
       })
 
       describe('user is already a member of the project', function() {
-        beforeEach(function(done) {
-          Async.series(
-            [
-              cb => expectInvitePage(this.user, this.link, cb),
-              cb => expectAcceptInviteAndRedirect(this.user, this.invite, cb),
-              cb => expectProjectAccess(this.user, this.invite.projectId, cb)
-            ],
-            done
-          )
+        beforeEach(function checkExpectInvitePage(done) {
+          expectInvitePage(this.user, this.link, done)
+        })
+        beforeEach(function checkExpectAcceptInviteAndRedirect(done) {
+          expectAcceptInviteAndRedirect(this.user, this.invite, done)
+        })
+        beforeEach(function checkExpectProjectAccess(done) {
+          expectProjectAccess(this.user, this.invite.projectId, done)
         })
 
         describe('when user clicks on the invite a second time', function() {

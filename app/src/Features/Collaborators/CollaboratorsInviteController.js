@@ -14,6 +14,7 @@
  */
 let CollaboratorsInviteController
 const OError = require('@overleaf/o-error')
+const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const ProjectGetter = require('../Project/ProjectGetter')
 const LimitationsManager = require('../Subscription/LimitationsManager')
 const UserGetter = require('../User/UserGetter')
@@ -383,7 +384,7 @@ module.exports = CollaboratorsInviteController = {
         if (req.xhr) {
           return res.sendStatus(204) //  Done async via project page notification
         } else {
-          return res.redirect(`/project/${projectId}`)
+          AsyncFormHelper.redirect(req, res, `/project/${projectId}`)
         }
       }
     )

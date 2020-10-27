@@ -17,13 +17,18 @@ block content
 						.row
 							.col-md-12
 								form.form(
+									async-form
 									name="acceptForm",
-									method="POST",
 									action="/project/"+invite.projectId+"/invite/token/"+invite.token+"/accept"
 								)
-									input(name='_csrf', type='hidden', value=csrfToken)
 									input(name='token', type='hidden', value=invite.token)
+									form-messages(for='acceptForm' role='alert')
 									.form-group.text-center
-										button.btn.btn-lg.btn-primary(type="submit" ng-cloak)
-											| {{translate("join_project")}}
+										button.btn.btn-lg.btn-primary(
+											type="submit"
+											ng-cloak
+											ng-disabled='acceptForm.inflight'
+										)
+											span(ng-hide='acceptForm.inflight') {{translate("join_project")}}
+											span(ng-show='acceptForm.inflight') {{translate("joining")}}…
 									.form-group.text-center
