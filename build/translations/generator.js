@@ -8,9 +8,25 @@ function moduleGenerator(locales, inMemory, FIELDS, LOCALES) {
   initMap(locales)
   locales = undefined // free asap
 
+  function getLocale(key, vars) {
+    const locale = LOCALES.get(key) || key
+    // regular translation
+    if (typeof vars.count === 'undefined') return locale
+
+    // plural translation
+    const localePlural = LOCALES.get(key + '_plural')
+    //  -> false-positives are unlikely
+    //  -> -> fail loud and refuse translating on missing plural locale
+    if (!localePlural) return key
+    //  -> singular case
+    if (vars.count === 1) return locale
+    //  -> zero / plural case
+    return localePlural
+  }
+
   function translate(key, vars) {
     vars = vars || {}
-    return (LOCALES.get(key) || key).replace(FIELDS, function(field, label) {
+    return getLocale(key, vars).replace(FIELDS, function(field, label) {
       // fallback to no replacement
       // ('__appName__', 'appName') => vars['appName'] || '__appName__'
       return typeof vars[label] !== 'undefined' ? vars[label] : field

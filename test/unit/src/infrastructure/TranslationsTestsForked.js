@@ -167,6 +167,47 @@ describe('TranslationsForked', function() {
       })
     })
 
+    describe('plural', function() {
+      it('should handle zero', function() {
+        expect(
+          this.Translations.i18n.translate('n_errors', { count: 0 })
+        ).to.equal('0 errors')
+      })
+      it('should handle singular', function() {
+        expect(
+          this.Translations.i18n.translate('n_errors', { count: 1 })
+        ).to.equal('1 error')
+      })
+      it('should handle plural', function() {
+        expect(
+          this.Translations.i18n.translate('n_errors', { count: 2 })
+        ).to.equal('2 errors')
+      })
+      describe('when the plural key is missing', function() {
+        it('should refuse translating zero case', function() {
+          expect(
+            this.Translations.i18n.translate('resend_confirmation_email', {
+              count: 0
+            })
+          ).to.equal('resend_confirmation_email')
+        })
+        it('should refuse translating singular case', function() {
+          expect(
+            this.Translations.i18n.translate('resend_confirmation_email', {
+              count: 1
+            })
+          ).to.equal('resend_confirmation_email')
+        })
+        it('should refuse translating plural case', function() {
+          expect(
+            this.Translations.i18n.translate('resend_confirmation_email', {
+              count: 2
+            })
+          ).to.equal('resend_confirmation_email')
+        })
+      })
+    })
+
     describe('perf', function() {
       before(function() {
         if (process.env.TEST_PERF !== 'true') {
