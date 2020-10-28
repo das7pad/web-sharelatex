@@ -13,7 +13,7 @@ function moduleGenerator(locales, inMemory, FIELDS, LOCALES) {
     return (LOCALES.get(key) || key).replace(FIELDS, function(field, label) {
       // fallback to no replacement
       // ('__appName__', 'appName') => vars['appName'] || '__appName__'
-      return vars[label] || field
+      return typeof vars[label] !== 'undefined' ? vars[label] : field
     })
   }
   translate.has = function has(key) {

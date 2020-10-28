@@ -157,6 +157,16 @@ describe('TranslationsForked', function() {
       })
     })
 
+    describe('falsely vars', function() {
+      it('should handle 0 as var value', function() {
+        expect(
+          this.Translations.i18n.translate('reconnecting_in_x_secs', {
+            seconds: 0
+          })
+        ).to.equal('Reconnecting in 0 secs')
+      })
+    })
+
     describe('perf', function() {
       before(function() {
         if (process.env.TEST_PERF !== 'true') {
