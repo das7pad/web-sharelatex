@@ -10,3 +10,15 @@ const chai = require('chai')
 chai.use(require('sinon-chai'))
 
 require('../../build/translations/generator').generateModuleInMemory('en')
+
+const moment = require('moment')
+moment.updateLocale('en', {
+  calendar: {
+    lastDay: '[Yesterday]',
+    sameDay: '[Today]',
+    nextDay: '[Tomorrow]',
+    lastWeek: 'ddd, Do MMM YY',
+    nextWeek: 'ddd, Do MMM YY',
+    sameElse: 'ddd, Do MMM YY'
+  }
+})
