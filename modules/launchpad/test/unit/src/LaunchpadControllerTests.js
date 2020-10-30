@@ -35,6 +35,11 @@ describe('LaunchpadController', function() {
         console: console
       },
       requires: {
+        '../../../../app/src/infrastructure/Features': {
+          hasFeature() {
+            return false
+          }
+        },
         'settings-sharelatex': (this.Settings = {}),
         'logger-sharelatex': (this.Logger = {
           log() {},
