@@ -7,6 +7,7 @@ const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 const Features = require('./Features')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
 const Modules = require('./Modules')
+const SafeHTMLSubstitute = require('../Features/Helpers/SafeHTMLSubstitution')
 
 let webpackManifest = {}
 if (Settings.useDevAssets) {
@@ -44,10 +45,15 @@ module.exports = function(app, webRouter) {
   webRouter.use(function(req, res, next) {
     const actualRender = res.render
     res.render = function() {
-      res.locals.translate = function(key, vars) {
+      res.locals.translate = function(key, vars, components) {
         vars = vars || {}
         vars.appName = Settings.appName
-        return req.i18n.translate(key, vars)
+        const locale = req.i18n.translate(key, vars)
+        if (components) {
+          return SafeHTMLSubstitute.render(locale, components)
+        } else {
+          return locale
+        }
       }
       res.locals.translate.has = req.i18n.translate.has
 
