@@ -17,7 +17,7 @@ const Failure = SmokeTestFailure
 
 // send requests to web router if this is the api process
 const OWN_PORT = Settings.port || Settings.internal.web.port || 3000
-const PORT = Settings.web.web_router_port || OWN_PORT
+const PORT = (Settings.web && Settings.web.web_router_port) || OWN_PORT
 
 // like the curl option `--resolve DOMAIN:PORT:127.0.0.1`
 class LocalhostAgent extends Agent {
