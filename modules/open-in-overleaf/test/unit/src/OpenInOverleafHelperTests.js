@@ -20,6 +20,8 @@ const should = chai.should()
 const { expect } = chai
 const modulePath = '../../../app/src/OpenInOverleafHelper.js'
 const SandboxedModule = require('sandboxed-module')
+const ProjectHelper = require('../../../../../app/src/Features/Project/ProjectHelper')
+const Errors = require('../../../../../app/src/Features/Errors/Errors')
 const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 
 const mmmagic = { Magic: sinon.stub() }
@@ -82,6 +84,8 @@ describe('OpenInOverleafHelper', function() {
     this.OpenInOverleafHelper = SandboxedModule.require(modulePath, {
       requires: {
         mmmagic: mmmagic,
+        '../../../../app/src/Features/Errors/Errors': Errors,
+        '../../../../app/src/Features/Project/ProjectHelper': ProjectHelper,
         '../../../../app/src/infrastructure/FileWriter': this.FileWriter,
         '../../../../app/src/Features/Helpers/UrlHelper': this.UrlHelper,
         '../../../../app/src/Features/Project/ProjectRootDocManager': this

@@ -18,6 +18,7 @@ const should = chai.should()
 const { expect } = chai
 const modulePath = '../../../app/src/OpenInOverleafController.js'
 const SandboxedModule = require('sandboxed-module')
+const ProjectHelper = require('../../../../../app/src/Features/Project/ProjectHelper')
 const Errors = require('../../../../../app/src/Features/Errors/Errors')
 const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 
@@ -121,6 +122,8 @@ describe('OpenInOverleafController', function() {
             log() {},
             err() {}
           },
+          '../../../../app/src/Features/Project/ProjectHelper': ProjectHelper,
+          '../../../../app/src/Features/Errors/Errors': Errors,
           '../../../../app/src/Features/Authentication/AuthenticationController': this
             .AuthenticationController,
           '../../../../app/src/Features/Project/ProjectCreationHandler': this
