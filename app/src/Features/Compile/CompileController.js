@@ -15,8 +15,8 @@
  */
 let CompileController
 const contentDisposition = require('content-disposition')
-const Metrics = require('@overleaf/metrics')
 const OError = require('@overleaf/o-error')
+const Metrics = require('@overleaf/metrics')
 const ProjectGetter = require('../Project/ProjectGetter')
 const CompileManager = require('./CompileManager')
 const ClsiManager = require('./ClsiManager')
