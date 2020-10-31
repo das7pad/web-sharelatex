@@ -84,7 +84,7 @@ nav.navbar.navbar-default.navbar-main
 							b.caret
 						ul.dropdown-menu
 							li
-								div.subdued(ng-non-bindable) #{getSessionUser().email || ''}
+								div.subdued {{ usersEmail }}
 							li.divider.hidden-xs.hidden-sm
 							li
 								a(href="/user/settings") {{translate('account_settings')}}

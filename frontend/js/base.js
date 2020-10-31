@@ -39,6 +39,8 @@ const App = angular
   })
 
 App.run(($rootScope, $templateCache) => {
+  // expose usersEmail globally, allows overwriting from settings page
+  $rootScope.usersEmail = getMeta('ol-usersEmail')
   // expose t and translate to all views -- without explicit import
   $rootScope.t = $rootScope.translate = t
   // expose getMeta without explicit import

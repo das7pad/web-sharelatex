@@ -62,6 +62,7 @@ module.exports = function(app, webRouter) {
       const currentUser = AuthenticationController.getSessionUser(req)
       res.locals.getLoggedInUserId = () => currentUser && currentUser._id
       res.locals.getSessionUser = () => currentUser
+      res.locals.getUserEmail = () => currentUser && currentUser.email
       actualRender.apply(res, arguments)
     }
     next()
