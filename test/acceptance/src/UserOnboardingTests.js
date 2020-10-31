@@ -15,7 +15,7 @@ describe('UserOnboardingTests', function() {
     this.user3._id = ObjectId('5d15fca20000000000000000')
     async.series(
       [
-        cb => db.users.insert(this.user3, cb),
+        cb => db.users.insertOne(this.user3, cb),
         this.user1.ensureUserExists.bind(this.user1),
         this.user2.ensureUserExists.bind(this.user2)
       ],

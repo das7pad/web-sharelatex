@@ -279,7 +279,7 @@ describe('UserEmails', function() {
               })
           },
           cb => {
-            db.tokens.update(
+            db.tokens.updateOne(
               {
                 token
               },
@@ -400,7 +400,7 @@ describe('UserEmails', function() {
       async.series(
         [
           cb => {
-            db.tokens.remove(
+            db.tokens.deleteOne(
               {
                 use: 'email_confirmation',
                 'data.user_id': this.user._id,
