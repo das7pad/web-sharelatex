@@ -37,7 +37,7 @@
     "firefox esr"
   ],
   "dependencies": {
-    "@overleaf/metrics": "https://github.com/das7pad/metrics-sharelatex/archive/583d38d6130bc95417d70008c259f832ac835b26.tar.gz",
+    "@overleaf/metrics": "https://github.com/das7pad/metrics-sharelatex/archive/c7336346ef96a1ba1d92bf268f96542d571a2b9c.tar.gz",
     "@overleaf/o-error": "^3.0.0",
     "archiver": "4.0.1",
     "async": "0.6.2",
