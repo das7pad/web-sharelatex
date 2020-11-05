@@ -8,6 +8,10 @@ const MODULE_PATH = path.join(
   '../../../../app/src/Features/Email/EmailBuilder'
 )
 
+const ctaEmailBody = require('../../../../app/src/Features/Email/Bodies/cta-email')
+const NoCTAEmailBody = require('../../../../app/src/Features/Email/Bodies/NoCTAEmailBody')
+const BaseWithHeaderEmailLayout = require('../../../../app/src/Features/Email/Layouts/BaseWithHeaderEmailLayout')
+
 describe('EmailBuilder', function() {
   before(function() {
     this.settings = {
@@ -19,6 +23,9 @@ describe('EmailBuilder', function() {
         console: console
       },
       requires: {
+        './Bodies/cta-email': ctaEmailBody,
+        './Bodies/NoCTAEmailBody': NoCTAEmailBody,
+        './Layouts/BaseWithHeaderEmailLayout': BaseWithHeaderEmailLayout,
         'settings-sharelatex': this.settings,
         'logger-sharelatex': {
           log() {}
