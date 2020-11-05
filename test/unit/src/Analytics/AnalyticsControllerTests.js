@@ -12,8 +12,8 @@ describe('AnalyticsController', function() {
 
     this.AnalyticsManager = {
       enabled: true,
-      updateEditingSession: sinon.stub().callsArgWith(3),
-      recordEvent: sinon.stub().callsArgWith(3)
+      updateEditingSession: sinon.stub(),
+      recordEvent: sinon.stub()
     }
 
     this.InstitutionsAPI = {
