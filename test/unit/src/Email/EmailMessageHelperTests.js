@@ -1,6 +1,7 @@
 const SandboxedModule = require('sandboxed-module')
 const path = require('path')
 const { expect } = require('chai')
+const sanitizeHtml = require('sanitize-html')
 
 const MODULE_PATH = path.join(
   __dirname,
@@ -10,6 +11,9 @@ const MODULE_PATH = path.join(
 describe('EmailMessageHelper', function() {
   beforeEach(function() {
     this.EmailMessageHelper = SandboxedModule.require(MODULE_PATH, {
+      requires: {
+        'sanitize-html': sanitizeHtml
+      },
       globals: {
         console: console
       }
