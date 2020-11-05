@@ -30,6 +30,7 @@ export default App.controller('BinaryFileController', function(
     'bibtex',
     'txt',
     'tikz',
+    'mtx',
     'rtex',
     'md',
     'asy',
@@ -46,7 +47,8 @@ export default App.controller('BinaryFileController', function(
     'clo',
     'ldf',
     'rmd',
-    'lua'
+    'lua',
+    'gv'
   ]
   const imageExtensions = ['png', 'jpg', 'jpeg', 'gif']
   const previewableExtensions = []
