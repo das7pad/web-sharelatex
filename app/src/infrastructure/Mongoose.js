@@ -2,8 +2,6 @@ const mongoose = require('mongoose')
 const Settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
 
-const POOL_SIZE = Settings.mongo.poolSize
-
 if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
   // set by -> test/unit/bootstrap.js
   throw new Error(
@@ -13,25 +11,21 @@ if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
 
 const connectionPromise = mongoose.connect(
   Settings.mongo.url,
-  {
-    poolSize: POOL_SIZE,
-    config: { autoIndex: false },
-    useUnifiedTopology: !!Settings.mongo.useUnifiedTopology,
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    socketTimeoutMS: Settings.mongo.socketTimeoutMS,
-    appname: 'web'
-  }
+  Object.assign(
+    {
+      // mongoose specific config
+      config: { autoIndex: false },
+      // mongoose defaults to false, native driver defaults to true
+      useNewUrlParser: true,
+      // use the equivalent `findOneAndUpdate` methods of the native driver
+      useFindAndModify: false
+    },
+    Settings.mongo.options
+  )
 )
 
 mongoose.connection.on('connected', () =>
-  logger.log(
-    {
-      url: Settings.mongo.url,
-      poolSize: POOL_SIZE
-    },
-    'mongoose default connection open'
-  )
+  logger.log('mongoose default connection open')
 )
 
 mongoose.connection.on('error', err =>

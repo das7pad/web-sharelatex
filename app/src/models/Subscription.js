@@ -14,7 +14,6 @@ const SubscriptionSchema = new Schema({
     type: [ObjectId],
     ref: 'User',
     required: true,
-    unique: true,
     validate: function(managers) {
       // require at least one manager
       return !!managers.length
@@ -40,11 +39,6 @@ const SubscriptionSchema = new Schema({
     }
   }
 })
-
-SubscriptionSchema.statics.findAndModify = function(query, update, callback) {
-  const self = this
-  return this.updateOne(query, update, () => self.findOne(query, callback))
-}
 
 // Subscriptions have no v1 data to fetch
 SubscriptionSchema.method('fetchV1Data', function(callback) {

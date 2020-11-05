@@ -40,9 +40,6 @@ describe('SubscriptionUpdater', function() {
 
     this.updateStub = sinon.stub().callsArgWith(2, null)
     this.updateManyStub = sinon.stub().callsArgWith(2, null)
-    this.findAndModifyStub = sinon
-      .stub()
-      .callsArgWith(2, null, this.subscription)
     this.findOneAndUpdateStub = sinon
       .stub()
       .callsArgWith(2, null, this.subscription)
@@ -59,7 +56,6 @@ describe('SubscriptionUpdater', function() {
     this.SubscriptionModel.deleteOne = sinon.stub().yields()
     this.SubscriptionModel.updateOne = this.updateStub
     this.SubscriptionModel.updateMany = this.updateManyStub
-    this.SubscriptionModel.findAndModify = this.findAndModifyStub
     this.SubscriptionModel.findOneAndUpdate = this.findOneAndUpdateStub
 
     this.SubscriptionLocator = {
@@ -402,7 +398,7 @@ describe('SubscriptionUpdater', function() {
           const insertOperation = {
             $addToSet: { member_ids: { $each: [this.otherUserId] } }
           }
-          this.findAndModifyStub
+          this.updateStub
             .calledWith(searchOps, insertOperation)
             .should.equal(true)
           done()

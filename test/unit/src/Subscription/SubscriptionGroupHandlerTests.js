@@ -68,6 +68,7 @@ describe('SubscriptionGroupHandler', function() {
     this.EmailHandler = { sendEmail: sinon.stub() }
 
     this.Subscription = {
+      updateOne: sinon.stub().yields(),
       updateMany: sinon.stub().yields(),
       findOne: sinon.stub().yields()
     }
@@ -143,7 +144,7 @@ describe('SubscriptionGroupHandler', function() {
     })
 
     it('replaces the admin_id', function() {
-      return this.Subscription.updateMany
+      return this.Subscription.updateOne
         .calledWith({ admin_id: this.oldId }, { admin_id: this.newId })
         .should.equal(true)
     })

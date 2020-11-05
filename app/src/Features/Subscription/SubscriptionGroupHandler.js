@@ -38,7 +38,7 @@ const SubscriptionGroupHandler = {
   },
 
   replaceUserReferencesInGroups(oldId, newId, callback) {
-    return Subscription.updateMany(
+    return Subscription.updateOne(
       { admin_id: oldId },
       { admin_id: newId },
       function(error) {
@@ -118,11 +118,11 @@ var replaceInArray = function(model, property, oldValue, newValue, callback) {
   const setOldValue = {}
   setOldValue[property] = oldValue
 
-  return model.updateMany(query, { $addToSet: setNewValue }, function(error) {
-    if (error != null) {
+  model.updateMany(query, { $addToSet: setNewValue }, function(error) {
+    if (error) {
       return callback(error)
     }
-    return model.updateMany(query, { $pull: setOldValue }, callback)
+    model.updateMany(query, { $pull: setOldValue }, callback)
   })
 }
 

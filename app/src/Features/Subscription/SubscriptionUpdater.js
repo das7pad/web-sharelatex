@@ -99,7 +99,7 @@ const SubscriptionUpdater = {
     const searchOps = { _id: subscriptionId }
     const insertOperation = { $addToSet: { member_ids: { $each: memberIds } } }
 
-    Subscription.findAndModify(searchOps, insertOperation, callback)
+    Subscription.updateOne(searchOps, insertOperation, callback)
   },
 
   removeUserFromGroups(filter, userId, callback) {
