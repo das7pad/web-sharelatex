@@ -24,12 +24,11 @@ const ProjectEntityUpdateHandler = require('./ProjectEntityUpdateHandler')
 const ProjectDetailsHandler = require('./ProjectDetailsHandler')
 const HistoryManager = require('../History/HistoryManager')
 const { User } = require('../../models/User')
-const fs = require('fs')
 const Path = require('path')
 const { promisify } = require('util')
-const _ = require('underscore')
 const AnalyticsManager = require('../Analytics/AnalyticsManager')
 const Errors = require('../Errors/Errors')
+const ProjectTemplateFiles = require('./ProjectTemplateFiles')
 
 const ProjectCreationHandler = {
   createBlankProject(owner_id, projectName, attributes, callback) {
@@ -305,22 +304,14 @@ const ProjectCreationHandler = {
         'December'
       ]
 
-      const templatePath = Path.resolve(
-        __dirname + `/../../../templates/project_files/${template_name}`
-      )
-      return fs.readFile(templatePath, function(error, template) {
-        if (error != null) {
-          return callback(error)
-        }
-        const data = {
-          project_name,
-          user,
-          year: new Date().getUTCFullYear(),
-          month: monthNames[new Date().getUTCMonth()]
-        }
-        const output = _.template(template.toString(), data)
-        return callback(null, output.split('\n'))
-      })
+      const data = {
+        project_name,
+        user,
+        year: new Date().getUTCFullYear(),
+        month: monthNames[new Date().getUTCMonth()]
+      }
+      const output = ProjectTemplateFiles[template_name](data)
+      return callback(null, output.split('\n'))
     })
   }
 }
