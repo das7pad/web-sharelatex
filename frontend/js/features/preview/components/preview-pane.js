@@ -15,6 +15,7 @@ function PreviewPane({
   onToggleLogs,
   outputFiles,
   pdfDownloadUrl,
+  onLogEntryLinkClick,
   showLogs
 }) {
   const nErrors =
@@ -57,7 +58,10 @@ function PreviewPane({
           : ''}
       </span>
       {showLogs ? (
-        <PreviewLogsPane logEntries={compilerState.logEntries.all} />
+        <PreviewLogsPane
+          logEntries={compilerState.logEntries.all}
+          onLogEntryLinkClick={onLogEntryLinkClick}
+        />
       ) : null}
     </>
   )
@@ -72,6 +76,7 @@ PreviewPane.propTypes = {
     logEntries: PropTypes.object.isRequired
   }),
   onClearCache: PropTypes.func.isRequired,
+  onLogEntryLinkClick: PropTypes.func.isRequired,
   onRecompile: PropTypes.func.isRequired,
   onRunSyntaxCheckNow: PropTypes.func.isRequired,
   onSetAutoCompile: PropTypes.func.isRequired,

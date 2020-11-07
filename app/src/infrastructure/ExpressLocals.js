@@ -1,6 +1,8 @@
 const Settings =
   require('settings-sharelatex') || require('../../../config/settings.defaults')
 const { URL } = require('url')
+const logger = require('logger-sharelatex')
+const pug = require('pug-runtime')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 
@@ -15,6 +17,8 @@ if (Settings.useDevAssets) {
 } else {
   webpackManifest = require('../../../public/manifest.json')
 }
+
+const I18N_HTML_INJECTIONS = new Set()
 
 const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
 
@@ -47,6 +51,21 @@ module.exports = function(app, webRouter) {
     res.render = function() {
       res.locals.translate = function(key, vars, components) {
         vars = vars || {}
+        if (Settings.i18n.checkForHTMLInVars) {
+          Object.entries(vars).forEach(([field, value]) => {
+            if (pug.escape(value) !== value) {
+              const violationsKey = key + field
+              // do not flood the logs, log one sample per pod + key + field
+              if (!I18N_HTML_INJECTIONS.has(violationsKey)) {
+                logger.warn(
+                  { key, field, value },
+                  'html content in translations context vars'
+                )
+                I18N_HTML_INJECTIONS.add(violationsKey)
+              }
+            }
+          })
+        }
         vars.appName = Settings.appName
         const locale = req.i18n.translate(key, vars)
         if (components) {

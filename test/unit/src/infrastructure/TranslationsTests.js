@@ -15,6 +15,7 @@ describe('Translations', function() {
       requires: {
         'settings-sharelatex': {
           i18n: {
+            escapeHTMLInVars: false,
             subdomainLang: {
               www: { lngCode: 'en', url: 'https://www.sharelatex.com' },
               fr: { lngCode: 'fr', url: 'https://fr.sharelatex.com' },
