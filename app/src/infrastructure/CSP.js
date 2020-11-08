@@ -34,21 +34,23 @@ function getCspMiddleware() {
     )
   )
 
+  const SELF = "'self'"
+  const assetsOrigin = cdnOrigin || SELF
+
   function generateCSP(cfg) {
-    const SELF = "'self'"
     const baseUri = [SELF]
     const childSrc = []
     const connectSrc = [SELF]
     const defaultSrc = []
-    const fontSrc = [SELF, 'about:']
+    const fontSrc = [assetsOrigin, 'about:']
     const formAction = [SELF]
     const frameAncestors = []
     const frameSrc = []
-    const imgSrc = [SELF, 'data:', 'blob:']
+    const imgSrc = [assetsOrigin, 'data:', 'blob:']
     const manifestSrc = []
-    const prefetchSrc = []
-    const scriptSrc = []
-    const styleSrc = [SELF, "'unsafe-inline'"]
+    const prefetchSrc = [assetsOrigin]
+    const scriptSrc = [assetsOrigin]
+    const styleSrc = [assetsOrigin, "'unsafe-inline'"]
     const workerSrc = []
 
     if (sentryOrigin) {
@@ -91,17 +93,9 @@ function getCspMiddleware() {
       fontSrc.push('fonts.googleapis.com')
     }
 
-    if (cdnOrigin) {
-      if (cfg.connectCDN) {
-        // e.g. pdfjs cmaps or /launchpad for ide blob check
-        connectSrc.push(cdnOrigin)
-      }
-      // assets
-      fontSrc.push(cdnOrigin)
-      imgSrc.push(cdnOrigin)
-      prefetchSrc.push(cdnOrigin)
-      scriptSrc.push(cdnOrigin)
-      styleSrc.push(cdnOrigin)
+    if (cdnOrigin && cfg.connectCDN) {
+      // e.g. pdfjs cmaps or /launchpad for ide blob check
+      connectSrc.push(cdnOrigin)
     }
 
     if (cfg.needsCompilesAccess) {
