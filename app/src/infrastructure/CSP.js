@@ -148,6 +148,7 @@ function getCspMiddleware() {
       'worker-src': workerSrc
     })
       .map(([directive, origins]) => {
+        origins = Array.from(new Set(origins))
         return `${directive} ${origins.join(' ') || "'none'"}`
       })
       .concat(policyAmend)
