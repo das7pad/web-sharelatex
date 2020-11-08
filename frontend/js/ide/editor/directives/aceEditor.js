@@ -35,12 +35,8 @@ ace.config.set('basePath', staticPath('/vendor/ace-builds/src-min-noconflict'))
 // By default, don't use workers - enable them per-session as required
 ace.config.setDefaultValue('session', 'useWorker', false)
 
-// CSP compat, we do not want to allow arbitrary blobs
-ace.config.set('loadWorkerFromBlob', false)
-ace.config.set(
-  'workerPath',
-  '/generate/worker/vendor/ace-builds/src-min-noconflict'
-)
+// CSP disallows loading JS from the main origin.
+ace.config.set('loadWorkerFromBlob', true)
 
 App.directive('aceEditor', function(
   $timeout,

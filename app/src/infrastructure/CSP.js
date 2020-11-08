@@ -12,14 +12,6 @@ module.exports = function(webRouter) {
   ) {
     webRouter.use(getCspMiddleware())
   }
-  webRouter.use('/generate/worker', function(req, res) {
-    const workerPath = req.path
-    if (workerPath.indexOf('/vendor') !== 0) {
-      return res.sendStatus(404)
-    }
-    res.contentType('application/javascript')
-    res.send(`importScripts('${staticFilesBase}${workerPath}');`)
-  })
 }
 
 function getCspMiddleware() {
@@ -55,9 +47,9 @@ function getCspMiddleware() {
     const imgSrc = [SELF, 'data:', 'blob:']
     const manifestSrc = []
     const prefetchSrc = []
-    const scriptSrc = [SELF]
+    const scriptSrc = []
     const styleSrc = [SELF, "'unsafe-inline'"]
-    const workerSrc = [SELF]
+    const workerSrc = []
 
     if (sentryOrigin) {
       connectSrc.push(sentryOrigin)
@@ -132,8 +124,9 @@ function getCspMiddleware() {
     if (!cfg.needsPrefetch) {
       prefetchSrc.length = 0
     }
-    if (!cfg.needsWorker) {
-      workerSrc.length = 0
+    if (cfg.needsWorker) {
+      // `Worker` are bootstrapped via `Blob`s sporting `importScript(...)`
+      workerSrc.push('blob:')
     }
 
     // backwards compatibility -- csp level 3 directives
