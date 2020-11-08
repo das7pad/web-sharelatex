@@ -5,6 +5,7 @@ const logger = require('logger-sharelatex')
 const metrics = require('@overleaf/metrics')
 const expressLocals = require('./ExpressLocals')
 const CSP = require('./CSP')
+const ResourceHints = require('./ResourceHints')
 const Validation = require('./Validation')
 const Router = require('../router')
 const helmet = require('helmet')
@@ -159,6 +160,7 @@ webRouter.use(function(req, res, next) {
 webRouter.use(ReferalConnect.use)
 expressLocals(app, webRouter)
 CSP(webRouter)
+ResourceHints(app, webRouter)
 
 webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)
 
