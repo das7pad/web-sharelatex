@@ -445,6 +445,7 @@ module.exports = settings =
 	# Fill in your unique token from various analytics services to enable
 	# them.
 	analytics:
+		enabled: process.env['ANALYTICS_ENABLED'] == 'true'
 		ga:
 			token: process.env['ANALYTICS_GA_TOKEN']
 		gaOptimize:
@@ -779,9 +780,6 @@ module.exports = settings =
 		autoCompile:
 			everyone: process.env['RATE_LIMIT_AUTO_COMPILE_EVERYONE'] or 100
 			standard: process.env['RATE_LIMIT_AUTO_COMPILE_STANDARD'] or 25
-
-	analytics:
-		enabled: process.env['ANALYTICS_ENABLED'] == 'true'
 
 	# currentImage: "texlive-full:2017.1"
 	# imageRoot: "<DOCKER REPOSITORY ROOT>" # without any trailing slash
