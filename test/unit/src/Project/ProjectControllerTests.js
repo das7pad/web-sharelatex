@@ -1163,10 +1163,11 @@ describe('ProjectController', function() {
           beforeEach(function() {
             this.req.query = {}
             this.req.query.ws = 'fallback'
+            this.settings.wsUrlFallback = '/fallback/socket.io'
           })
-          it('should unset the wsUrl', function(done) {
+          it('should use the fallback wsUrl', function(done) {
             this.res.render = (pageName, opts) => {
-              ;(opts.wsUrl || '/socket.io').should.equal('/socket.io')
+              opts.wsUrl.should.equal('/fallback/socket.io')
               done()
             }
             this.ProjectController.loadEditor(this.req, this.res)
@@ -1191,6 +1192,29 @@ describe('ProjectController', function() {
       })
       checkLoadEditorWsMetric('load-editor-ws')
       checkWsFallback(false)
+
+      it('should set the implicit wsAssetUrl', function(done) {
+        this.res.render = (pageName, opts) => {
+          opts.wsAssetUrl.should.equal('/other.socket.io/socket.io.js')
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+
+      describe('custom wsAssetUrl', function() {
+        const wsAssetUrl = 'https://foo.bar/socket.io.js'
+        beforeEach(function() {
+          this.settings.wsAssetUrl = wsAssetUrl
+        })
+
+        it('should set the custom wsAssetUrl', function(done) {
+          this.res.render = (pageName, opts) => {
+            opts.wsAssetUrl.should.equal(wsAssetUrl)
+            done()
+          }
+          this.ProjectController.loadEditor(this.req, this.res)
+        })
+      })
 
       describe('beta program', function() {
         beforeEach(function() {

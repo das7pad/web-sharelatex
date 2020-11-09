@@ -16,6 +16,7 @@ module.exports = function(webRouter) {
 
 function getCspMiddleware() {
   const csp = Settings.security.csp
+  const siteOrigin = new URL(Settings.siteUrl).origin
   const cdnOrigin = staticFilesBase.startsWith('http')
     ? new URL(staticFilesBase).origin
     : undefined
@@ -26,12 +27,27 @@ function getCspMiddleware() {
     ? new URL(Settings.sentry.frontend.dsn).origin
     : undefined
 
-  const uniqueWsUrlOrigins = Array.from(
-    new Set(
-      [Settings.wsUrl, Settings.wsUrlBeta, Settings.wsUrlV2]
-        .filter(Boolean)
-        .map(url => new URL(url, Settings.siteUrl).origin)
+  function getUniqueOrigins(...urls) {
+    return Array.from(
+      new Set(
+        urls
+          .filter(url => url !== undefined)
+          .map(url => new URL(url, Settings.siteUrl).origin)
+      )
     )
+  }
+
+  const uniqueWsUrlOrigins = getUniqueOrigins(
+    Settings.wsUrl,
+    Settings.wsUrlBeta,
+    Settings.wsUrlFallback,
+    Settings.wsUrlV2
+  )
+  const uniqueWsAssetUrlOrigins = getUniqueOrigins(
+    Settings.wsAssetUrl || Settings.wsUrl,
+    Settings.wsAssetUrlBeta || Settings.wsUrlBeta,
+    Settings.wsAssetUrlFallback || Settings.wsUrlFallback,
+    Settings.wsAssetUrlV2 || Settings.wsUrlV2
   )
 
   const SELF = "'self'"
@@ -106,11 +122,21 @@ function getCspMiddleware() {
     }
 
     if (cfg.needsSocketIo) {
-      uniqueWsUrlOrigins.map(wsUrl => {
-        scriptSrc.push(wsUrl)
+      uniqueWsUrlOrigins.forEach(wsUrl => {
+        if (wsUrl === siteOrigin) {
+          // 'self' covers http/https/ws/wss already
+          return
+        }
         connectSrc.push(wsUrl)
         // websocket support: http:// -> ws:// and https:// -> wss://
         connectSrc.push('ws' + wsUrl.slice(4))
+      })
+      uniqueWsAssetUrlOrigins.forEach(wsUrl => {
+        if (wsUrl === siteOrigin) {
+          // 'self' is shorter than 'https://...'
+          wsUrl = SELF
+        }
+        scriptSrc.push(wsUrl)
       })
     }
 

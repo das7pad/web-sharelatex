@@ -172,11 +172,12 @@ block content
 	meta(id="ol-gitBridgePublicBaseUrl" content=gitBridgePublicBaseUrl)
 	meta(id="ol-uiConfig" data-json content=settings.uiConfig)
 	meta(id="ol-useShareJsHash" data-boolean content=true)
+	meta(id="ol-wsUrl" content=wsUrl)
 	meta(id="ol-wsRetryHandshake" data-json content=settings.wsRetryHandshake)
 	meta(id="ol-overallThemes" data-json content=overallThemes)
 
 block foot-scripts
-	script(type='text/javascript', defer, src=(wsUrl || '/socket.io') + '/socket.io.js')
+	script(type='text/javascript', defer, src=wsAssetUrl)
 	script(type='text/javascript', defer, src=buildJsPath(`t/${currentLngCode}.js`))
 	each file in entrypointSources('ide')
 		script(type='text/javascript' defer src=file)

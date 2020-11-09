@@ -244,12 +244,18 @@ module.exports = settings =
 	editorIsOpen: process.env['EDITOR_IS_OPEN'] or true
 
 	# Optional separate location for websocket connections, if unset defaults to siteUrl.
-	wsUrl: process.env['WEBSOCKET_URL']
+	wsUrl: process.env['WEBSOCKET_URL'] || '/socket.io'
 	wsUrlV2: process.env['WEBSOCKET_URL_V2']
 	wsUrlBeta: process.env['WEBSOCKET_URL_BETA']
+	wsUrlFallback: process.env['WEBSOCKET_URL_FALLBACK'] || '/socket.io'
 
 	wsUrlV2Percentage: parseInt(process.env['WEBSOCKET_URL_V2_PERCENTAGE'] || '0', 10)
 	wsRetryHandshake: parseInt(process.env['WEBSOCKET_RETRY_HANDSHAKE'] || '5', 10)
+
+	wsAssetUrl: process.env['WEBSOCKET_ASSET_URL']
+	wsAssetUrlV2: process.env['WEBSOCKET_ASSET_URL_V2']
+	wsAssetUrlBeta: process.env['WEBSOCKET_ASSET_URL_BETA']
+	wsAssetUrlFallback: process.env['WEBSOCKET_ASSET_URL_FALLBACK']
 
 	# cookie domain
 	# use full domain for cookies to only be accessible from that domain,
