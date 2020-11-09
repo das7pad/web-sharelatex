@@ -48,7 +48,6 @@ function getCspMiddleware() {
     const frameSrc = []
     const imgSrc = [assetsOrigin, 'data:', 'blob:']
     const manifestSrc = []
-    const prefetchSrc = [assetsOrigin]
     const scriptSrc = [assetsOrigin]
     const styleSrc = [assetsOrigin, "'unsafe-inline'"]
     const workerSrc = []
@@ -115,9 +114,6 @@ function getCspMiddleware() {
       })
     }
 
-    if (!cfg.needsPrefetch) {
-      prefetchSrc.length = 0
-    }
     if (cfg.needsWorker) {
       // `Worker` are bootstrapped via `Blob`s sporting `importScript(...)`
       workerSrc.push('blob:')
@@ -125,7 +121,6 @@ function getCspMiddleware() {
 
     // backwards compatibility -- csp level 3 directives
     childSrc.push(...workerSrc)
-    defaultSrc.push(...prefetchSrc)
 
     let policyAmend = ['block-all-mixed-content']
     if (csp.reportURL) {
@@ -142,7 +137,6 @@ function getCspMiddleware() {
       'frame-src': frameSrc,
       'img-src': imgSrc,
       'manifest-src': manifestSrc,
-      'prefetch-src': prefetchSrc,
       'script-src': scriptSrc,
       'style-src': styleSrc,
       'worker-src': workerSrc
@@ -160,7 +154,6 @@ function getCspMiddleware() {
   const CSP_EDITOR = generateCSP({
     connectCDN: true,
     needsCompilesAccess: true,
-    needsPrefetch: true,
     needsSocketIo: true,
     needsWorker: true
   })
