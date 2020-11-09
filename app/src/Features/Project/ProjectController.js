@@ -759,30 +759,36 @@ const ProjectController = {
             }
 
             let wsUrl = Settings.wsUrl
+            let wsAssetUrl = Settings.wsAssetUrl
             let metricName = 'load-editor-ws'
             if (user.betaProgram && Settings.wsUrlBeta !== undefined) {
               wsUrl = Settings.wsUrlBeta
+              wsAssetUrl = Settings.wsAssetUrlBeta
               metricName += '-beta'
             } else if (
-              Settings.wsUrlV2 &&
+              Settings.wsUrlV2 !== undefined &&
               Settings.wsUrlV2Percentage > 0 &&
               (ObjectId(projectId).getTimestamp() / 1000) %
                 100 <
                 Settings.wsUrlV2Percentage
             ) {
               wsUrl = Settings.wsUrlV2
+              wsAssetUrl = Settings.wsAssetUrlV2
               metricName += '-v2'
             }
             if (req.query && req.query.ws === 'fallback') {
-              // `?ws=fallback` will connect to the bare origin, and ignore
-              //   the custom wsUrl. Hence it must load the client side
-              //   javascript from there too.
-              // Not resetting it here would possibly load a socket.io v2
-              //  client and connect to a v0 endpoint.
-              wsUrl = undefined
+              wsUrl = Settings.wsUrlFallback
+              wsAssetUrl = Settings.wsAssetUrlFallback
               metricName += '-fallback'
             }
             metrics.inc(metricName)
+
+            if (!wsUrl) {
+              wsUrl = '/socket.io'
+            }
+            if (wsUrl && !wsAssetUrl) {
+              wsAssetUrl = wsUrl + '/socket.io.js'
+            }
 
             if (userId) {
               AnalyticsManager.recordEvent(userId, 'project-opened', {
@@ -869,6 +875,7 @@ const ProjectController = {
               allowedImageNames,
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
               wsUrl,
+              wsAssetUrl,
               showSupport: Features.hasFeature('support'),
               showNewLogsUI: req.query && req.query.new_logs_ui === 'true',
               showNewChatUI: req.query && req.query.new_chat_ui === 'true'
