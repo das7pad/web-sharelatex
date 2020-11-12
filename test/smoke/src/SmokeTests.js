@@ -24,6 +24,20 @@ function _parseCsrf(body) {
   }
   return match[1]
 }
+async function _processWithTimeout({ work, timeout, message }) {
+  let workDeadLine
+  function checkinResults() {
+    clearTimeout(workDeadLine)
+  }
+  await Promise.race([
+    new Promise((resolve, reject) => {
+      workDeadLine = setTimeout(() => {
+        reject(new OError(message))
+      }, timeout)
+    }),
+    work.finally(checkinResults)
+  ])
+}
 
 async function clearRateLimit(endpointName, subject) {
   try {
@@ -46,17 +60,11 @@ async function clearOpenProjectRateLimit() {
   )
 }
 async function cleanupRateLimits() {
-  let timeoutCleanupRateLimits
-  await Promise.race([
-    new Promise((resolve, reject) => {
-      timeoutCleanupRateLimits = setTimeout(() => {
-        reject(new OError('cleanupRateLimits timed out'))
-      }, STEP_TIMEOUT)
-    }),
-    Promise.all([clearLoginRateLimit(), clearOpenProjectRateLimit()]).finally(
-      () => clearTimeout(timeoutCleanupRateLimits)
-    )
-  ])
+  await _processWithTimeout({
+    work: Promise.all([clearLoginRateLimit(), clearOpenProjectRateLimit()]),
+    timeout: STEP_TIMEOUT,
+    message: 'cleanupRateLimits timed out'
+  })
 }
 function assertHasStatusCode(response, expected) {
   const { statusCode: actual } = response
