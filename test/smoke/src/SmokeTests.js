@@ -4,8 +4,8 @@ const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
 const getRequest = require('./request')
 
 class SmokeTestFailure extends OError {
-  constructor(message, stats) {
-    super(message, { stats })
+  constructor(message, stats, cause) {
+    super(message, { stats }, cause)
   }
 }
 const Failure = SmokeTestFailure
@@ -29,7 +29,11 @@ async function clearRateLimit(endpointName, subject) {
   try {
     await RateLimiter.promises.clearRateLimit(endpointName, subject)
   } catch (err) {
-    throw new OError('error clearing rate limit').withCause(err)
+    throw new OError(
+      'error clearing rate limit',
+      { endpointName, subject },
+      err
+    )
   }
 }
 async function clearLoginRateLimit() {
@@ -83,10 +87,7 @@ async function runSmokeTest(stats) {
       assertHasStatusCode(response, 200)
       return _parseCsrf(response.body)
     } catch (err) {
-      throw new Failure(
-        `error fetching csrf token on ${endpoint}`,
-        stats
-      ).withCause(err)
+      throw new Failure(`error fetching csrf token on ${endpoint}`, stats, err)
     } finally {
       completeStep('getCsrfTokenFor' + endpoint)
     }
@@ -107,7 +108,7 @@ async function runSmokeTest(stats) {
   try {
     await cleanupRateLimits()
   } catch (err) {
-    throw new Failure('error clearing rate limits', stats).withCause(err)
+    throw new Failure('error clearing rate limits', stats, err)
   } finally {
     completeStep('cleanupRateLimits')
   }
@@ -130,7 +131,7 @@ async function runSmokeTest(stats) {
     }
     assertHasStatusCode(response, 200)
   } catch (err) {
-    throw new Failure('login failed', stats).withCause(err)
+    throw new Failure('login failed', stats, err)
   } finally {
     completeStep('login')
   }
@@ -143,7 +144,7 @@ async function runSmokeTest(stats) {
     }
   } catch (err) {
     cleanup().catch(() => {})
-    throw new Failure('loading editor failed', stats).withCause(err)
+    throw new Failure('loading editor failed', stats, err)
   } finally {
     completeStep('loadEditor')
   }
@@ -159,7 +160,7 @@ async function runSmokeTest(stats) {
     }
   } catch (err) {
     cleanup().catch(() => {})
-    throw new Failure('loading project list failed', stats).withCause(err)
+    throw new Failure('loading project list failed', stats, err)
   } finally {
     completeStep('loadProjectDashboard')
   }
@@ -167,7 +168,7 @@ async function runSmokeTest(stats) {
   try {
     await cleanup()
   } catch (err) {
-    throw new Failure('logout failed', stats).withCause(err)
+    throw new Failure('logout failed', stats, err)
   } finally {
     completeStep('logout')
   }
