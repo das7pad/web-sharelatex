@@ -25,7 +25,7 @@ class InsecureCookieJar extends request.jar().constructor {
   }
 }
 
-module.exports = function(timeout) {
+function requestFactory({ timeout }) {
   return promisify(
     request.defaults({
       agent: new LocalhostAgent(),
@@ -39,4 +39,8 @@ module.exports = function(timeout) {
       timeout
     })
   )
+}
+
+module.exports = {
+  requestFactory
 }

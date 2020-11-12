@@ -1,7 +1,7 @@
 const OError = require('@overleaf/o-error')
 const Settings = require('settings-sharelatex')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
-const getRequest = require('./request')
+const { requestFactory } = require('./requestFactory')
 
 class SmokeTestFailure extends OError {
   constructor(message, stats, cause) {
@@ -73,9 +73,7 @@ function assertHasStatusCode(response, expected) {
   }
 }
 
-module.exports = runSmokeTest
-module.exports.Failure = Failure
-async function runSmokeTest(stats) {
+async function runSmokeTests({ stats }) {
   let step
   let lastStep = stats.start
   function completeStep(key) {
@@ -84,7 +82,7 @@ async function runSmokeTest(stats) {
     lastStep = step
   }
 
-  const request = getRequest(STEP_TIMEOUT)
+  const request = requestFactory({ timeout: STEP_TIMEOUT })
 
   completeStep('init')
 
@@ -180,3 +178,5 @@ async function runSmokeTest(stats) {
     completeStep('logout')
   }
 }
+
+module.exports = { runSmokeTests, SmokeTestFailure }
