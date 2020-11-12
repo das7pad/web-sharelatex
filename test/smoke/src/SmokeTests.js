@@ -53,10 +53,9 @@ async function cleanupRateLimits() {
         reject(new OError('cleanupRateLimits timed out'))
       }, STEP_TIMEOUT)
     }),
-    Promise.all([
-      clearLoginRateLimit(),
-      clearOpenProjectRateLimit()
-    ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
+    Promise.all([clearLoginRateLimit(), clearOpenProjectRateLimit()]).finally(
+      () => clearTimeout(timeoutCleanupRateLimits)
+    )
   ])
 }
 function assertHasStatusCode(response, expected) {
