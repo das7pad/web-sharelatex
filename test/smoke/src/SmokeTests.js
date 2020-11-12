@@ -96,7 +96,9 @@ async function runSmokeTest(stats) {
     const logoutCsrfToken = await getCsrfTokenFor('/logout')
     const response = await request('/logout', {
       method: 'POST',
-      json: { _csrf: logoutCsrfToken }
+      headers: {
+        'X-CSRF-Token': logoutCsrfToken
+      }
     })
     assertHasStatusCode(response, 302)
   }
