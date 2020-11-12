@@ -26,6 +26,7 @@ services:
       MONGO_HOST: mongo
       API_REDIS_HOST: redis_api
       LOCK_REDIS_HOST: redis_lock
+      QUEUES_REDIS_HOST: redis
       REAL_TIME_REDIS_HOST: redis_realtime
       WEB_REDIS_HOST: redis_web
       WEB_SESSIONS_REDIS_HOST: redis_websessions
