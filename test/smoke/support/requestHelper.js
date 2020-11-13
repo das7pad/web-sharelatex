@@ -1,6 +1,8 @@
 const { Agent } = require('http')
 const { createConnection } = require('net')
 const { promisify } = require('util')
+
+const OError = require('@overleaf/o-error')
 const request = require('request')
 const Settings = require('settings-sharelatex')
 
@@ -41,6 +43,14 @@ function requestFactory({ timeout }) {
   )
 }
 
+function assertHasStatusCode(response, expected) {
+  const { statusCode: actual } = response
+  if (actual !== expected) {
+    throw new OError('unexpected response code', { actual, expected })
+  }
+}
+
 module.exports = {
+  assertHasStatusCode,
   requestFactory
 }
