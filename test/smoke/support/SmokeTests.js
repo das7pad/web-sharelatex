@@ -1,29 +1,17 @@
 const OError = require('@overleaf/o-error')
 const Settings = require('settings-sharelatex')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
-const { requestFactory } = require('./requestFactory')
-
-class SmokeTestFailure extends OError {
-  constructor(message, stats, cause) {
-    super(message, { stats }, cause)
-  }
-}
-const Failure = SmokeTestFailure
+const { getCsrfTokenFor } = require('./Csrf')
+const { Failure } = require('./Errors')
+const { requestFactory } = require('./requestHelper')
 
 const STEP_TIMEOUT = Settings.smokeTest.stepTimeout
 const ANGULAR_PROJECT_CONTROLLER_REGEX = /controller="ProjectPageController"/
-const CSRF_REGEX = /<meta id="ol-csrfToken" content="(.+?)">/
 const PROJECT_ID_REGEX = new RegExp(
   `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
 )
 const TITLE_REGEX = /<title>Your Projects - .*, Online LaTeX Editor<\/title>/
-function _parseCsrf(body) {
-  const match = CSRF_REGEX.exec(body)
-  if (!match) {
-    throw new Error('Cannot find csrfToken in HTML.')
-  }
-  return match[1]
-}
+
 async function _processWithTimeout({ work, timeout, message }) {
   let workDeadLine
   function checkinResults() {
@@ -83,23 +71,16 @@ async function runSmokeTests({ stats }) {
   }
 
   const request = requestFactory({ timeout: STEP_TIMEOUT })
+  const ctx = {
+    completeStep,
+    request,
+    stats
+  }
 
   completeStep('init')
 
-  async function getCsrfTokenFor(endpoint) {
-    try {
-      const response = await request(endpoint)
-      assertHasStatusCode(response, 200)
-      return _parseCsrf(response.body)
-    } catch (err) {
-      throw new Failure(`error fetching csrf token on ${endpoint}`, stats, err)
-    } finally {
-      completeStep('getCsrfTokenFor' + endpoint)
-    }
-  }
-
   async function cleanup() {
-    const logoutCsrfToken = await getCsrfTokenFor('/logout')
+    const logoutCsrfToken = await getCsrfTokenFor('/logout', ctx)
     const response = await request('/logout', {
       method: 'POST',
       headers: {
@@ -109,7 +90,7 @@ async function runSmokeTests({ stats }) {
     assertHasStatusCode(response, 302)
   }
 
-  const loginCsrfToken = await getCsrfTokenFor('/login')
+  const loginCsrfToken = await getCsrfTokenFor('/login', ctx)
   try {
     await cleanupRateLimits()
   } catch (err) {
