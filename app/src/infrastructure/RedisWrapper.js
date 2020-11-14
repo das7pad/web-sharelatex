@@ -1,5 +1,5 @@
 const Settings = require('settings-sharelatex')
-const redis = require('redis-sharelatex')
+const redis = require('@overleaf/redis-wrapper')
 
 if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
   // set by -> test/unit/bootstrap.js
