@@ -25,6 +25,9 @@ const OError = require('@overleaf/o-error')
 const { getNativeDb } = require('./app/src/infrastructure/Mongoose')
 const Server = require('./app/src/infrastructure/Server')
 const mongodb = require('./app/src/infrastructure/mongodb')
+const Queues = require('./app/src/infrastructure/Queues')
+
+Queues.initialize()
 
 const port = Settings.port || Settings.internal.web.port || 3000
 const host = Settings.internal.web.host || 'localhost'

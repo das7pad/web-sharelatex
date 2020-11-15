@@ -38,6 +38,7 @@
   ],
   "dependencies": {
     "@overleaf/metrics": "https://github.com/das7pad/metrics-sharelatex/archive/c7336346ef96a1ba1d92bf268f96542d571a2b9c.tar.gz",
+    "@overleaf/redis-wrapper": "^2.0.0",
     "@overleaf/o-error": "^3.0.0",
     "archiver": "4.0.1",
     "async": "0.6.2",
@@ -73,7 +74,6 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pug-runtime": "^2.0.4",
-    "redis-sharelatex": "https://github.com/das7pad/redis-sharelatex/archive/2d77ad921db0effe7e522cfb311ae8c8ae22f359.tar.gz",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
     "requestretry": "^1.13.0",
