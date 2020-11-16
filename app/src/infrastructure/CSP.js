@@ -121,6 +121,11 @@ function getCspMiddleware() {
       frameSrc.push(compilesOrigin || SELF)
     }
 
+    if (cfg.needsProjectFileAccess) {
+      // Binary file preview: /project/__PROJECT_ID__/file/__FILE_ID__
+      imgSrc.push(SELF)
+    }
+
     if (cfg.needsSocketIo) {
       uniqueWsUrlOrigins.forEach(wsUrl => {
         if (wsUrl === siteOrigin) {
@@ -180,6 +185,7 @@ function getCspMiddleware() {
   const CSP_EDITOR = generateCSP({
     connectCDN: true,
     needsCompilesAccess: true,
+    needsProjectFileAccess: true,
     needsSocketIo: true,
     needsWorker: true
   })
