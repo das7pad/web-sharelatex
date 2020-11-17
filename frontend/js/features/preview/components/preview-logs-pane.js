@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import PreviewLogEntry from './preview-log-entry'
+import t from '../../../misc/t'
 
 function PreviewLogsPane({ logEntries, rawLog, onLogEntryLocationClick }) {
-  const { t } = useTranslation()
-
   return (
     <div className="logs-pane">
       {logEntries && logEntries.length > 0 ? (

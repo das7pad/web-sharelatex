@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import Icon from '../../../shared/components/icon'
 import PreviewLogEntry from './preview-log-entry'
+import t from '../../../misc/t'
 
 function PreviewFirstErrorPopUp({
   logEntry,
@@ -10,8 +10,6 @@ function PreviewFirstErrorPopUp({
   onViewLogs,
   onClose
 }) {
-  const { t } = useTranslation()
-
   function handleGoToErrorLocation() {
     const { file, line, column } = logEntry
     onGoToErrorLocation({ file, line, column })
