@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import PreviewToolbar from './preview-toolbar'
 import PreviewLogsPane from './preview-logs-pane'
+import PreviewFirstErrorPopUp from './preview-first-error-pop-up'
 import t from '../../../misc/t'
 
 function PreviewPane({
@@ -15,9 +16,28 @@ function PreviewPane({
   onToggleLogs,
   outputFiles,
   pdfDownloadUrl,
-  onLogEntryLinkClick,
+  onLogEntryLocationClick,
   showLogs
 }) {
+  const [lastCompileTimestamp, setLastCompileTimestamp] = useState(
+    compilerState.lastCompileTimestamp
+  )
+  const [seenLogsForCurrentCompile, setSeenLogsForCurrentCompile] = useState(
+    false
+  )
+  const [dismissedFirstErrorPopUp, setDismissedFirstErrorPopUp] = useState(
+    false
+  )
+
+  if (lastCompileTimestamp < compilerState.lastCompileTimestamp) {
+    setLastCompileTimestamp(compilerState.lastCompileTimestamp)
+    setSeenLogsForCurrentCompile(false)
+  }
+
+  if (showLogs && !seenLogsForCurrentCompile) {
+    setSeenLogsForCurrentCompile(true)
+  }
+
   const nErrors =
     compilerState.logEntries && compilerState.logEntries.errors
       ? compilerState.logEntries.errors.length
@@ -30,6 +50,16 @@ function PreviewPane({
     compilerState.logEntries && compilerState.logEntries.all
       ? compilerState.logEntries.all.length
       : 0
+
+  const showFirstErrorPopUp =
+    nErrors > 0 &&
+    !seenLogsForCurrentCompile &&
+    !dismissedFirstErrorPopUp &&
+    !compilerState.isCompiling
+
+  function handleFirstErrorPopUpClose() {
+    setDismissedFirstErrorPopUp(true)
+  }
 
   return (
     <>
@@ -57,10 +87,19 @@ function PreviewPane({
           ? t('n_warnings', { count: nWarnings })
           : ''}
       </span>
+      {showFirstErrorPopUp ? (
+        <PreviewFirstErrorPopUp
+          logEntry={compilerState.logEntries.errors[0]}
+          onGoToErrorLocation={onLogEntryLocationClick}
+          onViewLogs={onToggleLogs}
+          onClose={handleFirstErrorPopUpClose}
+        />
+      ) : null}
       {showLogs ? (
         <PreviewLogsPane
           logEntries={compilerState.logEntries.all}
-          onLogEntryLinkClick={onLogEntryLinkClick}
+          rawLog={compilerState.rawLog}
+          onLogEntryLocationClick={onLogEntryLocationClick}
         />
       ) : null}
     </>
@@ -73,10 +112,12 @@ PreviewPane.propTypes = {
     isCompiling: PropTypes.bool.isRequired,
     isDraftModeOn: PropTypes.bool.isRequired,
     isSyntaxCheckOn: PropTypes.bool.isRequired,
-    logEntries: PropTypes.object.isRequired
+    lastCompileTimestamp: PropTypes.number,
+    logEntries: PropTypes.object.isRequired,
+    rawLog: PropTypes.string
   }),
   onClearCache: PropTypes.func.isRequired,
-  onLogEntryLinkClick: PropTypes.func.isRequired,
+  onLogEntryLocationClick: PropTypes.func.isRequired,
   onRecompile: PropTypes.func.isRequired,
   onRunSyntaxCheckNow: PropTypes.func.isRequired,
   onSetAutoCompile: PropTypes.func.isRequired,
