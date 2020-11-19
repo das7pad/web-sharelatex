@@ -110,7 +110,7 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/unit.xml')])
+              junit 'output/unit.xml'
             }
             cleanup {
               sh 'make clean_ci_stage'
@@ -131,7 +131,7 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/unit_module_*.xml')])
+              junit 'output/unit_module_*.xml'
             }
             cleanup {
               sh 'make clean_test_unit_modules'
@@ -153,7 +153,7 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/acceptance.xml')])
+              junit 'output/acceptance.xml'
             }
             cleanup {
               sh 'make clean_test_acceptance_app'
@@ -175,7 +175,7 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/jsdom.xml')])
+              junit 'output/jsdom.xml'
             }
             cleanup {
               sh 'make clean_test_frontend'
@@ -197,7 +197,7 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/karma.xml')])
+              junit 'output/karma.xml'
             }
             cleanup {
               sh 'make clean_test_karma'
@@ -219,7 +219,7 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/acceptance_module_*.xml')])
+              junit 'output/acceptance_module_*.xml'
             }
             cleanup {
               sh 'make clean_test_acceptance_modules'

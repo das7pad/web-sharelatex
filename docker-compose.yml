@@ -12,7 +12,7 @@ services:
     working_dir: /app
     environment:
       MOCHA_GREP: ${MOCHA_GREP}
-      NODE_OPTIONS: "--unhandled-rejections=strict"
+      NODE_OPTIONS: "--unhandled-rejections=strict --trace-deprecation"
     command: npm run test:unit
     user: node
 
@@ -37,7 +37,7 @@ services:
       LINKED_URL_PROXY: 'http://localhost:6543'
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
       NODE_ENV: test
-      NODE_OPTIONS: "--unhandled-rejections=strict"
+      NODE_OPTIONS: "--unhandled-rejections=strict --trace-deprecation"
     user: node
     depends_on:
       - mongo
@@ -60,7 +60,7 @@ services:
     command: npm run test:frontend
     environment:
       MOCHA_GREP: ${MOCHA_GREP}
-      NODE_OPTIONS: "--unhandled-rejections=strict"
+      NODE_OPTIONS: "--unhandled-rejections=strict --trace-deprecation"
 
   test_karma:
     build:
@@ -71,7 +71,7 @@ services:
     working_dir: /app
     command: npm run test:karma:single
     environment:
-      NODE_OPTIONS: "--unhandled-rejections=strict"
+      NODE_OPTIONS: "--unhandled-rejections=strict --trace-deprecation"
   mongo:
     image: mongo
     tmpfs: /data
