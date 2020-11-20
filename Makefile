@@ -38,6 +38,13 @@ export IMAGE_CACHE_HOT ?= $(IMAGE_BRANCH)
 SUFFIX ?=
 export IMAGE_CI ?= ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)$(SUFFIX)
 
+# Helper for creating reproducible tartifacts
+REFERENCE_DATE := 2020-01-01T00:00Z
+TAR_FLAGS_REPRODUCIBLE := --sort=name --mtime=$(REFERENCE_DATE)
+TAR_CREATE_REPRODUCIBLE := tar --create $(TAR_FLAGS_REPRODUCIBLE)
+TOUCH_FLAGS_REPRODUCIBLE := -m -d $(REFERENCE_DATE)
+TOUCH_REPRODUCIBLE := touch $(TOUCH_FLAGS_REPRODUCIBLE)
+
 clean_ci: clean
 clean_ci: clean_build
 
@@ -198,6 +205,7 @@ clean_test_frontend:
 KARMA_DOCKER_COMPOSE ?= \
 	COMPOSE_PROJECT_NAME=karma_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
 
+test_karma_build: build_test_karma
 build_test_karma:
 	$(KARMA_DOCKER_COMPOSE) build --force-rm test_karma
 
@@ -291,6 +299,7 @@ build_prod: clean_build_artifacts
 		$(IMAGE_CI)-webpack \
 			--create \
 			--gzip \
+			$(TAR_FLAGS_REPRODUCIBLE) \
 			app.js \
 			app/src \
 			app/templates \
@@ -302,7 +311,8 @@ build_prod: clean_build_artifacts
 			modules/*/index.js \
 			public/manifest.json \
 			test/smoke/src \
-		> build_artifacts.tar.gz
+	> build_artifacts.tar.gz
+	$(TOUCH_REPRODUCIBLE) build_artifacts.tar.gz
 
 	docker build \
 		--force-rm=true \
@@ -392,9 +402,10 @@ public.tar.gz:
 		--workdir /app/public \
 		--entrypoint sh \
 		$(IMAGE_CI)-webpack \
-		-c '/compress.sh && tar --create .' \
+		-c '/compress.sh && $(TAR_CREATE_REPRODUCIBLE) .' \
 	| gzip -9 \
 	> public.tar.gz
+	$(TOUCH_REPRODUCIBLE) public.tar.gz
 
 MODULE_DIRS := $(shell find modules -mindepth 1 -maxdepth 1 -type d -not -name '.git' )
 MODULE_MAKEFILES := $(MODULE_DIRS:=/Makefile)
