@@ -313,6 +313,9 @@ build_prod: clean_build_artifacts
 			test/smoke/src \
 	> build_artifacts.tar.gz
 	$(TOUCH_REPRODUCIBLE) build_artifacts.tar.gz
+	stat build_artifacts.tar.gz
+	sha256sum build_artifacts.tar.gz
+	$(TOUCH_REPRODUCIBLE) build_artifacts.tar.gz
 
 	docker build \
 		--force-rm=true \
