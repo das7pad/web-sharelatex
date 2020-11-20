@@ -21,3 +21,4 @@ done
 
 # normalize in order to get reproducible ETags (based on m-time)
 find . -name '*.gz' -exec ${NORMALIZE_LAST_MODIFIED} {} +
+find . -type d -exec ${NORMALIZE_LAST_MODIFIED} {} +
