@@ -295,11 +295,8 @@ build_prod: clean_build_artifacts
 
 	docker run \
 		--rm \
-		--entrypoint tar \
 		$(IMAGE_CI)-webpack \
-			--create \
-			--gzip \
-			$(TAR_FLAGS_REPRODUCIBLE) \
+		$(TAR_CREATE_REPRODUCIBLE) \
 			app.js \
 			app/src \
 			app/templates \
@@ -311,10 +308,8 @@ build_prod: clean_build_artifacts
 			modules/*/index.js \
 			public/manifest.json \
 			test/smoke/src \
+	| gzip \
 	> build_artifacts.tar.gz
-	$(TOUCH_REPRODUCIBLE) build_artifacts.tar.gz
-	stat build_artifacts.tar.gz
-	sha256sum build_artifacts.tar.gz
 	$(TOUCH_REPRODUCIBLE) build_artifacts.tar.gz
 
 	docker build \
