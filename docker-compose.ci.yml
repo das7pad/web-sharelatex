@@ -11,6 +11,11 @@ services:
     environment:
       NODE_OPTIONS: "--unhandled-rejections=strict --trace-deprecation"
     entrypoint:
+      - sh
+      - -c
+      # evaluate the modules/*/test/unit/src wildcard
+      - '$$@'
+      - --
       - npx
       - mocha
       - --exit
@@ -20,9 +25,9 @@ services:
       - --reporter
       - xunit
       - --reporter-options
-    command:
-      - output=/home/node/unit.xml,suiteName='App Unit Tests'
+      - output=/home/node/unit.xml,suiteName='Unit Tests'
       - test/unit/src
+      - modules/*/test/unit/src
     volumes:
       - ./output:/home/node:z
 
