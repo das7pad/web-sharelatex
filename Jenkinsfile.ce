@@ -118,28 +118,6 @@ pipeline {
           }
         }
 
-        stage('Module Unit Tests') {
-          agent {
-            label 'sharelatex'
-          }
-          environment {
-            SUFFIX = '-test-unit-modules'
-          }
-          steps {
-            sh 'make prepare_ci_stage'
-            sh 'make test_unit_modules_run_ci'
-          }
-          post {
-            always {
-              junit 'output/unit_module_*.xml'
-            }
-            cleanup {
-              sh 'make clean_test_unit_modules'
-              sh 'make clean_ci_stage'
-            }
-          }
-        }
-
         stage('App Acceptance Tests') {
           agent {
             label 'sharelatex'
