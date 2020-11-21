@@ -34,6 +34,7 @@ USER root
 # generate the translations modules -- used by backend and frontend
 RUN /docker_cleanup.sh make build_lngs_full
 
+ENV NODE_OPTIONS="--trace-deprecation"
 RUN /docker_cleanup.sh npm run webpack:production
 
 # precompile views
