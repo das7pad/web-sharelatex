@@ -406,6 +406,9 @@ public.tar.gz:
 	sha256sum public.tar.gz | awk '{ print $$1 }' > public.tar.gz.checksum.txt
 	$(TOUCH_REPRODUCIBLE) public.tar.gz public.tar.gz.checksum.txt
 
+clean/public.tar.gz:
+	rm -f public.tar.gz public.tar.gz.checksum.txt
+
 MODULE_DIRS := $(shell find modules -mindepth 1 -maxdepth 1 -type d -not -name '.git' )
 MODULE_MAKEFILES := $(MODULE_DIRS:=/Makefile)
 
