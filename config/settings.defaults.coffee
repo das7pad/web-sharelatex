@@ -621,6 +621,7 @@ module.exports = settings =
 		password: process.env['SMOKE_TEST_PASSWORD']
 		projectId: process.env['SMOKE_TEST_PROJECT_ID']
 		rateLimitSubject: process.env['SMOKE_TEST_RATE_LIMIT_SUBJECT'] or "127.0.0.1"
+		stepTimeout: parseInt(process.env['SMOKE_TEST_STEP_TIMEOUT'] || '4000', 10)
 
 	appName: process.env['APP_NAME'] or "ShareLaTeX (Community Edition)"
 

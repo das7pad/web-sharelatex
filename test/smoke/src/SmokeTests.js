@@ -18,6 +18,7 @@ const Failure = SmokeTestFailure
 // send requests to web router if this is the api process
 const OWN_PORT = Settings.port || Settings.internal.web.port || 3000
 const PORT = (Settings.web && Settings.web.web_router_port) || OWN_PORT
+const STEP_TIMEOUT = Settings.smokeTest.stepTimeout
 
 // like the curl option `--resolve DOMAIN:PORT:127.0.0.1`
 class LocalhostAgent extends Agent {
@@ -67,7 +68,7 @@ async function runSmokeTest(stats) {
       qs: {
         setLng: 'en'
       },
-      timeout: 4000
+      timeout: STEP_TIMEOUT
     })
   )
 
@@ -81,7 +82,7 @@ async function runSmokeTest(stats) {
       new Promise((resolve, reject) => {
         timeoutCleanupRateLimits = setTimeout(
           reject,
-          4000,
+          STEP_TIMEOUT,
           new Failure('cleanupRateLimits timed out', stats)
         )
       }),
