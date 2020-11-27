@@ -74,7 +74,7 @@ describe('ProjectCreationHandler', function() {
         '../History/HistoryManager': this.HistoryManager,
         './ProjectEntityUpdateHandler': this.ProjectEntityUpdateHandler,
         './ProjectDetailsHandler': this.ProjectDetailsHandler,
-        'settings-sharelatex': this.Settings,
+        '@overleaf/settings': this.Settings,
         '../Analytics/AnalyticsManager': this.AnalyticsManager,
         'logger-sharelatex': { log() {} },
         '@overleaf/metrics': {

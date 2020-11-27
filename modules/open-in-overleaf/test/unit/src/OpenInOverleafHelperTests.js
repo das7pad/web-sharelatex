@@ -95,7 +95,7 @@ describe('OpenInOverleafHelper', function() {
         '../../../../app/src/Features/Project/ProjectOptionsHandler': this
           .ProjectOptionsHandler,
         '../../../../app/src/Features/V1/V1Api': this.V1Api,
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         fs: this.fs,
         'logger-sharelatex': {
           log() {},

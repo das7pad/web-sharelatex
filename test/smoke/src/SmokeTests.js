@@ -3,7 +3,7 @@ const { createConnection } = require('net')
 const { promisify } = require('util')
 const OError = require('@overleaf/o-error')
 const requestModule = require('request')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
 

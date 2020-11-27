@@ -25,7 +25,7 @@ describe('ClsiFormatChecker', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = { compileBodySizeLimitMb: 5 }),
+        '@overleaf/settings': (this.settings = { compileBodySizeLimitMb: 5 }),
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
           error: sinon.stub(),

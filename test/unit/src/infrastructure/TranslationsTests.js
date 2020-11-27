@@ -13,7 +13,7 @@ describe('Translations', function() {
   beforeEach(function() {
     translations = SandboxedModule.require(MODULE_PATH, {
       requires: {
-        'settings-sharelatex': {
+        '@overleaf/settings': {
           i18n: {
             escapeHTMLInVars: false,
             subdomainLang: {

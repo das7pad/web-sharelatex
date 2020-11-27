@@ -14,7 +14,7 @@
  */
 const RateLimiterMiddleware = require('../../../../app/src/Features/Security/RateLimiterMiddleware')
 const WikiController = require('./WikiController')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 const logger = require('logger-sharelatex')
 const _ = require('lodash')
 const Url = require('url')

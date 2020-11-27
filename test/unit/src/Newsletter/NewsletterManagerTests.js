@@ -29,7 +29,7 @@ describe('NewsletterManager', function() {
       requires: {
         'logger-sharelatex': { info: sinon.stub() },
         'mailchimp-api-v3': this.Mailchimp,
-        'settings-sharelatex': this.Settings
+        '@overleaf/settings': this.Settings
       },
       globals: { console: console }
     }).promises

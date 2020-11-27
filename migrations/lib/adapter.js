@@ -1,6 +1,6 @@
 const eastMongo = require('east-mongo')
 
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 function Adapter(params) {
   params = params || {}

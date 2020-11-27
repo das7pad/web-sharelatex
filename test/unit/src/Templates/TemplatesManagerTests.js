@@ -83,7 +83,7 @@ describe('TemplatesManager', function() {
           log() {},
           err() {}
         },
-        'settings-sharelatex': {
+        '@overleaf/settings': {
           path: {
             dumpFolder: this.dumpFolder
           },

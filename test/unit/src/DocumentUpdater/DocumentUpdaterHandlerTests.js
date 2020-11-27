@@ -41,7 +41,7 @@ describe('DocumentUpdaterHandler', function() {
             return this.request
           }
         },
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': { log() {}, error() {}, warn() {} },
         '../Project/ProjectEntityHandler': this.projectEntityHandler,
         '../../models/Project': {

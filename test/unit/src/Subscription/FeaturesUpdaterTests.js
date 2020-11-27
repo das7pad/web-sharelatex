@@ -34,7 +34,7 @@ describe('FeaturesUpdater', function() {
           log() {},
           warn() {}
         },
-        'settings-sharelatex': (this.Settings = {}),
+        '@overleaf/settings': (this.Settings = {}),
         '../Referal/ReferalFeatures': (this.ReferalFeatures = {}),
         './V1SubscriptionManager': (this.V1SubscriptionManager = {}),
         '../Institutions/InstitutionsFeatures': (this.InstitutionsFeatures = {}),

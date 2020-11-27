@@ -37,7 +37,7 @@ describe('ProjectOptionsHandler', function() {
       },
       requires: {
         '../../models/Project': { Project: this.projectModel },
-        'settings-sharelatex': {
+        '@overleaf/settings': {
           languages: [
             { name: 'English', code: 'en' },
             { name: 'French', code: 'fr' }

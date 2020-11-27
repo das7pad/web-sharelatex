@@ -21,7 +21,7 @@ const ProjectGetter = require('../../../../app/src/Features/Project/ProjectGette
 const ProjectOptionsHandler = require('../../../../app/src/Features/Project/ProjectOptionsHandler')
 const FeaturesUpdater = require('../../../../app/src/Features/Subscription/FeaturesUpdater')
 const async = require('async')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 
 module.exports = ProjectAdminController = {
   show(req, res, next) {

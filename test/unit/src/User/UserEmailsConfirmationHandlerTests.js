@@ -31,7 +31,7 @@ describe('UserEmailsConfirmationHandler', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = {
+        '@overleaf/settings': (this.settings = {
           siteUrl: 'emails.example.com'
         }),
         'logger-sharelatex': (this.logger = { log: sinon.stub() }),

@@ -59,7 +59,7 @@ describe('CollaboratorsInviteHandler', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = {}),
+        '@overleaf/settings': (this.settings = {}),
         '../../models/ProjectInvite': { ProjectInvite: this.ProjectInvite },
         'logger-sharelatex': (this.logger = {
           err: sinon.stub(),

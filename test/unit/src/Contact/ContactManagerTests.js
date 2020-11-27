@@ -23,7 +23,7 @@ describe('ContactManager', function() {
       },
       requires: {
         request: (this.request = sinon.stub()),
-        'settings-sharelatex': (this.settings = {
+        '@overleaf/settings': (this.settings = {
           apis: {
             contacts: {
               url: 'contacts.sharelatex.com'

@@ -31,7 +31,7 @@ describe('CompileManager', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = {
+        '@overleaf/settings': (this.settings = {
           redis: { web: { host: 'localhost', port: 42 } },
           rateLimit: { autoCompile: {} }
         }),

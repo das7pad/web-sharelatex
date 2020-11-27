@@ -35,7 +35,7 @@ describe('NotificationsHandler', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': {
+        '@overleaf/settings': {
           apis: { notifications: { url: notificationUrl } }
         },
         request: this.request,

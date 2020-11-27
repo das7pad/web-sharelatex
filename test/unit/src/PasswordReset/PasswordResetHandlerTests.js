@@ -56,7 +56,7 @@ describe('PasswordResetHandler', function() {
         '../Security/OneTimeTokenHandler': this.OneTimeTokenHandler,
         '../Email/EmailHandler': this.EmailHandler,
         '../Authentication/AuthenticationManager': this.AuthenticationManager,
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': {
           log() {},
           err() {}

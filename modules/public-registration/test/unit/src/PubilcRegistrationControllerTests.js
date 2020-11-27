@@ -71,7 +71,7 @@ describe('PublicRegistrationController', function() {
           .AnalyticsManager,
         'logger-sharelatex': { log() {} },
         '@overleaf/metrics': { inc() {} },
-        'settings-sharelatex': {}
+        '@overleaf/settings': {}
       }
     })
 

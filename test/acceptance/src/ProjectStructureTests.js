@@ -2,7 +2,7 @@ const { expect } = require('chai')
 const { ObjectId } = require('mongodb')
 const Path = require('path')
 const fs = require('fs')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const _ = require('underscore')
 
 const { Project } = require('../../../app/src/models/Project')

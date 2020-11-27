@@ -39,7 +39,7 @@ describe('NotificationsBuilder', function() {
       },
       requires: {
         './NotificationsHandler': this.handler,
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         request: this.request,
         'logger-sharelatex': {
           log() {},

@@ -10,7 +10,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const moment = require('moment')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 
 const currenySymbols = {
   EUR: '€',

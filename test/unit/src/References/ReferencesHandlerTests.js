@@ -57,7 +57,7 @@ describe('ReferencesHandler', function() {
           warn() {},
           err() {}
         },
-        'settings-sharelatex': (this.settings = {
+        '@overleaf/settings': (this.settings = {
           apis: {
             references: { url: 'http://some.url/references' },
             docstore: { url: 'http://some.url/docstore' },

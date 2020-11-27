@@ -83,7 +83,7 @@ describe('ProjectDetailsHandler', function() {
           err() {}
         },
         './ProjectTokenGenerator': this.ProjectTokenGenerator,
-        'settings-sharelatex': this.settings
+        '@overleaf/settings': this.settings
       }
     })
   })

@@ -29,7 +29,7 @@ const AuthenticationController = require('../../../../app/src/Features/Authentic
 const SubscriptionLocator = require('../../../../app/src/Features/Subscription/SubscriptionLocator')
 const FeaturesUpdater = require('../../../../app/src/Features/Subscription/FeaturesUpdater')
 const async = require('async')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 
 const EmailHelper = require('../../../../app/src/Features/Helpers/EmailHelper')
 

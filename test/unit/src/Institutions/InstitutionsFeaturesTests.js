@@ -32,7 +32,7 @@ describe('InstitutionsFeatures', function() {
       requires: {
         '../User/UserGetter': this.UserGetter,
         '../Subscription/PlansLocator': this.PlansLocator,
-        'settings-sharelatex': {
+        '@overleaf/settings': {
           institutionPlanCode: this.institutionPlanCode
         },
         'logger-sharelatex': {

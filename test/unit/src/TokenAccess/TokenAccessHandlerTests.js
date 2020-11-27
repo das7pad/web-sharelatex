@@ -43,7 +43,7 @@ describe('TokenAccessHandler', function() {
         mongodb: { ObjectId },
         '../../models/Project': { Project: (this.Project = {}) },
         'logger-sharelatex': { err: sinon.stub() },
-        'settings-sharelatex': (this.settings = {}),
+        '@overleaf/settings': (this.settings = {}),
         '../User/UserGetter': (this.UserGetter = {}),
         '../V1/V1Api': (this.V1Api = {
           request: sinon.stub()

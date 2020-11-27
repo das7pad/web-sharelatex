@@ -68,7 +68,7 @@ describe('FileStoreHandler', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         request: this.request,
         'logger-sharelatex': this.logger,
         './FileHashManager': this.FileHashManager,

@@ -159,7 +159,7 @@ describe('ProjectController', function() {
       },
       requires: {
         mongodb: { ObjectId },
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': {
           log() {},
           err() {}

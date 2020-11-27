@@ -34,7 +34,7 @@ describe('SpellingController', function() {
           error() {},
           info() {}
         },
-        'settings-sharelatex': {
+        '@overleaf/settings': {
           languages: [
             { name: 'English', code: 'en' },
             { name: 'French', code: 'fr' }

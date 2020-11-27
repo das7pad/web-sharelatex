@@ -4,7 +4,7 @@ const requestRetry = require('requestretry').defaults({
   maxAttempts: 3,
   retryDelay: 10
 })
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const OError = require('@overleaf/o-error')
 
 const TIMEOUT = 10 * 1000

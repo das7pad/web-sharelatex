@@ -39,7 +39,7 @@ describe('ExpressLocalsTests', function() {
         staticPath
       },
       'logger-sharelatex': { log: function() {} },
-      'settings-sharelatex': this.settings,
+      '@overleaf/settings': this.settings,
       '../Features/Subscription/SubscriptionFormatters': {},
       '../Features/SystemMessages/SystemMessageManager': {},
       '../Features/Authentication/AuthenticationController': {

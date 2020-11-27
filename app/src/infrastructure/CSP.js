@@ -1,5 +1,5 @@
 const Settings =
-  require('settings-sharelatex') || require('../../../config/settings.defaults')
+  require('@overleaf/settings') || require('../../../config/settings.defaults')
 const { URL } = require('url')
 
 const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')

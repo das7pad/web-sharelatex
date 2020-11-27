@@ -42,7 +42,7 @@ describe('BrandVariationsHandler', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': this.logger,
         '../V1/V1Api': this.V1Api
       }

@@ -44,7 +44,7 @@ describe('ClsiManager', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = {
+        '@overleaf/settings': (this.settings = {
           apis: {
             filestore: {
               url: 'filestore.example.com',

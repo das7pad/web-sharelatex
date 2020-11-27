@@ -32,7 +32,7 @@ describe('TrackChanges CommentsController', function() {
     }
     this.CommentsController = SandboxedModule.require(modulePath, {
       requires: {
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': { log() {} },
         '../../../../../app/src/Features/Chat/ChatApiHandler': this
           .ChatApiHandler,

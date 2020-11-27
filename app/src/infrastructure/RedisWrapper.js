@@ -1,4 +1,4 @@
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const redis = require('@overleaf/redis-wrapper')
 
 if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {

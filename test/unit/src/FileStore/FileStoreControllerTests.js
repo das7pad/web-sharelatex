@@ -27,7 +27,7 @@ describe('FileStoreController', function() {
       },
       requires: {
         stream: { pipeline: this.pipeline },
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
           err: sinon.stub()

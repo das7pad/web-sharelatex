@@ -3,7 +3,7 @@ const Path = require('path')
 const glob = require('glob')
 const Views = require('./Views')
 const async = require('async')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 module.exports = Modules = {
   modules: [],

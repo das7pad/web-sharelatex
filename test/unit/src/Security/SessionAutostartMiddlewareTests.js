@@ -22,7 +22,7 @@ describe('SessionAutostartMiddleware', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': Settings
+        '@overleaf/settings': Settings
       }
     })
 

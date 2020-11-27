@@ -1,5 +1,5 @@
 const Settings =
-  require('settings-sharelatex') || require('../../../config/settings.defaults')
+  require('@overleaf/settings') || require('../../../config/settings.defaults')
 const { buildCssPath, buildImgPath, staticPath } = require('./WebpackAssets')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1

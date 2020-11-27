@@ -1,6 +1,6 @@
 const { pipeline } = require('stream')
 const logger = require('logger-sharelatex')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 const FileStoreHandler = require('./FileStoreHandler')
 const ProjectLocator = require('../Project/ProjectLocator')

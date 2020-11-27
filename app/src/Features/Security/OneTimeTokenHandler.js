@@ -11,7 +11,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const crypto = require('crypto')
 const logger = require('logger-sharelatex')
 const { db } = require('../../infrastructure/mongodb')

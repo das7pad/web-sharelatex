@@ -54,7 +54,7 @@ describe('ProjectHistoryHandler', function() {
           error: sinon.stub(),
           err() {}
         }),
-        'settings-sharelatex': (this.Settings = {}),
+        '@overleaf/settings': (this.Settings = {}),
         '../../models/Project': {
           Project: this.ProjectModel
         },

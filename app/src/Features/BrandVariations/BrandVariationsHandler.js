@@ -15,7 +15,7 @@
 let BrandVariationsHandler
 const OError = require('@overleaf/o-error')
 const { URL } = require('url')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 const logger = require('logger-sharelatex')
 const V1Api = require('../V1/V1Api')
 

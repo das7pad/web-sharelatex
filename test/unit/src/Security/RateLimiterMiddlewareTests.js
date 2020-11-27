@@ -37,7 +37,7 @@ describe('RateLimiterMiddleware', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = {}),
+        '@overleaf/settings': (this.settings = {}),
         '../../infrastructure/RateLimiter': (this.RateLimiter = {}),
         'logger-sharelatex': (this.logger = { warn: sinon.stub() }),
         './LoginRateLimiter': {},

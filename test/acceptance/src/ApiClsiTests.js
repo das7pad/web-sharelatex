@@ -13,7 +13,7 @@
  */
 const { expect } = require('chai')
 const request = require('./helpers/request')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 require('./helpers/MockClsiApi')
 

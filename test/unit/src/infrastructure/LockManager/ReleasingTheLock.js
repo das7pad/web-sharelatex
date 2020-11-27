@@ -26,7 +26,7 @@ describe('LockManager - releasing the lock', function() {
     'logger-sharelatex': {
       log() {}
     },
-    'settings-sharelatex': {
+    '@overleaf/settings': {
       redis: {},
       lockManager: {
         lockTestInterval: 50,

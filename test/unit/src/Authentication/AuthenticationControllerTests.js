@@ -56,7 +56,7 @@ describe('AuthenticationController', function() {
           error: sinon.stub(),
           err: sinon.stub()
         }),
-        'settings-sharelatex': (this.Settings = {
+        '@overleaf/settings': (this.Settings = {
           siteUrl: 'http://www.foo.bar',
           httpAuthUsers: this.httpAuthUsers
         }),

@@ -65,7 +65,7 @@ describe('CompileController', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         request: (this.request = sinon.stub()),
         '../Project/ProjectGetter': (this.ProjectGetter = {}),
         'logger-sharelatex': (this.logger = {

@@ -11,7 +11,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const fs = require('fs')
 
 // The groups.json file encodes the various group plan options we provide, and

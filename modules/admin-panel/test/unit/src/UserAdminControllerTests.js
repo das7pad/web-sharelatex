@@ -104,7 +104,7 @@ describe('UserAdminController', function() {
         '@overleaf/metrics': {
           gauge() {}
         },
-        'settings-sharelatex': (this.settings = {})
+        '@overleaf/settings': (this.settings = {})
       }
     })
 

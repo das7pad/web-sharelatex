@@ -40,7 +40,7 @@ describe('AuthorizationManager', function() {
             .stub()
             .callsArgWith(2, null, false, false)
         }),
-        'settings-sharelatex': { passwordStrengthOptions: {} }
+        '@overleaf/settings': { passwordStrengthOptions: {} }
       }
     })
     this.user_id = 'user-id-1'

@@ -40,7 +40,7 @@ describe('InstitutionsAPI', function() {
         '@overleaf/metrics': {
           timeAsyncMethod: sinon.stub()
         },
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         request: this.request,
         '../Notifications/NotificationsBuilder': {
           ipMatcherAffiliation: sinon.stub().returns(this.ipMatcherNotification)

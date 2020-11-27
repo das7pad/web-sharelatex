@@ -31,7 +31,7 @@ describe('RestoreManager', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': {},
+        '@overleaf/settings': {},
         '../../infrastructure/FileWriter': (this.FileWriter = {}),
         '../Uploads/FileSystemImportManager': (this.FileSystemImportManager = {}),
         '../Project/ProjectEntityHandler': (this.ProjectEntityHandler = {}),

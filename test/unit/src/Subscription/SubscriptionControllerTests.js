@@ -111,7 +111,7 @@ describe('SubscriptionController', function() {
           log() {},
           warn() {}
         },
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         '../User/UserGetter': this.UserGetter,
         './RecurlyWrapper': (this.RecurlyWrapper = {
           updateAccountEmailAddress: sinon.stub().yields()

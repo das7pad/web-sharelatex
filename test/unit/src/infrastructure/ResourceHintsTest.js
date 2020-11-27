@@ -22,7 +22,7 @@ describe('ResourceHints', function() {
     }
 
     this.requires = {
-      'settings-sharelatex': this.settings,
+      '@overleaf/settings': this.settings,
       './WebpackAssets': {
         buildCssPath(themeModifier) {
           return `/stylesheets/${themeModifier}style.css`

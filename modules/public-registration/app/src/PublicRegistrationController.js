@@ -26,7 +26,7 @@ const UserHandler = require('../../../../app/src/Features/User/UserHandler')
 const UserSessionsManager = require('../../../../app/src/Features/User/UserSessionsManager')
 const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
 const AnalyticsManager = require('../../../../app/src/Features/Analytics/AnalyticsManager')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 
 EmailBuilder.templates.welcome = EmailBuilder.ctaTemplate({
   subject() {

@@ -25,7 +25,7 @@ describe('TrackChanges TrackChangesController', function() {
   beforeEach(function() {
     this.TrackChangesController = SandboxedModule.require(modulePath, {
       requires: {
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': { log() {} },
         './RangesManager': (this.RangesManager = {}),
         './TrackChangesManager': (this.TrackChangesManager = {}),

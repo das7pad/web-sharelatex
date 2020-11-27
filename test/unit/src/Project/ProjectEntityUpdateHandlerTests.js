@@ -154,7 +154,7 @@ describe('ProjectEntityUpdateHandler', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': { validRootDocExtensions: ['tex'] }, // from 17s to 2s
+        '@overleaf/settings': { validRootDocExtensions: ['tex'] }, // from 17s to 2s
         'logger-sharelatex': this.logger,
         fs: this.fs,
         '../../models/Doc': { Doc: this.DocModel },

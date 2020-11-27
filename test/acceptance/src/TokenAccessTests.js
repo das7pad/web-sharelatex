@@ -3,7 +3,7 @@ const async = require('async')
 const MockV1Api = require('./helpers/MockV1Api')
 const User = require('./helpers/User')
 const request = require('./helpers/request')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongodb')
 
 require('./helpers/MockDocstoreApi')

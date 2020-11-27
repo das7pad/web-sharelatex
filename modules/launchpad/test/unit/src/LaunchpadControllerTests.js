@@ -40,7 +40,7 @@ describe('LaunchpadController', function() {
             return false
           }
         },
-        'settings-sharelatex': (this.Settings = {}),
+        '@overleaf/settings': (this.Settings = {}),
         'logger-sharelatex': (this.Logger = {
           log() {},
           warn() {},

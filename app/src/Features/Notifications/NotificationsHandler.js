@@ -12,7 +12,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const OError = require('@overleaf/o-error')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 const request = require('request')
 const requestRetry = require('requestretry').defaults({
   maxAttempts: 3,

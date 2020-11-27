@@ -37,7 +37,7 @@ describe('V1SubscriptionManager', function() {
           err: sinon.stub(),
           warn: sinon.stub()
         },
-        'settings-sharelatex': (this.Settings = {
+        '@overleaf/settings': (this.Settings = {
           apis: {
             v1: {
               host: (this.host = 'http://overleaf.example.com'),

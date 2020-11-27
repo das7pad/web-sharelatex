@@ -31,7 +31,7 @@ describe('AnalyticsManager', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': this.Settings,
+        '@overleaf/settings': this.Settings,
         'logger-sharelatex': {
           warn() {}
         },

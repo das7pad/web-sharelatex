@@ -31,7 +31,7 @@ describe('ReferencesController', function() {
           log() {},
           err() {}
         },
-        'settings-sharelatex': (this.settings = {
+        '@overleaf/settings': (this.settings = {
           apis: { web: { url: 'http://some.url' } }
         }),
         './ReferencesHandler': (this.ReferencesHandler = {

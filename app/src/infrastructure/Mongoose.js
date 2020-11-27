@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const logger = require('logger-sharelatex')
 
 if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {

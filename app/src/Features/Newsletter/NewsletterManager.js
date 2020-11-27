@@ -1,6 +1,6 @@
 const { callbackify } = require('util')
 const logger = require('logger-sharelatex')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const crypto = require('crypto')
 const OError = require('@overleaf/o-error')
 

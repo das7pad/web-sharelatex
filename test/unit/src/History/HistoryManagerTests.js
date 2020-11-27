@@ -41,7 +41,7 @@ describe('HistoryManager', function() {
       },
       requires: {
         'request-promise-native': this.request,
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         '../User/UserGetter': this.UserGetter
       }
     })

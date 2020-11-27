@@ -8,7 +8,7 @@ const PublicAccessLevels = require('../Authorization/PublicAccessLevels')
 const Errors = require('../Errors/Errors')
 const ProjectTokenGenerator = require('./ProjectTokenGenerator')
 const ProjectHelper = require('./ProjectHelper')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 const { callbackify } = require('util')
 
 const MAX_PROJECT_NAME_LENGTH = 150

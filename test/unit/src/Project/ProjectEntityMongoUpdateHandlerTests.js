@@ -188,7 +188,7 @@ describe('ProjectEntityMongoUpdateHandler', function() {
       requires: {
         mongodb: { ObjectId },
         'logger-sharelatex': this.logger,
-        'settings-sharelatex': this.Settings,
+        '@overleaf/settings': this.Settings,
         '../Cooldown/CooldownManager': this.CooldownManager,
         '../../models/Folder': { Folder: this.FolderModel },
         '../../infrastructure/LockManager': this.LockManager,

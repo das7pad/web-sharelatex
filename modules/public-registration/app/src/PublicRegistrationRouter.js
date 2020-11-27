@@ -13,7 +13,7 @@
 const PublicRegistrationController = require('./PublicRegistrationController')
 const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
 const CaptchaMiddleware = require('../../../../app/src/Features/Captcha/CaptchaMiddleware')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 const logger = require('logger-sharelatex')
 

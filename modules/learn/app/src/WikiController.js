@@ -16,7 +16,7 @@
  */
 let WikiController
 const request = require('request')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 const logger = require('logger-sharelatex')
 const ErrorController = require('../../../../app/src/Features/Errors/ErrorController')
 const _ = require('underscore')

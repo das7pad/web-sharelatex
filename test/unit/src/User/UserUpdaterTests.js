@@ -75,7 +75,7 @@ describe('UserUpdater', function() {
         '../Subscription/FeaturesUpdater': {
           refreshFeatures: this.refreshFeatures
         },
-        'settings-sharelatex': (this.settings = {}),
+        '@overleaf/settings': (this.settings = {}),
         request: (this.request = {}),
         '../Newsletter/NewsletterManager': this.NewsletterManager,
         '../Subscription/RecurlyWrapper': this.RecurlyWrapper,

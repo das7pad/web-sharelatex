@@ -1,5 +1,5 @@
 const glob = require('glob')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const Path = require('path')
 
 function getBuiltViewList() {

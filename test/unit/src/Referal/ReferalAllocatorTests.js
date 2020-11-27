@@ -17,7 +17,7 @@ describe('ReferalAllocator', function() {
           User: (this.User = {})
         },
         '../Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
-        'settings-sharelatex': (this.Settings = {}),
+        '@overleaf/settings': (this.Settings = {}),
         'logger-sharelatex': {
           log() {},
           err() {}

@@ -30,7 +30,7 @@ describe('TranslationsForked', function() {
       subdomainLang
     }
     this.Translations = SandboxedModule.require(MODULE_PATH, {
-      requires: { 'settings-sharelatex': { i18n: options } },
+      requires: { '@overleaf/settings': { i18n: options } },
       globals: { process }
     })
 
@@ -65,7 +65,7 @@ describe('TranslationsForked', function() {
   describe('without any provided options', function() {
     beforeEach(function() {
       this.Translations = SandboxedModule.require(MODULE_PATH, {
-        requires: { 'settings-sharelatex': { i18n: {} } },
+        requires: { '@overleaf/settings': { i18n: {} } },
         globals: { process }
       })
     })
@@ -391,7 +391,7 @@ describe('TranslationsForked', function() {
           }
         }
         this.Translations = SandboxedModule.require(MODULE_PATH, {
-          requires: { 'settings-sharelatex': { i18n: options } },
+          requires: { '@overleaf/settings': { i18n: options } },
           globals: { process }
         })
       })

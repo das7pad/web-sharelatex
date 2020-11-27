@@ -26,7 +26,7 @@ describe('EmailBuilder', function() {
         './Bodies/cta-email': ctaEmailBody,
         './Bodies/NoCTAEmailBody': NoCTAEmailBody,
         './Layouts/BaseWithHeaderEmailLayout': BaseWithHeaderEmailLayout,
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': {
           log() {}
         }

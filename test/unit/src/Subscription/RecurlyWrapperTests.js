@@ -149,7 +149,7 @@ describe('RecurlyWrapper', function() {
           console: console
         },
         requires: {
-          'settings-sharelatex': this.settings,
+          '@overleaf/settings': this.settings,
           'logger-sharelatex': {
             err: sinon.stub(),
             error: sinon.stub(),

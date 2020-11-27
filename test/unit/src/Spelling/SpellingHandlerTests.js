@@ -40,7 +40,7 @@ describe('SpellingHandler', function() {
           error() {},
           info() {}
         },
-        'settings-sharelatex': {
+        '@overleaf/settings': {
           apis: { spelling: { host: SPELLING_HOST, url: SPELLING_URL } }
         }
       }

@@ -1,6 +1,6 @@
 const Path = require('path')
 const { URL } = require('url')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const merge = require('webpack-merge')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 

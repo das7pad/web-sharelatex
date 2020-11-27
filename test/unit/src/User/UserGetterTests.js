@@ -57,7 +57,7 @@ describe('UserGetter', function() {
         '@overleaf/metrics': {
           timeAsyncMethod: sinon.stub()
         },
-        'settings-sharelatex': settings,
+        '@overleaf/settings': settings,
         '../Institutions/InstitutionsAPI': {
           getUserAffiliations: this.getUserAffiliations
         },

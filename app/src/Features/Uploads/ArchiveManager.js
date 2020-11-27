@@ -18,7 +18,7 @@ const metrics = require('@overleaf/metrics')
 const fs = require('fs')
 const Path = require('path')
 const yauzl = require('yauzl')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const {
   InvalidZipFileError,
   EmptyZipFileError,

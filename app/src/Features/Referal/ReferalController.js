@@ -1,6 +1,6 @@
 const ReferalHandler = require('./ReferalHandler')
 const AuthenticationController = require('../Authentication/AuthenticationController')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 module.exports = {
   bonus(req, res, next) {

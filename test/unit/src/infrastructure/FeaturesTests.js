@@ -10,7 +10,7 @@ describe('Features', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = {})
+        '@overleaf/settings': (this.settings = {})
       }
     })
   })
@@ -47,7 +47,7 @@ describe('Features', function() {
   })
 
   describe('hasFeature', function() {
-    const defaults = SandboxedModule.require('settings-sharelatex', {
+    const defaults = SandboxedModule.require('@overleaf/settings', {
       globals: {
         process: { env: {} }
       }

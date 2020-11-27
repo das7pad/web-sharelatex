@@ -31,7 +31,7 @@ describe('HistoryController', function() {
       },
       requires: {
         request: (this.request = sinon.stub()),
-        'settings-sharelatex': (this.settings = {}),
+        '@overleaf/settings': (this.settings = {}),
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
           warn: sinon.stub(),

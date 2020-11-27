@@ -67,7 +67,7 @@ describe('UserSessionsManager', function() {
       },
       requires: {
         'logger-sharelatex': this.logger,
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         './UserSessionsRedis': this.UserSessionsRedis
       }
     }))

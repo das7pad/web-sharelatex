@@ -26,7 +26,7 @@ describe('ClsiStateManager', function() {
         console: console
       },
       requires: {
-        'settings-sharelatex': (this.settings = {}),
+        '@overleaf/settings': (this.settings = {}),
         '../Project/ProjectEntityHandler': (this.ProjectEntityHandler = {}),
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),

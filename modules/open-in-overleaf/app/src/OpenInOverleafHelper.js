@@ -15,7 +15,7 @@
  */
 let OpenInOverleafHelper
 const logger = require('logger-sharelatex')
-const settings = require('settings-sharelatex')
+const settings = require('@overleaf/settings')
 const mmm = require('mmmagic')
 const fs = require('fs')
 const path = require('path')

@@ -49,7 +49,7 @@ describe('ProjectUploadController', function() {
       },
       requires: {
         multer: sinon.stub(), // from 428ms to 43ms
-        'settings-sharelatex': { path: {} },
+        '@overleaf/settings': { path: {} },
         './ProjectUploadManager': (this.ProjectUploadManager = {}),
         './FileSystemImportManager': (this.FileSystemImportManager = {}),
         'logger-sharelatex': (this.logger = {

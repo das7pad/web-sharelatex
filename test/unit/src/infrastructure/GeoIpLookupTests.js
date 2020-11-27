@@ -39,7 +39,7 @@ describe('GeoIpLookup', function() {
       },
       requires: {
         request: this.request,
-        'settings-sharelatex': this.settings,
+        '@overleaf/settings': this.settings,
         'logger-sharelatex': {
           log() {},
           err() {}

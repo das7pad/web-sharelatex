@@ -106,7 +106,7 @@ describe('SubscriptionUpdater', function() {
           log() {},
           warn() {}
         },
-        'settings-sharelatex': this.Settings,
+        '@overleaf/settings': this.Settings,
         '../../infrastructure/mongodb': { db: {}, ObjectId },
         './FeaturesUpdater': this.FeaturesUpdater,
         '../../models/DeletedSubscription': {
