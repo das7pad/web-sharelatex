@@ -403,5 +403,4 @@ script(type='text/ng-template', id='clearCacheModalTemplate')
 			span(ng-show="!state.inflight") {{translate("clear_cache")}}
 			span(ng-show="state.inflight") {{translate("clearing")}}…
 
-script.
-	window.showNewLogsUI = #{showNewLogsUI}
+meta(id="ol-showNewLogsUI" data-boolean content=showNewLogsUI)

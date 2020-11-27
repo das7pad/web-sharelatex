@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import PreviewLogsPaneEntry from './preview-logs-pane-entry'
+import t from '../../../misc/t'
 
 function PreviewError({ name }) {
-  const { t } = useTranslation()
   let errorTitle
   let errorContent
 
