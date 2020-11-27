@@ -8,6 +8,7 @@ import t from '../../../misc/t'
 function PreviewLogsToggleButton({
   onToggle,
   showLogs,
+  compileFailed = false,
   logsState: { nErrors, nWarnings },
   showText
 }) {
@@ -40,6 +41,7 @@ function PreviewLogsToggleButton({
     <button
       id="logs-toggle"
       type="button"
+      disabled={compileFailed}
       className={toggleButtonClasses}
       onClick={handleOnClick}
     >
@@ -132,7 +134,8 @@ PreviewLogsToggleButton.propTypes = {
     nLogEntries: PropTypes.number.isRequired
   }),
   showLogs: PropTypes.bool.isRequired,
-  showText: PropTypes.bool.isRequired
+  showText: PropTypes.bool.isRequired,
+  compileFailed: PropTypes.bool
 }
 
 LogsCompilationResultIndicator.propTypes = {

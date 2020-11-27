@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Icon from '../../../shared/components/icon'
-import PreviewLogEntry from './preview-log-entry'
+import PreviewLogsPaneEntry from './preview-logs-pane-entry'
 import t from '../../../misc/t'
 
 function PreviewFirstErrorPopUp({
@@ -21,8 +21,12 @@ function PreviewFirstErrorPopUp({
       role="alertdialog"
       aria-label={t('first_error_popup_label')}
     >
-      <PreviewLogEntry
-        {...logEntry}
+      <PreviewLogsPaneEntry
+        headerTitle={logEntry.message}
+        rawContent={logEntry.content}
+        formattedContent={logEntry.humanReadableHintComponent}
+        extraInfoURL={logEntry.extraInfoURL}
+        level={logEntry.level}
         showLineAndNoLink={false}
         showCloseButton
         onClose={onClose}

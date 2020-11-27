@@ -51,6 +51,18 @@ function PreviewPane({
       ? compilerState.logEntries.all.length
       : 0
 
+  const hasCLSIErrors =
+    compilerState.errors &&
+    Object.keys(compilerState.errors).length > 0 &&
+    compilerState.compileFailed &&
+    !compilerState.isCompiling
+
+  const hasValidationIssues =
+    compilerState.validationIssues &&
+    Object.keys(compilerState.validationIssues).length > 0 &&
+    compilerState.compileFailed &&
+    !compilerState.isCompiling
+
   const showFirstErrorPopUp =
     nErrors > 0 &&
     !seenLogsForCurrentCompile &&
@@ -78,6 +90,12 @@ function PreviewPane({
         pdfDownloadUrl={pdfDownloadUrl}
       />
       <span aria-live="polite" className="sr-only">
+        {hasCLSIErrors ? t('compile_error_description') : ''}
+      </span>
+      <span aria-live="polite" className="sr-only">
+        {hasValidationIssues ? t('validation_issue_description') : ''}
+      </span>
+      <span aria-live="polite" className="sr-only">
         {nErrors && !compilerState.isCompiling
           ? t('n_errors', { count: nErrors })
           : ''}
@@ -99,6 +117,8 @@ function PreviewPane({
         <PreviewLogsPane
           logEntries={compilerState.logEntries.all}
           rawLog={compilerState.rawLog}
+          validationIssues={compilerState.validationIssues}
+          errors={compilerState.errors}
           onLogEntryLocationClick={onLogEntryLocationClick}
         />
       ) : null}
@@ -113,8 +133,11 @@ PreviewPane.propTypes = {
     isDraftModeOn: PropTypes.bool.isRequired,
     isSyntaxCheckOn: PropTypes.bool.isRequired,
     lastCompileTimestamp: PropTypes.number,
-    logEntries: PropTypes.object.isRequired,
-    rawLog: PropTypes.string
+    logEntries: PropTypes.object,
+    validationIssues: PropTypes.object,
+    errors: PropTypes.object,
+    rawLog: PropTypes.string,
+    compileFailed: PropTypes.bool
   }),
   onClearCache: PropTypes.func.isRequired,
   onLogEntryLocationClick: PropTypes.func.isRequired,
