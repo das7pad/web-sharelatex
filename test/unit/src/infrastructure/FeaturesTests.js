@@ -49,7 +49,7 @@ describe('Features', function() {
   describe('hasFeature', function() {
     const defaults = SandboxedModule.require('@overleaf/settings', {
       globals: {
-        process: { env: {} }
+        process: { env: {}, cwd: () => process.cwd() }
       }
     })
     beforeEach(function() {
