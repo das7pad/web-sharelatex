@@ -57,6 +57,8 @@ Gemfile.lock
 
 docker-shared.yml
 
+config/*.js
+!config/settings.defaults.js
 config/*.coffee
 
 modules/**/Makefile
