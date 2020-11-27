@@ -369,6 +369,14 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     CompileController.downloadPdf
   )
 
+  // Align with limits defined in CompileController.downloadPdf
+  const rateLimiterMiddlewareOutputFiles = RateLimiterMiddleware.rateLimit({
+    endpointName: 'misc-output-download',
+    params: ['Project_id'],
+    maxRequests: 1000,
+    timeInterval: 60 * 60
+  })
+
   // Used by the pdf viewers
   webRouter.get(
     /^\/project\/([^/]*)\/output\/(.*)$/,
@@ -380,6 +388,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       req.params = params
       next()
     },
+    rateLimiterMiddlewareOutputFiles,
     AuthorizationMiddleware.ensureUserCanReadProject,
     CompileController.getFileFromClsi
   )
@@ -395,6 +404,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       req.params = params
       next()
     },
+    rateLimiterMiddlewareOutputFiles,
     AuthorizationMiddleware.ensureUserCanReadProject,
     CompileController.getFileFromClsi
   )
@@ -411,6 +421,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       req.params = params
       next()
     },
+    rateLimiterMiddlewareOutputFiles,
     AuthorizationMiddleware.ensureUserCanReadProject,
     CompileController.getFileFromClsi
   )
@@ -428,6 +439,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       req.params = params
       next()
     },
+    rateLimiterMiddlewareOutputFiles,
     AuthorizationMiddleware.ensureUserCanReadProject,
     CompileController.getFileFromClsi
   )
