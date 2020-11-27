@@ -744,6 +744,8 @@ const ProjectController = {
         const allowedImageNames = ProjectHelper.getAllowedImagesForUser(
           sessionUser
         )
+        const wantsOldFileTreeUI =
+          req.query && req.query.new_file_tree_ui === 'false'
         if (projectId) {
           if (project) {
             let allowedFreeTrial = true
@@ -881,7 +883,8 @@ const ProjectController = {
               wsAssetUrl,
               showSupport: Features.hasFeature('support'),
               showNewLogsUI: req.query && req.query.new_logs_ui === 'true',
-              showNewChatUI: user.betaProgram && !wantsOldChatUI
+              showNewChatUI: user.betaProgram && !wantsOldChatUI,
+              showReactFileTree: user.alphaProgram && !wantsOldFileTreeUI
             })
             timer.done()
           }
