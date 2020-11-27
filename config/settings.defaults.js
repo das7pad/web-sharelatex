@@ -4,15 +4,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let cdnUrl,
-  defaultFeatures,
-  docUpdaterPort,
-  plans,
-  settings,
-  siteUrl,
-  v1Api,
-  webPort
-const Path = require('path')
+let cdnUrl, defaultFeatures, docUpdaterPort, siteUrl, v1Api
+
 const http = require('http')
 http.globalAgent.maxSockets = 300
 
@@ -57,7 +50,7 @@ const intFromEnv = function(name, defaultValue) {
   return parseInt(process.env[name], 10) || defaultValue
 }
 
-module.exports = settings = {
+module.exports = {
   enableLegacyRegistration: true,
 
   allowAnonymousReadAndWriteSharing:
@@ -206,7 +199,7 @@ module.exports = settings = {
   // running which conflict, or want to run the web process on port 80.
   internal: {
     web: {
-      port: (webPort = process.env['WEB_PORT'] || 3000),
+      port: process.env['WEB_PORT'] || 3000,
       host: process.env['LISTEN_ADDRESS'] || 'localhost'
     },
     documentupdater: {
@@ -380,9 +373,6 @@ module.exports = settings = {
     )
   },
 
-  // Used to close the editor off to users
-  editorIsOpen: process.env['EDITOR_IS_OPEN'] || true,
-
   // Optional separate location for websocket connections, if unset defaults to siteUrl.
   wsUrl: process.env['WEBSOCKET_URL'] || '/socket.io',
   wsUrlV2: process.env['WEBSOCKET_URL_V2'],
@@ -490,14 +480,14 @@ module.exports = settings = {
     personal: defaultFeatures
   },
 
-  plans: (plans = [
+  plans: [
     {
       planCode: 'personal',
       name: 'Personal',
       price: 0,
       features: defaultFeatures
     }
-  ]),
+  ],
 
   enableSubscriptions: false,
 
