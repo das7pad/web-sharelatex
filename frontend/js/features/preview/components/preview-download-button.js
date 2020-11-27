@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { Dropdown, MenuItem, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import Icon from '../../../shared/components/icon'
 import t from '../../../misc/t'
-import { Trans } from '../../../components/trans'
 
 export const topFileTypes = ['bbl', 'gls', 'ind']
 
@@ -77,11 +76,11 @@ function PreviewDownloadButton({
         bsStyle="info"
       />
       <Dropdown.Menu id="download-dropdown-list">
+        <MenuItem header>{t('other_output_files')}</MenuItem>
         <FileList list={topFiles} listType="main" />
         {otherFiles.length > 0 && topFiles.length > 0 ? (
           <>
             <MenuItem divider />
-            <MenuItem header>{t('other_output_files')}</MenuItem>
           </>
         ) : (
           <></>
@@ -102,11 +101,7 @@ function FileList({ listType, list }) {
   return list.map((file, index) => {
     return (
       <MenuItem download href={file.url} key={`${listType}-${index}`}>
-        <Trans
-          i18nKey="download_file"
-          components={[<strong />]}
-          values={{ type: file.fileName }}
-        />
+        <b>{file.fileName}</b>
       </MenuItem>
     )
   })
