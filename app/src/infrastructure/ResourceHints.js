@@ -81,20 +81,22 @@ function getPreloadMiddleware() {
   return function preloadMiddleware(req, res, next) {
     const actualRender = res.render
     res.render = function(view, locals, cb) {
-      const endpoint = req.route.path
       let headerValue
-      if (endpoint === '/project') {
-        headerValue = PRELOAD_DASHBOARD
-      } else if (endpoint === '/Project/:Project_id') {
-        if (locals.themeModifier === 'ieee-') {
-          headerValue = PRELOAD_EDITOR_IEEE
-        } else if (locals.themeModifier === 'light-') {
-          headerValue = PRELOAD_EDITOR_LIGHT
-        } else {
-          headerValue = PRELOAD_EDITOR_DEFAULT
-        }
-      } else {
-        headerValue = PRELOAD_DEFAULT
+      switch (view) {
+        case 'project/list':
+          headerValue = PRELOAD_DASHBOARD
+          break
+        case 'project/editor':
+          if (locals.themeModifier === 'ieee-') {
+            headerValue = PRELOAD_EDITOR_IEEE
+          } else if (locals.themeModifier === 'light-') {
+            headerValue = PRELOAD_EDITOR_LIGHT
+          } else {
+            headerValue = PRELOAD_EDITOR_DEFAULT
+          }
+          break
+        default:
+          headerValue = PRELOAD_DEFAULT
       }
       res.setHeader('Link', headerValue)
       actualRender.call(res, view, locals, cb)

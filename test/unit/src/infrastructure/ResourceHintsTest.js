@@ -94,16 +94,14 @@ describe('ResourceHints', function() {
     })
 
     it('should set the header for custom css', function() {
-      this.req.route.path = '/Project/:Project_id'
-      this.res.render('template', { themeModifier: 'light-' })
+      this.res.render('project/editor', { themeModifier: 'light-' })
       expect(this.res.headers.Link).to.include(
         '</stylesheets/light-style.css>;rel=preload;as=style'
       )
     })
 
     it('should set the header for images', function() {
-      this.req.route.path = '/Project/:Project_id'
-      this.res.render('template', {})
+      this.res.render('project/editor', {})
       expect(this.res.headers.Link).to.include(
         '</img/ol-brand/overleaf-o.svg>;rel=preload;as=image'
       )
@@ -118,8 +116,7 @@ describe('ResourceHints', function() {
 
     it('should inject the tooltip font on the dashboard', function() {
       const tooltipFont = 'merriweather-v21-latin-700italic'
-      this.req.route.path = '/project'
-      this.res.render('template', {})
+      this.res.render('project/list', {})
       expect(this.res.headers.Link).to.include(
         `</fonts/${tooltipFont}.woff2>;rel=preload;as=font;crossorigin`
       )
