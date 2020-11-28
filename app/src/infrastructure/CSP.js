@@ -1,6 +1,7 @@
 const Settings =
   require('@overleaf/settings') || require('../../../config/settings.defaults')
 const { URL } = require('url')
+const Path = require('path')
 
 const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
 
@@ -195,24 +196,32 @@ function getCspMiddleware() {
   })
   const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
 
+  const MODULE_PATH = Path.resolve(__dirname, '../../../modules')
+  const VIEW_LAUNCHPAD = Path.resolve(
+    MODULE_PATH,
+    'launchpad/app/views/launchpad'
+  )
+
   return function cspMiddleware(req, res, next) {
     const actualRender = res.render
-    res.render = function() {
-      const endpoint = req.route.path
+    res.render = function(view) {
       let headerValue
-      if (endpoint === '/project') {
-        headerValue = CSP_DASHBOARD
-      } else if (endpoint === '/Project/:Project_id') {
-        headerValue = CSP_EDITOR
-      } else if (
-        endpoint === '/user/subscription/new' ||
-        endpoint === '/user/subscription'
-      ) {
-        headerValue = CSP_SUBSCRIPTION
-      } else if (endpoint === '/launchpad') {
-        headerValue = CSP_LAUNCHPAD
-      } else {
-        headerValue = CSP_DEFAULT
+      switch (view) {
+        case 'project/list':
+          headerValue = CSP_DASHBOARD
+          break
+        case 'project/editor':
+          headerValue = CSP_EDITOR
+          break
+        case '/user/subscription/new':
+        case '/user/subscription':
+          headerValue = CSP_SUBSCRIPTION
+          break
+        case VIEW_LAUNCHPAD:
+          headerValue = CSP_LAUNCHPAD
+          break
+        default:
+          headerValue = CSP_DEFAULT
       }
       if (csp.enforce) {
         res.setHeader('Content-Security-Policy', headerValue)
