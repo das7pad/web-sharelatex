@@ -1,12 +1,10 @@
 import React from 'react'
 import { Button, Modal } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
 
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
+import t from '../../../../misc/t'
 
 function FileTreeModalDelete() {
-  const { t } = useTranslation()
-
   const {
     isDeleting,
     inFlight,

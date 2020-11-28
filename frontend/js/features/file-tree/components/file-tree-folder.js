@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import classNames from 'classnames'
 
 import Icon from '../../../shared/components/icon'
@@ -9,10 +8,9 @@ import { useDroppable } from '../contexts/file-tree-draggable'
 
 import FileTreeItemInner from './file-tree-item/file-tree-item-inner'
 import FileTreeFolderList from './file-tree-folder-list'
+import t from '../../../misc/t'
 
 function FileTreeFolder({ name, id, folders, docs, files }) {
-  const { t } = useTranslation()
-
   const { isSelected, props: selectableEntityProps } = useSelectableEntity(id)
   const [expanded, setExpanded] = useState(false)
 

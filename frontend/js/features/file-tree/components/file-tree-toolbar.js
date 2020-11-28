@@ -1,11 +1,11 @@
 import React, { useContext } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import Icon from '../../../shared/components/icon'
 import TooltipButton from '../../../shared/components/tooltip-button'
 
 import { FileTreeMainContext } from '../contexts/file-tree-main'
 import { useFileTreeActionable } from '../contexts/file-tree-actionable'
+import t from '../../../misc/t'
 
 function FileTreeToolbar() {
   const { hasWritePermissions } = useContext(FileTreeMainContext)
@@ -21,7 +21,6 @@ function FileTreeToolbar() {
 }
 
 function FileTreeToolbarLeft() {
-  const { t } = useTranslation()
   const {
     canCreate,
     startCreatingFolder,
@@ -63,7 +62,6 @@ function FileTreeToolbarLeft() {
 }
 
 function FileTreeToolbarRight() {
-  const { t } = useTranslation()
   const {
     canRename,
     canDelete,

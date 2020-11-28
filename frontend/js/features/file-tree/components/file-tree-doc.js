@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 
 import Icon from '../../../shared/components/icon'
 import iconTypeFromName from '../util/icon-type-from-name'
@@ -8,10 +7,9 @@ import iconTypeFromName from '../util/icon-type-from-name'
 import { useSelectableEntity } from '../contexts/file-tree-selectable'
 
 import FileTreeItemInner from './file-tree-item/file-tree-item-inner'
+import t from '../../../misc/t'
 
 function FileTreeDoc({ name, id, isLinkedFile }) {
-  const { t } = useTranslation()
-
   const { isSelected, props: selectableEntityProps } = useSelectableEntity(id)
 
   const icons = (

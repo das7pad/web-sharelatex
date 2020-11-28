@@ -2,13 +2,12 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { Button, Modal } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
 import { useRefWithAutoFocus } from '../../../../infrastructure/auto-focus'
 
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
+import t from '../../../../misc/t'
 
 function FileTreeModalCreateFolder() {
-  const { t } = useTranslation()
   const [name, setName] = useState('')
 
   const {

@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 
 import { DndProvider, createDndContext, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend, getEmptyImage } from 'react-dnd-html5-backend'
@@ -13,6 +12,7 @@ import {
 import { useFileTreeActionable } from './file-tree-actionable'
 import { useFileTreeMutable } from './file-tree-mutable'
 import { useFileTreeSelectable } from '../contexts/file-tree-selectable'
+import t from '../../../misc/t'
 
 const DndContext = createDndContext(HTML5Backend)
 
@@ -36,8 +36,6 @@ FileTreeDraggableProvider.propTypes = {
 }
 
 export function useDraggable(draggedEntityId) {
-  const { t } = useTranslation()
-
   const { fileTreeData } = useFileTreeMutable()
   const { selectedEntityIds } = useFileTreeSelectable()
 

@@ -1,12 +1,10 @@
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { MenuItem } from 'react-bootstrap'
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
+import t from '../../../../misc/t'
 
 function FileTreeItemMenuItems() {
-  const { t } = useTranslation()
-
   const {
     canRename,
     canDelete,

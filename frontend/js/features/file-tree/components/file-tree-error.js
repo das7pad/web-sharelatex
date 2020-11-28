@@ -1,10 +1,8 @@
 import React from 'react'
 import { Button } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function FileTreeError() {
-  const { t } = useTranslation()
-
   function reload() {
     location.reload()
   }
