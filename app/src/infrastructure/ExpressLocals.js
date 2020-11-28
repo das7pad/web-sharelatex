@@ -1,5 +1,4 @@
-const Settings =
-  require('@overleaf/settings') || require('../../../config/settings.defaults')
+const Settings = require('@overleaf/settings')
 const logger = require('logger-sharelatex')
 const pug = require('pug-runtime')
 
