@@ -35,7 +35,7 @@ describe('Subscription Locator Tests', function() {
         console: console
       },
       requires: {
-        './GroupPlansData': {}, // from 399ms to 11ms
+        './GroupPlansData': {},
         '../../models/Subscription': {
           Subscription: this.Subscription
         },

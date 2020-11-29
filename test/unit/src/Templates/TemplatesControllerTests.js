@@ -29,7 +29,7 @@ describe('TemplatesController', function() {
         console: console
       },
       requires: {
-        '../Project/ProjectHelper': ProjectHelper, // from 1s to 13ms
+        '../Project/ProjectHelper': ProjectHelper,
         '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub().returns(this.user_id)
         }),

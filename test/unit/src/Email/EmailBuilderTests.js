@@ -8,6 +8,7 @@ const MODULE_PATH = path.join(
   '../../../../app/src/Features/Email/EmailBuilder'
 )
 
+const EmailMessageHelper = require('../../../../app/src/Features/Email/EmailMessageHelper')
 const ctaEmailBody = require('../../../../app/src/Features/Email/Bodies/cta-email')
 const NoCTAEmailBody = require('../../../../app/src/Features/Email/Bodies/NoCTAEmailBody')
 const BaseWithHeaderEmailLayout = require('../../../../app/src/Features/Email/Layouts/BaseWithHeaderEmailLayout')
@@ -23,6 +24,7 @@ describe('EmailBuilder', function() {
         console: console
       },
       requires: {
+        './EmailMessageHelper': EmailMessageHelper,
         './Bodies/cta-email': ctaEmailBody,
         './Bodies/NoCTAEmailBody': NoCTAEmailBody,
         './Layouts/BaseWithHeaderEmailLayout': BaseWithHeaderEmailLayout,

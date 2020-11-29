@@ -149,7 +149,7 @@ describe('ProjectUploadManager', function() {
         console: console
       },
       requires: {
-        'logger-sharelatex': {}, // from 2s to 68ms
+        'logger-sharelatex': {},
         'fs-extra': this.fs,
         './ArchiveManager': this.ArchiveManager,
         '../../models/Doc': { Doc: this.Doc },

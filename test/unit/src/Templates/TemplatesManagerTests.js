@@ -70,7 +70,7 @@ describe('TemplatesManager', function() {
         console: console
       },
       requires: {
-        'request-promise-native': sinon.stub(), // from 546ms to 50ms
+        'request-promise-native': sinon.stub(),
         '../Uploads/ProjectUploadManager': this.ProjectUploadManager,
         '../Project/ProjectOptionsHandler': this.ProjectOptionsHandler,
         '../Project/ProjectRootDocManager': this.ProjectRootDocManager,

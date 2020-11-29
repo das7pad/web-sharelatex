@@ -82,12 +82,21 @@ describe('UserController', function() {
       unprocessableEntity: sinon.stub(),
       legacyInternal: sinon.stub()
     }
+
+    this.UrlHelper = {
+      getSafeRedirectPath: sinon.stub()
+    }
+    this.UrlHelper.getSafeRedirectPath
+      .withArgs('https://evil.com')
+      .returns(undefined)
+    this.UrlHelper.getSafeRedirectPath.returnsArg(0)
+
     this.UserController = SandboxedModule.require(modulePath, {
       globals: {
         console: console
       },
       requires: {
-        '../Helpers/UrlHelper': { getSafeRedirectPath: url => url },
+        '../Helpers/UrlHelper': this.UrlHelper,
         './UserGetter': this.UserGetter,
         './UserDeleter': this.UserDeleter,
         './UserUpdater': this.UserUpdater,
@@ -509,6 +518,16 @@ describe('UserController', function() {
       this.req.session.destroy = sinon.stub().callsArgWith(0)
       this.res.redirect = url => {
         url.should.equal(this.req.body.redirect)
+        done()
+      }
+      this.UserController.logout(this.req, this.res)
+    })
+
+    it('should redirect after logout, but not to evil.com', function(done) {
+      this.req.body.redirect = 'https://evil.com'
+      this.req.session.destroy = sinon.stub().callsArgWith(0)
+      this.res.redirect = url => {
+        url.should.equal('/login')
         done()
       }
       this.UserController.logout(this.req, this.res)

@@ -48,7 +48,7 @@ describe('ProjectUploadController', function() {
         console: console
       },
       requires: {
-        multer: sinon.stub(), // from 428ms to 43ms
+        multer: sinon.stub(),
         '@overleaf/settings': { path: {} },
         './ProjectUploadManager': (this.ProjectUploadManager = {}),
         './FileSystemImportManager': (this.FileSystemImportManager = {}),

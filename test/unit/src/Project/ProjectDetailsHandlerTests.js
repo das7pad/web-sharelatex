@@ -70,7 +70,7 @@ describe('ProjectDetailsHandler', function() {
         console: console
       },
       requires: {
-        './ProjectHelper': ProjectHelper, // from 8s to 176ms
+        './ProjectHelper': ProjectHelper,
         './ProjectGetter': this.ProjectGetter,
         '../../models/Project': {
           Project: this.ProjectModel
