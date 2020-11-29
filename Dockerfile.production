@@ -3,7 +3,7 @@
 # https://github.com/das7pad/sharelatex-dev-env
 
 ARG BASE
-FROM $BASE
+FROM $BASE as prod-base
 
 # monkey patch npm ci --only=prod
 # npm tries to update the _from field of dev-only/optional dependencies
@@ -12,6 +12,8 @@ RUN sed -i -E \
       /usr/local/lib/node_modules/npm/node_modules/libcipm/index.js
 
 RUN /docker_cleanup.sh npm ci --only=prod
+
+FROM prod-base
 
 ADD build_artifacts.tar.gz /app
 

@@ -25,7 +25,7 @@ services:
       - --reporter
       - xunit
       - --reporter-options
-      - output=/home/node/unit.xml,suiteName='Unit Tests'
+      - output=/home/node/unit.xml,suiteName='UnitTests'
       - test/unit/src
       - modules/*/test/unit/src
     volumes:
@@ -70,7 +70,7 @@ services:
       - xunit
       - --reporter-options
     command:
-      - output=/home/node/acceptance.xml,suiteName='App Acceptance Tests'
+      - output=/home/node/acceptance.xml,suiteName='AppAcceptanceTests'
       - test/acceptance/src/Init.js
       - test/acceptance/src
     volumes:
@@ -94,7 +94,7 @@ services:
       - xunit
       - --reporter-options
     command:
-      - output=/home/node/jsdom.xml,suiteName='JSDOM Tests'
+      - output=/home/node/jsdom.xml,suiteName='JSDOMTests'
       - test/frontend
     volumes:
       - ./output:/home/node:z
