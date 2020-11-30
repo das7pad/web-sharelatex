@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import App from '../base'
 
 if (window.preLoadMathJax) {
@@ -17,23 +16,6 @@ export default App.directive('mathjax', function($compile, $parse) {
           const nonBindableEl = $compile('<span ng-non-bindable></span>')({})
           element.html('').append(nonBindableEl)
           nonBindableEl.html(mathJaxContents)
-        }
-
-        if (attrs.delimiter !== 'no-single-dollar') {
-          const inlineMathConfig =
-            MathJax.Hub.config && MathJax.Hub.config.tex2jax.inlineMath
-          const alreadyConfigured = _.find(
-            inlineMathConfig,
-            c => c[0] === '$' && c[1] === '$'
-          )
-
-          if (!alreadyConfigured) {
-            MathJax.Hub.Config({
-              tex2jax: {
-                inlineMath: inlineMathConfig.concat([['$', '$']])
-              }
-            })
-          }
         }
 
         setTimeout(() => {
