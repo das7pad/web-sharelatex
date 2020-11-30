@@ -3,6 +3,6 @@ version: "3.1"
 services:
   test_acceptance:
     environment:
-      SHARELATEX_CONFIG: /app/$MODULE_DIR/test/acceptance/config/settings.test.coffee
+      SHARELATEX_CONFIG: /app/$MODULE_DIR/test/acceptance/config/settings.test.js
       REDIS_HOST: redis
       MONGO_URL: 'mongodb://mongo/sharelatex'
