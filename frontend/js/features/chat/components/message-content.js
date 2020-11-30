@@ -1,23 +1,17 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import Linkify from 'react-linkify'
 
 function MessageContent({ content }) {
   const root = useRef(null)
 
+  const [MJHub, setMJHub] = useState(undefined)
   useEffect(() => {
-    const MJHub = window.MathJax.Hub
-    const inlineMathConfig = MJHub.config && MJHub.config.tex2jax.inlineMath
-    const alreadyConfigured = inlineMathConfig.some(
-      c => c[0] === '$' && c[1] === '$'
-    )
-    if (!alreadyConfigured) {
-      MJHub.Config({
-        tex2jax: {
-          inlineMath: inlineMathConfig.concat([['$', '$']])
-        }
+    import('../../../MathJaxBundle')
+      .then(({ default: MathJax }) => {
+        setMJHub(MathJax.Hub)
       })
-    }
+      .catch(error => console.error('Cannot load MathJaxBundle', error))
   }, [])
 
   useEffect(
@@ -29,13 +23,13 @@ function MessageContent({ content }) {
       }
 
       // MathJax typesetting
-      const MJHub = window.MathJax.Hub
+      if (!MJHub) return
       const timeoutHandler = setTimeout(() => {
         MJHub.Queue(['Typeset', MJHub, root.current])
       }, 0)
       return () => clearTimeout(timeoutHandler)
     },
-    [content]
+    [content, MJHub]
   )
 
   return (
