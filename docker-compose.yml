@@ -35,7 +35,7 @@ services:
       PROJECT_HISTORY_ENABLED: 'true'
       ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file,mendeley,zotero'
       LINKED_URL_PROXY: 'http://localhost:6543'
-      SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
+      SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.js
       NODE_ENV: test
       NODE_OPTIONS: "--unhandled-rejections=strict --trace-deprecation"
     user: node
