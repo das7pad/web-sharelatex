@@ -39,6 +39,7 @@ ace.config.setDefaultValue('session', 'useWorker', false)
 ace.config.set('loadWorkerFromBlob', true)
 
 App.directive('aceEditor', function(
+  ide,
   $timeout,
   $compile,
   $rootScope,
@@ -104,6 +105,11 @@ App.directive('aceEditor', function(
 
       const editor = ace.edit(element.find('.ace-editor-body')[0])
       editor.$blockScrolling = Infinity
+
+      // end-to-end check for edits -> acks, globally on any doc
+      // This may catch a missing attached ShareJsDoc that in turn bails out
+      //  on missing acks.
+      ide.globalEditorWatchdogManager.attachToEditor('Ace', editor)
 
       // auto-insertion of braces, brackets, dollars
       editor.setOption('behavioursEnabled', scope.autoPairDelimiters || false)
@@ -452,7 +458,6 @@ App.directive('aceEditor', function(
           'Menlo',
           'Ubuntu Mono',
           'Consolas',
-          'source-code-pro',
           'monospace'
         ]
 
@@ -466,7 +471,7 @@ App.directive('aceEditor', function(
             case 'lucida':
               return editor.setOption(
                 'fontFamily',
-                '"Lucida Console", monospace'
+                '"Lucida Console", "Source Code Pro", monospace'
               )
             default:
               return editor.setOption('fontFamily', null)
