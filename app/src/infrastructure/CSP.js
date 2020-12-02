@@ -2,10 +2,15 @@ const Settings =
   require('@overleaf/settings') || require('../../../config/settings.defaults')
 const { URL } = require('url')
 const Path = require('path')
+const Crypto = require('crypto')
 
 const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
 
-module.exports = function(webRouter) {
+const NG_CLOAK =
+  '@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}'
+
+module.exports = function(app, webRouter) {
+  app.locals.NG_CLOAK = NG_CLOAK
   if (
     Settings.security &&
     Settings.security.csp &&
@@ -51,6 +56,14 @@ function getCspMiddleware() {
     Settings.wsAssetUrlV2 || Settings.wsUrlV2
   )
 
+  function getDigest(blob) {
+    const hash = Crypto.createHash('sha512')
+    hash.update(blob)
+    return `'sha512-${hash.digest('base64')}'`
+  }
+  const ngCloakDigest = getDigest(NG_CLOAK)
+  const angularSanitizeProbeDigest = getDigest('<img src="')
+
   const SELF = "'self'"
   const assetsOrigin = cdnOrigin || SELF
 
@@ -66,8 +79,15 @@ function getCspMiddleware() {
     const imgSrc = [assetsOrigin, 'data:', 'blob:']
     const manifestSrc = []
     const scriptSrc = [assetsOrigin]
-    const styleSrc = [assetsOrigin, "'unsafe-inline'"]
+    const styleSrc = [assetsOrigin]
     const workerSrc = []
+
+    if (csp.blockInlineStyle) {
+      // TODO: Add Ace and MathJax digests
+      styleSrc.push(ngCloakDigest, angularSanitizeProbeDigest)
+    } else {
+      styleSrc.push("'unsafe-inline'")
+    }
 
     if (sentryOrigin) {
       connectSrc.push(sentryOrigin)

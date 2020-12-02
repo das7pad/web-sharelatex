@@ -159,7 +159,7 @@ webRouter.use(function(req, res, next) {
 
 webRouter.use(ReferalConnect.use)
 expressLocals(app, webRouter)
-CSP(webRouter)
+CSP(app, webRouter)
 ResourceHints(app, webRouter)
 
 webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)

@@ -420,6 +420,7 @@ module.exports = {
   // --------
   security: {
     csp: {
+      blockInlineStyle: process.env['CSP_BLOCK_INLINE_STYLE'] === 'true',
       reportURL: process.env['CSP_REPORT_URL'],
       reportOnly: process.env['CSP_REPORT_ONLY'],
       enforce: process.env['CSP_ENFORCE']
