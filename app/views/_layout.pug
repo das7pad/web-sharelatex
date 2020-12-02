@@ -50,7 +50,7 @@ html(
 				})
 
 
-	body(ng-csp="no-unsafe-eval")
+	body(ng-csp)
 		if(settings.recaptcha && settings.recaptcha.siteKeyV3)
 			meta(id='ol-recaptchaSiteKeyV3' content=settings.recaptcha.siteKeyV3)
 			script(type="text/javascript", src="https://www.google.com/recaptcha/api.js?render="+settings.recaptcha.siteKeyV3)
