@@ -420,7 +420,6 @@ module.exports = {
   // --------
   security: {
     csp: {
-      allowCookieDomain: process.env[''],
       reportURL: process.env['CSP_REPORT_URL'],
       reportOnly: process.env['CSP_REPORT_ONLY'],
       enforce: process.env['CSP_ENFORCE']
