@@ -50,6 +50,11 @@ services:
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.js
       NODE_ENV: test
       NODE_OPTIONS: "--unhandled-rejections=strict --trace-deprecation"
+      COOKIE_DOMAIN: .overleaf.test
+      PUBLIC_URL: 'http://www.overleaf.test:3000'
+      HTTP_TEST_HOST: www.overleaf.test
+    extra_hosts:
+      - 'www.overleaf.test:127.0.0.1'
     depends_on:
       - mongo
       - redis_api
