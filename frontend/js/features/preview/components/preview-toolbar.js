@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
 import PreviewDownloadButton from './preview-download-button'
 import PreviewRecompileButton from './preview-recompile-button'
 import PreviewLogsToggleButton from './preview-logs-toggle-button'
 import useResizeObserver from '../../../shared/hooks/use-resize-observer'
 import Icon from '../../../shared/components/icon'
+import t from '../../../misc/t'
 
 function _getElementWidth(element) {
   if (!element) return 0
@@ -40,7 +40,6 @@ function PreviewToolbar({
   const [showToggleText, setShowToggleText] = useState(
     showToggleTextRef.current
   )
-  const { t } = useTranslation()
 
   function checkCanShowText(observedElement) {
     // toolbar items can be in 3 states:

@@ -1,13 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { MenuItem } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 export const topFileTypes = ['bbl', 'gls', 'ind']
 
 function PreviewDownloadFileList({ fileList = [] }) {
-  const { t } = useTranslation()
-
   let topFiles = []
   let otherFiles = []
 
