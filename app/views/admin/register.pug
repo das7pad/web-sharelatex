@@ -36,5 +36,5 @@ block content
 								th Set Password Url
 							tr(ng-repeat="user in users")
 								td {{ user.email }}
-								td(style="word-break: break-all;") {{ user.setNewPasswordUrl }}
+								td(ng-style="{word-break: 'break-all'}") {{ user.setNewPasswordUrl }}
 							

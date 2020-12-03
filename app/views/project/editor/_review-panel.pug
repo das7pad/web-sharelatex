@@ -80,7 +80,7 @@
 			)
 				span.rp-tc-state-item-name(
 					ng-class="{ 'rp-tc-state-item-name-disabled' : reviewPanel.trackChangesOnForEveryone}"
-					style="color: hsl({{ member.hue }}, 70%, 40%);"
+					ng-style="{color: 'hsl({{ member.hue }}, 70%, 40%)'}"
 					tooltip="{{translate('tc_switch_user_tip')}}"
 					tooltip-placement="left"
 					tooltip-append-to-body="true"
@@ -284,7 +284,7 @@ script(type='text/ng-template', id='changeEntryTemplate')
 							) {{ isCollapsed ? ('… (' translate("show_all") + ')') : (' (' + translate("show_less") ')') }}
 					.rp-entry-metadata
 						| {{ entry.metadata.ts | date : 'MMM d, y h:mm a' }}&nbsp;&bull;&nbsp;
-						span.rp-entry-user(style="color: hsl({{ user.hue }}, 70%, 40%);") {{ user.name }}
+						span.rp-entry-user(ng-style="{color: 'hsl({{ user.hue }}, 70%, 40%)'}") {{ user.name }}
 			.rp-entry-actions(ng-if="permissions.write")
 				a.rp-entry-button(href, ng-click="onReject();")
 					i.fa.fa-times
@@ -327,7 +327,7 @@ script(type='text/ng-template', id='aggregateChangeEntryTemplate')
 						) {{ isInsertionCollapsed ? '… ({{translate("show_all")}})' : ' ({{translate("show_less")}})' }}
 					.rp-entry-metadata
 						| {{ entry.metadata.ts | date : 'MMM d, y h:mm a' }}&nbsp;&bull;&nbsp;
-						span.rp-entry-user(style="color: hsl({{ user.hue }}, 70%, 40%);") {{ user.name }}
+						span.rp-entry-user(ng-style="{color: 'hsl({{ user.hue }}, 70%, 40%)'}") {{ user.name }}
 			.rp-entry-actions(ng-if="permissions.write")
 				a.rp-entry-button(href, ng-click="onReject();")
 					i.fa.fa-times
@@ -359,7 +359,7 @@ script(type='text/ng-template', id='commentEntryTemplate')
 					p.rp-comment-content
 						span(ng-if="!comment.editing")
 							span.rp-entry-user(
-								style="color: hsl({{ comment.user.hue }}, 70%, 40%);",
+								ng-style="{color: 'hsl({{ comment.user.hue }}, 70%, 40%)'}",
 							) {{ comment.user.name }}:&nbsp;
 							span(ng-bind-html="comment.content | linky:'_blank':{rel: 'noreferrer noopener'}")
 						textarea.rp-comment-input(
@@ -432,7 +432,7 @@ script(type='text/ng-template', id='resolvedCommentEntryTemplate')
 			)
 				p.rp-comment-content
 					span.rp-entry-user(
-						style="color: hsl({{ comment.user.hue }}, 70%, 40%);"
+						ng-style="{color: 'hsl({{ comment.user.hue }}, 70%, 40%)'}"
 						ng-if="$first || comment.user.id !== thread.messages[$index - 1].user.id"
 					) {{ comment.user.name }}:&nbsp;
 					span(ng-bind-html="comment.content | linky:'_blank':{rel: 'noreferrer noopener'}")
@@ -441,7 +441,7 @@ script(type='text/ng-template', id='resolvedCommentEntryTemplate')
 			.rp-comment.rp-comment-resolver
 				p.rp-comment-resolver-content
 					span.rp-entry-user(
-						style="color: hsl({{ thread.resolved_by_user.hue }}, 70%, 40%);"
+						ng-style="{color: 'hsl({{ thread.resolved_by_user.hue }}, 70%, 40%)'}"
 					) {{ thread.resolved_by_user.name }}:&nbsp;
 					| {{translate("mark_as_resolved")}}.
 				.rp-entry-metadata

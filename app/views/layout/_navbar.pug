@@ -4,7 +4,7 @@ nav.navbar.navbar-default.navbar-main
 			button.navbar-toggle(ng-init="navCollapsed = true", ng-click="navCollapsed = !navCollapsed", ng-class="{active: !navCollapsed}", aria-label="Toggle {{translate('navigation')}}")
 				i.fa.fa-bars(aria-hidden="true")
 			if settings.nav.custom_logo
-				a(href='/', aria-label=settings.appName, style='background-image:url("'+settings.nav.custom_logo+'")').navbar-brand
+				a(href='/', aria-label=settings.appName, ng-style="{'background-image': 'url("+settings.nav.custom_logo+")'}").navbar-brand
 			else if (settings.nav.title)
 				a(href='/', aria-label=settings.appName, ng-non-bindable).navbar-title #{settings.nav.title}
 			else

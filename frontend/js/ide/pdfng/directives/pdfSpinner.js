@@ -20,13 +20,11 @@ export default App.factory('pdfSpinner', function() {
     // handler for spinners
 
     add(element, options) {
-      const size = 64
       const spinner = $(
-        `<div class="pdfng-spinner" style="position: absolute; top: 50%; left:50%; transform: translateX(-50%) translateY(-50%);"><i class="fa fa-spinner${
-          (options != null ? options.static : undefined) ? '' : ' fa-spin'
-        }" style="color: #999"></i></div>`
+        `<div class="pdfng-spinner"><i class="fa fa-spinner${
+          options && options.static ? '' : ' fa-spin'
+        }"/></div>`
       )
-      spinner.css({ 'font-size': size + 'px' })
       return element.append(spinner)
     }
 

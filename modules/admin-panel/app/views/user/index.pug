@@ -21,9 +21,8 @@ block content
 									on-enter="searchUsers()"
 								)
 								i.fa.fa-search.form-control-feedback-left
-								i.fa.fa-times.form-control-feedback(
+								i.fa.fa-times.form-control-feedback.clickable(
 									ng-click="clearSearchText()",
-									style="cursor: pointer;",
 									ng-show="searchText.length > 0"
 								)
 								div.form-check

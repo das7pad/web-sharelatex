@@ -1,7 +1,7 @@
 p
 	form(async-form="adminUserEmail", name="adminUserEmailForm", method="POST", action="/admin/user/" + user._id + "/email", novalidate)
 		input(type="hidden", name="_csrf", value=csrfToken)
-		table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
+		table.table.table-striped.table-bordered(ng-style={'margin-bottom': '12px'})
 			tr
 				td
 					label ID
@@ -81,7 +81,7 @@ p
 	
 	form(async-form="adminUser", name="adminUserForm", method="POST", action="/admin/user/" + user._id, novalidate)
 		input(type="hidden", name="_csrf", value=csrfToken)
-		table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
+		table.table.table-striped.table-bordered(ng-style={'margin-bottom': '12px'})
 			tr
 				th(colspan=2).text-center Profile
 

@@ -32,7 +32,7 @@ mixin providerList()
 					//- to do: fix CSS so that we don't need inline styling
 					.alert.alert-danger(
 						ng-if="providers[key].ui.hasError"
-						style="display: block; margin-bottom: 10px;"
+						ng-style={display: block, 'margin-bottom': '10px'}
 					)
 						i.fa.fa-fw.fa-exclamation-triangle(aria-hidden="true") &nbsp;
 						| {{providers[key].ui.errorMessage}}

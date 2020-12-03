@@ -11,9 +11,8 @@
 					ng-keyup="searchProjects()"
 				)
 				i.fa.fa-search.form-control-feedback-left(aria-hidden="true")
-				i.fa.fa-times.form-control-feedback(
+				i.fa.fa-times.form-control-feedback.clickable(
 					ng-click="clearSearchText()",
-					style="cursor: pointer;",
 					ng-show="searchText.value.length > 0"
 					aria-hidden="true"
 				)

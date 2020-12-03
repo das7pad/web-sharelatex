@@ -21,7 +21,7 @@ block content
 				p
 					form(async-form="adminSubscription", name="adminSubscriptionForm", method="POST", action="/admin/subscription/" + subscription._id, novalidate)
 						input(type="hidden", name="_csrf", value=csrfToken)
-						table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
+						table.table.table-striped.table-bordered(ng-style={'margin-bottom': '12px'})
 							tr
 								td
 									label ID

@@ -28,7 +28,7 @@ div.full-size(
 	)
 		.loading-panel(
 			ng-show="!editor.sharejs_doc || editor.opening",
-			style=showRichText ? "top: 32px" : "",
+			class=(showRichText ? "rich-text-spacing" : ""),
 		)
 			span(ng-show="editor.open_doc_id")
 				i.fa.fa-spin.fa-refresh

@@ -252,7 +252,7 @@ block content
 							ng-model="state.confirmSharelatexDelete"
 							ng-change="checkValidation()"
 						).pull-left
-						label(style="display: inline") &nbsp;I understand this will delete all projects in my Overleaf account with email address #[em {{ userDefaultEmail }}]
+						label &nbsp;I understand this will delete all projects in my Overleaf account with email address #[em {{ userDefaultEmail }}]
 
 			div(ng-if="state.error")
 				div.alert.alert-danger(ng-switch="state.error.code")
