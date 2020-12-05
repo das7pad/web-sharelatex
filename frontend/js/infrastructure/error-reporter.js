@@ -1,4 +1,4 @@
-import getMeta from './meta'
+import getMeta from '../utils/meta'
 
 if (getMeta('ol-sentry')) {
   import(/* webpackChunkName: "sentry" */ '@sentry/browser').then(Sentry => {

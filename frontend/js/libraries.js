@@ -1,5 +1,5 @@
 import './utils/staticPath'
-import './utils/sentry'
+import './infrastructure/error-reporter'
 import 'jquery'
 import 'angular'
 import 'angular-sanitize'
