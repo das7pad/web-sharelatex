@@ -12,11 +12,7 @@ before(function(done) {
     if (error) {
       throw error
     }
-    if (process.env.HTTP_TEST_HOST) {
-      done()
-    } else {
-      require('../../../app.js').listen(3000, 'localhost', done)
-    }
+    require('../../../app.js').listen(3000, 'localhost', done)
   })
 })
 
