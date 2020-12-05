@@ -1096,7 +1096,9 @@ var defaultSettingsForAnonymousUser = userId => ({
   },
   featureSwitches: {
     github: false
-  }
+  },
+  alphaProgram: false,
+  betaProgram: false
 })
 
 module.exports = ProjectController
