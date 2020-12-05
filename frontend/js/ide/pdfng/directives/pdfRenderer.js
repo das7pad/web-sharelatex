@@ -20,6 +20,7 @@
 import App from '../../../base'
 import PDFJS from '../../../pdfjsBundle'
 import staticPath from '../../../utils/staticPath'
+import { captureMessage } from '../../../infrastructure/error-reporter'
 
 export default App.factory('PDFRenderer', function(
   $timeout,
@@ -339,11 +340,10 @@ export default App.factory('PDFRenderer', function(
           if (loadTask.cancelled) {
             return
           } // return from cancelled page load
-          __guardMethod__(window.Raven, 'captureMessage', o =>
-            o.captureMessage(
-              `pdfng page load timed out after ${this.PAGE_LOAD_TIMEOUT}ms`
-            )
+          captureMessage(
+            `pdfng page load timed out after ${this.PAGE_LOAD_TIMEOUT}ms`
           )
+
           timedOut = true
           this.clearIndicator(page)
           // @jobs = @jobs - 1
