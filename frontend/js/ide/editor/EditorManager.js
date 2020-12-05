@@ -19,6 +19,7 @@ import './components/spellMenu'
 import './directives/aceEditor'
 import './directives/toggleSwitch'
 import './controllers/SavingNotificationController'
+import { captureException } from '../../infrastructure/error-reporter'
 let EditorManager
 
 export default (EditorManager = (function() {
@@ -268,11 +269,9 @@ export default (EditorManager = (function() {
         } else {
           this.ide.socket.disconnect()
           this.ide.reportError(error, meta)
-          if (typeof Sentry !== 'undefined') {
-            Sentry.captureException(new Error(message), {
-              extra: { error: error, meta: meta }
-            })
-          }
+          captureException(new Error(message), {
+            extra: { error: error, meta: meta }
+          })
           this.ide.showOutOfSyncModal(
             'Out of sync',
             "Sorry, this file has gone out of sync and we need to do a full refresh. <br> <a href='/learn/Kb/Editor_out_of_sync_problems'>Please see this help guide for more information</a>",
