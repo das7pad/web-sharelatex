@@ -38,7 +38,10 @@ app.config([
             return
           }
           if (typeof Sentry !== 'undefined') {
-            Sentry.captureException(exception)
+            Sentry.captureException(exception, scope => {
+              scope.setTag('handler', 'angular-exception-handler')
+              return scope
+            })
           }
           return $delegate(exception, cause)
         }
