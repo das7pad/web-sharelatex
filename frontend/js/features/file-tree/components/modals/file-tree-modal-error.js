@@ -1,15 +1,13 @@
 import React from 'react'
 
 import { Button, Modal } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
 
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 
 import { InvalidFilenameError, DuplicateFilenameError } from '../../errors'
+import t from '../../../../misc/t'
 
 function FileTreeModalError() {
-  const { t } = useTranslation()
-
   const { isRenaming, cancel, error } = useFileTreeActionable()
 
   if (!isRenaming || !error) return null // the modal will not be rendered; return early
