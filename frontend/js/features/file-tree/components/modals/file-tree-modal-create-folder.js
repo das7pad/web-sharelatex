@@ -7,8 +7,13 @@ import { useRefWithAutoFocus } from '../../../../infrastructure/auto-focus'
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import t from '../../../../misc/t'
 
+import { DuplicateFilenameError } from '../../errors'
+
+import { isCleanFilename } from '../../util/safe-path'
+
 function FileTreeModalCreateFolder() {
   const [name, setName] = useState('')
+  const [validName, setValidName] = useState(true)
 
   const {
     isCreatingFolder,
@@ -28,6 +33,15 @@ function FileTreeModalCreateFolder() {
     finishCreatingFolder(name)
   }
 
+  function errorMessage() {
+    switch (error.constructor) {
+      case DuplicateFilenameError:
+        return t('file_already_exists')
+      default:
+        return t('generic_something_went_wrong')
+    }
+  }
+
   return (
     <Modal show={isCreatingFolder} onHide={handleHide}>
       <Modal.Header>
@@ -38,13 +52,28 @@ function FileTreeModalCreateFolder() {
         <InputName
           name={name}
           setName={setName}
+          validName={validName}
+          setValidName={setValidName}
           handleCreateFolder={handleCreateFolder}
         />
-        {error && (
-          <div className="alert alert-danger file-tree-modal-alert">
-            {t('generic_something_went_wrong')}
+        {!validName ? (
+          <div
+            role="alert"
+            aria-label={t('files_cannot_include_invalid_characters')}
+            className="alert alert-danger file-tree-modal-alert"
+          >
+            {t('files_cannot_include_invalid_characters')}
           </div>
-        )}
+        ) : null}
+        {error ? (
+          <div
+            role="alert"
+            aria-label={errorMessage()}
+            className="alert alert-danger file-tree-modal-alert"
+          >
+            {errorMessage()}
+          </div>
+        ) : null}
       </Modal.Body>
 
       <Modal.Footer>
@@ -55,7 +84,11 @@ function FileTreeModalCreateFolder() {
         ) : (
           <>
             <Button onClick={handleHide}>{t('cancel')}</Button>
-            <Button bsStyle="primary" onClick={handleCreateFolder}>
+            <Button
+              bsStyle="primary"
+              onClick={handleCreateFolder}
+              disabled={!validName}
+            >
               {t('create')}
             </Button>
           </>
@@ -65,7 +98,13 @@ function FileTreeModalCreateFolder() {
   )
 }
 
-function InputName({ name, setName, handleCreateFolder }) {
+function InputName({
+  name,
+  setName,
+  validName,
+  setValidName,
+  handleCreateFolder
+}) {
   const { autoFocusedRef } = useRefWithAutoFocus()
 
   function handleFocus(ev) {
@@ -73,11 +112,12 @@ function InputName({ name, setName, handleCreateFolder }) {
   }
 
   function handleChange(ev) {
+    setValidName(isCleanFilename(ev.target.value.trim()))
     setName(ev.target.value)
   }
 
   function handleKeyDown(ev) {
-    if (ev.key === 'Enter') {
+    if (ev.key === 'Enter' && validName) {
       handleCreateFolder()
     }
   }
@@ -98,6 +138,8 @@ function InputName({ name, setName, handleCreateFolder }) {
 InputName.propTypes = {
   name: PropTypes.string.isRequired,
   setName: PropTypes.func.isRequired,
+  validName: PropTypes.bool.isRequired,
+  setValidName: PropTypes.func.isRequired,
   handleCreateFolder: PropTypes.func.isRequired
 }
 

@@ -3,11 +3,15 @@ const rclient = RedisWrapper.client('health_check')
 const settings = require('@overleaf/settings')
 const logger = require('logger-sharelatex')
 const UserGetter = require('../User/UserGetter')
+const {
+  SmokeTestFailure,
+  runSmokeTests
+} = require('./../../../../test/smoke/src/SmokeTests')
 
 module.exports = {
-  check(req, res) {
-    // detach from express stack
-    setTimeout(runSmokeTest, 0, res)
+  check(req, res, next) {
+    // detach from express for cleaner stack traces
+    setTimeout(() => runSmokeTestsDetached(req, res).catch(next))
   },
 
   checkActiveHandles(req, res, next) {
@@ -82,28 +86,34 @@ module.exports = {
   }
 }
 
-const smokeTests = require('./../../../../test/smoke/src/SmokeTests')
 function prettyJSON(blob) {
   return JSON.stringify(blob, null, 2) + '\n'
 }
-function runSmokeTest(res) {
-  res.contentType('application/json')
-  const stats = { start: new Date() }
-  smokeTests(stats)
-    .finally(() => {
+async function runSmokeTestsDetached(req, res) {
+  function isAborted() {
+    return req.aborted
+  }
+  const stats = { start: new Date(), steps: [] }
+  let status, response
+  try {
+    try {
+      await runSmokeTests({ isAborted, stats })
+    } finally {
       stats.end = new Date()
       stats.duration = stats.end - stats.start
-    })
-    .then(stats => {
-      res.status(200).send(prettyJSON({ stats }))
-    })
-    .catch(err => {
-      if (!(err instanceof smokeTests.Failure)) {
-        err = new smokeTests.Failure('low level error', stats).withCause(err)
-      }
-      const { failureMessage } = err.info
-      delete err.info.failureMessage
-      logger.err({ err }, 'health check failed')
-      res.status(500).send(prettyJSON({ stats, error: failureMessage }))
-    })
+    }
+    status = 200
+    response = { stats }
+  } catch (e) {
+    let err = e
+    if (!(e instanceof SmokeTestFailure)) {
+      err = new SmokeTestFailure('low level error', {}, e)
+    }
+    logger.err({ err, stats }, 'health check failed')
+    status = 500
+    response = { stats, error: err.message }
+  }
+  if (isAborted()) return
+  res.contentType('application/json')
+  res.status(status).send(prettyJSON(response))
 }
