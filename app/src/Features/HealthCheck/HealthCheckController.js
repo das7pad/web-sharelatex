@@ -9,9 +9,9 @@ const {
 } = require('./../../../../test/smoke/src/SmokeTests')
 
 module.exports = {
-  check(req, res) {
-    // detach from express stack
-    setTimeout(runSmokeTestsDetached, 0, res)
+  check(req, res, next) {
+    // detach from express for cleaner stack traces
+    setTimeout(() => runSmokeTestsDetached(req, res).catch(next))
   },
 
   checkActiveHandles(req, res, next) {
@@ -89,22 +89,31 @@ module.exports = {
 function prettyJSON(blob) {
   return JSON.stringify(blob, null, 2) + '\n'
 }
-function runSmokeTestsDetached(res) {
-  res.contentType('application/json')
+async function runSmokeTestsDetached(req, res) {
+  function isAborted() {
+    return req.aborted
+  }
   const stats = { start: new Date(), steps: [] }
-  runSmokeTests({ stats })
-    .finally(() => {
+  let status, response
+  try {
+    try {
+      await runSmokeTests({ isAborted, stats })
+    } finally {
       stats.end = new Date()
       stats.duration = stats.end - stats.start
-    })
-    .then(() => {
-      res.status(200).send(prettyJSON({ stats }))
-    })
-    .catch(err => {
-      if (!(err instanceof SmokeTestFailure)) {
-        err = new SmokeTestFailure('low level error', stats, err)
-      }
-      logger.err({ err }, 'health check failed')
-      res.status(500).send(prettyJSON({ stats, error: err.message }))
-    })
+    }
+    status = 200
+    response = { stats }
+  } catch (e) {
+    let err = e
+    if (!(e instanceof SmokeTestFailure)) {
+      err = new SmokeTestFailure('low level error', {}, e)
+    }
+    logger.err({ err, stats }, 'health check failed')
+    status = 500
+    response = { stats, error: err.message }
+  }
+  if (isAborted()) return
+  res.contentType('application/json')
+  res.status(status).send(prettyJSON(response))
 }

@@ -1,14 +1,13 @@
-const Settings = require('settings-sharelatex')
-
-const PROJECT_ID_REGEX = new RegExp(
-  `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
-)
+const Settings = require('@overleaf/settings')
 
 async function run({ assertHasStatusCode, request }) {
   const response = await request(`/project/${Settings.smokeTest.projectId}`)
 
   assertHasStatusCode(response, 200)
 
+  const PROJECT_ID_REGEX = new RegExp(
+    `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
+  )
   if (!PROJECT_ID_REGEX.test(response.body)) {
     throw new Error('project page html does not have project_id')
   }

@@ -4,7 +4,7 @@ const { promisify } = require('util')
 
 const OError = require('@overleaf/o-error')
 const request = require('request')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 // send requests to web router if this is the api process
 const OWN_PORT = Settings.port || Settings.internal.web.port || 3000
@@ -46,7 +46,11 @@ function requestFactory({ timeout }) {
 function assertHasStatusCode(response, expected) {
   const { statusCode: actual } = response
   if (actual !== expected) {
-    throw new OError('unexpected response code', { actual, expected })
+    throw new OError('unexpected response code', {
+      url: response.request.uri.href,
+      actual,
+      expected
+    })
   }
 }
 

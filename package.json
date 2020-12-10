@@ -38,7 +38,7 @@
   ],
   "dependencies": {
     "@overleaf/metrics": "https://github.com/das7pad/metrics-sharelatex/archive/c7336346ef96a1ba1d92bf268f96542d571a2b9c.tar.gz",
-    "@overleaf/o-error": "^3.0.0",
+    "@overleaf/o-error": "^3.2.0",
     "@overleaf/redis-wrapper": "^2.0.0",
     "@overleaf/settings": "https://github.com/das7pad/settings-sharelatex/archive/e8942a2a7825619dbc8ab66797b90c684b5ccd2d.tar.gz",
     "archiver": "4.0.1",

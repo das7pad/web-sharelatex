@@ -1,5 +1,3 @@
-const OError = require('@overleaf/o-error')
-
 async function processWithTimeout({ work, timeout, message }) {
   let workDeadLine
   function checkInResults() {
@@ -8,7 +6,7 @@ async function processWithTimeout({ work, timeout, message }) {
   await Promise.race([
     new Promise((resolve, reject) => {
       workDeadLine = setTimeout(() => {
-        reject(new OError(message))
+        reject(new Error(message))
       }, timeout)
     }),
     work.finally(checkInResults)

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const Path = require('path')
 
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const { getCsrfTokenForFactory } = require('./support/Csrf')
 const { SmokeTestFailure } = require('./support/Errors')
 const {
@@ -22,11 +22,10 @@ const STEPS = fs
     return step
   })
 
-async function runSmokeTests({ stats }) {
-  let step
+async function runSmokeTests({ isAborted, stats }) {
   let lastStep = stats.start
   function completeStep(key) {
-    step = Date.now()
+    const step = Date.now()
     stats.steps.push({ [key]: step - lastStep })
     lastStep = step
   }
@@ -35,7 +34,6 @@ async function runSmokeTests({ stats }) {
   const getCsrfTokenFor = getCsrfTokenForFactory({ request })
   const ctx = {
     assertHasStatusCode,
-    completeStep,
     getCsrfTokenFor,
     processWithTimeout,
     request,
@@ -48,8 +46,8 @@ async function runSmokeTests({ stats }) {
     let result
     try {
       result = await fn(ctx)
-    } catch (err) {
-      throw new SmokeTestFailure(`${id} failed`, { stats }, err)
+    } catch (e) {
+      throw new SmokeTestFailure(`${id} failed`, {}, e)
     } finally {
       completeStep(id)
     }
@@ -60,7 +58,9 @@ async function runSmokeTests({ stats }) {
 
   let err
   try {
-    for (step of STEPS) {
+    for (const step of STEPS) {
+      if (isAborted()) break
+
       const { name, run, cleanup } = step
       if (cleanup) cleanupSteps.unshift({ name, cleanup })
 
@@ -76,9 +76,9 @@ async function runSmokeTests({ stats }) {
 
     try {
       await runAndTrack(`cleanup.${name}`, cleanup)
-    } catch (err) {
+    } catch (e) {
       // keep going with cleanup
-      cleanupErrors.push(err)
+      cleanupErrors.push(e)
     }
   }
 
