@@ -59,9 +59,3 @@ window.sl_debugging = sl_debugging // make a global flag for debugging code
 window.sl_console = sl_debugging ? console : { log() {} }
 
 export default App
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
