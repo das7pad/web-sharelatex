@@ -74,7 +74,7 @@ function HotkeysModalContent({
               combination={`${ctrl} + Shift + U`}
               description="To Lowercase"
             />
-            <Hotkey combination={`Tab`} description="Indent Selection" />
+            <Hotkey combination="Tab" description="Indent Selection" />
           </Col>
 
           <Col xs={4}>
