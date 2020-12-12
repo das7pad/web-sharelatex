@@ -134,7 +134,7 @@
   "open_project": "Open Project",
   "files_cannot_include_invalid_characters": "Bestandsnaam mag niet '*' of '/' bevatten",
   "invalid_file_name": "Ongeldige Bestandsnaam",
-  "autocomplete_references": "Refereer Autocomplete (in een <code>\\cite{}</code> blok)",
+  "autocomplete_references": "Refereer Autocomplete (in een <0>\\cite{}</0> blok)",
   "autocomplete": "Autocomplete",
   "failed_compile_check": "Het lijkt erop dat uw project een aantal fatale syntax errors heeft die u zou moeten fixen voordat we het compilen",
   "failed_compile_check_try": "Probeer toch te compileren",

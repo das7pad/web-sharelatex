@@ -170,7 +170,7 @@
   "open_project": "打开项目",
   "files_cannot_include_invalid_characters": "文件中不能包含 *  或 /",
   "invalid_file_name": "文件名无效",
-  "autocomplete_references": "参考文献自动补全（在 <code>\\cite{}</code> 中）",
+  "autocomplete_references": "参考文献自动补全（在 <0>\\cite{}</0> 中）",
   "autocomplete": "自动补全",
   "failed_compile_check": "您的项目中似乎含有关键性语法错误，请修改后重试",
   "failed_compile_check_try": "强制编译",

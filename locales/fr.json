@@ -582,7 +582,7 @@
   "open_project": "Ouvrir le projet",
   "files_cannot_include_invalid_characters": "Le nom du fichier est vide ou contient des caractères invalides",
   "invalid_file_name": "Nom de fichier invalide",
-  "autocomplete_references": "Auto-complétion des références (à l’intérieur d’une commande <code>\\cite{}</code>)",
+  "autocomplete_references": "Auto-complétion des références (à l’intérieur d’une commande <0>\\cite{}</0>)",
   "autocomplete": "Auto-complétion",
   "failed_compile_check": "Il semblerait que votre projet contienne des erreurs fatales de syntaxe que vous devriez corriger avant de le compiler",
   "failed_compile_check_try": "Essayer de le compiler quand même",

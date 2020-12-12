@@ -89,7 +89,7 @@
   "open_project": "Öffne Projekt",
   "files_cannot_include_invalid_characters": "Dateien dürfen die Zeichen '*' oder '/' nicht enthalten.",
   "invalid_file_name": "Ungültiger Dateiname",
-  "autocomplete_references": "Referenzautovervollständigung (in einem <code>\\cite{}</code>-Block)",
+  "autocomplete_references": "Referenzautovervollständigung (in einem <0>\\cite{}</0>-Block)",
   "autocomplete": "Autovervollständigung",
   "failed_compile_check": "In deinem Projekt scheinen fatale Syntaxfehler vorzuliegen, die du beheben solltest, bevor wir es kompilieren",
   "failed_compile_check_try": "Versuche es trotzdem zu kompilieren",

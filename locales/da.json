@@ -423,7 +423,7 @@
   "open_project": "Åben projekt",
   "files_cannot_include_invalid_characters": "Filnavnet er tomt, eller indeholder ugyldige karakterer",
   "invalid_file_name": "Ugyldigt filnavn",
-  "autocomplete_references": "Automatisk reference-udfyldelse (indeni en <code>\\cite{}</code> blok)",
+  "autocomplete_references": "Automatisk reference-udfyldelse (indeni en <0>\\cite{}</0> blok)",
   "autocomplete": "Auto udfyld",
   "failed_compile_check": "Det ser ud til at dit projekt har nogle fatale syntaksfejl, som skal rettes før vi kan kompilere det",
   "failed_compile_check_try": "Prøv at kompilere alligevel",

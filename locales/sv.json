@@ -240,7 +240,7 @@
   "open_project": "Öppna projekt",
   "files_cannot_include_invalid_characters": "Filer kan inte innehålla '*' eller '/' tecken",
   "invalid_file_name": "Ogiltigt filnamn",
-  "autocomplete_references": "Autokomplettering av referenser (inuti <code>\\cite{}</code>)",
+  "autocomplete_references": "Autokomplettering av referenser (inuti <0>\\cite{}</0>)",
   "autocomplete": "Autokomplettering",
   "failed_compile_check": "Det verkar som att ditt projekt har allvarliga syntaxfel som du måste åtgärda innan vi kan kompilera det",
   "failed_compile_check_try": "Försök att kompilera ändå",

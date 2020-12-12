@@ -17,7 +17,7 @@
   "open_project": "Открыть проект",
   "files_cannot_include_invalid_characters": "Файлы не могут содержать символы '*' и '/'",
   "invalid_file_name": "Неверное имя файла",
-  "autocomplete_references": "Автодополнение ссылок (внутри блока <code>\\cite{}</code>)",
+  "autocomplete_references": "Автодополнение ссылок (внутри блока <0>\\cite{}</0>)",
   "autocomplete": "Автозавершение",
   "failed_compile_check": "Похоже, в Вашем проекте имеются критические синтаксические ошибки, которые Вы должны исправить перед компиляцией",
   "failed_compile_check_try": "Попытаться скомпилировать всё равно",

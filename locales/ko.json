@@ -176,7 +176,7 @@
   "open_project": "프로젝트 열기",
   "files_cannot_include_invalid_characters": "파일에 '*'과 '/'은 사용할 수 없습니다.",
   "invalid_file_name": "파일 이름이 부적절합니다.",
-  "autocomplete_references": "레퍼런스 자동완성 (<code>\\cite{}</code> 블록 안에서)",
+  "autocomplete_references": "레퍼런스 자동완성 (<0>\\cite{}</0> 블록 안에서)",
   "autocomplete": "자동 완성",
   "failed_compile_check": "프로젝트에 심각한 문법 오류가 있는 것으로 보입니다. 완료하기 전 수정하십시오.",
   "failed_compile_check_try": "무시하고 컴파일하기",

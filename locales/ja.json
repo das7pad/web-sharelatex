@@ -29,7 +29,7 @@
   "open_project": "プロジェクトを開く",
   "files_cannot_include_invalid_characters": "ファイルには「*」や「/」などの文字を含めることはできません",
   "invalid_file_name": "無効なファイル名",
-  "autocomplete_references": "参照オートコンプリート（<code>\\cite{}</code>ブロック内）",
+  "autocomplete_references": "参照オートコンプリート（<0>\\cite{}</0>ブロック内）",
   "autocomplete": "オートコンプリート",
   "failed_compile_check": "コンパイルする前に修正すべき重大なシンタックスエラーがプロジェクトにあるようです",
   "failed_compile_check_try": "とにかくコンパイルを実行",
