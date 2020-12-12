@@ -432,6 +432,10 @@ module.exports = {
   httpAuthUsers,
 
   jwt: {
+    // upstream jwt module
+    key: process.env['OT_JWT_AUTH_KEY'],
+    algorithm: process.env['OT_JWT_AUTH_ALG'] || 'HS256',
+
     spelling: {
       sign: {
         options: {
