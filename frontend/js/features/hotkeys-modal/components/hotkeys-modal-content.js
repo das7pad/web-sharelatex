@@ -1,15 +1,14 @@
 import React from 'react'
 import { Button, Modal, Row, Col } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { Trans, useTranslation } from 'react-i18next'
+import { Trans } from '../../../components/trans'
+import t from '../../../misc/t'
 
 function HotkeysModalContent({
   handleHide,
   isMac = false,
   trackChangesVisible = false
 }) {
-  const { t } = useTranslation()
-
   const ctrl = isMac ? 'Cmd' : 'Ctrl'
 
   return (
