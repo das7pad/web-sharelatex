@@ -95,7 +95,7 @@
     "@babel/register": "^7.10.1",
     "@sentry/browser": "^5.27.6",
     "@testing-library/react": "^11.0.4",
-    "ace-builds": "https://jenkins.das7pad.de/artifacts/ace/overleaf-plus-csp/2/builds/1.4.12-c17e9ef365c5ba0915bd647c46b705c6863ff4c3.tar.gz",
+    "ace-builds": "https://jenkins.das7pad.de/artifacts/ace/overleaf-plus-csp/4/builds/1.4.12-1580dd1648ba901724f0a81d07932002f8d7d966.tar.gz",
     "algoliasearch": "^3.35.1",
     "angular": "~1.8.0",
     "angular-mocks": "~1.8.0",
