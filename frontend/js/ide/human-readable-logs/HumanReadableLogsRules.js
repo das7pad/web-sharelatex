@@ -28,9 +28,9 @@ const rules = [
         You have placed an alignment tab character '&' in the wrong place. If
         you want to align something, you must write it inside an align
         environment such as \begin
-        {'{align}'} … \end
+        {'{align}'} ... \end
         {'{align}'}, \begin
-        {'{tabular}'} … \end
+        {'{tabular}'} ... \end
         {'{tabular}'}, etc. If you want to write an ampersand '&' in text, you
         must write \& instead.
       </>
@@ -56,8 +56,8 @@ const rules = [
     humanReadableHintComponent: (
       <>
         You have forgotten a $ sign at the end of 'display math' mode. When
-        writing in display math mode, you must always math write inside $$ … $$.
-        Check that the number of $s match around each math expression.
+        writing in display math mode, you must always math write inside $$ ...
+        $$. Check that the number of $s match around each math expression.
       </>
     )
   },
@@ -75,9 +75,9 @@ const rules = [
         <WikiLink url="https://www.overleaf.com/learn/Errors/Missing_$_inserted">
           here
         </WikiLink>
-        . If you intended to use mathematics mode, then use $ … $ for 'inline
-        math mode', $$ … $$ for 'display math mode' or alternatively \begin
-        {'{math}'} … \end
+        . If you intended to use mathematics mode, then use $ ... $ for 'inline
+        math mode', $$ ... $$ for 'display math mode' or alternatively \begin
+        {'{math}'} ... \end
         {'{math}'}.
       </>
     )
@@ -239,8 +239,8 @@ const rules = [
     humanReadableHintComponent: (
       <>
         You have used a font command which is only available in math mode. To
-        use this command, you must be in maths mode (E.g. $ … $ or \begin
-        {'{math}'} … \end
+        use this command, you must be in maths mode (E.g. $ ... $ or \begin
+        {'{math}'} ... \end
         {'{math}'}
         ). If you want to use it outside of math mode, use the text version
         instead: \textrm, \textit, etc.
@@ -276,9 +276,9 @@ const rules = [
     humanReadableHintComponent: (
       <>
         You have used a command in the main body of your document which should
-        be used in the preamble. Make sure that \documentclass[…]
-        {'{…}'} and all \usepackage
-        {'{…}'} commands are written before \begin
+        be used in the preamble. Make sure that \documentclass[...]
+        {'{...}'} and all \usepackage
+        {'{...}'} commands are written before \begin
         {'{document}'}.
       </>
     )
@@ -331,7 +331,7 @@ const rules = [
         You have used the \maketitle command, but have not specified any
         \author. To fix this, include an author in your preamble using the
         \author
-        {'{…}'} command.
+        {'{...}'} command.
       </>
     )
   },
@@ -342,8 +342,8 @@ const rules = [
     humanReadableHintComponent: (
       <>
         You have created an environment (using \begin
-        {'{…}'} and \end
-        {'{…}'} commands) which is not recognized. Make sure you have included
+        {'{...}'} and \end
+        {'{...}'} commands) which is not recognized. Make sure you have included
         the required package for that environment in your preamble, and that the
         environment is spelled correctly.
       </>
@@ -393,7 +393,7 @@ const rules = [
         You have used a \verb command incorrectly. Try replacling the \verb
         command with \begin
         {'{verbatim}'}
-        …\end
+        ...\end
         {'{verbatim}'}
         .\
       </>
@@ -407,7 +407,7 @@ const rules = [
       <>
         You have written a length, but have not specified the appropriate units
         (pt, mm, cm etc.). If you have not written a length, check that you have
-        not witten a linebreak \\ followed by square brackets […] anywhere.
+        not witten a linebreak \\ followed by square brackets [...] anywhere.
       </>
     )
   },
