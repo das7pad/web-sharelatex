@@ -479,10 +479,12 @@ const rules = [
 ]
 
 rules.forEach(rule => {
-  rule.humanReadableHint = ReactDOMServer.renderToStaticMarkup(
-    rule.humanReadableHintComponent
-  )
+  try {
+    rule.humanReadableHint = ReactDOMServer.renderToStaticMarkup(
+      rule.humanReadableHintComponent
+    )
+  } catch (e) {}
   rule.extraInfoURL = window.wikiEnabled ? rule.extraInfoURL : null
 })
 
-export default rules
+export default rules.filter(rule => !!rule.humanReadableHint)
