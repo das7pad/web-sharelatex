@@ -2,7 +2,7 @@
   Inject the worker path, pointing to the CDN and init a global Worker instance
  */
 
-import pdfjsBundle from 'pdfjs-dist/es5/build/pdf'
+import * as pdfjsBundle from 'pdfjs-dist/es5/build/pdf'
 import staticPath from './utils/staticPath'
 
 // Load the worker from the CDN
