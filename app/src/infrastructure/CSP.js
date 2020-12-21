@@ -72,7 +72,7 @@ function getCspMiddleware() {
     const childSrc = []
     const connectSrc = [SELF]
     const defaultSrc = []
-    const fontSrc = [assetsOrigin, 'about:']
+    const fontSrc = [assetsOrigin]
     const formAction = [SELF]
     const frameAncestors = []
     const frameSrc = []
