@@ -22,6 +22,14 @@ import PDFJS from '../../../pdfjsBundle'
 import staticPath from '../../../utils/staticPath'
 import { captureMessage } from '../../../infrastructure/error-reporter'
 
+export function isRenderingCancelledException(error) {
+  return (
+    error &&
+    (error.name === 'RenderingCancelledException' ||
+      /^Rendering cancelled/.test(error.message))
+  )
+}
+
 export default App.factory('PDFRenderer', function(
   $timeout,
   pdfAnnotations,
@@ -494,7 +502,7 @@ export default App.factory('PDFRenderer', function(
           })
           .catch(function(error) {
             // page render failed
-            if (error.name === 'RenderingCancelledException') {
+            if (isRenderingCancelledException(error)) {
               // do nothing when cancelled
             } else {
               return typeof self.errorCallback === 'function'

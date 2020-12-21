@@ -23,9 +23,17 @@ import { captureMessage } from '../../../infrastructure/error-reporter'
 import pdfTextLayer from './pdfTextLayer'
 import pdfAnnotations from './pdfAnnotations'
 import pdfHighlights from './pdfHighlights'
-import pdfRenderer from './pdfRenderer'
+import pdfRenderer, { isRenderingCancelledException } from './pdfRenderer'
 import pdfPage from './pdfPage'
 import pdfSpinner from './pdfSpinner'
+
+function isMissingPDFException(error) {
+  return (
+    error &&
+    (error.name === 'MissingPDFException' || /^Missing PDF/.test(error.message))
+  )
+}
+
 App.controller('pdfViewerController', function(
   $scope,
   $q,
@@ -73,7 +81,7 @@ App.controller('pdfViewerController', function(
           // but we plan to add this in the future
           // (https://github.com/overleaf/issues/issues/2985) and this error
           // is causing noise in Sentry so ignore it
-          if (!error || error.name !== 'MissingPDFException') {
+          if (!isMissingPDFException(error)) {
             captureMessage(`pdfng error ${error}`)
           }
           return $scope.$emit('pdf:error', error)
@@ -503,7 +511,7 @@ export default App.directive('pdfViewer', ($q, $timeout, pdfSpinner) => ({
     )
 
     scope.$on('pdf:error', function(event, error) {
-      if (error.name === 'RenderingCancelledException') {
+      if (isRenderingCancelledException(error)) {
         return
       }
       // check if too many retries or file is missing
