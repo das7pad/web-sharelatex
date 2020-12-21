@@ -5,7 +5,6 @@ const WebpackAssetsManifest = require('webpack-assets-manifest')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const AutoPrefixer = require('autoprefixer')
 
-const NODE_MODULES = path.join(__dirname, 'node_modules')
 const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
 // Generate a hash of entry points, including modules
@@ -48,7 +47,6 @@ module.exports = {
 
   // Define how file types are handled by webpack
   module: {
-    noParse: [path.join(NODE_MODULES, 'pdfjs-dist/es5/build/pdf.js')],
     rules: [
       {
         // Pass application JS files through babel-loader, compiling to ES5
@@ -233,6 +231,11 @@ module.exports = {
       __REACT_DEVTOOLS_GLOBAL_HOOK__: '({ isDisabled: true })'
     }),
 
+    new webpack.DefinePlugin({
+      // CSP fix for regenerator, bundled inside ES5 compatible pdf.js
+      regeneratorRuntime: 'window.regeneratorRuntime'
+    }),
+
     // Prevent moment from loading (very large) locale files that aren't used
     new webpack.IgnorePlugin({
       resourceRegExp: /^\.\/locale$/,
@@ -256,17 +259,7 @@ module.exports = {
             to: path.join(
               __dirname,
               '/public/js/pdfjs-dist/es5/build/pdf.worker.js'
-            ),
-            transform: content => {
-              // CSP fix for regenerator
-              content = content
-                .toString()
-                .replace(
-                  /Function("r", "regeneratorRuntime = r")(runtime);/,
-                  ''
-                )
-              return content
-            }
+            )
           }
         ])
         .concat(
