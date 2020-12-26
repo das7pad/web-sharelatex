@@ -52,7 +52,14 @@ export default describe('SpellCheckManager', function() {
     return this.timelord.restore()
   })
 
+  beforeEach(function() {
+    this.$httpBackend.expect('GET', '/spelling/v20200714/dict').respond([])
+    this.spellCheckManager.userDictFetched = false
+  })
+
   it('adds an highlight when a misspelling is found', function() {
+    this.spellCheckManager.init()
+    this.$httpBackend.flush()
     this.$httpBackend.when('POST', '/spelling/v20200714/check').respond({
       misspellings: [
         {
@@ -62,7 +69,6 @@ export default describe('SpellCheckManager', function() {
       ]
     })
     this.adapter.getLinesByRows.returns(['oppozition'])
-    this.spellCheckManager.init()
     this.timelord.tick(500)
     this.$httpBackend.flush()
     expect(this.highlightedWordManager.addHighlight).to.have.been.called
@@ -90,6 +96,7 @@ export default describe('SpellCheckManager', function() {
     describe('when doing the first check', function() {
       beforeEach(function() {
         this.spellCheckManager.init()
+        this.$httpBackend.flush()
       })
       it('initially flags all lines as dirty ', function() {
         expect(this.spellCheckManager.changedLines)
@@ -116,6 +123,7 @@ export default describe('SpellCheckManager', function() {
     describe('after the initial check', function() {
       beforeEach(function() {
         this.spellCheckManager.init()
+        this.$httpBackend.flush()
         this.spellCheckManager.firstCheck = false
       })
 
@@ -176,18 +184,19 @@ export default describe('SpellCheckManager', function() {
           }
         ]
       })
+
+      this.spellCheckManager.init()
+      this.$httpBackend.flush()
     })
 
     it('adds already checked words to the spellchecker cache', function() {
       expect(this.spellCheckManager.cache.info().size).to.equal(0)
-      this.spellCheckManager.init()
       this.timelord.tick(500)
       this.$httpBackend.flush()
       expect(this.spellCheckManager.cache.info().size).to.equal(3)
     })
 
     it('adds misspeled word suggestions to the cache', function() {
-      this.spellCheckManager.init()
       this.timelord.tick(500)
       this.$httpBackend.flush()
 
@@ -199,7 +208,6 @@ export default describe('SpellCheckManager', function() {
     })
 
     it('adds non-misspeled words to the cache as a boolean', function() {
-      this.spellCheckManager.init()
       this.timelord.tick(500)
       this.$httpBackend.flush()
       expect(
@@ -216,6 +224,9 @@ export default describe('SpellCheckManager', function() {
       this.adapter.getFirstVisibleRowNum.returns(1)
       this.adapter.getLastVisibleRowNum.returns(1)
       this.adapter.getLinesByRows.returns(['Lorem ipsum dolor'])
+
+      this.spellCheckManager.init()
+      this.$httpBackend.flush()
     })
 
     it('hits the backend with all words at startup', function() {
@@ -234,7 +245,6 @@ export default describe('SpellCheckManager', function() {
             }
           ]
         })
-      this.spellCheckManager.init()
       this.timelord.tick(500)
       this.$httpBackend.flush()
     })
@@ -255,7 +265,6 @@ export default describe('SpellCheckManager', function() {
             }
           ]
         })
-      this.spellCheckManager.init()
       this.timelord.tick(500)
       this.$httpBackend.flush()
       this.spellCheckManager.init()
@@ -278,7 +287,6 @@ export default describe('SpellCheckManager', function() {
             }
           ]
         })
-      this.spellCheckManager.init()
       this.timelord.tick(500)
       this.$httpBackend.flush()
 
