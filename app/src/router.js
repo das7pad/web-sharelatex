@@ -826,6 +826,11 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     AuthenticationController.requireLogin(),
     SpellingController.proxyRequestToSpellingApi
   )
+  webRouter.get(
+    '/spelling/v20200714/dict',
+    AuthenticationController.requireLogin(),
+    SpellingController.proxyRequestToSpellingApi
+  )
   webRouter.post(
     '/spelling/v20200714/learn',
     AuthenticationController.requireLogin(),
