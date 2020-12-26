@@ -671,13 +671,6 @@ const ProjectController = {
             SpellingHandler.getJWT(userId, cb)
           }
         },
-        spellingDict(cb) {
-          if (!userId) {
-            cb(null, [])
-          } else {
-            SpellingHandler.getUserDictionary(userId, cb)
-          }
-        },
         subscription(cb) {
           if (userId == null) {
             return cb()
@@ -735,7 +728,6 @@ const ProjectController = {
           project,
           user,
           jwtSpelling,
-          spellingDict,
           subscription,
           brandVariation,
           isTokenMember,
@@ -869,7 +861,6 @@ const ProjectController = {
                 isTokenMember
               ),
               jwtSpelling,
-              spellingDict,
               languages: Settings.languages,
               editorThemes: Settings.editorThemes,
               maxDocLength: Settings.max_doc_length,

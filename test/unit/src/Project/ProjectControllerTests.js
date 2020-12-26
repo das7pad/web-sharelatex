@@ -1019,27 +1019,6 @@ describe('ProjectController', function() {
       })
     })
 
-    describe('spellingDict', function() {
-      it('should request the users dic when logged in', function(done) {
-        this.res.render = (pageName, opts) => {
-          expect(this.SpellingHandler.getUserDictionary.called).to.equal(true)
-          expect(opts.spellingDict).to.deep.equal(['word'])
-          done()
-        }
-        this.ProjectController.loadEditor(this.req, this.res)
-      })
-
-      it('should not get the dict for anonymous users', function(done) {
-        this.AuthenticationController.isUserLoggedIn.returns(false)
-        this.res.render = (pageName, opts) => {
-          expect(this.SpellingHandler.getUserDictionary.called).to.equal(false)
-          expect(opts.spellingDict).to.deep.equal([])
-          done()
-        }
-        this.ProjectController.loadEditor(this.req, this.res)
-      })
-    })
-
     it('should add on userSettings', function(done) {
       this.res.render = (pageName, opts) => {
         opts.userSettings.fontSize.should.equal(this.user.ace.fontSize)
