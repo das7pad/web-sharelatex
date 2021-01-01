@@ -29,6 +29,9 @@ function getCspMiddleware() {
   const compilesOrigin = Settings.pdfDownloadDomain
     ? new URL(Settings.pdfDownloadDomain).origin
     : undefined
+  const spellingOrigin = Settings.apis.spelling.publicUrl
+    ? new URL(Settings.apis.spelling.publicUrl).origin
+    : undefined
   const sentryOrigin = Settings.sentry.frontend.dsn
     ? new URL(Settings.sentry.frontend.dsn).origin
     : undefined
@@ -166,6 +169,10 @@ function getCspMiddleware() {
       })
     }
 
+    if (cfg.needsSpellingAccess) {
+      connectSrc.push(spellingOrigin || SELF)
+    }
+
     if (cfg.needsWorker) {
       // `Worker` are bootstrapped via `Blob`s sporting `importScript(...)`
       workerSrc.push('blob:')
@@ -208,6 +215,7 @@ function getCspMiddleware() {
     needsCompilesAccess: true,
     needsProjectFileAccess: true,
     needsSocketIo: true,
+    needsSpellingAccess: true,
     needsWorker: true
   })
   const CSP_LAUNCHPAD = generateCSP({
