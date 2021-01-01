@@ -29,6 +29,9 @@ function getCspMiddleware() {
   const compilesOrigin = Settings.pdfDownloadDomain
     ? new URL(Settings.pdfDownloadDomain).origin
     : undefined
+  const notificationsOrigin = Settings.apis.notifications.publicUrl
+    ? new URL(Settings.apis.notifications.publicUrl).origin
+    : undefined
   const spellingOrigin = Settings.apis.spelling.publicUrl
     ? new URL(Settings.apis.spelling.publicUrl).origin
     : undefined
@@ -145,6 +148,11 @@ function getCspMiddleware() {
       frameSrc.push(compilesOrigin || SELF)
     }
 
+    if (cfg.needsNotificationsAccess) {
+      connectSrc.push(SELF)
+      connectSrc.push(notificationsOrigin)
+    }
+
     if (cfg.needsProjectFileAccess) {
       // Binary file preview: /project/__PROJECT_ID__/file/__FILE_ID__
       imgSrc.push(SELF)
@@ -209,7 +217,10 @@ function getCspMiddleware() {
   }
 
   const CSP_DEFAULT = generateCSP({})
-  const CSP_DASHBOARD = generateCSP({ needsFront: true })
+  const CSP_DASHBOARD = generateCSP({
+    needsFront: true,
+    needsNotificationsAccess: true
+  })
   const CSP_EDITOR = generateCSP({
     connectCDN: true,
     needsCompilesAccess: true,

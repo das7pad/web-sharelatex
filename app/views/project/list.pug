@@ -6,7 +6,8 @@ block vars
 block content
 	meta(id="ol-projects" data-json content=projects)
 	meta(id="ol-tags" data-json content=tags)
-	meta(id="ol-notifications" data-json content=notifications)
+	meta(id="ol-publicUrlNotifications", content=settings.apis.notifications.publicUrl)
+	meta(id="ol-jwtNotifications" content=jwtNotifications)
 	meta(id="ol-notificationsInstitution" data-json content=notificationsInstitution)
 	meta(id="ol-algolia" data-json content={
 			institutions: {

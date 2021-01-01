@@ -309,7 +309,8 @@ module.exports = {
           : undefined
     },
     notifications: {
-      url: `http://${process.env['NOTIFICATIONS_HOST'] || 'localhost'}:3042`
+      url: `http://${process.env['NOTIFICATIONS_HOST'] || 'localhost'}:3042`,
+      publicUrl: process.env['NOTIFICATIONS_PUBLIC_URL']
     },
     analytics: {
       enabled: true,
@@ -436,6 +437,17 @@ module.exports = {
     key: process.env['OT_JWT_AUTH_KEY'],
     algorithm: process.env['OT_JWT_AUTH_ALG'] || 'HS256',
 
+    notifications: {
+      sign: {
+        options: {
+          algorithm: 'HS512',
+          expiresIn: '30d'
+        },
+        secret:
+          process.env.JWT_NOTIFICATIONS_SIGN_SECRET ||
+          'jwt-notifications-secret'
+      }
+    },
     spelling: {
       sign: {
         options: {

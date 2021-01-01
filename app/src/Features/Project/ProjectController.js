@@ -385,8 +385,12 @@ const ProjectController = {
         tags(cb) {
           TagsHandler.getAllTags(userId, cb)
         },
-        notifications(cb) {
-          NotificationsHandler.getUserNotifications(userId, cb)
+        jwtNotifications(cb) {
+          if (!Settings.apis.notifications.publicUrl) {
+            cb(null, undefined)
+          } else {
+            NotificationsHandler.getJWT(userId, cb)
+          }
         },
         projects(cb) {
           ProjectGetter.findAllUsersProjects(
@@ -432,7 +436,7 @@ const ProjectController = {
           OError.tag(err, 'error getting data for project list page')
           return next(err)
         }
-        const { notifications, user, userAffiliations } = results
+        const { user, userAffiliations } = results
         // Handle case of deleted user
         if (user == null) {
           UserController.logout(req, res, next)
@@ -440,12 +444,6 @@ const ProjectController = {
         }
         const tags = results.tags
         const notificationsInstitution = []
-        for (const notification of notifications) {
-          notification.html = req.i18n.translate(
-            notification.templateKey,
-            notification.messageOpts
-          )
-        }
 
         // Institution SSO Notifications
         if (Features.hasFeature('saml')) {
@@ -555,7 +553,7 @@ const ProjectController = {
             priority_title: true,
             projects,
             tags,
-            notifications: notifications || [],
+            jwtNotifications: results.jwtNotifications,
             notificationsInstitution,
             portalTemplates,
             user,

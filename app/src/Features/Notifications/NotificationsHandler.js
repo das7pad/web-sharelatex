@@ -11,6 +11,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
+const jwt = require('jsonwebtoken')
 const OError = require('@overleaf/o-error')
 const settings = require('@overleaf/settings')
 const request = require('request')
@@ -37,6 +38,15 @@ const makeRequest = function(opts, callback) {
 }
 
 module.exports = {
+  getJWT(userId, callback) {
+    jwt.sign(
+      { userId },
+      settings.jwt.notifications.sign.secret,
+      settings.jwt.notifications.sign.options,
+      callback
+    )
+  },
+
   getUserNotifications(user_id, callback) {
     const opts = {
       uri: `${

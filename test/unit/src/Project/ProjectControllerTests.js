@@ -27,6 +27,9 @@ describe('ProjectController', function() {
         chat: {
           url: 'chat.com'
         },
+        notifications: {
+          publicUrl: undefined
+        },
         spelling: {
           publicUrl: undefined
         }
@@ -70,7 +73,10 @@ describe('ProjectController', function() {
     this.SubscriptionLocator = { getUsersSubscription: sinon.stub() }
     this.LimitationsManager = { hasPaidSubscription: sinon.stub() }
     this.TagsHandler = { getAllTags: sinon.stub() }
-    this.NotificationsHandler = { getUserNotifications: sinon.stub() }
+    this.NotificationsHandler = {
+      getUserNotifications: sinon.stub(),
+      getJWT: sinon.stub().yields(null, 'some-jwt')
+    }
     this.UserModel = { findById: sinon.stub() }
     this.AuthorizationManager = {
       getPrivilegeLevelForProject: sinon.stub(),
@@ -526,6 +532,28 @@ describe('ProjectController', function() {
         done()
       }
       this.ProjectController.projectListPage(this.req, this.res)
+    })
+
+    describe('jwtNotifications', function() {
+      it('should generate a jwt when the publicUrl exists', function(done) {
+        this.settings.apis.notifications.publicUrl = 'http://notifications.test'
+        this.res.render = (pageName, opts) => {
+          expect(this.NotificationsHandler.getJWT.called).to.equal(true)
+          expect(opts.jwtNotifications).to.equal('some-jwt')
+          done()
+        }
+        this.ProjectController.projectListPage(this.req, this.res)
+      })
+
+      it('should not generate a jwt when no publicUrl exists', function(done) {
+        this.settings.apis.notifications.publicUrl = undefined
+        this.res.render = (pageName, opts) => {
+          expect(this.NotificationsHandler.getJWT.called).to.equal(false)
+          expect(opts.jwtNotifications).to.equal(undefined)
+          done()
+        }
+        this.ProjectController.projectListPage(this.req, this.res)
+      })
     })
 
     describe('when there is a v1 connection error', function() {

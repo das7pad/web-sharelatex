@@ -3,10 +3,13 @@ import getMeta from '../../utils/meta'
 import { escapeForInnerHTML } from '../../misc/escape'
 import t from '../../misc/t'
 
-App.controller('NotificationsController', function($scope, $http) {
-  for (let notification of $scope.notifications || []) {
-    notification.hide = false
-  }
+App.controller('NotificationsController', function(
+  $scope,
+  $http,
+  eventTracking
+) {
+  // initialize
+  $scope.notifications = []
 
   $scope.samlInitPath = getMeta('ol-samlInitPath')
 
@@ -15,14 +18,60 @@ App.controller('NotificationsController', function($scope, $http) {
       notification.hide = true
       return
     }
-    $http({
+    apiRequest({
       url: `/notifications/${notification._id}`,
-      method: 'DELETE',
-      headers: {
-        'X-Csrf-Token': window.csrfToken
-      }
+      method: 'DELETE'
     }).then(() => (notification.hide = true))
   }
+
+  let jwtNotifications = getMeta('ol-jwtNotifications')
+  function apiRequest({ url, method }) {
+    let headers
+    if (jwtNotifications) {
+      const publicUrlNotifications = getMeta('ol-publicUrlNotifications') || ''
+      url = publicUrlNotifications + '/jwt' + url
+      headers = { Authorization: 'Bearer ' + jwtNotifications }
+    } else if (method !== 'GET') {
+      headers = { 'X-Csrf-Token': getMeta('ol-csrfToken') }
+    }
+    return $http({ method, url, headers })
+  }
+
+  function fetchNotifications() {
+    return apiRequest({ method: 'GET', url: '/notifications' })
+      .then(response => {
+        if (response.status === 200) {
+          return response.data
+        }
+        if (jwtNotifications && response.status === 401) {
+          eventTracking.sendMB('jwt-notifications-error')
+          // use a proxied request
+          jwtNotifications = null
+          // immediately retry without the jwt
+          return fetchNotifications()
+        }
+        throw new Error(`unexpected status ${response.status}`)
+      })
+      .catch(error => {
+        sl_console.log('[NotificationsController] failed to fetch', error)
+        // retry with delay
+        return new Promise(resolve => {
+          setTimeout(() => {
+            fetchNotifications().then(resolve)
+          }, 10000)
+        })
+      })
+  }
+
+  function setNotifications(notifications) {
+    for (const notification of notifications) {
+      notification.html = t(notification.templateKey, notification.messageOpts)
+      notification.hide = false
+    }
+    $scope.notifications = notifications
+  }
+
+  fetchNotifications().then(setNotifications)
 })
 
 App.controller('DismissableNotificationsController', function(

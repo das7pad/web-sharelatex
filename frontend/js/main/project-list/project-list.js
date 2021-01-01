@@ -13,7 +13,6 @@ App.controller('ProjectPageController', function(
 ) {
   $scope.projects = window.data.projects
   $scope.tags = window.data.tags
-  $scope.notifications = window.data.notifications
   $scope.notificationsInstitution = window.data.notificationsInstitution
   $scope.allSelected = false
   $scope.selectedProjects = []
