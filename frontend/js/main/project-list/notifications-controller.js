@@ -1,5 +1,7 @@
 import App from '../../base'
 import getMeta from '../../utils/meta'
+import { escapeForInnerHTML } from '../../misc/escape'
+import t from '../../misc/t'
 
 App.controller('NotificationsController', function($scope, $http) {
   for (let notification of $scope.notifications || []) {
@@ -37,9 +39,19 @@ App.controller('DismissableNotificationsController', function(
 })
 
 App.controller('ProjectInviteNotificationController', function($scope, $http) {
-  // Shortcuts for translation keys
-  $scope.projectName = $scope.notification.messageOpts.projectName
-  $scope.userName = $scope.notification.messageOpts.userName
+  const projectName = escapeForInnerHTML(
+    $scope.notification.messageOpts.projectName
+  )
+  const userName = escapeForInnerHTML($scope.notification.messageOpts.userName)
+
+  $scope.notification.htmlAccepted = t(
+    'notification_project_invite_accepted_message',
+    { projectName }
+  )
+  $scope.notification.htmlNotAccepted = t(
+    'notification_project_invite_message',
+    { userName, projectName }
+  )
 
   $scope.accept = function() {
     $scope.notification.inflight = true

@@ -15,10 +15,14 @@ include ../../_mixins/saml
 					ng-controller="ProjectInviteNotificationController"
 				)
 					.notification-body
-						span(ng-show="!notification.accepted")
-						| {{translate("notification_project_invite_message", {userName, projectName})}}
-						span(ng-show="notification.accepted")
-						| {{translate("notification_project_invite_accepted_message", {projectName})}}
+						span(
+							ng-show="!notification.accepted",
+							ng-bind-html="notification.htmlNotAccepted"
+						)
+						span(
+							ng-show="notification.accepted"
+							ng-bind-html="notification.htmlAccepted"
+						)
 					.notification-action
 						a.pull-right.btn.btn-sm.btn-info(
 							ng-show="notification.accepted",
