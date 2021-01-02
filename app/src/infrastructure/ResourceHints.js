@@ -31,8 +31,7 @@ function getPreloadMiddleware() {
       preload(buildImgPath(path), 'image')
     }
 
-    if (cfg.hasTooltip) {
-      // additional font for the (i) tooltip
+    if (cfg.usesBoldItalicFont) {
       preloadFont('merriweather-v21-latin-700italic')
     }
 
@@ -64,7 +63,7 @@ function getPreloadMiddleware() {
   }
 
   const PRELOAD_DEFAULT = generatePreloadLink({})
-  const PRELOAD_DASHBOARD = generatePreloadLink({ hasTooltip: true })
+  const PRELOAD_DASHBOARD = generatePreloadLink({ usesBoldItalicFont: true })
   const PRELOAD_EDITOR_DEFAULT = generatePreloadLink({
     isEditor: true,
     themeModifier: ''
@@ -76,6 +75,9 @@ function getPreloadMiddleware() {
   const PRELOAD_EDITOR_LIGHT = generatePreloadLink({
     isEditor: true,
     themeModifier: 'light-'
+  })
+  const PRELOAD_PASSWORD_RESET = generatePreloadLink({
+    usesBoldItalicFont: true
   })
 
   return function preloadMiddleware(req, res, next) {
@@ -94,6 +96,9 @@ function getPreloadMiddleware() {
           } else {
             headerValue = PRELOAD_EDITOR_DEFAULT
           }
+          break
+        case 'user/passwordReset':
+          headerValue = PRELOAD_PASSWORD_RESET
           break
         default:
           headerValue = PRELOAD_DEFAULT
