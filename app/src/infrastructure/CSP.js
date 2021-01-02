@@ -72,10 +72,6 @@ function getCspMiddleware() {
 
   const SELF = "'self'"
   const assetsOrigin = cdnOrigin || SELF
-  const policyAmend = ['block-all-mixed-content']
-  if (csp.reportURL) {
-    policyAmend.push(`report-uri ${csp.reportURL}`)
-  }
   let headerName
   if (csp.enforce) {
     headerName = 'Content-Security-Policy'
@@ -199,24 +195,31 @@ function getCspMiddleware() {
     // backwards compatibility -- csp level 3 directives
     childSrc.push(...workerSrc)
 
-    return serializeCSP({
-      'base-uri': baseUri,
-      'child-src': childSrc,
-      'connect-src': connectSrc,
-      'default-src': defaultSrc,
-      'font-src': fontSrc,
-      'form-action': formAction,
-      'frame-ancestors': frameAncestors,
-      'frame-src': frameSrc,
-      'img-src': imgSrc,
-      'manifest-src': manifestSrc,
-      'script-src': scriptSrc,
-      'style-src': styleSrc,
-      'worker-src': workerSrc
-    })
+    return serializeCSP(
+      {
+        'base-uri': baseUri,
+        'child-src': childSrc,
+        'connect-src': connectSrc,
+        'default-src': defaultSrc,
+        'font-src': fontSrc,
+        'form-action': formAction,
+        'frame-ancestors': frameAncestors,
+        'frame-src': frameSrc,
+        'img-src': imgSrc,
+        'manifest-src': manifestSrc,
+        'script-src': scriptSrc,
+        'style-src': styleSrc,
+        'worker-src': workerSrc
+      },
+      { reportViolations: true }
+    )
   }
 
-  function serializeCSP(directives) {
+  function serializeCSP(directives, { reportViolations }) {
+    const policyAmend = ['block-all-mixed-content']
+    if (reportViolations && csp.reportURL) {
+      policyAmend.push(`report-uri ${csp.reportURL}`)
+    }
     return Object.entries(directives)
       .map(([directive, origins]) => {
         origins = Array.from(new Set(origins))
@@ -228,12 +231,15 @@ function getCspMiddleware() {
 
   // default CSP for other sources, like JSON or file downloads
   // lock down all but image source for loading the favicon
-  const CSP_DEFAULT_MISC = serializeCSP({
-    'default-src': [],
-    'form-action': [],
-    'frame-ancestors': [],
-    'img-src': [SELF, assetsOrigin]
-  })
+  const CSP_DEFAULT_MISC = serializeCSP(
+    {
+      'default-src': [],
+      'form-action': [],
+      'frame-ancestors': [],
+      'img-src': [SELF, assetsOrigin]
+    },
+    { reportViolations: false }
+  )
   // default CSP for rendering
   const CSP_DEFAULT_RENDER = generateCSP({})
   const CSP_DASHBOARD = generateCSP({
