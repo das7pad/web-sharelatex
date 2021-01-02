@@ -18,6 +18,13 @@ const logger = require('logger-sharelatex')
 
 module.exports = RedirectManager = {
   apply(webRouter) {
+    let cdnUrl = settings.cdn.web.host
+    if (cdnUrl) {
+      // drop trailing slash
+      cdnUrl = cdnUrl.replace(/\/$/, '')
+      settings.redirects['/favicon.ico'] = cdnUrl + '/favicon.ico'
+    }
+
     return (() => {
       const result = []
       for (var redirectUrl in settings.redirects) {
