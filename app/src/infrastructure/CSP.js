@@ -72,6 +72,16 @@ function getCspMiddleware() {
 
   const SELF = "'self'"
   const assetsOrigin = cdnOrigin || SELF
+  const policyAmend = ['block-all-mixed-content']
+  if (csp.reportURL) {
+    policyAmend.push(`report-uri ${csp.reportURL}`)
+  }
+  let headerName
+  if (csp.enforce) {
+    headerName = 'Content-Security-Policy'
+  } else {
+    headerName = 'Content-Security-Policy-Report-Only'
+  }
 
   function generateCSP(cfg) {
     const baseUri = [SELF]
@@ -189,11 +199,7 @@ function getCspMiddleware() {
     // backwards compatibility -- csp level 3 directives
     childSrc.push(...workerSrc)
 
-    let policyAmend = ['block-all-mixed-content']
-    if (csp.reportURL) {
-      policyAmend.push(`report-uri ${csp.reportURL}`)
-    }
-    return Object.entries({
+    return serializeCSP({
       'base-uri': baseUri,
       'child-src': childSrc,
       'connect-src': connectSrc,
@@ -208,6 +214,10 @@ function getCspMiddleware() {
       'style-src': styleSrc,
       'worker-src': workerSrc
     })
+  }
+
+  function serializeCSP(directives) {
+    return Object.entries(directives)
       .map(([directive, origins]) => {
         origins = Array.from(new Set(origins))
         return `${directive} ${origins.join(' ') || "'none'"}`
@@ -216,7 +226,16 @@ function getCspMiddleware() {
       .join('; ')
   }
 
-  const CSP_DEFAULT = generateCSP({})
+  // default CSP for other sources, like JSON or file downloads
+  // lock down all but image source for loading the favicon
+  const CSP_DEFAULT_MISC = serializeCSP({
+    'default-src': [],
+    'form-action': [],
+    'frame-ancestors': [],
+    'img-src': [SELF, assetsOrigin]
+  })
+  // default CSP for rendering
+  const CSP_DEFAULT_RENDER = generateCSP({})
   const CSP_DASHBOARD = generateCSP({
     needsFront: true,
     needsNotificationsAccess: true
@@ -242,6 +261,7 @@ function getCspMiddleware() {
   )
 
   return function cspMiddleware(req, res, next) {
+    res.setHeader(headerName, CSP_DEFAULT_MISC)
     const actualRender = res.render
     res.render = function(view) {
       let headerValue
@@ -260,13 +280,9 @@ function getCspMiddleware() {
           headerValue = CSP_LAUNCHPAD
           break
         default:
-          headerValue = CSP_DEFAULT
+          headerValue = CSP_DEFAULT_RENDER
       }
-      if (csp.enforce) {
-        res.setHeader('Content-Security-Policy', headerValue)
-      } else {
-        res.setHeader('Content-Security-Policy-Report-Only', headerValue)
-      }
+      res.setHeader(headerName, headerValue)
       actualRender.apply(res, arguments)
     }
     next()
