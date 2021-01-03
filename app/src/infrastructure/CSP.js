@@ -70,6 +70,7 @@ function getCspMiddleware() {
   const ngCloakDigest = getDigest(NG_CLOAK)
   const angularSanitizeProbeDigest = getDigest('<img src="')
 
+  const UNSAFE_INLINE = "'unsafe-inline'"
   const SELF = "'self'"
   const assetsOrigin = cdnOrigin || SELF
   const pdfDownloadOrigin = compilesOrigin || SELF
@@ -98,7 +99,7 @@ function getCspMiddleware() {
     if (csp.blockInlineStyle && !cfg.hasUnsafeInlineStyle) {
       styleSrc.push(ngCloakDigest, angularSanitizeProbeDigest)
     } else {
-      styleSrc.push("'unsafe-inline'")
+      styleSrc.push(UNSAFE_INLINE)
     }
 
     if (sentryOrigin) {
