@@ -95,7 +95,6 @@ function getCspMiddleware() {
     const workerSrc = []
 
     if (csp.blockInlineStyle) {
-      // TODO: Add Ace digests
       styleSrc.push(ngCloakDigest, angularSanitizeProbeDigest)
     } else {
       styleSrc.push("'unsafe-inline'")
