@@ -94,7 +94,7 @@ function getCspMiddleware() {
     const styleSrc = [assetsOrigin]
     const workerSrc = []
 
-    if (csp.blockInlineStyle) {
+    if (csp.blockInlineStyle && !cfg.hasUnsafeInlineStyle) {
       styleSrc.push(ngCloakDigest, angularSanitizeProbeDigest)
     } else {
       styleSrc.push("'unsafe-inline'")
@@ -266,6 +266,9 @@ function getCspMiddleware() {
     connectCDN: true,
     needsSocketIo: true
   })
+  const CSP_LEARN = generateCSP({
+    hasUnsafeInlineStyle: true
+  })
   const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
 
   const MODULE_PATH = Path.resolve(__dirname, '../../../modules')
@@ -273,6 +276,7 @@ function getCspMiddleware() {
     MODULE_PATH,
     'launchpad/app/views/launchpad'
   )
+  const VIEW_LEARN = Path.resolve(MODULE_PATH, 'learn/app/views/page')
 
   return function cspMiddleware(req, res, next) {
     res.setHeader(headerName, CSP_DEFAULT_MISC)
@@ -292,6 +296,9 @@ function getCspMiddleware() {
           break
         case VIEW_LAUNCHPAD:
           headerValue = CSP_LAUNCHPAD
+          break
+        case VIEW_LEARN:
+          headerValue = CSP_LEARN
           break
         default:
           headerValue = CSP_DEFAULT_RENDER
