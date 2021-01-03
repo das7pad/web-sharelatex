@@ -211,17 +211,26 @@ function getCspMiddleware() {
         'style-src': styleSrc,
         'worker-src': workerSrc
       },
-      { reportViolations: true }
+      { reportViolations: true, dropHTTPProtocol: true }
     )
   }
 
-  function serializeCSP(directives, { reportViolations }) {
-    const policyAmend = ['block-all-mixed-content']
+  function serializeCSP(directives, { reportViolations, dropHTTPProtocol }) {
+    const policyAmend = []
+    if (dropHTTPProtocol) {
+      policyAmend.push('block-all-mixed-content')
+    }
     if (reportViolations && csp.reportURL) {
       policyAmend.push(`report-uri ${csp.reportURL}`)
     }
     return Object.entries(directives)
       .map(([directive, origins]) => {
+        if (dropHTTPProtocol) {
+          origins = origins.map(origin => {
+            if (origin.startsWith('http')) return new URL(origin).host
+            return origin
+          })
+        }
         origins = Array.from(new Set(origins))
         return `${directive} ${origins.join(' ') || "'none'"}`
       })
