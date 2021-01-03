@@ -72,6 +72,7 @@ function getCspMiddleware() {
 
   const SELF = "'self'"
   const assetsOrigin = cdnOrigin || SELF
+  const pdfDownloadOrigin = compilesOrigin || SELF
   let headerName
   if (csp.enforce) {
     headerName = 'Content-Security-Policy'
@@ -146,11 +147,9 @@ function getCspMiddleware() {
     }
 
     if (cfg.needsCompilesAccess) {
-      if (compilesOrigin) {
-        connectSrc.push(compilesOrigin)
-      }
+      connectSrc.push(pdfDownloadOrigin)
       // native pdf viewer
-      frameSrc.push(compilesOrigin || SELF)
+      frameSrc.push(pdfDownloadOrigin)
     }
 
     if (cfg.needsNotificationsAccess) {
