@@ -17,6 +17,11 @@ module.exports = function(app, webRouter) {
     (Settings.security.csp.reportOnly || Settings.security.csp.enforce)
   ) {
     webRouter.use(getCspMiddleware())
+  } else {
+    webRouter.use(function(req, res, next) {
+      res.setCSPFor = function(topic) {}
+      next()
+    })
   }
 }
 
@@ -281,35 +286,46 @@ function getCspMiddleware() {
   )
   const VIEW_LEARN = Path.resolve(MODULE_PATH, 'learn/app/views/page')
 
+  function setCSPFor(topic) {
+    let headerValue
+    switch (topic) {
+      case 'initial':
+        headerValue = CSP_DEFAULT_MISC
+        break
+      case 'project/list':
+        headerValue = CSP_DASHBOARD
+        break
+      case 'project/editor':
+        headerValue = CSP_EDITOR
+        break
+      case 'referal/bonus':
+        headerValue = CSP_BONUS_PAGE
+        break
+      case '/user/subscription/new':
+      case '/user/subscription':
+        headerValue = CSP_SUBSCRIPTION
+        break
+      case VIEW_LAUNCHPAD:
+        headerValue = CSP_LAUNCHPAD
+        break
+      case VIEW_LEARN:
+        headerValue = CSP_LEARN
+        break
+      default:
+        headerValue = CSP_DEFAULT_RENDER
+    }
+    // this === res
+    this.setHeader(headerName, headerValue)
+    // enable chaining
+    return this
+  }
+
   return function cspMiddleware(req, res, next) {
-    res.setHeader(headerName, CSP_DEFAULT_MISC)
+    res.setCSPFor = setCSPFor
+    res.setCSPFor('initial')
     const actualRender = res.render
     res.render = function(view) {
-      let headerValue
-      switch (view) {
-        case 'project/list':
-          headerValue = CSP_DASHBOARD
-          break
-        case 'project/editor':
-          headerValue = CSP_EDITOR
-          break
-        case 'referal/bonus':
-          headerValue = CSP_BONUS_PAGE
-          break
-        case '/user/subscription/new':
-        case '/user/subscription':
-          headerValue = CSP_SUBSCRIPTION
-          break
-        case VIEW_LAUNCHPAD:
-          headerValue = CSP_LAUNCHPAD
-          break
-        case VIEW_LEARN:
-          headerValue = CSP_LEARN
-          break
-        default:
-          headerValue = CSP_DEFAULT_RENDER
-      }
-      res.setHeader(headerName, headerValue)
+      res.setCSPFor(view)
       actualRender.apply(res, arguments)
     }
     next()
