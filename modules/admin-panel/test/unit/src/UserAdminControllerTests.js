@@ -58,25 +58,7 @@ describe('UserAdminController', function() {
       return User
     })()
 
-    this.AuthenticationManager = { setUserPassword: sinon.stub() }
-
     this.AuthenticationController = {}
-
-    this.adminSubscription = { _id: 'mock-subscription-id-1' }
-    this.memberSubscriptions = [
-      { _id: 'mock-subscription-id-2' },
-      { _id: 'mock-subscription-id-3' }
-    ]
-    this.managedSubscription = { _id: 'mock-subscription-id-4' }
-    this.SubscriptionLocator = {
-      getUsersSubscription: sinon.stub().yields(null, this.adminSubscription),
-      getMemberSubscriptions: sinon
-        .stub()
-        .yields(null, this.memberSubscriptions),
-      findManagedSubscription: sinon
-        .stub()
-        .yields(null, this.managedSubscription)
-    }
 
     this.ProjectGetter = {
       findAllUsersProjects: sinon.stub().yields(null, this.projects)
@@ -91,19 +73,12 @@ describe('UserAdminController', function() {
         '../../../../app/src/Features/User/UserGetter': this.UserGetter,
         '../../../../app/src/Features/User/UserDeleter': this.UserDeleter,
         '../../../../app/src/Features/User/UserUpdater': this.UserUpdater,
-        '../../../../app/src/Features/Authentication/AuthenticationManager': this
-          .AuthenticationManager,
         '../../../../app/src/Features/Authentication/AuthenticationController': this
           .AuthenticationController,
-        '../../../../app/src/Features/Subscription/SubscriptionLocator': this
-          .SubscriptionLocator,
         '../../../../app/src/models/User': { User: this.User },
         '../../../../app/src/Features/Project/ProjectGetter': this
           .ProjectGetter,
         '../../../../app/src/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
-        '@overleaf/metrics': {
-          gauge() {}
-        },
         '@overleaf/settings': (this.settings = {})
       }
     })
@@ -216,30 +191,6 @@ describe('UserAdminController', function() {
     it('should send the user projects', function(done) {
       this.res.render = (pageName, opts) => {
         opts.projects.should.deep.equal(this.projects.owned)
-        return done()
-      }
-      return this.UserAdminController.show(this.req, this.res)
-    })
-
-    it("should send the user's subscription", function(done) {
-      this.res.render = (pageName, opts) => {
-        opts.adminSubscription.should.deep.equal(this.adminSubscription)
-        return done()
-      }
-      return this.UserAdminController.show(this.req, this.res)
-    })
-
-    it("should send the user's member subscriptions", function(done) {
-      this.res.render = (pageName, opts) => {
-        opts.memberSubscriptions.should.deep.equal(this.memberSubscriptions)
-        return done()
-      }
-      return this.UserAdminController.show(this.req, this.res)
-    })
-
-    it("should send the user's managed subscription", function(done) {
-      this.res.render = (pageName, opts) => {
-        opts.managedSubscription.should.deep.equal(this.managedSubscription)
         return done()
       }
       return this.UserAdminController.show(this.req, this.res)

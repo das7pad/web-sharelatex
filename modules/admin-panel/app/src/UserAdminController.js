@@ -16,7 +16,6 @@
  */
 let UserAdminController
 const logger = require('logger-sharelatex')
-const metrics = require('@overleaf/metrics')
 const _ = require('underscore')
 const Path = require('path')
 const UserGetter = require('../../../../app/src/Features/User/UserGetter')
@@ -24,9 +23,7 @@ const UserDeleter = require('../../../../app/src/Features/User/UserDeleter')
 const UserUpdater = require('../../../../app/src/Features/User/UserUpdater')
 const { User } = require('../../../../app/src/models/User')
 const ProjectGetter = require('../../../../app/src/Features/Project/ProjectGetter')
-const AuthenticationManager = require('../../../../app/src/Features/Authentication/AuthenticationManager')
 const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
-const SubscriptionLocator = require('../../../../app/src/Features/Subscription/SubscriptionLocator')
 const FeaturesUpdater = require('../../../../app/src/Features/Subscription/FeaturesUpdater')
 const async = require('async')
 const settings = require('@overleaf/settings')
@@ -168,16 +165,6 @@ module.exports = UserAdminController = {
               return cb(null, allProjects)
             }
           )
-        },
-
-        adminSubscription(cb) {
-          return SubscriptionLocator.getUsersSubscription(user_id, cb)
-        },
-        managedSubscription(cb) {
-          return SubscriptionLocator.findManagedSubscription(user_id, cb)
-        },
-        memberSubscriptions(cb) {
-          return SubscriptionLocator.getMemberSubscriptions(user_id, cb)
         }
       },
       function(err, data) {
