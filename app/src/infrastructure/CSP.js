@@ -289,6 +289,9 @@ function getCspMiddleware() {
     { reportViolations: false }
   )
   const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
+  const CSP_USER_GRAPH = generateCSP({
+    needsWorker: true
+  })
 
   const MODULE_PATH = Path.resolve(__dirname, '../../../modules')
   const VIEW_LAUNCHPAD = Path.resolve(
@@ -296,6 +299,10 @@ function getCspMiddleware() {
     'launchpad/app/views/launchpad'
   )
   const VIEW_LEARN = Path.resolve(MODULE_PATH, 'learn/app/views/page')
+  const VIEW_USER_GRAPH = Path.resolve(
+    MODULE_PATH,
+    'admin-panel/app/views/user/graph'
+  )
 
   function setCSPFor(topic) {
     let headerValue
@@ -324,6 +331,9 @@ function getCspMiddleware() {
         break
       case VIEW_LEARN:
         headerValue = CSP_LEARN
+        break
+      case VIEW_USER_GRAPH:
+        headerValue = CSP_USER_GRAPH
         break
       default:
         headerValue = CSP_DEFAULT_RENDER
