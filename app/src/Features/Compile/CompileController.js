@@ -302,6 +302,7 @@ module.exports = CompileController = {
         req.params.build_id,
         req.params.file
       )
+      if (req.params.file === 'output.pdf') res.setCSPFor('output.pdf')
       return CompileController.proxyToClsi(project_id, url, req, res, next)
     })
   },

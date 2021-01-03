@@ -277,6 +277,17 @@ function getCspMiddleware() {
   const CSP_LEARN = generateCSP({
     hasUnsafeInlineStyle: true
   })
+  // the browsers 'native' viewer may use inline styles
+  const CSP_OUTPUT_PDF = serializeCSP(
+    {
+      'default-src': [],
+      'form-action': [],
+      'frame-ancestors': [pdfDownloadOrigin],
+      'img-src': [SELF, assetsOrigin],
+      'style-src': [UNSAFE_INLINE]
+    },
+    { reportViolations: false }
+  )
   const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
 
   const MODULE_PATH = Path.resolve(__dirname, '../../../modules')
@@ -291,6 +302,9 @@ function getCspMiddleware() {
     switch (topic) {
       case 'initial':
         headerValue = CSP_DEFAULT_MISC
+        break
+      case 'output.pdf':
+        headerValue = CSP_OUTPUT_PDF
         break
       case 'project/list':
         headerValue = CSP_DASHBOARD
