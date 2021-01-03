@@ -158,6 +158,12 @@ function getCspMiddleware() {
       frameSrc.push(pdfDownloadOrigin)
     }
 
+    if (cfg.needsLearnWikiImageAccess) {
+      imgSrc.push(SELF)
+      imgSrc.push('https://wikimedia.org')
+      imgSrc.push('https://www.filepicker.io')
+    }
+
     if (cfg.needsNotificationsAccess) {
       connectSrc.push(SELF)
       connectSrc.push(notificationsOrigin)
@@ -275,6 +281,7 @@ function getCspMiddleware() {
     needsSocketIo: true
   })
   const CSP_LEARN = generateCSP({
+    needsLearnWikiImageAccess: true,
     hasUnsafeInlineStyle: true
   })
   // the browsers 'native' viewer may use inline styles
