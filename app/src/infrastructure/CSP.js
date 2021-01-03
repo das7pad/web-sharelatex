@@ -237,6 +237,9 @@ function getCspMiddleware() {
       .join('; ')
   }
 
+  const CSP_BONUS_PAGE = generateCSP({
+    unsafeInlineStyle: true
+  })
   // default CSP for other sources, like JSON or file downloads
   // lock down all but image source for loading the favicon
   const CSP_DEFAULT_MISC = serializeCSP(
@@ -289,6 +292,9 @@ function getCspMiddleware() {
           break
         case 'project/editor':
           headerValue = CSP_EDITOR
+          break
+        case 'referal/bonus':
+          headerValue = CSP_BONUS_PAGE
           break
         case '/user/subscription/new':
         case '/user/subscription':
