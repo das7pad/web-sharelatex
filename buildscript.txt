@@ -1,7 +1,7 @@
 web
 --language=es
 --src-dir=src
---node-version=14.15.1
+--node-version=14.15.4
 --dependencies=mongo,redis_api,redis_lock,redis_queues,redis_realtime,redis_web,redis_websessions
 --data-dirs=data/dumpFolder,data/logs,data/pdf,data/uploads,data/zippedProjects
 --lint-runner-version=6.0.3-web
