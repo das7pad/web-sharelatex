@@ -61,6 +61,9 @@ import './main/account-upgrade'
 import './main/system-messages'
 import '../../modules/modules-ide'
 import getMeta from './utils/meta'
+
+import { react2angular } from 'react2angular'
+import { rootContext } from './shared/context/root-context'
 App.controller('IdeController', function(
   $scope,
   $timeout,
@@ -343,6 +346,10 @@ If the project has been renamed please look in your project list for a new proje
     }
   })
 })
+
+// required by react2angular-shared-context, maps the shared context instance to an angular component
+// that must be rendered in the app
+App.component('sharedContextReact', react2angular(rootContext.component))
 
 export default angular.bootstrap(document.body, ['SharelatexApp'])
 
