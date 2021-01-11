@@ -10,10 +10,10 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const metrics = require('@overleaf/metrics')
-metrics.initialize(process.env['METRICS_APP_NAME'] || 'web')
+metrics.initialize(process.env.METRICS_APP_NAME || 'web')
 const Settings = require('@overleaf/settings')
 const logger = require('logger-sharelatex')
-logger.initialize(process.env['METRICS_APP_NAME'] || 'web')
+logger.initialize(process.env.METRICS_APP_NAME || 'web')
 logger.logger.serializers.user = require('./app/src/infrastructure/LoggerSerializers').user
 logger.logger.serializers.docs = require('./app/src/infrastructure/LoggerSerializers').docs
 logger.logger.serializers.files = require('./app/src/infrastructure/LoggerSerializers').files

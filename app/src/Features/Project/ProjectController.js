@@ -760,8 +760,7 @@ const ProjectController = {
             } else if (
               Settings.wsUrlV2 !== undefined &&
               Settings.wsUrlV2Percentage > 0 &&
-              (ObjectId(projectId).getTimestamp() / 1000) %
-                100 <
+              (ObjectId(projectId).getTimestamp() / 1000) % 100 <
                 Settings.wsUrlV2Percentage
             ) {
               wsUrl = Settings.wsUrlV2

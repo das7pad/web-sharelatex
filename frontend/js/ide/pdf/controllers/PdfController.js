@@ -270,7 +270,7 @@ App.controller('PdfController', function(
     const url = `/project/${$scope.project_id}/compile`
     const params = {}
     if (options.isAutoCompileOnLoad || options.isAutoCompileOnChange) {
-      params['auto_compile'] = true
+      params.auto_compile = true
     }
     // if the previous run was a check, clear the error logs
     if ($scope.check) {
@@ -577,9 +577,7 @@ App.controller('PdfController', function(
         // FIXME clean this up when we have file.urls out consistently
         opts.url = file.url
       } else if (file && file.build) {
-        opts.url = `/project/${$scope.project_id}/build/${
-          file.build
-        }/output/${name}`
+        opts.url = `/project/${$scope.project_id}/build/${file.build}/output/${name}`
       } else {
         opts.url = `/project/${$scope.project_id}/output/${name}`
       }

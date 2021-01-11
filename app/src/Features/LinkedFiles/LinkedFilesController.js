@@ -137,9 +137,7 @@ module.exports = LinkedFilesController = {
   },
 
   handleError(error, req, res, next) {
-    if (error instanceof BadDataError) {
-      return res.status(400).send('The submitted data is not valid')
-    } else if (error instanceof AccessDeniedError) {
+    if (error instanceof AccessDeniedError) {
       return res.status(403).send('You do not have access to this project')
     } else if (error instanceof BadDataError) {
       return res.status(400).send('The submitted data is not valid')
@@ -161,9 +159,7 @@ module.exports = LinkedFilesController = {
       return res
         .status(422)
         .send(
-          `Your URL could not be reached (${
-            error.statusCode
-          } status code). Please check it and try again.`
+          `Your URL could not be reached (${error.statusCode} status code). Please check it and try again.`
         )
     } else if (error instanceof InvalidUrlError) {
       return res

@@ -24,7 +24,6 @@ describe('FileStoreHandler', function() {
       my: 'writeStream',
       on(type, cb) {
         if (type === 'response') {
-          // eslint-disable-next-line standard/no-callback-literal
           cb({ statusCode: 200 })
         }
       }
@@ -213,7 +212,6 @@ describe('FileStoreHandler', function() {
       beforeEach(function() {
         this.writeStream.on = function(type, cb) {
           if (type === 'response') {
-            // eslint-disable-next-line standard/no-callback-literal
             cb({ statusCode: 500 })
           }
         }
@@ -365,7 +363,7 @@ describe('FileStoreHandler', function() {
             this.request.callCount.should.equal(1)
             const { headers } = this.request.firstCall.args[0]
             expect(headers).to.have.keys('range')
-            expect(headers['range']).to.equal('bytes=0-10')
+            expect(headers.range).to.equal('bytes=0-10')
             done()
           }
         )

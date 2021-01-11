@@ -594,9 +594,7 @@ describe('UserController', function() {
           this.EmailHandler.promises.sendEmail.callCount.should.equal(1)
           const expectedArg = {
             to: this.user.email,
-            actionDescribed: `active sessions were cleared on your account ${
-              this.user.email
-            }`,
+            actionDescribed: `active sessions were cleared on your account ${this.user.email}`,
             action: 'active sessions cleared'
           }
           const emailCall = this.EmailHandler.promises.sendEmail.lastCall
@@ -708,9 +706,7 @@ describe('UserController', function() {
         this.res.json.callsFake(() => {
           const expectedArg = {
             to: this.user.email,
-            actionDescribed: `your password has been changed on your account ${
-              this.user.email
-            }`,
+            actionDescribed: `your password has been changed on your account ${this.user.email}`,
             action: 'password changed'
           }
           const emailCall = this.EmailHandler.sendEmail.lastCall

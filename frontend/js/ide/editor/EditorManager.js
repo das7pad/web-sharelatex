@@ -1,7 +1,7 @@
 import _ from 'lodash'
 /* eslint-disable
     camelcase,
-    handle-callback-err,
+    node/handle-callback-err,
     max-len,
     no-return-assign,
 */
@@ -22,11 +22,12 @@ import './controllers/SavingNotificationController'
 import { captureException } from '../../infrastructure/error-reporter'
 let EditorManager
 
-export default (EditorManager = (function() {
+export default EditorManager = (function() {
   EditorManager = class EditorManager {
     static initClass() {
       this.prototype._syncTimeout = null
     }
+
     constructor(ide, $scope, localStorage) {
       this.ide = ide
       this.editorOpenDocEpoch = 0 // track pending document loads
@@ -240,9 +241,7 @@ export default (EditorManager = (function() {
           }
           if (this.editorOpenDocEpoch !== editorOpenDocEpoch) {
             sl_console.log(
-              `[openNewDocument] editorOpenDocEpoch mismatch ${
-                this.editorOpenDocEpoch
-              } vs ${editorOpenDocEpoch}`
+              `[openNewDocument] editorOpenDocEpoch mismatch ${this.editorOpenDocEpoch} vs ${editorOpenDocEpoch}`
             )
             return callback(new Error('another document was loaded'))
           }
@@ -270,9 +269,7 @@ export default (EditorManager = (function() {
         }
         if (this.editorOpenDocEpoch !== editorOpenDocEpoch) {
           sl_console.log(
-            `[openNewDocument] editorOpenDocEpoch mismatch ${
-              this.editorOpenDocEpoch
-            } vs ${editorOpenDocEpoch}`
+            `[openNewDocument] editorOpenDocEpoch mismatch ${this.editorOpenDocEpoch} vs ${editorOpenDocEpoch}`
           )
           new_sharejs_doc.leaveAndCleanUp()
           return callback(new Error('another document was loaded'))
@@ -381,6 +378,7 @@ export default (EditorManager = (function() {
     stopIgnoringExternalUpdates() {
       return (this._ignoreExternalUpdates = false)
     }
+
     _syncTrackChangesState(doc) {
       let tryToggle
       if (doc == null) {
@@ -414,4 +412,4 @@ export default (EditorManager = (function() {
   }
   EditorManager.initClass()
   return EditorManager
-})())
+})()
