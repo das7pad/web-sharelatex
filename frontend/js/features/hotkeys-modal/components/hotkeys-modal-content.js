@@ -104,7 +104,10 @@ function HotkeysModalContent({
         </Row>
 
         <h3>
-          <Trans i18nKey="autocomplete_references" components={[<code />]} />
+          <Trans
+            i18nKey="autocomplete_references"
+            components={[<code key={0} />]}
+          />
         </h3>
 
         <Row>
