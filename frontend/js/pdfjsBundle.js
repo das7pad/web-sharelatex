@@ -7,7 +7,7 @@ import staticPath from './utils/staticPath'
 
 // Load the worker from the CDN
 pdfjsBundle.GlobalWorkerOptions.workerSrc = staticPath(
-  '/js/pdfjs-dist/es5/build/pdf.worker.js'
+  '/vendor/pdfjs-dist/es5/build/pdf.worker.js'
 )
 
 const hasWorkerSupport = typeof window !== 'undefined' && 'Worker' in window
