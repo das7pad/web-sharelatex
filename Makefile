@@ -74,7 +74,7 @@ test: format
 format:
 
 LINT_RUNNER_IMAGE ?= \
-	$(SHARELATEX_DOCKER_REPOS)/lint-runner:6.0.4-web
+	$(SHARELATEX_DOCKER_REPOS)/lint-runner:7.0.0-web
 LINT_RUNNER = \
 	docker run \
 		--rm \
@@ -99,13 +99,18 @@ NEED_FULL_LINT ?= \
 
 ifeq (,$(NEED_FULL_LINT))
 lint: lint_partial
+lint_fix: lint_fix_partial
 else
 lint: lint_full
+lint_fix: lint_fix_full
 endif
 
 RUN_LINT ?= $(LINT_RUNNER) eslint
 lint_full:
 	$(RUN_LINT) .
+
+lint_fix_full:
+	$(RUN_LINT) --fix .
 
 GIT_DIFF_CMD_FORMAT ?= \
 	$(git) diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
@@ -124,6 +129,11 @@ ifneq (,$(FILES_FOR_LINT))
 	$(RUN_LINT) $(FILES_FOR_LINT)
 endif
 
+lint_fix_partial:
+ifneq (,$(FILES_FOR_LINT))
+	$(RUN_LINT) --fix $(FILES_FOR_LINT)
+endif
+
 NEED_FULL_FORMAT ?= \
 	$(shell $(git) diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
 			| grep --max-count=1 \
@@ -140,7 +150,7 @@ format: format_full
 format_fix: format_fix_full
 endif
 
-RUN_FORMAT ?= $(LINT_RUNNER) prettier-eslint
+RUN_FORMAT ?= $(LINT_RUNNER) prettier
 format_full:
 	$(RUN_FORMAT) '$(PWD)/**/*.{js,less}' --list-different
 format_fix_full:
