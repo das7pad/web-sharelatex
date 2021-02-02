@@ -49,6 +49,7 @@ const TemplatesRouter = require('./Features/Templates/TemplatesRouter')
 const InstitutionsController = require('./Features/Institutions/InstitutionsController')
 const UserMembershipRouter = require('./Features/UserMembership/UserMembershipRouter')
 const SystemMessageController = require('./Features/SystemMessages/SystemMessageController')
+const { Joi, validate } = require('./infrastructure/Validation')
 
 const logger = require('logger-sharelatex')
 const _ = require('underscore')
@@ -446,6 +447,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
 
   webRouter.delete(
     '/project/:Project_id/output',
+    validate({ query: { clsiserverid: Joi.string() } }),
     AuthorizationMiddleware.ensureUserCanReadProject,
     CompileController.deleteAuxFiles
   )
@@ -461,6 +463,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   )
   webRouter.get(
     '/project/:Project_id/wordcount',
+    validate({ query: { clsiserverid: Joi.string() } }),
     AuthorizationMiddleware.ensureUserCanReadProject,
     CompileController.wordCount
   )
