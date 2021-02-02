@@ -123,7 +123,6 @@ function PreviewLogsPane({
 }
 
 function LogsPaneBetaNotice() {
-  const { t } = useTranslation()
   const [dismissedBetaNotice, setDismissedBetaNotice] = usePersistedState(
     `logs_pane.dismissed_beta_notice`,
     false

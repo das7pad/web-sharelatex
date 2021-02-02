@@ -59,7 +59,6 @@ function PreviewFirstErrorPopUp({
 }
 
 function FirstErrorPopUpBetaBadge() {
-  const { t } = useTranslation()
   const logsPaneBetaMessage = t('logs_pane_beta_message_popup')
   const tooltip = (
     <Tooltip id="file-tree-badge-tooltip">{logsPaneBetaMessage}</Tooltip>
