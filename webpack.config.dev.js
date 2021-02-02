@@ -9,8 +9,8 @@ const base = require('./webpack.config')
 module.exports = merge(base, {
   mode: 'development',
 
-  // Enable source maps for dev (fast compilation, slow runtime)
-  devtool: 'eval-cheap-module-source-map',
+  // Enable accurate source maps for dev
+  devtool: 'eval-source-map',
 
   plugins: [
     // Extract CSS to a separate file (rather than inlining to a <style> tag)
