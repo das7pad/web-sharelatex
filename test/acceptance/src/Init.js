@@ -12,7 +12,11 @@ before(function(done) {
     if (error) {
       throw error
     }
-    require('../../../app.js').listen(3000, 'localhost', done)
+    try {
+      require('../../../app.js').listen(3000, 'localhost', done)
+    } catch (err) {
+      done(err)
+    }
   })
 })
 
