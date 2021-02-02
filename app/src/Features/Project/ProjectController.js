@@ -810,9 +810,6 @@ const ProjectController = {
               ]
             }
 
-            const wantsOldChatUI =
-              req.query && req.query.new_chat_ui === 'false'
-
             const wantsOldLogsUI =
               req.query && req.query.new_logs_ui === 'false'
 
@@ -876,7 +873,6 @@ const ProjectController = {
               wsAssetUrl,
               showSupport: Features.hasFeature('support'),
               showNewLogsUI: user.alphaProgram && !wantsOldLogsUI,
-              showNewChatUI: user.betaProgram && !wantsOldChatUI,
               showReactFileTree: user.betaProgram && !wantsOldFileTreeUI
             })
             timer.done()
