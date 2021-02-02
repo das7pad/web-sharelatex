@@ -25,8 +25,14 @@ MathJax.Hub.Config({
   tex2jax: {
     processEscapes: true,
     // Dollar delimiters are added by the mathjax directive
-    inlineMath: [['\\(', '\\)'], ['$', '$']],
-    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    inlineMath: [
+      ['\\(', '\\)'],
+      ['$', '$']
+    ],
+    displayMath: [
+      ['$$', '$$'],
+      ['\\[', '\\]']
+    ]
   }
 })
 MathJax.Hub.Configured()

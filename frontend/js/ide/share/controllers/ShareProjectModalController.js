@@ -159,59 +159,62 @@ App.controller('ShareProjectModalController', function(
         // do v3 captcha to collect data only
         validateCaptchaV3('invite')
         // do v2 captcha
-        validateCaptcha(function(response) {
-          $scope.grecaptchaResponse = response
-          const invites = $scope.project.invites || []
-          const invite = _.find(invites, invite => invite.email === email)
-          let request
-          if (currentInviteEmails.includes(email) && invite) {
-            request = projectInvites.resendInvite(invite._id)
-          } else {
-            request = projectInvites.sendInvite(
-              email,
-              $scope.inputs.privileges,
-              $scope.grecaptchaResponse
-            )
-          }
-
-          request
-            .then(function(response) {
-              const { data } = response
-              if (data.error) {
-                $scope.setError(data.error)
-                $scope.state.inflight = false
-              } else {
-                if (data.invite) {
-                  const { invite } = data
-                  $scope.project.invites.push(invite)
-                } else {
-                  const users =
-                    data.users != null
-                      ? data.users
-                      : data.user != null
-                      ? [data.user]
-                      : []
-                  $scope.project.members.push(...users)
-                }
-              }
-
-              setTimeout(
-                () =>
-                  // Give $scope a chance to update $scope.canAddCollaborators
-                  // with new collaborator information.
-                  addNextMember(),
-
-                0
+        validateCaptcha(
+          function(response) {
+            $scope.grecaptchaResponse = response
+            const invites = $scope.project.invites || []
+            const invite = _.find(invites, invite => invite.email === email)
+            let request
+            if (currentInviteEmails.includes(email) && invite) {
+              request = projectInvites.resendInvite(invite._id)
+            } else {
+              request = projectInvites.sendInvite(
+                email,
+                $scope.inputs.privileges,
+                $scope.grecaptchaResponse
               )
-            })
-            .catch(function(httpResponse) {
-              const { data } = httpResponse
-              $scope.state.inflight = false
-              $scope.setError(data.errorReason)
-            })
-        }, getMeta('ol-recaptchaDisabled') != null
-          ? getMeta('ol-recaptchaDisabled').invite
-          : true)
+            }
+
+            request
+              .then(function(response) {
+                const { data } = response
+                if (data.error) {
+                  $scope.setError(data.error)
+                  $scope.state.inflight = false
+                } else {
+                  if (data.invite) {
+                    const { invite } = data
+                    $scope.project.invites.push(invite)
+                  } else {
+                    const users =
+                      data.users != null
+                        ? data.users
+                        : data.user != null
+                        ? [data.user]
+                        : []
+                    $scope.project.members.push(...users)
+                  }
+                }
+
+                setTimeout(
+                  () =>
+                    // Give $scope a chance to update $scope.canAddCollaborators
+                    // with new collaborator information.
+                    addNextMember(),
+
+                  0
+                )
+              })
+              .catch(function(httpResponse) {
+                const { data } = httpResponse
+                $scope.state.inflight = false
+                $scope.setError(data.errorReason)
+              })
+          },
+          getMeta('ol-recaptchaDisabled') != null
+            ? getMeta('ol-recaptchaDisabled').invite
+            : true
+        )
       }
     }
 

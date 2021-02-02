@@ -83,7 +83,9 @@ module.exports = MockV1HistoryApi = {
         MockV1HistoryApi.events.emit('v1-history-pack-zip')
         return res.json({
           zipUrl: `http://${process.env.V1_HISTORY_HOST ||
-            'localhost'}:3100/fake-zip-download/${req.params.project_id}/version/${req.params.version}`
+            'localhost'}:3100/fake-zip-download/${
+            req.params.project_id
+          }/version/${req.params.version}`
         })
       }
     )

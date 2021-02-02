@@ -33,7 +33,7 @@ export default function ImgPreview({ file }) {
           onLoad={doneLoading}
         />
       ) : (
-        <p className={'no-preview'}>{t('no_preview_available')}</p>
+        <p className="no-preview">{t('no_preview_available')}</p>
       )}
     </>
   )

@@ -13,7 +13,7 @@
  */
 let SpellCheckAdapter
 
-export default (SpellCheckAdapter = class SpellCheckAdapter {
+export default SpellCheckAdapter = class SpellCheckAdapter {
   constructor(editor) {
     this.replaceWord = this.replaceWord.bind(this)
     this.editor = editor
@@ -94,4 +94,4 @@ export default (SpellCheckAdapter = class SpellCheckAdapter {
     codeMirror.replaceSelection(newWord)
     return codeMirror.focus()
   }
-})
+}

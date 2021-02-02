@@ -65,7 +65,7 @@ export default function BetaProgramParticipate() {
           <span
             aria-label={t('beta_feature_badge')}
             role="img"
-            className={'beta-feature-badge'}
+            className="beta-feature-badge"
           />
         </li>
         <li>
@@ -99,18 +99,18 @@ export default function BetaProgramParticipate() {
           href="https://forms.gle/CFEsmvZQTAwHCd3X9"
           target="_blank"
           rel="noopener noreferrer"
-          bsStyle={'primary'}
-          bsSize={'lg'}
+          bsStyle="primary"
+          bsSize="lg"
         >
           {t('give_feedback')}
         </Button>
       </FormGroup>
       <FormGroup>
         <Button
-          type={'submit'}
+          type="submit"
           disabled={requestStatus === REQUEST_PENDING}
-          bsStyle={'info'}
-          bsSize={'sm'}
+          bsStyle="info"
+          bsSize="sm"
           onClick={optOut}
         >
           {t('beta_program_opt_out_action')}
@@ -121,9 +121,9 @@ export default function BetaProgramParticipate() {
     <>
       <FormGroup>
         <Button
-          type={'submit'}
+          type="submit"
           disabled={requestStatus === REQUEST_PENDING}
-          bsStyle={'primary'}
+          bsStyle="primary"
           onClick={optIn}
         >
           {t('beta_program_opt_in_action')}
@@ -134,7 +134,7 @@ export default function BetaProgramParticipate() {
 
   const visualRequestStatus =
     requestStatus === REQUEST_ERROR ? (
-      <Alert bsStyle={'danger'}>{t('error_performing_request')}</Alert>
+      <Alert bsStyle="danger">{t('error_performing_request')}</Alert>
     ) : (
       <></>
     )
@@ -147,12 +147,12 @@ export default function BetaProgramParticipate() {
           {howItWorks}
         </Col>
       </Row>
-      <Row className={'text-centered'}>
+      <Row className="text-centered">
         <Col md={12}>
           {cta}
           {visualRequestStatus}
           <FormGroup>
-            <Button href="/project" bsStyle={'link'} bsSize={'sm'}>
+            <Button href="/project" bsStyle="link" bsSize="sm">
               {t('back_to_your_projects')}
             </Button>
           </FormGroup>
@@ -166,10 +166,10 @@ export default function BetaProgramParticipate() {
       <Row>
         <Col lg={8} lgOffset={2} md={10} mdOffset={1}>
           <Card>
-            <PageHeader className={'text-centered'}>
+            <PageHeader className="text-centered">
               <h1>{t('sharelatex_beta_program')}</h1>
             </PageHeader>
-            <div className={'beta-opt-in'}>
+            <div className="beta-opt-in">
               <Grid fluid>{cardBody}</Grid>
             </div>
           </Card>

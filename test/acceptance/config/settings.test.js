@@ -1,6 +1,6 @@
 let features
 const v1Api = {
-  url: `http://${process.env['V1_HOST'] || 'localhost'}:5000`,
+  url: `http://${process.env.V1_HOST || 'localhost'}:5000`,
   user: 'overleaf',
   pass: 'password'
 }
@@ -13,9 +13,9 @@ httpAuthUsers[httpAuthUser] = httpAuthPass
 module.exports = {
   mongo: {
     url:
-      process.env['MONGO_CONNECTION_STRING'] ||
-      process.env['MONGO_URL'] ||
-      `mongodb://${process.env['MONGO_HOST'] || '127.0.0.1'}/sharelatex_dev`
+      process.env.MONGO_CONNECTION_STRING ||
+      process.env.MONGO_URL ||
+      `mongodb://${process.env.MONGO_HOST || '127.0.0.1'}/sharelatex_dev`
   },
 
   cacheStaticAssets: true,
@@ -41,7 +41,7 @@ module.exports = {
     },
 
     linkedUrlProxy: {
-      url: `http://${process.env['LINKED_URL_PROXY_HOST'] || 'localhost'}:6543`
+      url: `http://${process.env.LINKED_URL_PROXY_HOST || 'localhost'}:6543`
     },
 
     project_history: {
@@ -52,7 +52,7 @@ module.exports = {
 
     recurly: {
       // Set up our own mock recurly server
-      url: `http://${process.env['RECURLY_HOST'] || 'localhost'}:6034`,
+      url: `http://${process.env.RECURLY_HOST || 'localhost'}:6034`,
       subdomain: 'test'
     }
   },

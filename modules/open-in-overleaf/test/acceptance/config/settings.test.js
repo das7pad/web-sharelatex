@@ -7,12 +7,12 @@ module.exports = {
       url: undefined
     },
     v1: {
-      url: `http://${process.env['V1_HOST'] || 'localhost'}:5000`,
+      url: `http://${process.env.V1_HOST || 'localhost'}:5000`,
       user: 'overleaf',
       pass: 'password'
     },
     linkedUrlProxy: {
-      url: `http://${process.env['LINKED_URL_PROXY_HOST'] || 'localhost'}:6543`
+      url: `http://${process.env.LINKED_URL_PROXY_HOST || 'localhost'}:6543`
     }
   },
 
@@ -31,7 +31,7 @@ module.exports = {
     }
   },
   overleaf: {
-    host: `http://${process.env['V1_HOST'] || 'localhost'}:5000`,
+    host: `http://${process.env.V1_HOST || 'localhost'}:5000`,
     s3: {
       host: 'http://localhost:5001'
     }, // MockS3Api
