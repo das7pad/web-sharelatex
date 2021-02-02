@@ -1,10 +1,8 @@
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import t from '../../../misc/t'
 
 function FileTreeBadge() {
-  const { t } = useTranslation()
-
   const tooltip = (
     <Tooltip id="file-tree-badge-tooltip">
       {t('file_tree_badge_tooltip')}
