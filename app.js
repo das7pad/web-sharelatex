@@ -22,9 +22,9 @@ logger.logger.serializers.project = require('./app/src/infrastructure/LoggerSeri
 metrics.memory.monitor(logger)
 const { promisify } = require('util')
 const OError = require('@overleaf/o-error')
-const { getNativeDb } = require('./app/src/infrastructure/Mongoose')
 const Server = require('./app/src/infrastructure/Server')
 const mongodb = require('./app/src/infrastructure/mongodb')
+const mongoose = require('./app/src/infrastructure/Mongoose')
 const Queues = require('./app/src/infrastructure/Queues')
 
 Queues.initialize()
@@ -40,7 +40,7 @@ if (!module.parent) {
       throw new Error('No API user and password provided')
     }
   }
-  Promise.all([getNativeDb(), mongodb.waitForDb()])
+  Promise.all([mongodb.waitForDb(), mongoose.connectionPromise])
     .catch(err => {
       throw new OError('cannot connect to mongo').withCause(err)
     })

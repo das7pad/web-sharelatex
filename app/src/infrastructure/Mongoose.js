@@ -54,5 +54,6 @@ async function getNativeDb() {
 }
 
 mongoose.getNativeDb = getNativeDb
+mongoose.connectionPromise = connectionPromise
 
 module.exports = mongoose
