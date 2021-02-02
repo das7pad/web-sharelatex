@@ -42,6 +42,7 @@ describe('FileTree Create Folder Flow', function() {
         hasWritePermissions
         onSelect={onSelect}
         onInit={onInit}
+        isConnected
       />
     )
 
@@ -97,6 +98,7 @@ describe('FileTree Create Folder Flow', function() {
         rootDocId="789ghi"
         onSelect={onSelect}
         onInit={onInit}
+        isConnected
       />
     )
 
@@ -161,11 +163,9 @@ describe('FileTree Create Folder Flow', function() {
         rootDocId="456def"
         onSelect={onSelect}
         onInit={onInit}
+        isConnected
       />
     )
-
-    const expandButton = screen.getByRole('button', { name: 'Expand' })
-    fireEvent.click(expandButton)
 
     const newFolderName = 'Foo Bar In thefolder'
     const matcher = /\/project\/\w+\/folder/
@@ -196,7 +196,7 @@ describe('FileTree Create Folder Flow', function() {
     await screen.findByRole('treeitem', { name: newFolderName })
 
     // collapse the parent folder; created folder should not be rendered anymore
-    fireEvent.click(expandButton)
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse' }))
     expect(screen.queryByRole('treeitem', { name: newFolderName })).to.not.exist
   })
 
@@ -217,6 +217,7 @@ describe('FileTree Create Folder Flow', function() {
         rootDocId="456def"
         onSelect={onSelect}
         onInit={onInit}
+        isConnected
       />
     )
 

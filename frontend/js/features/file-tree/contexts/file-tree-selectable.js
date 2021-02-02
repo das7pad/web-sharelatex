@@ -1,11 +1,19 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useState
+} from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { findInTree } from '../util/find-in-tree'
 import { useFileTreeMutable } from './file-tree-mutable'
+import { FileTreeMainContext } from './file-tree-main'
+import usePersistedState from '../../../infrastructure/persisted-state-hook'
 
-const FileTreeSelectableContext = createContext(new Set())
+const FileTreeSelectableContext = createContext()
 
 const ACTION_TYPES = {
   SELECT: 'SELECT',
@@ -63,17 +71,53 @@ function fileTreeSelectableReadOnlyReducer(selectedEntityIds, action) {
 
 export function FileTreeSelectableProvider({
   hasWritePermissions,
-  initialSelectedEntityId = null,
+  rootDocId,
   onSelect,
   children
 }) {
+  const { projectId } = useContext(FileTreeMainContext)
+
+  const [initialSelectedEntityId] = usePersistedState(
+    `doc.open_id.${projectId}`,
+    rootDocId
+  )
+
+  const { fileTreeData } = useFileTreeMutable()
+
   const [selectedEntityIds, dispatch] = useReducer(
     hasWritePermissions
       ? fileTreeSelectableReadWriteReducer
       : fileTreeSelectableReadOnlyReducer,
-    initialSelectedEntityId ? new Set([initialSelectedEntityId]) : new Set()
+    null,
+    () => {
+      if (!initialSelectedEntityId) return new Set()
+
+      // the entity with id=initialSelectedEntityId might not exist in the tree
+      // anymore. This checks that it exists before initialising the reducer
+      // with the id.
+      if (findInTree(fileTreeData, initialSelectedEntityId))
+        return new Set([initialSelectedEntityId])
+
+      // the entity doesn't exist anymore; don't select any files
+      return new Set()
+    }
   )
-  const { fileTreeData } = useFileTreeMutable()
+
+  const [selectedEntityParentIds, setSelectedEntityParentIds] = useState(
+    new Set()
+  )
+
+  // fills `selectedEntityParentIds` set
+  useEffect(() => {
+    const ids = new Set()
+    selectedEntityIds.forEach(id => {
+      const found = findInTree(fileTreeData, id)
+      if (found) {
+        found.path.forEach(pathItem => ids.add(pathItem))
+      }
+    })
+    setSelectedEntityParentIds(ids)
+  }, [fileTreeData, selectedEntityIds])
 
   // calls `onSelect` on entities selection
   useEffect(() => {
@@ -81,8 +125,7 @@ export function FileTreeSelectableProvider({
       findInTree(fileTreeData, id)
     )
     onSelect(selectedEntities)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fileTreeData, selectedEntityIds])
+  }, [fileTreeData, selectedEntityIds, onSelect])
 
   useEffect(() => {
     // listen for `editor.openDoc` and selected that doc
@@ -94,7 +137,9 @@ export function FileTreeSelectableProvider({
   }, [])
 
   return (
-    <FileTreeSelectableContext.Provider value={{ selectedEntityIds, dispatch }}>
+    <FileTreeSelectableContext.Provider
+      value={{ selectedEntityIds, selectedEntityParentIds, dispatch }}
+    >
       {children}
     </FileTreeSelectableContext.Provider>
   )
@@ -102,7 +147,7 @@ export function FileTreeSelectableProvider({
 
 FileTreeSelectableProvider.propTypes = {
   hasWritePermissions: PropTypes.bool.isRequired,
-  initialSelectedEntityId: PropTypes.string,
+  rootDocId: PropTypes.string,
   onSelect: PropTypes.func.isRequired,
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),
@@ -152,7 +197,9 @@ export function useSelectableEntity(id) {
 }
 
 export function useFileTreeSelectable() {
-  const { selectedEntityIds, dispatch } = useContext(FileTreeSelectableContext)
+  const { selectedEntityIds, selectedEntityParentIds, dispatch } = useContext(
+    FileTreeSelectableContext
+  )
 
   function select(id) {
     dispatch({ type: ACTION_TYPES.SELECT, id })
@@ -164,6 +211,7 @@ export function useFileTreeSelectable() {
 
   return {
     selectedEntityIds,
+    selectedEntityParentIds,
     select,
     unselect
   }

@@ -41,6 +41,7 @@ describe('FileTree Delete Entity Flow', function() {
           hasWritePermissions
           onSelect={onSelect}
           onInit={onInit}
+          isConnected
         />
       )
 
@@ -73,6 +74,9 @@ describe('FileTree Delete Entity Flow', function() {
             name: 'main.tex'
           })
         ).to.not.exist
+
+        // check that the confirmation modal is closed
+        expect(screen.queryByText(/Are you sure/)).to.not.exist
       })
 
       const [lastFetchPath] = fetchMock.lastCall(fetchMatcher)
@@ -87,6 +91,9 @@ describe('FileTree Delete Entity Flow', function() {
 
       window._ide.socket.socketClient.emit('removeEntity', '456def')
 
+      // check that the confirmation modal is open
+      screen.getByText(/Are you sure/)
+
       await waitFor(() => {
         expect(
           screen.queryByRole('treeitem', {
@@ -100,6 +107,10 @@ describe('FileTree Delete Entity Flow', function() {
             name: 'main.tex'
           })
         ).to.not.exist
+
+        // check that the confirmation modal is closed
+        // is not, the 404 probably triggered a bug
+        expect(screen.queryByText(/Are you sure/)).to.not.exist
       })
     })
 
@@ -112,6 +123,62 @@ describe('FileTree Delete Entity Flow', function() {
 
       // The modal should still be open, but the file should not be deleted
       await screen.findByRole('treeitem', { name: 'main.tex', hidden: true })
+    })
+  })
+
+  describe('folders', function() {
+    beforeEach(function() {
+      const rootFolder = [
+        {
+          docs: [{ _id: '456def', name: 'main.tex' }],
+          folders: [
+            {
+              _id: '123abc',
+              name: 'folder',
+              docs: [],
+              folders: [],
+              fileRefs: [{ _id: '789ghi', name: 'my.bib' }]
+            }
+          ],
+          fileRefs: []
+        }
+      ]
+      render(
+        <FileTreeRoot
+          rootFolder={rootFolder}
+          projectId="123abc"
+          hasWritePermissions
+          onSelect={onSelect}
+          onInit={onInit}
+          isConnected
+        />
+      )
+
+      const expandButton = screen.queryByRole('button', { name: 'Expand' })
+      if (expandButton) fireEvent.click(expandButton)
+      const treeitemDoc = screen.getByRole('treeitem', { name: 'main.tex' })
+      fireEvent.click(treeitemDoc)
+      const treeitemFile = screen.getByRole('treeitem', { name: 'my.bib' })
+      fireEvent.click(treeitemFile, { ctrlKey: true })
+
+      window._ide.socket.socketClient.emit('removeEntity', '123abc')
+    })
+
+    it('removes the folder', function() {
+      expect(screen.queryByRole('treeitem', { name: 'folder' })).to.not.exist
+    })
+
+    it('leaves the main file selected', function() {
+      screen.getByRole('treeitem', { name: 'main.tex', selected: true })
+    })
+
+    it('unselect the child entity', async function() {
+      // as a proxy to check that the child entity has been unselect we start
+      // a delete and ensure the modal is displayed (the cancel button can be
+      // selected) This is needed to make sure the test fail.
+      const deleteButton = screen.getByRole('menuitem', { name: 'Delete' })
+      fireEvent.click(deleteButton)
+      await waitFor(() => screen.getByRole('button', { name: 'Cancel' }))
     })
   })
 
@@ -132,6 +199,7 @@ describe('FileTree Delete Entity Flow', function() {
           hasWritePermissions
           onSelect={onSelect}
           onInit={onInit}
+          isConnected
         />
       )
 
@@ -170,6 +238,9 @@ describe('FileTree Delete Entity Flow', function() {
               name
             })
           ).to.not.exist
+
+          // check that the confirmation modal is closed
+          expect(screen.queryByText(/Are you sure/)).to.not.exist
         }
       })
 

@@ -4,13 +4,21 @@ import { Button, Modal } from 'react-bootstrap'
 
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 
-import { InvalidFilenameError, DuplicateFilenameError } from '../../errors'
+import {
+  InvalidFilenameError,
+  BlockedFilenameError,
+  DuplicateFilenameError,
+  DuplicateFilenameMoveError
+} from '../../errors'
 import t from '../../../../misc/t'
+import { Trans } from '../../../../components/trans'
 
 function FileTreeModalError() {
-  const { isRenaming, cancel, error } = useFileTreeActionable()
+  const { isRenaming, isMoving, cancel, error } = useFileTreeActionable()
 
-  if (!isRenaming || !error) return null // the modal will not be rendered; return early
+  // the modal will not be rendered; return early
+  if (!error) return null
+  if (!isRenaming && !isMoving) return null
 
   function handleHide() {
     cancel()
@@ -19,8 +27,10 @@ function FileTreeModalError() {
   function errorTitle() {
     switch (error.constructor) {
       case DuplicateFilenameError:
+      case DuplicateFilenameMoveError:
         return t('duplicate_file')
       case InvalidFilenameError:
+      case BlockedFilenameError:
         return t('invalid_file_name')
       default:
         return t('error')
@@ -31,8 +41,18 @@ function FileTreeModalError() {
     switch (error.constructor) {
       case DuplicateFilenameError:
         return t('file_already_exists')
+      case DuplicateFilenameMoveError:
+        return (
+          <Trans
+            i18nKey="file_already_exists_in_this_location"
+            components={[<strong />]} // eslint-disable-line react/jsx-key
+            values={{ fileName: error.entityName }}
+          />
+        )
       case InvalidFilenameError:
         return t('files_cannot_include_invalid_characters')
+      case BlockedFilenameError:
+        return t('blocked_filename')
       default:
         return t('generic_something_went_wrong')
     }

@@ -1,6 +1,7 @@
+import { expect } from 'chai'
 import React from 'react'
 import sinon from 'sinon'
-import { screen, render, fireEvent } from '@testing-library/react'
+import { screen, render, fireEvent, waitFor } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
 import FileTreeRoot from '../../../../../frontend/js/features/file-tree/components/file-tree-root'
@@ -18,9 +19,41 @@ describe('<FileTreeRoot/>', function() {
     fetchMock.restore()
     onSelect.reset()
     onInit.reset()
+    global.localStorage.clear()
   })
 
   it('renders', function() {
+    const rootFolder = [
+      {
+        _id: 'root-folder-id',
+        docs: [{ _id: '456def', name: 'main.tex' }],
+        folders: [],
+        fileRefs: []
+      }
+    ]
+    const { container } = render(
+      <FileTreeRoot
+        rootFolder={rootFolder}
+        projectId="123abc"
+        hasWritePermissions={false}
+        rootDocId="456def"
+        onSelect={onSelect}
+        onInit={onInit}
+        isConnected
+      />
+    )
+
+    screen.queryByRole('tree')
+    screen.getByRole('treeitem')
+    screen.getByRole('treeitem', { name: 'main.tex', selected: true })
+    expect(container.querySelector('.disconnected-overlay')).to.not.exist
+  })
+
+  it('renders with invalid selected doc in local storage', async function() {
+    global.localStorage.setItem(
+      'doc.open_id.123abc',
+      JSON.stringify('not-a-valid-id')
+    )
     const rootFolder = [
       {
         _id: 'root-folder-id',
@@ -33,16 +66,47 @@ describe('<FileTreeRoot/>', function() {
       <FileTreeRoot
         rootFolder={rootFolder}
         projectId="123abc"
+        hasWritePermissions
+        rootDocId="456def"
+        onSelect={onSelect}
+        onInit={onInit}
+        isConnected
+      />
+    )
+
+    // as a proxy to check that the invalid entity ha not been select we start
+    // a delete and ensure the modal is displayed (the cancel button can be
+    // selected) This is needed to make sure the test fail.
+    const treeitemFile = screen.getByRole('treeitem', { name: 'main.tex' })
+    fireEvent.click(treeitemFile, { ctrlKey: true })
+    const deleteButton = screen.getByRole('menuitem', { name: 'Delete' })
+    fireEvent.click(deleteButton)
+    await waitFor(() => screen.getByRole('button', { name: 'Cancel' }))
+  })
+
+  it('renders disconnected overlay', function() {
+    const rootFolder = [
+      {
+        _id: 'root-folder-id',
+        docs: [{ _id: '456def', name: 'main.tex' }],
+        folders: [],
+        fileRefs: []
+      }
+    ]
+
+    const { container } = render(
+      <FileTreeRoot
+        rootFolder={rootFolder}
+        projectId="123abc"
         hasWritePermissions={false}
         rootDocId="456def"
         onSelect={onSelect}
         onInit={onInit}
+        isConnected={false}
       />
     )
 
-    screen.queryByRole('tree')
-    screen.getByRole('treeitem')
-    screen.getByRole('treeitem', { name: 'main.tex', selected: true })
+    expect(container.querySelector('.disconnected-overlay')).to.exist
   })
 
   it('fire onSelect', function() {
@@ -65,6 +129,7 @@ describe('<FileTreeRoot/>', function() {
         hasWritePermissions={false}
         onSelect={onSelect}
         onInit={onInit}
+        isConnected
       />
     )
     sinon.assert.calledOnce(onSelect)
@@ -112,6 +177,7 @@ describe('<FileTreeRoot/>', function() {
         hasWritePermissions={false}
         onSelect={onSelect}
         onInit={onInit}
+        isConnected
       />
     )
 

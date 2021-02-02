@@ -24,14 +24,14 @@ function FileTreeRoot({
   rootDocId,
   hasWritePermissions,
   onSelect,
-  onInit
+  onInit,
+  isConnected
 }) {
   const isReady = projectId && rootFolder
 
   useEffect(() => {
     if (isReady) onInit()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady])
+  }, [isReady, onInit])
   if (!isReady) return null
 
   return (
@@ -39,9 +39,10 @@ function FileTreeRoot({
       projectId={projectId}
       hasWritePermissions={hasWritePermissions}
       rootFolder={rootFolder}
-      initialSelectedEntityId={rootDocId}
+      rootDocId={rootDocId}
       onSelect={onSelect}
     >
+      {isConnected ? null : <div className="disconnected-overlay" />}
       <FileTreeToolbar />
       <FileTreeContextMenu />
       <div className="file-tree-inner">
@@ -71,7 +72,9 @@ function FileTreeRootFolder() {
         classes={{ root: 'file-tree-list' }}
         dropRef={dropRef}
         isOver={isOver}
-      />
+      >
+        <li className="bottom-buffer" />
+      </FileTreeFolderList>
     </>
   )
 }
@@ -82,7 +85,8 @@ FileTreeRoot.propTypes = {
   rootDocId: PropTypes.string,
   hasWritePermissions: PropTypes.bool.isRequired,
   onSelect: PropTypes.func.isRequired,
-  onInit: PropTypes.func.isRequired
+  onInit: PropTypes.func.isRequired,
+  isConnected: PropTypes.bool.isRequired
 }
 
 export default withErrorBoundary(FileTreeRoot, FileTreeError)

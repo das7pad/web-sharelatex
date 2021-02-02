@@ -1,18 +1,34 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import Icon from '../../../shared/components/icon'
-import { useSelectableEntity } from '../contexts/file-tree-selectable'
+import {
+  useFileTreeSelectable,
+  useSelectableEntity
+} from '../contexts/file-tree-selectable'
 import { useDroppable } from '../contexts/file-tree-draggable'
 
 import FileTreeItemInner from './file-tree-item/file-tree-item-inner'
 import FileTreeFolderList from './file-tree-folder-list'
+import usePersistedState from '../../../infrastructure/persisted-state-hook'
 import t from '../../../misc/t'
 
 function FileTreeFolder({ name, id, folders, docs, files }) {
   const { isSelected, props: selectableEntityProps } = useSelectableEntity(id)
-  const [expanded, setExpanded] = useState(false)
+
+  const { selectedEntityParentIds } = useFileTreeSelectable(id)
+
+  const [expanded, setExpanded] = usePersistedState(
+    `folder.${id}.expanded`,
+    false
+  )
+
+  useEffect(() => {
+    if (selectedEntityParentIds.has(id)) {
+      setExpanded(true)
+    }
+  }, [id, selectedEntityParentIds, setExpanded])
 
   function handleExpandCollapseClick() {
     setExpanded(!expanded)

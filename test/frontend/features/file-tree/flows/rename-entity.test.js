@@ -53,6 +53,7 @@ describe('FileTree Rename Entity Flow', function() {
         hasWritePermissions
         onSelect={onSelect}
         onInit={onInit}
+        isConnected
       />
     )
   })
@@ -89,8 +90,8 @@ describe('FileTree Rename Entity Flow', function() {
     const fetchMatcher = /\/project\/\w+\/file\/\w+\/rename/
     fetchMock.post(fetchMatcher, 204)
 
-    const expandButton = screen.getByRole('button', { name: 'Expand' })
-    fireEvent.click(expandButton)
+    const expandButton = screen.queryByRole('button', { name: 'Expand' })
+    if (expandButton) fireEvent.click(expandButton)
 
     const input = initItemRename('c.tex')
     fireEvent.change(input, { target: { value: 'd.tex' } })
@@ -137,8 +138,8 @@ describe('FileTree Rename Entity Flow', function() {
   })
 
   it('shows error modal on duplicate filename in subfolder', async function() {
-    const expandButton = screen.getByRole('button', { name: 'Expand' })
-    fireEvent.click(expandButton)
+    const expandButton = screen.queryByRole('button', { name: 'Expand' })
+    if (expandButton) fireEvent.click(expandButton)
 
     const input = initItemRename('c.tex')
     fireEvent.change(input, { target: { value: 'e.tex' } })
@@ -146,6 +147,17 @@ describe('FileTree Rename Entity Flow', function() {
 
     await screen.findByRole('alert', {
       name: 'A file or folder with this name already exists',
+      hidden: true
+    })
+  })
+
+  it('shows error modal on blocked filename', async function() {
+    const input = initItemRename('a.tex')
+    fireEvent.change(input, { target: { value: 'prototype' } })
+    fireEvent.keyDown(input, { key: 'Enter' })
+
+    await screen.findByRole('alert', {
+      name: 'This file name is blocked.',
       hidden: true
     })
   })

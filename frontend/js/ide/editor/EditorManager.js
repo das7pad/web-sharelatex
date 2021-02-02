@@ -1,10 +1,10 @@
 import _ from 'lodash'
 /* eslint-disable
-    camelcase,
-    node/handle-callback-err,
-    max-len,
-    no-return-assign,
-*/
+   camelcase,
+   node/handle-callback-err,
+   max-len,
+   no-return-assign,
+ */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
 /*
@@ -47,6 +47,12 @@ export default EditorManager = (function() {
         if (this.$scope.ui.view !== 'history' && entity.type === 'doc') {
           return this.openDoc(entity)
         }
+      })
+
+      this.$scope.$on('entity:no-selection', () => {
+        this.$scope.$apply(() => {
+          this.$scope.ui.view = null
+        })
       })
 
       this.$scope.$on('entity:deleted', (event, entity) => {
@@ -324,7 +330,7 @@ export default EditorManager = (function() {
           this.$scope.editor.error_state = true
           this.ide.showOutOfSyncModal(
             'Out of sync',
-            "Sorry, this file has gone out of sync and we need to do a full refresh. <br> <a href='/learn/Kb/Editor_out_of_sync_problems'>Please see this help guide for more information</a>",
+            "Sorry, this file has gone out of sync and we need to do a full refresh. <br> <a target='_blank' rel='noopener noreferrer' href='/learn/Kb/Editor_out_of_sync_problems'>Please see this help guide for more information</a>",
             editorContent
           )
           // Do not forceReopen the document.
