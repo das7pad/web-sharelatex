@@ -244,6 +244,9 @@ module.exports = {
 
     new CopyPlugin(
       [
+        // pdfjs worker
+        'pdfjs-dist/es5/build/pdf.worker.js',
+        'pdfjs-dist/es5/build/pdf.worker.js.map',
         // Copy CMap files from pdfjs-dist package to build output. These are used
         // to provide support for non-Latin characters
         'pdfjs-dist/cmaps',
@@ -253,15 +256,6 @@ module.exports = {
         .map(path => {
           return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
         })
-        .concat([
-          {
-            from: 'node_modules/pdfjs-dist/es5/build/pdf.worker.js',
-            to: path.join(
-              __dirname,
-              '/public/js/pdfjs-dist/es5/build/pdf.worker.js'
-            )
-          }
-        ])
         .concat(
           ['mathjax', 'sigma-master'].map(path => {
             return {
