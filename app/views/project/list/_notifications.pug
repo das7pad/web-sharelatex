@@ -2,6 +2,8 @@ include ../../_meta/saml.pug
 include ../../_mixins/saml
 
 .user-notifications(ng-controller="NotificationsController")
+	include ./_unsupported-browser
+
 	ul.list-unstyled(
 		ng-if="notifications.length > 0 && projects.length > 0",
 		ng-cloak

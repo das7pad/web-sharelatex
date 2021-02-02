@@ -538,6 +538,7 @@ const ProjectController = {
           userId
         )
         const warnings = ProjectController._buildWarningsList(noV1Connection)
+        const isIE = /\b(msie|trident)\b/i.test(req.headers['user-agent'])
 
         // in v2 add notifications for matching university IPs
         if (Settings.overleaf != null && req.ip !== user.lastLoginIp) {
@@ -562,6 +563,7 @@ const ProjectController = {
             samlBeta: req.session.samlBeta,
             institutionLinkingError,
             warnings,
+            isIE,
             zipFileSizeLimit: Settings.maxUploadSize
           }
 
