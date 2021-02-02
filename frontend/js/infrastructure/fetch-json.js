@@ -13,13 +13,23 @@ export function postJSON(path, options) {
   return fetchJSON(path, { ...options, method: 'POST' })
 }
 
+export function putJSON(path, options) {
+  return fetchJSON(path, { ...options, method: 'PUT' })
+}
+
 export function deleteJSON(path, options) {
   return fetchJSON(path, { ...options, method: 'DELETE' })
 }
 
-export default function fetchJSON(
+function fetchJSON(
   path,
-  { body = {}, headers = {}, method = 'GET', ...otherOptions }
+  {
+    body = {},
+    headers = {},
+    method = 'GET',
+    credentials = 'same-origin',
+    ...otherOptions
+  }
 ) {
   const options = {
     ...otherOptions,
@@ -29,6 +39,7 @@ export default function fetchJSON(
       'X-Csrf-Token': window.csrfToken,
       Accept: 'application/json'
     },
+    credentials,
     method
   }
 

@@ -873,6 +873,8 @@ const ProjectController = {
               wsAssetUrl,
               showSupport: Features.hasFeature('support'),
               showNewLogsUI: user.alphaProgram && !wantsOldLogsUI,
+              showNewNavigationUI:
+                req.query && req.query.new_navigation_ui === 'true',
               showReactFileTree: user.betaProgram && !wantsOldFileTreeUI
             })
             timer.done()
