@@ -518,6 +518,7 @@ describe('Subscriptions', function() {
             department: 'Math',
             role: 'Prof',
             inferred: false,
+            inReconfirmNotificationPeriod: false,
             institution: {
               name: 'Stanford',
               confirmed: true
