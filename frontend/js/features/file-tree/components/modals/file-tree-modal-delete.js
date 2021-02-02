@@ -1,6 +1,8 @@
 import React from 'react'
 import { Button, Modal } from 'react-bootstrap'
 
+import AccessibleModal from '../../../../shared/components/accessible-modal'
+
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import t from '../../../../misc/t'
 
@@ -25,7 +27,7 @@ function FileTreeModalDelete() {
   }
 
   return (
-    <Modal show={isDeleting} onHide={handleHide}>
+    <AccessibleModal show={isDeleting} onHide={handleHide}>
       <Modal.Header>
         <Modal.Title>{t('delete')}</Modal.Title>
       </Modal.Header>
@@ -58,7 +60,7 @@ function FileTreeModalDelete() {
           </>
         )}
       </Modal.Footer>
-    </Modal>
+    </AccessibleModal>
   )
 }
 

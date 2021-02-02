@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import { Button, Modal } from 'react-bootstrap'
 import { useRefWithAutoFocus } from '../../../../infrastructure/auto-focus'
 
+import AccessibleModal from '../../../../shared/components/accessible-modal'
+
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import t from '../../../../misc/t'
 
@@ -43,7 +45,7 @@ function FileTreeModalCreateFolder() {
   }
 
   return (
-    <Modal show={isCreatingFolder} onHide={handleHide}>
+    <AccessibleModal show={isCreatingFolder} onHide={handleHide}>
       <Modal.Header>
         <Modal.Title>{t('new_folder')}</Modal.Title>
       </Modal.Header>
@@ -94,7 +96,7 @@ function FileTreeModalCreateFolder() {
           </>
         )}
       </Modal.Footer>
-    </Modal>
+    </AccessibleModal>
   )
 }
 
