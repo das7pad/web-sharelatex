@@ -4,12 +4,11 @@ import PropTypes from 'prop-types'
 export const ApplicationContext = createContext()
 
 export function ApplicationProvider({ children }) {
+  const applicationContextValue = {
+    user: window.user
+  }
   return (
-    <ApplicationContext.Provider
-      value={{
-        user: window.user
-      }}
-    >
+    <ApplicationContext.Provider value={applicationContextValue}>
       {children}
     </ApplicationContext.Provider>
   )
@@ -20,8 +19,6 @@ ApplicationProvider.propTypes = {
 }
 
 export function useApplicationContext() {
-  const { user } = useContext(ApplicationContext)
-  return {
-    user
-  }
+  const applicationContext = useContext(ApplicationContext)
+  return applicationContext
 }
