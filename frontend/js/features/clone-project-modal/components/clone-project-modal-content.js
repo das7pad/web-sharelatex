@@ -8,7 +8,7 @@ import {
   FormControl
 } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function CloneProjectModalContent({
   cloneProject,
@@ -17,8 +17,6 @@ function CloneProjectModalContent({
   cancel,
   inFlight
 }) {
-  const { t } = useTranslation()
-
   const [clonedProjectName, setClonedProjectName] = useState(
     `${projectName} (Copy)`
   )

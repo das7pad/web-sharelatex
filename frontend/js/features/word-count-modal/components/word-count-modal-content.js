@@ -1,12 +1,10 @@
 import React from 'react'
 import { Row, Col, Modal, Grid, Alert, Button } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import Icon from '../../../shared/components/icon'
+import t from '../../../misc/t'
 
 function WordCountModalContent({ data, error, handleHide, loading }) {
-  const { t } = useTranslation()
-
   return (
     <>
       <Modal.Header closeButton>
