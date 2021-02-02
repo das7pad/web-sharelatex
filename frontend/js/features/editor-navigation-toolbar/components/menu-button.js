@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import Icon from '../../../shared/components/icon'
+import t from '../../../misc/t'
 
 function MenuButton({ onClick }) {
-  const { t } = useTranslation()
-
   return (
     // eslint-disable-next-line jsx-a11y/anchor-is-valid
     <a role="button" className="btn btn-full-height" href="#" onClick={onClick}>

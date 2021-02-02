@@ -1,9 +1,8 @@
 import React from 'react'
 import Icon from '../../../shared/components/icon'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function BackToProjectsButton() {
-  const { t } = useTranslation()
   return (
     <a className="toolbar-header-back-projects" href="/project">
       <Icon
