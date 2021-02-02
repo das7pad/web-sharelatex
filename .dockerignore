@@ -37,7 +37,7 @@
 
 !/.prettierrc
 
-!/.babelrc
+!/babel.config.json
 
 !/.eslintignore
 
