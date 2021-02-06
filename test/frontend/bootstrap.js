@@ -8,6 +8,7 @@ require('jsdom-global/register')
 // has a nicer failure messages
 const chai = require('chai')
 chai.use(require('sinon-chai'))
+chai.use(require('chai-as-promised'))
 
 require('../../build/translations/generator').generateModuleInMemory('en')
 
