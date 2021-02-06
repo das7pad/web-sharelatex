@@ -117,6 +117,7 @@ describe('ProjectController', function() {
       ipMatcherAffiliation: sinon.stub().returns({ create: sinon.stub() })
     }
     this.UserGetter = {
+      getUserFullEmails: sinon.stub().yields(null, []),
       getUser: sinon
         .stub()
         .callsArgWith(2, null, { lastLoginIp: '192.170.18.2' })
@@ -140,18 +141,6 @@ describe('ProjectController', function() {
       getUserDictionary: sinon.stub().yields(null, ['word']),
       getJWT: sinon.stub().yields(null, 'some-jwt')
     }
-    this.getUserAffiliations = sinon.stub().callsArgWith(1, null, [
-      {
-        email: 'test@overleaf.com',
-        institution: {
-          id: 1,
-          confirmed: true,
-          name: 'Overleaf',
-          ssoBeta: false,
-          ssoEnabled: true
-        }
-      }
-    ])
     this.Metrics = {
       Timer: class {
         done() {}
@@ -199,13 +188,13 @@ describe('ProjectController', function() {
         '../User/UserGetter': this.UserGetter,
         '../BrandVariations/BrandVariationsHandler': this
           .BrandVariationsHandler,
-        '../Institutions/InstitutionsAPI': {
-          getUserAffiliations: this.getUserAffiliations
-        },
         '../ThirdPartyDataStore/TpdsProjectFlusher': this.TpdsProjectFlusher,
         '../Spelling/SpellingHandler': this.SpellingHandler,
         '../../models/Project': {},
-        '../Analytics/AnalyticsManager': { recordEvent: () => {} }
+        '../Analytics/AnalyticsManager': { recordEvent: () => {} },
+        '../../infrastructure/Modules': {
+          hooks: { fire: sinon.stub().yields(null, []) }
+        }
       }
     })
 
@@ -577,8 +566,10 @@ describe('ProjectController', function() {
         this.ProjectController.projectListPage(this.req, this.res)
       })
 
-      it('should show a warning when there is an error getting affiliations from v1', function(done) {
-        this.getUserAffiliations.yields(new Errors.V1ConnectionError('error'))
+      it('should show a warning when there is an error getting full emails due to v1', function(done) {
+        this.UserGetter.getUserFullEmails.yields(
+          new Errors.V1ConnectionError('error')
+        )
         this.res.render = (pageName, opts) => {
           expect(opts.warnings).to.contain(this.connectionWarning)
           done()
@@ -637,6 +628,20 @@ describe('ProjectController', function() {
         done()
       })
       it('should show institution SSO available notification for confirmed domains', function() {
+        this.UserGetter.getUserFullEmails.yields(null, [
+          {
+            email: 'test@overleaf.com',
+            affiliation: {
+              institution: {
+                id: 1,
+                confirmed: true,
+                name: 'Overleaf',
+                ssoBeta: false,
+                ssoEnabled: true
+              }
+            }
+          }
+        ])
         this.res.render = (pageName, opts) => {
           expect(opts.notificationsInstitution).to.deep.include({
             email: this.institutionEmail,
@@ -753,15 +758,17 @@ describe('ProjectController', function() {
       })
       describe('for an unconfirmed domain for an SSO institution', function() {
         beforeEach(function(done) {
-          this.getUserAffiliations.yields(null, [
+          this.UserGetter.getUserFullEmails.yields(null, [
             {
               email: 'test@overleaf-uncofirmed.com',
-              institution: {
-                id: 1,
-                confirmed: false,
-                name: 'Overleaf',
-                ssoBeta: false,
-                ssoEnabled: true
+              affiliation: {
+                institution: {
+                  id: 1,
+                  confirmed: false,
+                  name: 'Overleaf',
+                  ssoBeta: false,
+                  ssoEnabled: true
+                }
               }
             }
           ])
@@ -798,15 +805,17 @@ describe('ProjectController', function() {
       })
       describe('Institution with SSO beta testable', function() {
         beforeEach(function(done) {
-          this.getUserAffiliations.yields(null, [
+          this.UserGetter.getUserFullEmails.yields(null, [
             {
               email: 'beta@beta.com',
-              institution: {
-                id: 2,
-                confirmed: true,
-                name: 'Beta University',
-                ssoBeta: true,
-                ssoEnabled: false
+              affiliation: {
+                institution: {
+                  id: 2,
+                  confirmed: true,
+                  name: 'Beta University',
+                  ssoBeta: true,
+                  ssoEnabled: false
+                }
               }
             }
           ])

@@ -522,7 +522,10 @@ describe('Subscriptions', function() {
             institution: {
               name: 'Stanford',
               confirmed: true
-            }
+            },
+            lastDayToReconfirm: undefined,
+            pastReconfirmDate: false,
+            portal: undefined
           }
         ])
       })

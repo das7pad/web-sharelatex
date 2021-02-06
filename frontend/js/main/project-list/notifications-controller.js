@@ -135,7 +135,7 @@ App.controller('EmailNotificationController', function(
   $http,
   UserAffiliationsDataService
 ) {
-  $scope.userEmails = []
+  $scope.userEmails = window.data.userEmails
   const _ssoAvailable = email => {
     if (!getMeta('ol-hasSamlFeature')) return false
     if (email.samlProviderId) return true
@@ -158,13 +158,6 @@ App.controller('EmailNotificationController', function(
   for (let userEmail of $scope.userEmails) {
     userEmail.hide = false
   }
-
-  const _getUserEmails = () =>
-    UserAffiliationsDataService.getUserEmails().then(function(emails) {
-      $scope.userEmails = emails
-      $scope.$emit('project-list:notifications-received')
-    })
-  _getUserEmails()
 
   $scope.resendConfirmationEmail = function(userEmail) {
     userEmail.confirmationInflight = true

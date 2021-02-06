@@ -31,10 +31,10 @@ const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
 const { V1ConnectionError } = require('../Errors/Errors')
 const Features = require('../../infrastructure/Features')
 const BrandVariationsHandler = require('../BrandVariations/BrandVariationsHandler')
-const { getUserAffiliations } = require('../Institutions/InstitutionsAPI')
 const UserController = require('../User/UserController')
 const SpellingHandler = require('../Spelling/SpellingHandler')
 const AnalyticsManager = require('../Analytics/AnalyticsManager')
+const Modules = require('../../infrastructure/Modules')
 
 const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
   if (!affiliation.institution) return false
@@ -418,16 +418,33 @@ const ProjectController = {
             cb
           )
         },
-        userAffiliations(cb) {
-          if (!Features.hasFeature('affiliations')) {
-            return cb(null, [])
-          }
-          getUserAffiliations(userId, (error, affiliations) => {
+        userEmailsData(cb) {
+          const result = { list: [], allInReconfirmNotificationPeriods: [] }
+
+          UserGetter.getUserFullEmails(userId, (error, fullEmails) => {
             if (error && error instanceof V1ConnectionError) {
               noV1Connection = true
-              return cb(null, [])
+              return cb(null, result)
             }
-            cb(error, affiliations)
+
+            if (!Features.hasFeature('affiliations')) {
+              result.list = fullEmails
+              return cb(null, result)
+            }
+            Modules.hooks.fire(
+              'allInReconfirmNotificationPeriodsForUser',
+              fullEmails,
+              (error, results) => {
+                // Module.hooks.fire accepts multiple methods
+                // and does async.series
+                const allInReconfirmNotificationPeriods =
+                  (results && results[0]) || []
+                return cb(null, {
+                  list: fullEmails,
+                  allInReconfirmNotificationPeriods
+                })
+              }
+            )
           })
         }
       },
@@ -436,7 +453,19 @@ const ProjectController = {
           OError.tag(err, 'error getting data for project list page')
           return next(err)
         }
-        const { user, userAffiliations } = results
+        const { user, userEmailsData } = results
+
+        const userEmails = userEmailsData.list || []
+
+        const userAffiliations = userEmails
+          .filter(emailData => !!emailData.affiliation)
+          .map(emailData => {
+            const result = emailData.affiliation
+            result.email = emailData.email
+            return result
+          })
+
+        const { allInReconfirmNotificationPeriods } = userEmailsData
         // Handle case of deleted user
         if (user == null) {
           UserController.logout(req, res, next)
@@ -556,9 +585,11 @@ const ProjectController = {
             tags,
             jwtNotifications: results.jwtNotifications,
             notificationsInstitution,
+            allInReconfirmNotificationPeriods,
             portalTemplates,
             user,
             userAffiliations,
+            userEmails,
             hasSubscription: results.hasSubscription,
             samlBeta: req.session.samlBeta,
             institutionLinkingError,
