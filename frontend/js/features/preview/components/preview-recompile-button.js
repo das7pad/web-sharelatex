@@ -74,7 +74,8 @@ function PreviewRecompileButton({
         <Icon type="refresh" spin={isCompiling} />
 
         <span id="text-compiling" className="toolbar-text" {...compilingProps}>
-          {t('compiling')} &hellip;
+          {t('compiling')}
+          &hellip;
         </span>
 
         <span id="text-recompile" className="toolbar-text" {...recompileProps}>
