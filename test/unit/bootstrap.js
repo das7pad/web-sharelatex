@@ -56,5 +56,19 @@ SandboxedModule.configure({
   requires: GLOBAL_REQUIRE_CACHE_FOR_SANDBOXED_MODULES
 })
 
+// sandboxed-module somehow registers every fake module it creates in this
+// module's children array, which uses quite a big amount of memory. We'll take
+// a copy of the module children array and restore it after each test so that
+// the garbage collector has a chance to reclaim the fake modules.
+let initialModuleChildren
+before('record initial module children', function() {
+  initialModuleChildren = module.children.slice()
+})
+
+afterEach('restore module children', function() {
+  // Delete leaking sandboxed modules
+  module.children = initialModuleChildren.slice()
+})
+
 // used by -> app/src/infrastructure/Mongoose.js
 process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING = 'true'
