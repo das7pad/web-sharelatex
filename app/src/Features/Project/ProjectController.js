@@ -906,7 +906,7 @@ const ProjectController = {
               showNewLogsUI: user.alphaProgram && !wantsOldLogsUI,
               showNewNavigationUI:
                 req.query && req.query.new_navigation_ui === 'true',
-              showReactFileTree: user.betaProgram && !wantsOldFileTreeUI
+              showReactFileTree: !wantsOldFileTreeUI
             })
             timer.done()
           }

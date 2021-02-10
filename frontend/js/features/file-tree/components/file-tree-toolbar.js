@@ -7,8 +7,6 @@ import { FileTreeMainContext } from '../contexts/file-tree-main'
 import { useFileTreeActionable } from '../contexts/file-tree-actionable'
 import t from '../../../misc/t'
 
-import FileTreeBadge from './file-tree-badge'
-
 function FileTreeToolbar() {
   const { hasWritePermissions } = useContext(FileTreeMainContext)
 
@@ -72,11 +70,7 @@ function FileTreeToolbarRight() {
   } = useFileTreeActionable()
 
   if (!canRename && !canDelete) {
-    return (
-      <div className="toolbar-right">
-        <FileTreeBadge />
-      </div>
-    )
+    return null
   }
 
   return (
@@ -99,7 +93,6 @@ function FileTreeToolbarRight() {
           <Icon type="trash-o" modifier="fw" accessibilityLabel={t('delete')} />
         </TooltipButton>
       ) : null}
-      <FileTreeBadge />
     </div>
   )
 }

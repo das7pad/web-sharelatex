@@ -22,7 +22,11 @@ module.exports = merge(
       // Minify JS (with Terser) and CSS (with cssnano)
       minimizer: [
         new TerserPlugin({
-          exclude: /^vendor|js\/t\//
+          exclude: /^vendor|js\/t\//,
+          terserOptions: {
+            keep_classnames: /Error$/,
+            keep_fnames: /Error$/
+          }
         }),
         new OptimizeCssAssetsPlugin()
       ]

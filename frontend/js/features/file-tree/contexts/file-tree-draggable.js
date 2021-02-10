@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { DndProvider, createDndContext, useDrag, useDrop } from 'react-dnd'
@@ -76,6 +76,8 @@ export function useDraggable(draggedEntityId) {
   const { fileTreeData } = useFileTreeMutable()
   const { selectedEntityIds } = useFileTreeSelectable()
 
+  const [isDraggable, setIsDraggable] = useState(true)
+
   const item = { type: DRAGGABLE_TYPE }
   const [{ isDragging }, dragRef, preview] = useDrag({
     item, // required, but overwritten by the return value of `begin`
@@ -102,7 +104,9 @@ export function useDraggable(draggedEntityId) {
 
   return {
     dragRef,
-    isDragging
+    isDragging,
+    isDraggable,
+    setIsDraggable
   }
 }
 
