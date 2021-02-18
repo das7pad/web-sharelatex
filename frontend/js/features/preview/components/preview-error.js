@@ -8,7 +8,9 @@ import t from '../../../misc/t'
 import getMeta from '../../../utils/meta'
 
 function PreviewError({ name }) {
-  const { isProjectOwner } = useEditorContext()
+  const { isProjectOwner } = useEditorContext({
+    isProjectOwner: PropTypes.bool
+  })
   const enableSubscriptions = getMeta('ol-enableSubscriptions')
 
   let errorTitle

@@ -4,11 +4,26 @@ import usePersistedState from '../../infrastructure/persisted-state-hook'
 
 export const EditorContext = createContext()
 
+EditorContext.Provider.propTypes = {
+  value: PropTypes.shape({
+    cobranding: PropTypes.shape({
+      logoImgUrl: PropTypes.string.isRequired,
+      brandVariationName: PropTypes.string.isRequired,
+      brandVariationHomeUrl: PropTypes.string.isRequired
+    }),
+    loading: PropTypes.bool,
+    projectId: PropTypes.string.isRequired,
+    isProjectOwner: PropTypes.bool
+  })
+}
+
 export function EditorProvider({
   children,
   loading,
   chatIsOpenAngular,
-  setChatIsOpenAngular
+  setChatIsOpenAngular,
+  openDoc,
+  onlineUsersArray
 }) {
   const cobranding = window.brandVariation
     ? {
@@ -50,6 +65,8 @@ export function EditorProvider({
     loading,
     projectId: window.project_id,
     isProjectOwner: ownerId === window.user.id,
+    openDoc,
+    onlineUsersArray,
     ui: {
       chatIsOpen,
       toggleChatOpen
@@ -67,10 +84,13 @@ EditorProvider.propTypes = {
   children: PropTypes.any,
   loading: PropTypes.bool,
   chatIsOpenAngular: PropTypes.bool,
-  setChatIsOpenAngular: PropTypes.func.isRequired
+  setChatIsOpenAngular: PropTypes.func.isRequired,
+  openDoc: PropTypes.func.isRequired,
+  onlineUsersArray: PropTypes.array.isRequired
 }
 
-export function useEditorContext() {
-  const editorContext = useContext(EditorContext)
-  return editorContext
+export function useEditorContext(propTypes) {
+  const data = useContext(EditorContext)
+  PropTypes.checkPropTypes(propTypes, data, 'data', 'EditorContext.Provider')
+  return data
 }

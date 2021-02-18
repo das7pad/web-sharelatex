@@ -55,6 +55,29 @@ const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
   return false
 }
 
+function _shouldSeeNewLogsUI(user) {
+  const {
+    _id: userId,
+    alphaProgram: isAlphaUser,
+    betaProgram: isBetaUser
+  } = user
+  if (!userId) {
+    return false
+  }
+
+  const userIdAsPercentile = (ObjectId(userId).getTimestamp() / 1000) % 100
+
+  if (isAlphaUser) {
+    return true
+  } else if (isBetaUser && userIdAsPercentile < Settings.logsUIPercentageBeta) {
+    return true
+  } else if (userIdAsPercentile < Settings.logsUIPercentage) {
+    return true
+  } else {
+    return false
+  }
+}
+
 const ProjectController = {
   _isInPercentageRollout(rolloutName, objectId, percentage) {
     if (Settings.bypassPercentageRollouts === true) {
@@ -841,6 +864,7 @@ const ProjectController = {
               ]
             }
 
+            const userShouldSeeNewLogsUI = _shouldSeeNewLogsUI(user)
             const wantsOldLogsUI =
               req.query && req.query.new_logs_ui === 'false'
 
@@ -903,7 +927,7 @@ const ProjectController = {
               wsUrl,
               wsAssetUrl,
               showSupport: Features.hasFeature('support'),
-              showNewLogsUI: user.alphaProgram && !wantsOldLogsUI,
+              showNewLogsUI: userShouldSeeNewLogsUI && !wantsOldLogsUI,
               showNewNavigationUI:
                 req.query && req.query.new_navigation_ui === 'true',
               showReactFileTree: !wantsOldFileTreeUI

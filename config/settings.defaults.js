@@ -367,6 +367,13 @@ module.exports = {
   wsAssetUrlBeta: process.env.WEBSOCKET_ASSET_URL_BETA,
   wsAssetUrlFallback: process.env.WEBSOCKET_ASSET_URL_FALLBACK,
 
+  // Compile UI rollout percentages
+  logsUIPercentageBeta: parseInt(
+    process.env.LOGS_UI_PERCENTAGE_BETA || '0',
+    10
+  ),
+  logsUIPercentage: parseInt(process.env.LOGS_UI_PERCENTAGE || '0', 10),
+
   // cookie domain
   // use full domain for cookies to only be accessible from that domain,
   // replace subdomain with dot to have them accessible on all subdomains
