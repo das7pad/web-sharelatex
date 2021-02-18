@@ -26,7 +26,7 @@ describe('NewLogsUI helper', function() {
     NewLogsUI = SandboxedModule.require(MODULE_PATH, {
       requires: {
         mongodb: { ObjectId },
-        'settings-sharelatex': this.settings
+        '@overleaf/settings': this.settings
       }
     })
   })

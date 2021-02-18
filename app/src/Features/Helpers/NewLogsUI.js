@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongodb')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 
 function shouldUserSeeNewLogsUI(user) {
   const {
