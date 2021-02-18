@@ -1,13 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import { Dropdown, MenuItem, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import Icon from '../../../shared/components/icon'
 import ColorManager from '../../../ide/colors/ColorManager'
+import t from '../../../misc/t'
 
 function OnlineUsersWidget({ onlineUsers, goToUser }) {
-  const { t } = useTranslation()
-
   const shouldDisplayDropdown = onlineUsers.length >= 4
 
   if (shouldDisplayDropdown) {
@@ -93,7 +91,6 @@ UserIcon.propTypes = {
 }
 
 const DropDownToggleButton = React.forwardRef((props, ref) => {
-  const { t } = useTranslation()
   return (
     <OverlayTrigger
       placement="left"
