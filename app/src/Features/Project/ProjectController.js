@@ -35,6 +35,7 @@ const UserController = require('../User/UserController')
 const SpellingHandler = require('../Spelling/SpellingHandler')
 const AnalyticsManager = require('../Analytics/AnalyticsManager')
 const Modules = require('../../infrastructure/Modules')
+const { shouldUserSeeNewLogsUI } = require('../Helpers/NewLogsUI')
 
 const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
   if (!affiliation.institution) return false
@@ -53,29 +54,6 @@ const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
     return false
   }
   return false
-}
-
-function _shouldSeeNewLogsUI(user) {
-  const {
-    _id: userId,
-    alphaProgram: isAlphaUser,
-    betaProgram: isBetaUser
-  } = user
-  if (!userId) {
-    return false
-  }
-
-  const userIdAsPercentile = (ObjectId(userId).getTimestamp() / 1000) % 100
-
-  if (isAlphaUser) {
-    return true
-  } else if (isBetaUser && userIdAsPercentile < Settings.logsUIPercentageBeta) {
-    return true
-  } else if (userIdAsPercentile < Settings.logsUIPercentage) {
-    return true
-  } else {
-    return false
-  }
 }
 
 const ProjectController = {
@@ -859,7 +837,7 @@ const ProjectController = {
               ]
             }
 
-            const userShouldSeeNewLogsUI = _shouldSeeNewLogsUI(user)
+            const userShouldSeeNewLogsUI = shouldUserSeeNewLogsUI(user)
             const wantsOldLogsUI =
               req.query && req.query.new_logs_ui === 'false'
 

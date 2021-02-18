@@ -1,130 +1,160 @@
-let Modules
+const fs = require('fs')
 const Path = require('path')
-const glob = require('glob')
 const Views = require('./Views')
 const async = require('async')
 const Settings = require('@overleaf/settings')
+const { promisify } = require('util')
 
-module.exports = Modules = {
-  modules: [],
-  loadModules() {
-    glob
-      .sync(`${__dirname}/../../../modules/*/index.js`)
-      .map(Path.dirname)
-      .forEach(modulePath => {
-        const loadedModule = require(modulePath)
-        loadedModule.path = modulePath
-        this.modules.push(loadedModule)
-      })
-    Modules.attachHooks()
-  },
+const MODULE_BASE_PATH = Path.resolve(__dirname + '/../../../modules')
 
-  applyRouter(webRouter, privateApiRouter, publicApiRouter) {
-    for (const module of this.modules) {
-      if (module.router && typeof module.router.apply === 'function') {
-        module.router.apply(webRouter, privateApiRouter, publicApiRouter)
-      }
+const _modules = []
+const _hooks = {}
+let _viewIncludes = {}
+
+function loadModules() {
+  for (let moduleName of fs.readdirSync(MODULE_BASE_PATH)) {
+    if (fs.existsSync(Path.join(MODULE_BASE_PATH, moduleName, 'index.js'))) {
+      const loadedModule = require(Path.join(
+        MODULE_BASE_PATH,
+        moduleName,
+        'index'
+      ))
+      loadedModule.name = moduleName
+      _modules.push(loadedModule)
     }
-  },
+  }
+  attachHooks()
+}
 
-  applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter) {
-    for (const module of this.modules) {
-      if (module.nonCsrfRouter) {
-        module.nonCsrfRouter.apply(webRouter, privateApiRouter, publicApiRouter)
-      }
-      if (
-        module.router &&
-        typeof module.router.applyNonCsrfRouter === 'function'
-      ) {
-        module.router.applyNonCsrfRouter(
-          webRouter,
-          privateApiRouter,
-          publicApiRouter
-        )
-      }
-    }
-  },
-
-  attachViewIncludesReloadMiddleware(webRouter) {
-    if (Settings.reloadModuleViewsOnEachRequest) {
-      webRouter.use((req, res, next) => {
-        const actualRender = res.render
-        res.render = function() {
-          Modules.loadViewIncludes()
-          actualRender.apply(res, arguments)
-        }
-        next()
-      })
-    }
-  },
-
-  viewIncludes: new Map(),
-  loadViewIncludes() {
-    this.viewIncludes.clear()
-    for (const module of this.modules) {
-      Object.entries(module.viewIncludes || {}).forEach(
-        ([viewInclude, partial]) => {
-          if (!this.viewIncludes.has(viewInclude)) {
-            this.viewIncludes.set(viewInclude, [])
-          }
-          const path = Path.join(module.path, 'app/views', partial + '.pug')
-          const template = Views.getTemplate(path)
-          this.viewIncludes.get(viewInclude).push(template)
-        }
-      )
-    }
-  },
-
-  moduleIncludes(view, locals) {
-    const compiledPartials = Modules.viewIncludes.get(view) || []
-    return compiledPartials.reduce(
-      (html, compiledPartial) => html + compiledPartial(locals),
-      ''
-    )
-  },
-
-  moduleIncludesAvailable(view) {
-    return Modules.viewIncludes.has(view)
-  },
-
-  linkedFileAgentsIncludes() {
-    const agents = {}
-    for (const module of this.modules) {
-      Object.entries(module.linkedFileAgents || {}).forEach(
-        ([name, agentFunction]) => {
-          agents[name] = agentFunction()
-        }
-      )
-    }
-    return agents
-  },
-
-  attachHooks() {
-    for (const module of this.modules) {
-      Object.entries(module.hooks || {}).forEach(([hook, method]) => {
-        Modules.hooks.attach(hook, method)
-      })
-    }
-  },
-
-  hooks: {
-    _hooks: new Map(),
-    attach(name, method) {
-      if (!this._hooks.has(name)) {
-        this._hooks.set(name, [])
-      }
-      this._hooks.get(name).push(method)
-    },
-
-    fire(name, ...args) {
-      const callback = args.pop()
-      const methods = this._hooks.get(name) || []
-      function fanOut(method, cb) {
-        method(...args, cb)
-      }
-      async.mapSeries(methods, fanOut, callback)
+function applyRouter(webRouter, privateApiRouter, publicApiRouter) {
+  for (const module of _modules) {
+    if (module.router && module.router.apply) {
+      module.router.apply(webRouter, privateApiRouter, publicApiRouter)
     }
   }
 }
 
-Modules.loadModules()
+function applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter) {
+  for (let module of _modules) {
+    if (module.nonCsrfRouter != null) {
+      module.nonCsrfRouter.apply(webRouter, privateApiRouter, publicApiRouter)
+    }
+    if (module.router && module.router.applyNonCsrfRouter) {
+      module.router.applyNonCsrfRouter(
+        webRouter,
+        privateApiRouter,
+        publicApiRouter
+      )
+    }
+  }
+}
+
+function attachViewIncludesReloadMiddleware(webRouter) {
+  if (Settings.reloadModuleViewsOnEachRequest) {
+    webRouter.use((req, res, next) => {
+      const actualRender = res.render
+      res.render = function() {
+        loadViewIncludes()
+        actualRender.apply(res, arguments)
+      }
+      next()
+    })
+  }
+}
+
+function loadViewIncludes(app) {
+  _viewIncludes = {}
+  for (const module of _modules) {
+    const object = module.viewIncludes || {}
+    for (let view in object) {
+      const partial = object[view]
+      if (!_viewIncludes[view]) {
+        _viewIncludes[view] = []
+      }
+      const filePath = Path.join(
+        MODULE_BASE_PATH,
+        module.name,
+        'app/views',
+        partial + '.pug'
+      )
+      _viewIncludes[view].push(Views.getTemplate(filePath))
+    }
+  }
+}
+
+function moduleIncludes(view, locals) {
+  const compiledPartials = _viewIncludes[view] || []
+  let html = ''
+  for (let compiledPartial of compiledPartials) {
+    html += compiledPartial(locals)
+  }
+  return html
+}
+
+function moduleIncludesAvailable(view) {
+  return (_viewIncludes[view] || []).length > 0
+}
+
+function linkedFileAgentsIncludes() {
+  const agents = {}
+  for (let module of _modules) {
+    for (let name in module.linkedFileAgents) {
+      const agentFunction = module.linkedFileAgents[name]
+      agents[name] = agentFunction()
+    }
+  }
+  return agents
+}
+
+function attachHooks() {
+  for (var module of _modules) {
+    if (module.hooks != null) {
+      for (let hook in module.hooks) {
+        const method = module.hooks[hook]
+        attachHook(hook, method)
+      }
+    }
+  }
+}
+
+function attachHook(name, method) {
+  if (_hooks[name] == null) {
+    _hooks[name] = []
+  }
+  _hooks[name].push(method)
+}
+
+function fireHook(name, ...rest) {
+  const adjustedLength = Math.max(rest.length, 1)
+  const args = rest.slice(0, adjustedLength - 1)
+  const callback = rest[adjustedLength - 1]
+  const methods = _hooks[name] || []
+  const callMethods = methods.map(method => cb => method(...args, cb))
+  async.series(callMethods, function(error, results) {
+    if (error) {
+      return callback(error)
+    }
+    callback(null, results)
+  })
+}
+
+module.exports = {
+  applyNonCsrfRouter,
+  applyRouter,
+  attachViewIncludesReloadMiddleware,
+  linkedFileAgentsIncludes,
+  loadViewIncludes,
+  moduleIncludes,
+  moduleIncludesAvailable,
+  hooks: {
+    attach: attachHook,
+    fire: fireHook
+  },
+  promises: {
+    hooks: {
+      fire: promisify(fireHook)
+    }
+  }
+}
+
+loadModules()

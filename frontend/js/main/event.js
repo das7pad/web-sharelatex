@@ -104,8 +104,8 @@ App.factory('eventTracking', function($http, localStorage) {
       })
     },
 
-    sendMBSampled(key, segmentation) {
-      if (Math.random() < 0.01) {
+    sendMBSampled(key, segmentation, rate = 0.01) {
+      if (Math.random() < rate) {
         return this.sendMB(key, segmentation)
       }
     },

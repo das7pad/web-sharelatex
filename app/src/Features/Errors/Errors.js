@@ -170,8 +170,6 @@ class InvalidQueryError extends OErrorV2CompatibleError {
   }
 }
 
-class ProjectIsArchivedOrTrashedError extends BackwardCompatibleError {}
-
 class AffiliationError extends OError {}
 
 module.exports = {
@@ -204,6 +202,5 @@ module.exports = {
   UserNotCollaboratorError,
   DocHasRangesError,
   InvalidQueryError,
-  ProjectIsArchivedOrTrashedError,
   AffiliationError
 }
