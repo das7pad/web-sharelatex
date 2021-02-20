@@ -65,19 +65,19 @@ include ../../_meta/saml.pug
 						br
 						| !{translate("you_can_now_log_in_sso", {}, ['strong'])}
 						br
-						| #{translate("link_institutional_email_get_started", {}, ['strong'])}&nbsp;
+						| {{translate("link_institutional_email_get_started")}}&nbsp;
 						a(
 							ng-href="{{notification.messageOpts.portalPath || 'https://www.overleaf.com/learn/how-to/Institutional_Login'}}"
-						) #{translate("find_out_more_nt")}
+						) {{translate("find_out_more_nt")}}
 					.notification-action
 						a.pull-right.btn.btn-sm.btn-info(
 							href=`{{samlInitPath}}?university_id={{notification.messageOpts.institutionId}}&auto=/project`
 						)
-							| #{translate("link_account")}
+							| {{translate("link_account")}}
 					.notification-close
 						button.btn-sm(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 				.alert.alert-info(
 					ng-switch-when="notification_ip_matched_affiliation"
 					ng-if="!notification.messageOpts.ssoEnabled"
@@ -87,11 +87,11 @@ include ../../_meta/saml.pug
 						br
 						| !{translate("did_you_know_institution_providing_professional", {institutionName: '{{notification.messageOpts.university_name}}'}, ['strong'])}
 						br
-						| #{translate("add_email_to_claim_features")}
+						| {{translate("add_email_to_claim_features")}}
 					.notification-action
 						a.pull-right.btn.btn-sm.btn-info(
 							href="/user/settings"
-						) #{translate("add_affiliation")}
+						) {{translate("add_affiliation")}}
 					.notification-close
 						button.btn-sm(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
@@ -121,7 +121,7 @@ include ../../_meta/saml.pug
 					.notification-close
 						button.btn-sm(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 				.alert.alert-info(
 					ng-switch-default
@@ -193,15 +193,15 @@ include ../../_meta/saml.pug
 					.notification-body
 						div
 							i.fa.fa-fw.fa-exclamation-triangle(aria-hidden="true")
-							| &nbsp;#{translate("generic_something_went_wrong")}.
+							| &nbsp;{{translate("generic_something_went_wrong")}}.
 							div(ng-if="notification.error.translatedMessage" ng-bind-html="notification.error.translatedMessage")
 							div(ng-else="notification.error.message") {{ notification.error.message}}
-							div(ng-if="notification.error.tryAgain") #{translate("try_again")}.
+							div(ng-if="notification.error.tryAgain") {{translate("try_again")}}.
 
 					.notification-close
 						button(ng-click="dismiss(notification)").close.pull-right
 							span(aria-hidden="true") &times;
-							span.sr-only #{translate("close")}
+							span.sr-only {{translate("close")}}
 
 	if !settings.emailConfirmationDisabled
 		ul.list-unstyled(

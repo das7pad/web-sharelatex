@@ -23,7 +23,7 @@ mixin btnRemoveEmail()
 		)
 			button.btn.btn-sm.btn-danger(disabled)
 				i.fa.fa-fw.fa-trash(aria-hidden="true")
-				span.sr-only #{translate("please_change_primary_to_remove")}
+				span.sr-only {{translate("please_change_primary_to_remove")}}
 	button.btn.btn-sm.btn-danger.affiliations-table-inline-action(
 		ng-if="!userEmail.default"
 		ng-click="removeUserEmail(userEmail)"
@@ -32,7 +32,7 @@ mixin btnRemoveEmail()
 		type="button"
 	)
 		i.fa.fa-fw.fa-trash(aria-hidden="true")
-		span.sr-only #{translate("remove")}
+		span.sr-only {{translate("remove")}}
 
 form.row(
 	ng-controller="UserAffiliationsController"
@@ -285,7 +285,7 @@ form.row(
 								span(aria-hidden="true") &times;
 							.small
 								i.fa.fa-fw.fa-exclamation-triangle(aria-hidden="true")
-								| &nbsp;#{translate("generic_something_went_wrong")}.
+								| &nbsp;{{translate("generic_something_went_wrong")}}.
 								br
 								if samlError.translatedMessage
 									| !{samlError.translatedMessage}
@@ -293,7 +293,7 @@ form.row(
 									| #{samlError.message}
 								if samlError.tryAgain
 									br
-									| &nbsp;#{translate("try_again")}.
+									| &nbsp;{{translate("try_again")}}.
 
 script(type="text/ng-template", id="affiliationFormTpl")
 	.affiliations-form-group(
