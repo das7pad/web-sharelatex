@@ -78,10 +78,9 @@ const UserPagesController = {
         institutionLinked
       )
     }
-    const institutionLinkedToAnother = saml.linkedToAnother
+    const samlError = saml.error
     const institutionEmailNonCanonical = saml.emailNonCanonical
     const institutionRequestedEmail = saml.requestedEmail
-    const institutionLinkingError = saml.error
     delete req.session.saml
     let shouldAllowEditingDetails = true
     if (Settings.ldap && Settings.ldap.updateUserDetailsOnLogin) {
@@ -109,12 +108,11 @@ const UserPagesController = {
         ),
         oauthUseV2: Settings.oauthUseV2 || false,
         institutionLinked,
-        institutionLinkedToAnother,
+        samlError,
         institutionEmailNonCanonical:
           institutionEmailNonCanonical && institutionRequestedEmail
             ? institutionEmailNonCanonical
             : undefined,
-        institutionLinkingError,
         samlBeta: req.session.samlBeta,
         ssoError: ssoError,
         thirdPartyIds: UserPagesController._restructureThirdPartyIds(user)

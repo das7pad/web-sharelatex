@@ -23,7 +23,7 @@ async function unsetDeletedFiles(projectId) {
 }
 
 describe('BackFillDeletedFiles', function() {
-  let user, projectId1, projectId2, projectId3, projectId4
+  let user, projectId1, projectId2, projectId3, projectId4, projectId5
 
   before('skip unless the script exists', async function() {
     const scriptPath = Path.join(
@@ -45,14 +45,16 @@ describe('BackFillDeletedFiles', function() {
     projectId2 = ObjectId(await user.createProject('project2'))
     projectId3 = ObjectId(await user.createProject('project3'))
     projectId4 = ObjectId(await user.createProject('project4'))
+    projectId5 = ObjectId(await user.createProject('project5'))
   })
 
-  let fileId1, fileId2, fileId3
+  let fileId1, fileId2, fileId3, fileId4
   beforeEach('create files', function() {
     // take a short cut and just allocate file ids
     fileId1 = ObjectId()
     fileId2 = ObjectId()
     fileId3 = ObjectId()
+    fileId4 = ObjectId()
   })
   const otherFileDetails = {
     name: 'universe.jpg',
@@ -61,7 +63,7 @@ describe('BackFillDeletedFiles', function() {
     deletedAt: new Date(),
     __v: 0
   }
-  let deletedFiles1, deletedFiles2
+  let deletedFiles1, deletedFiles2, deletedFiles3
   beforeEach('set deletedFiles details', async function() {
     deletedFiles1 = [
       { _id: fileId1, ...otherFileDetails },
@@ -75,6 +77,12 @@ describe('BackFillDeletedFiles', function() {
     await setDeletedFiles(projectId3, [])
     // a project without deletedFiles array
     await unsetDeletedFiles(projectId4)
+    // duplicate entry
+    deletedFiles3 = [
+      { _id: fileId4, ...otherFileDetails },
+      { _id: fileId4, ...otherFileDetails }
+    ]
+    await setDeletedFiles(projectId5, deletedFiles3)
   })
 
   async function runScript(args = []) {
@@ -95,7 +103,7 @@ describe('BackFillDeletedFiles', function() {
     expect(stdOut).to.include(projectId1.toString())
     expect(stdOut).to.include(projectId2.toString())
 
-    expect(stdErr).to.include(`Completed batch ending ${projectId2}`)
+    expect(stdErr).to.include(`Completed batch ending ${projectId5}`)
   }
 
   function checkAreFilesBackFilled() {
@@ -106,7 +114,8 @@ describe('BackFillDeletedFiles', function() {
       expect(docs).to.deep.equal([
         { _id: fileId1, projectId: projectId1, ...otherFileDetails },
         { _id: fileId2, projectId: projectId1, ...otherFileDetails },
-        { _id: fileId3, projectId: projectId2, ...otherFileDetails }
+        { _id: fileId3, projectId: projectId2, ...otherFileDetails },
+        { _id: fileId4, projectId: projectId5, ...otherFileDetails }
       ])
     })
   }
@@ -119,6 +128,7 @@ describe('BackFillDeletedFiles', function() {
     it('should leave the deletedFiles as is', async function() {
       expect(await getDeletedFiles(projectId1)).to.deep.equal(deletedFiles1)
       expect(await getDeletedFiles(projectId2)).to.deep.equal(deletedFiles2)
+      expect(await getDeletedFiles(projectId5)).to.deep.equal(deletedFiles3)
     })
   })
 
@@ -132,6 +142,7 @@ describe('BackFillDeletedFiles', function() {
     it('should cleanup the deletedFiles', async function() {
       expect(await getDeletedFiles(projectId1)).to.deep.equal([])
       expect(await getDeletedFiles(projectId2)).to.deep.equal([])
+      expect(await getDeletedFiles(projectId5)).to.deep.equal([])
     })
   })
 })
