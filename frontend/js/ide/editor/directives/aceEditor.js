@@ -39,7 +39,24 @@ ace.config.setDefaultValue('session', 'useWorker', false)
 // CSP disallows loading JS from the main origin.
 ace.config.set('loadWorkerFromBlob', true)
 
-App.directive('aceEditor', function(
+const deps = [
+  'ide',
+  '$timeout',
+  '$compile',
+  '$rootScope',
+  'eventTracking',
+  '$cacheFactory',
+  'metadata',
+  'graphics',
+  'preamble',
+  'files',
+  '$http',
+  '$q',
+  '$window'
+]
+App.directive('aceEditor', [...deps, aceEditorDirective])
+
+function aceEditorDirective(
   ide,
   $timeout,
   $compile,
@@ -937,7 +954,7 @@ App.directive('aceEditor', function(
 </div>\
 `
   }
-})
+}
 
 function monkeyPatchSearch($rootScope, $compile) {
   const searchHtml = `\
