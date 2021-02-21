@@ -245,8 +245,7 @@ module.exports = {
     new CopyPlugin(
       [
         // pdfjs worker
-        'pdfjs-dist/es5/build/pdf.worker.js',
-        'pdfjs-dist/es5/build/pdf.worker.js.map',
+        'pdfjs-dist/build/pdf.worker.min.js',
         // Copy CMap files from pdfjs-dist package to build output. These are used
         // to provide support for non-Latin characters
         'pdfjs-dist/cmaps',
