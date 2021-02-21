@@ -1,7 +1,8 @@
 import App from '../../../../../../frontend/js/base'
 import EventEmitter from '../../../../../../frontend/js/utils/EventEmitter'
+import { localStorage } from '../../../../../../frontend/js/modules/storage'
 
-App.controller('EditorLoaderController', function($scope, localStorage) {
+App.controller('EditorLoaderController', function($scope) {
   $scope.richText = {
     bundle: null,
     bundleLoading: null,

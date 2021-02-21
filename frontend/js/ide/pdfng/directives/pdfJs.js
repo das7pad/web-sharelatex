@@ -14,8 +14,9 @@
  */
 import App from '../../../base'
 import './pdfViewer'
+import { localStorage } from '../../../modules/storage'
 
-export default App.directive('pdfng', ($timeout, localStorage) => ({
+export default App.directive('pdfng', $timeout => ({
   scope: {
     pdfSrc: '=',
     highlights: '=',
