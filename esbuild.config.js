@@ -52,7 +52,7 @@ const CONFIGS = [
     plugins: [
       aliasResolver({
         libs: Path.join(FRONTEND_PATH, 'js/vendor/libs'),
-        ace: 'ace-builds/src-noconflict'
+        ace: Path.join(NODE_MODULES, 'ace-builds/src-noconflict')
       }),
       valLoader(Path.join(__dirname, 'modules/modules-ide.js')),
       valLoader(Path.join(__dirname, 'modules/modules-main.js'))
