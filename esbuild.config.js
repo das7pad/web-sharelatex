@@ -75,15 +75,15 @@ const CONFIGS = [
   },
 
   // stylesheets
-  {
-    plugins: [lessLoader()],
-    entryPoints: [
-      Path.join(FRONTEND_PATH, 'stylesheets/style.less'),
-      Path.join(FRONTEND_PATH, 'stylesheets/light-style.less')
-    ],
-    outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
-    outdir: Path.join(PUBLIC_PATH, 'stylesheets')
-  }
+  // {
+  //   plugins: [lessLoader()],
+  //   entryPoints: [
+  //     Path.join(FRONTEND_PATH, 'stylesheets/style.less'),
+  //     Path.join(FRONTEND_PATH, 'stylesheets/light-style.less')
+  //   ],
+  //   outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
+  //   outdir: Path.join(PUBLIC_PATH, 'stylesheets')
+  // }
 ].map(cfg => Object.assign({}, COMMON_CFG, cfg))
 
 const ACTION = process.argv.pop()
