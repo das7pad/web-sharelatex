@@ -18,11 +18,13 @@ const COMMON_CFG = {
   target: TARGETS,
   outdir: PUBLIC_PATH,
   metafile: METAFILE_PATH,
+  external: [Path.join(PUBLIC_PATH, '/*')],
   loader: {
     '.woff': 'file',
     '.woff2': 'file',
     '.png': 'file',
-    '.svg': 'file'
+    '.svg': 'file',
+    '.gif': 'file'
     // inline loader images
     // 'overleaf-o.svg': 'dataurl',
     // 'overleaf-o-grey.svg': 'dataurl',
