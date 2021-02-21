@@ -87,6 +87,22 @@ const CONFIGS = [
 ].map(cfg => Object.assign({}, COMMON_CFG, cfg))
 
 const ACTION = process.argv.pop()
-if (ACTION === 'build') {
+if (ACTION === 'watch') {
+  CONFIGS.forEach(cfg => {
+    Object.assign(cfg, {
+      watch: {
+        onRebuild(error, result) {
+          if (error) {
+            console.error('watch build failed:', error)
+          } else {
+            console.error('watch build succeeded:', result)
+          }
+        }
+      }
+    })
+  })
+}
+
+if (ACTION === 'build' || ACTION === 'watch') {
   Promise.all(CONFIGS.map(esbuild.build)).catch(() => process.exit(1))
 }
