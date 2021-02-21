@@ -56,7 +56,8 @@ const CONFIGS = [
       }),
       valLoader(Path.join(__dirname, 'modules/modules-ide.js')),
       valLoader(Path.join(__dirname, 'modules/modules-main.js'))
-    ]
+    ],
+    loader: { '.js': 'jsx' }
   },
 
   // translations bundles
