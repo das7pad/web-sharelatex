@@ -31,8 +31,8 @@ App.directive('selectAll', () => ({
   link(scope, element, attrs, selectAllListController) {
     scope.$on('select-all:clear', () => element.prop('checked', false))
 
-    return element.change(function() {
-      if (element.is(':checked')) {
+    $(element).change(function() {
+      if ($(element).is(':checked')) {
         selectAllListController.selectAll()
       } else {
         selectAllListController.deselectAll()
