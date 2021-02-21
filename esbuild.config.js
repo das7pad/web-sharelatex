@@ -42,10 +42,7 @@ const CONFIGS = [
     ],
     outbase: Path.join(FRONTEND_PATH, 'js'),
     outdir: Path.join(PUBLIC_PATH, 'js'),
-    inject: [
-      Path.join(__dirname, 'esbuild/angularExporter.js'),
-      Path.join(__dirname, 'esbuild/jqueryExporter.js')
-    ],
+    inject: [Path.join(__dirname, 'esbuild/bootstrap.js')],
     define: {
       'process.env.NODE_ENV': '"production"',
       // work around 'process' usage in algoliasearch
