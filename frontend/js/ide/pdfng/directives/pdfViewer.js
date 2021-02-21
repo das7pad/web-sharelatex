@@ -20,12 +20,12 @@ import _ from 'lodash'
  */
 import App from '../../../base'
 import { captureMessage } from '../../../infrastructure/error-reporter'
-import pdfTextLayer from './pdfTextLayer'
-import pdfAnnotations from './pdfAnnotations'
-import pdfHighlights from './pdfHighlights'
-import pdfRenderer, { isRenderingCancelledException } from './pdfRenderer'
-import pdfPage from './pdfPage'
-import pdfSpinner from './pdfSpinner'
+import './pdfTextLayer'
+import './pdfAnnotations'
+import './pdfHighlights'
+import { isRenderingCancelledException } from './pdfRenderer'
+import './pdfPage'
+import './pdfSpinner'
 
 function isMissingPDFException(error) {
   return (
