@@ -7,6 +7,7 @@ const valLoader = require('./esbuild/valLoader')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, './generated')
+const NODE_MODULES = Path.join(__dirname, 'node_modules')
 const PUBLIC_PATH = Path.join(__dirname, 'public')
 const METAFILE_PATH = Path.join(PUBLIC_PATH, 'metafile.json')
 
@@ -16,7 +17,6 @@ const COMMON_CFG = {
   sourcemap: true,
   target: TARGETS,
   outdir: PUBLIC_PATH,
-  outbase: FRONTEND_PATH,
   metafile: METAFILE_PATH,
   loader: {
     '.woff': 'file',
@@ -38,6 +38,8 @@ const CONFIGS = [
       Path.join(FRONTEND_PATH, 'js/ide.js'),
       Path.join(FRONTEND_PATH, 'js/main.js')
     ],
+    outbase: Path.join(FRONTEND_PATH, 'js'),
+    outdir: Path.join(PUBLIC_PATH, 'js'),
     inject: [
       Path.join(__dirname, 'esbuild/angularExporter.js'),
       Path.join(__dirname, 'esbuild/jqueryExporter.js')
@@ -73,7 +75,9 @@ const CONFIGS = [
     entryPoints: [
       Path.join(FRONTEND_PATH, 'stylesheets/style.less'),
       Path.join(FRONTEND_PATH, 'stylesheets/light-style.less')
-    ]
+    ],
+    outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
+    outdir: Path.join(PUBLIC_PATH, 'stylesheets')
   }
 ].map(cfg => Object.assign({}, COMMON_CFG, cfg))
 
