@@ -9,16 +9,11 @@ const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
 // Generate a hash of entry points, including modules
 const entryPoints = {
-  main: './frontend/js/main.js',
-  ide: './frontend/js/ide.js',
   style: './frontend/stylesheets/style.less',
   'light-style': './frontend/stylesheets/light-style.less'
 }
 
 const TRANSLATIONS_FILES = require('glob').sync('./generated/lng/*.js')
-TRANSLATIONS_FILES.forEach(file => {
-  entryPoints[`t/${path.basename(file, '.js')}`] = file
-})
 
 // Attempt to load frontend entry-points from modules, if they exist
 require('glob')
