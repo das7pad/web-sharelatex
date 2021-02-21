@@ -17,11 +17,6 @@ const COMMON_CFG = {
   target: TARGETS,
   outdir: PUBLIC_PATH,
   outbase: FRONTEND_PATH,
-  define: {
-    'process.env.NODE_ENV': '"production"',
-    __REACT_DEVTOOLS_GLOBAL_HOOK__: '({ isDisabled: true })',
-    regeneratorRuntime: 'window.regeneratorRuntime'
-  },
   metafile: METAFILE_PATH,
   loader: {
     '.woff': 'file',
@@ -47,6 +42,13 @@ const CONFIGS = [
       Path.join(__dirname, 'esbuild/angularExporter.js'),
       Path.join(__dirname, 'esbuild/jqueryExporter.js')
     ],
+    define: {
+      'process.env.NODE_ENV': '"production"',
+      __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }'
+      // TODO
+      // Invalid define value (must be valid JSON syntax or a single identifier)
+      // regeneratorRuntime: 'window.regeneratorRuntime'
+    },
     plugins: [
       aliasResolver({
         libs: Path.join(FRONTEND_PATH, 'js/vendor/libs'),
