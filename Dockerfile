@@ -35,6 +35,7 @@ USER root
 RUN /docker_cleanup.sh make build_lngs_full
 
 RUN /docker_cleanup.sh npm run webpack:production
+RUN /docker_cleanup.sh node esbuild.config build
 
 # precompile views
 RUN /docker_cleanup.sh make build_views_full

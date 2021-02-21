@@ -10,13 +10,13 @@ if (Settings.useDevAssets) {
 
 const STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
 
-const ENTRYPOINTS = new Map(
-  Object.entries(webpackManifest.entrypoints).map(
-    ([entrypoint, entrypointSpec]) => {
-      return [entrypoint, entrypointSpec.js.map(staticPath)]
-    }
-  )
-)
+// const ENTRYPOINTS = new Map(
+//   Object.entries(webpackManifest.entrypoints).map(
+//     ([entrypoint, entrypointSpec]) => {
+//       return [entrypoint, entrypointSpec.js.map(staticPath)]
+//     }
+//   )
+// )
 
 function buildCssPath(themeModifier = '') {
   return STATIC_FILES_BASE + webpackManifest[themeModifier + 'style.css']
@@ -28,6 +28,7 @@ function buildJsPath(path) {
   return STATIC_FILES_BASE + '/esbuild/js/' + path
 }
 function entrypointSources(entrypoint) {
+  // TODO: use meta
   return [buildJsPath(entrypoint + '.js')]
 }
 function staticPath(path) {

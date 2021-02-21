@@ -43,6 +43,9 @@
 
 !/.prettierignore
 
+!/esbuild
+!/esbuild.config.js
+
 !/Gruntfile.js
 
 !/karma.conf.js

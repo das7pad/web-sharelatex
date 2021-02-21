@@ -2,7 +2,7 @@ const Path = require('path')
 const esbuild = require('esbuild')
 const TARGETS = require('./esbuild/getTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
-const lessLoader = require('./esbuild/lessLoader')
+// const lessLoader = require('./esbuild/lessLoader')
 const valLoader = require('./esbuild/valLoader')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
