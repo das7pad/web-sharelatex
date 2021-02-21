@@ -72,7 +72,7 @@ const CONFIGS = [
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
     outdir: Path.join(PUBLIC_PATH, 'js/t')
-  },
+  }
 
   // stylesheets
   // {
