@@ -1,3 +1,3 @@
-import angular from 'angular'
+import 'angular'
 
-export { angular }
+export const angular = window.angular

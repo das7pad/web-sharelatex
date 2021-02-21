@@ -8,7 +8,7 @@ const valLoader = require('./esbuild/valLoader')
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, './generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
-const PUBLIC_PATH = Path.join(__dirname, 'public')
+const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
 const METAFILE_PATH = Path.join(PUBLIC_PATH, 'metafile.json')
 
 const COMMON_CFG = {

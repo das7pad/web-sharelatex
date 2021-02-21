@@ -70,4 +70,4 @@ html(
 		block foot-scripts
 			script(type='text/javascript' defer src=buildJsPath(`t/${currentLngCode}.js`))
 			each file in entrypointSources('main')
-				script(type='text/javascript' defer src=file)
+				script(type="module" defer src=file)

@@ -25,10 +25,10 @@ function buildImgPath(path) {
   return STATIC_FILES_BASE + '/img/' + path
 }
 function buildJsPath(path) {
-  return STATIC_FILES_BASE + webpackManifest[path]
+  return STATIC_FILES_BASE + '/esbuild/js/' + path
 }
 function entrypointSources(entrypoint) {
-  return ENTRYPOINTS.get(entrypoint)
+  return [buildJsPath(entrypoint + '.js')]
 }
 function staticPath(path) {
   return STATIC_FILES_BASE + path
