@@ -50,9 +50,6 @@ const CONFIGS = [
       'process.env.RESET_APP_DATA_TIMER': 'null',
       // silence ad
       __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }'
-      // TODO
-      // Invalid define value (must be valid JSON syntax or a single identifier)
-      // regeneratorRuntime: 'window.regeneratorRuntime'
     },
     plugins: [
       aliasResolver({
