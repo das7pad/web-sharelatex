@@ -52,6 +52,7 @@ export default (function() {
   BAD_CROSS_REFERENCE_REGEX = /^(A bad cross reference---entry ".+?"\nrefers to entry.+?, which doesn't exist)$/m;
   MULTILINE_COMMAND_ERROR_REGEX = /^(.*)\n?---line (\d+) of file (.*)\n([^]+?)\nI'm skipping whatever remains of this command$/m;
   // Errors hit in BST file have a slightly different format
+  var BST_ERROR_REGEX
   BST_ERROR_REGEX = /^(.*?)\nwhile executing---line (\d+) of file (.*)/m;
   warningParsers = [
     [
