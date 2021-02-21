@@ -45,6 +45,7 @@ UserAndProjectPopulator.coffee
 
 public/manifest.json
 
+public/esbuild
 public/fonts
 public/js
 public/stylesheets
