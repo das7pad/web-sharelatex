@@ -13,7 +13,8 @@ const METAFILE_PATH = Path.join(PUBLIC_PATH, 'metafile.json')
 
 const COMMON_CFG = {
   bundle: true,
-  minify: true,
+  minifyWhitespace: true,
+  minifySyntax: true,
   sourcemap: true,
   target: TARGETS,
   outdir: PUBLIC_PATH,
