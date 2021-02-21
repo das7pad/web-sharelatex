@@ -1,1 +1,2 @@
-export default MathJax = {}
+const MathJax = {}
+export default { MathJax }
