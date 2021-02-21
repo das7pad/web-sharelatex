@@ -23,6 +23,7 @@ import '../../metadata/services/metadata'
 import '../../graphics/services/graphics'
 import '../../preamble/services/preamble'
 import '../../files/services/files'
+import { localStorage } from '../../../modules/storage'
 const { EditSession } = ace.require('ace/edit_session')
 const ModeList = ace.require('ace/ext/modelist')
 const { Vim } = ace.require('ace/keyboard/vim')
@@ -44,7 +45,6 @@ App.directive('aceEditor', function(
   $compile,
   $rootScope,
   eventTracking,
-  localStorage,
   $cacheFactory,
   metadata,
   graphics,

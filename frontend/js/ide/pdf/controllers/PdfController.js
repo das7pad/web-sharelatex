@@ -5,6 +5,7 @@ import PreviewPane from '../../../features/preview/components/preview-pane'
 import { react2angular } from 'react2angular'
 import { rootContext } from '../../../shared/context/root-context'
 import 'ace/ace'
+import { localStorage } from '../../../modules/storage'
 
 const AUTO_COMPILE_MAX_WAIT = 5000
 // We add a 1 second debounce to sending user changes to server if they aren't
@@ -22,7 +23,6 @@ App.controller('PdfController', function(
   $modal,
   synctex,
   eventTracking,
-  localStorage,
   $q
 ) {
   let autoCompile = true

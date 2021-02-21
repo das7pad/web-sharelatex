@@ -14,6 +14,7 @@
  */
 import moment from 'moment'
 import App from '../base'
+import { localStorage } from '../modules/storage'
 const CACHE_KEY = 'mbEvents'
 
 // keep track of how many heartbeats we've sent so we can calculate how
@@ -21,7 +22,7 @@ const CACHE_KEY = 'mbEvents'
 let heartbeatsSent = 0
 let nextHeartbeat = new Date()
 
-App.factory('eventTracking', function($http, localStorage) {
+App.factory('eventTracking', function($http) {
   const _getEventCache = function() {
     let eventCache = localStorage(CACHE_KEY)
 

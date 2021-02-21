@@ -2,6 +2,7 @@ import App from '../../base'
 import getMeta from '../../utils/meta'
 import { escapeForInnerHTML } from '../../misc/escape'
 import t from '../../misc/t'
+import { localStorage } from '../../modules/storage'
 
 App.controller('NotificationsController', function(
   $scope,
@@ -74,10 +75,7 @@ App.controller('NotificationsController', function(
   fetchNotifications().then(setNotifications)
 })
 
-App.controller('DismissableNotificationsController', function(
-  $scope,
-  localStorage
-) {
+App.controller('DismissableNotificationsController', function($scope) {
   $scope.shouldShowNotification =
     localStorage('dismissed-covid-19-notification-extended') !== true
 

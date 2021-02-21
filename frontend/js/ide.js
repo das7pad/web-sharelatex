@@ -63,12 +63,12 @@ import '../../modules/modules-ide'
 import getMeta from './utils/meta'
 import './shared/context/controllers/root-context-controller'
 import './features/editor-navigation-toolbar/controllers/editor-navigation-toolbar-controller'
+import { localStorage } from './modules/storage'
 
 App.controller('IdeController', function(
   $scope,
   $timeout,
   ide,
-  localStorage,
   eventTracking,
   metadata,
   $q,

@@ -13,12 +13,12 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import { localStorage } from '../../../modules/storage'
 
 export default App.controller('FileTreeFolderController', function(
   $scope,
   ide,
-  $modal,
-  localStorage
+  $modal
 ) {
   $scope.expanded = localStorage(`folder.${$scope.entity.id}.expanded`) || false
 
