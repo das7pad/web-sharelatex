@@ -3,7 +3,7 @@ const esbuild = require('esbuild')
 const TARGETS = require('./esbuild/getTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
 const lessLoader = require('./esbuild/lessLoader')
-const modulesLoader = require('./esbuild/modulesLoader')
+const valLoader = require('./esbuild/valLoader')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, './generated')
@@ -52,7 +52,8 @@ const CONFIGS = [
         libs: Path.join(FRONTEND_PATH, 'js/vendor/libs'),
         ace: 'ace-builds/src-noconflict'
       }),
-      modulesLoader()
+      valLoader(Path.join(__dirname, 'modules/modules-ide.js')),
+      valLoader(Path.join(__dirname, 'modules/modules-main.js'))
     ]
   },
 
