@@ -15,7 +15,7 @@ import App from '../../../base'
 // uses the PDFJS text layer renderer to provide invisible overlayed
 // text for searching
 
-App.factory('pdfTextLayer', function() {
+export default App.factory('pdfTextLayer', function() {
   let pdfTextLayer
   return (pdfTextLayer = class pdfTextLayer {
     constructor(options) {
