@@ -48,6 +48,9 @@ const CONFIGS = [
     ],
     define: {
       'process.env.NODE_ENV': '"production"',
+      // work around 'process' usage in algoliasearch
+      'process.env.RESET_APP_DATA_TIMER': 'null',
+      // silence ad
       __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }'
       // TODO
       // Invalid define value (must be valid JSON syntax or a single identifier)
