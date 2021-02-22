@@ -9,7 +9,6 @@ const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, './generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
 const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
-const METAFILE_PATH = Path.join(PUBLIC_PATH, 'metafile.json')
 
 const COMMON_CFG = {
   bundle: true,
@@ -18,7 +17,6 @@ const COMMON_CFG = {
   sourcemap: true,
   target: TARGETS,
   outdir: PUBLIC_PATH,
-  metafile: METAFILE_PATH,
   external: [Path.join(PUBLIC_PATH, '/*')],
   loader: {
     '.woff': 'file',
