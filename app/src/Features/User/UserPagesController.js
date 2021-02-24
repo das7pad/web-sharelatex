@@ -61,6 +61,7 @@ const UserPagesController = {
 
   settingsPage(req, res, next) {
     const userId = AuthenticationController.getLoggedInUserId(req)
+    const reconfirmationRemoveEmail = req.query.remove
     // SSO
     const ssoError = req.session.ssoError
     if (ssoError) {
@@ -81,6 +82,7 @@ const UserPagesController = {
     const samlError = saml.error
     const institutionEmailNonCanonical = saml.emailNonCanonical
     const institutionRequestedEmail = saml.requestedEmail
+    const reconfirmedViaSAML = saml.reconfirmed
     delete req.session.saml
     let shouldAllowEditingDetails = true
     if (Settings.ldap && Settings.ldap.updateUserDetailsOnLogin) {
@@ -113,6 +115,8 @@ const UserPagesController = {
           institutionEmailNonCanonical && institutionRequestedEmail
             ? institutionEmailNonCanonical
             : undefined,
+        reconfirmedViaSAML,
+        reconfirmationRemoveEmail,
         samlBeta: req.session.samlBeta,
         ssoError: ssoError,
         thirdPartyIds: UserPagesController._restructureThirdPartyIds(user)

@@ -23,6 +23,8 @@ export default App.controller('UserAffiliationsController', function(
   }
   $scope.samlBetaSession = getMeta('ol-hasSamlBeta')
   $scope.samlInitPath = getMeta('ol-samlInitPath')
+  $scope.reconfirmationRemoveEmail = getMeta('ol-reconfirmationRemoveEmail')
+  $scope.reconfirmedViaSAML = getMeta('ol-reconfirmedViaSAML')
 
   const LOCAL_AND_DOMAIN_REGEX = /([^@]+)@(.+)/
   const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
