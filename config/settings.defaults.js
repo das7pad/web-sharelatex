@@ -789,19 +789,6 @@ module.exports = {
 
   statusPageUrl: process.env.OVERLEAF_STATUS_URL || 'status.overleaf.com',
 
-  uiConfig: {
-    defaultResizerSizeOpen: 7,
-    defaultResizerSizeClosed: 7,
-    eastResizerCursor: 'ew-resize',
-    westResizerCursor: 'ew-resize',
-    chatResizerSizeOpen: 7,
-    chatResizerSizeClosed: 0,
-    chatMessageBorderSaturation: '85%',
-    chatMessageBorderLightness: '40%',
-    chatMessageBgSaturation: '85%',
-    chatMessageBgLightness: '40%'
-  },
-
   nav: {
     title: 'ShareLaTeX Community Edition',
 
