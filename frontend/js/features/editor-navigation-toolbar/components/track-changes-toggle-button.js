@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 function TrackChangesToggleButton({ trackChangesIsOpen, disabled, onClick }) {
-  const { t } = useTranslation()
   const classes = classNames('btn', 'btn-full-height', {
     active: trackChangesIsOpen && !disabled,
     disabled: disabled
