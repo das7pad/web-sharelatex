@@ -960,6 +960,11 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     UserController.register
   )
   webRouter.post(
+    '/admin/openEditor',
+    AuthorizationMiddleware.ensureUserIsSiteAdmin,
+    AdminController.openEditor
+  )
+  webRouter.post(
     '/admin/closeEditor',
     AuthorizationMiddleware.ensureUserIsSiteAdmin,
     AdminController.closeEditor
