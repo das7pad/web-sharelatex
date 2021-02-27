@@ -2,11 +2,6 @@ const { expect } = require('chai')
 const _ = require('underscore')
 
 const User = require('./helpers/User').promises
-require('./helpers/MockFileStoreApi')
-require('./helpers/MockClsiApi')
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
 
 const express = require('express')
 const LinkedUrlProxy = express()
