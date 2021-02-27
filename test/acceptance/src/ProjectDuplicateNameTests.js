@@ -21,12 +21,6 @@ const Path = require('path')
 const fs = require('fs')
 const _ = require('underscore')
 
-const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
-
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
-const request = require('./helpers/request')
 const User = require('./helpers/User')
 
 const MockDocstoreApiClass = require('./mocks/MockDocstoreApi')

@@ -10,10 +10,6 @@ const redis = require('./helpers/redis')
 const _ = require('lodash')
 const Features = require('../../../app/src/infrastructure/Features')
 
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
 // Currently this is testing registration via the 'public-registration' module,
 // whereas in production we're using the 'overleaf-integration' module.
 

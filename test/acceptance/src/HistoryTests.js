@@ -23,10 +23,6 @@ before(function() {
   MockV1HistoryApi = MockV1HistoryApiClass.instance()
 })
 
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
 describe('History', function() {
   this.timeout(10000)
 

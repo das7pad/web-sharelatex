@@ -3,10 +3,6 @@ const User = require('./helpers/User').promises
 const { Project } = require('../../../app/src/models/Project')
 const { ObjectId } = require('mongodb')
 
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
 describe('Project CRUD', function() {
   beforeEach(async function() {
     this.user = new User()
