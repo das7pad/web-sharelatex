@@ -42,7 +42,7 @@ block content
 									p.small Will stop anyone opening the editor. Will NOT disconnect already connected users.
 
 								.row-spaced
-									form(async-form name='dissconectAllUsers' action='/admin/dissconectAllUsers')
+									form(async-form name='dissconectAllUsers' action='/admin/disconnectAllUsers')
 										form-messages(for='dissconectAllUsers' role='alert')
 										button.btn.btn-danger(type="submit") Disconnect all users
 									p.small Will force disconnect all users with the editor open. Make sure to close the editor first to avoid them reconnecting.
