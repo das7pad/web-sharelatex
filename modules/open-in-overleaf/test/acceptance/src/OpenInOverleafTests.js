@@ -21,13 +21,16 @@ const User = require('../../../../../test/acceptance/src/helpers/User')
 const ProjectGetter = require('../../../../../app/src/Features/Project/ProjectGetter')
 const ProjectEntityHandler = require('../../../../../app/src/Features/Project/ProjectEntityHandler')
 
-const MockProjectHistoryApi = require('../../../../../test/acceptance/src/helpers/MockProjectHistoryApi')
-const MockDocUpdaterApi = require('../../../../../test/acceptance/src/helpers/MockDocUpdaterApi')
-const MockFileStoreApi = require('../../../../../test/acceptance/src/helpers/MockFileStoreApi')
-const MockDocstoreApi = require('../../../../../test/acceptance/src/helpers/MockDocstoreApi')
-const MockV1Api = require('../../../../../test/acceptance/src/helpers/MockV1Api')
+const MockV1ApiClass = require('../../../../../test/acceptance/src/mocks/MockV1Api')
 
 const PROJECT_URI_REGEX = /^\/project\/([0-9a-fA-F]{24})$/
+
+let MockV1Api
+
+before(function() {
+  MockV1Api = MockV1ApiClass.instance()
+  MockV1Api.reset()
+})
 
 describe('Open In Overleaf', function() {
   this.timeout(25000)
@@ -81,7 +84,9 @@ I have a bad name
     })
 
     LinkedUrlProxy.listen(6543, done)
+  })
 
+  beforeEach(function() {
     MockV1Api.brands.OSF = {
       id: 176,
       name: 'Open Science Framework',
