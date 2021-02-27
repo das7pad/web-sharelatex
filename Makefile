@@ -449,7 +449,7 @@ public.tar.gz:
 		--entrypoint sh \
 		$(IMAGE_CI)-webpack \
 		-c '/compress.sh && $(TAR_CREATE_REPRODUCIBLE) .' \
-	| gzip -9 \
+	| gzip -6 \
 	> public.tar.gz
 	sha256sum public.tar.gz | awk '{ print $$1 }' > public.tar.gz.checksum.txt
 	$(TOUCH_REPRODUCIBLE) public.tar.gz public.tar.gz.checksum.txt
