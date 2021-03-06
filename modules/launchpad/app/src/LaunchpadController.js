@@ -49,9 +49,20 @@ module.exports = LaunchpadController = {
       if (err != null) {
         return next(err)
       }
+      let wsUrl = Settings.wsUrl
+      let wsAssetUrl = Settings.wsAssetUrl
+      if (!wsUrl) {
+        wsUrl = '/socket.io'
+      }
+      if (wsUrl && !wsAssetUrl) {
+        wsAssetUrl = wsUrl + '/socket.io.js'
+      }
+
       if (!sessionUser) {
         if (!adminUserExists) {
           return res.render(Path.resolve(__dirname, '../views/launchpad'), {
+            wsUrl,
+            wsAssetUrl,
             adminUserExists,
             authMethod
           })
@@ -69,7 +80,8 @@ module.exports = LaunchpadController = {
           }
           if (user && user.isAdmin) {
             return res.render(Path.resolve(__dirname, '../views/launchpad'), {
-              wsUrl: Settings.wsUrl,
+              wsUrl,
+              wsAssetUrl,
               adminUserExists,
               authMethod
             })

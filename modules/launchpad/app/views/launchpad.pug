@@ -1,6 +1,7 @@
 extends ../../../../app/views/_layout
 
 block content
+	meta(id="ol-wsUrl" content=wsUrl)
 	meta(id="ol-adminUserExists" data-boolean content=adminUserExists)
 	meta(id="ol-ideJsPath" content=buildJsPath('ide.js'))
 	meta(id="ol-authMethod" content=authMethod)
@@ -263,4 +264,4 @@ block content
 												br
 
 block prepend foot-scripts
-	script(defer src=(wsUrl || '/socket.io') + '/socket.io.js')
+	script(type="text/javascript" defer src=wsAssetUrl)
