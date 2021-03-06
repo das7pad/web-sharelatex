@@ -2,7 +2,7 @@ import React, { useState, useEffect, createRef, useRef } from 'react'
 import PropTypes from 'prop-types'
 import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed'
 import classNames from 'classnames'
-import { t } from '../../../misc/t'
+import t from '../../../misc/t'
 import OutlineList from './outline-list'
 import Icon from '../../../shared/components/icon'
 
