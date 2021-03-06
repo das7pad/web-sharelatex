@@ -17,10 +17,6 @@ const async = require('async')
 const User = require('./helpers/User')
 const request = require('./helpers/request')
 
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
 const assert_has_common_headers = function(response) {
   const { headers } = response
   assert.equal(headers['x-download-options'], 'noopen')

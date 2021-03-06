@@ -4,11 +4,6 @@ const User = require('./helpers/User')
 const request = require('./helpers/request')
 const settings = require('@overleaf/settings')
 
-require('./helpers/MockChatApi')
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
 const expectErrorResponse = require('./helpers/expectErrorResponse')
 
 function tryReadAccess(user, projectId, test, callback) {

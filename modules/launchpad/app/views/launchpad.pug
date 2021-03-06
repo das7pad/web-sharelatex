@@ -1,6 +1,7 @@
 extends ../../../../app/views/_layout
 
 block content
+	meta(id="ol-wsUrl" content=wsUrl)
 	meta(id="ol-adminUserExists" data-boolean content=adminUserExists)
 	meta(id="ol-ideJsPath" content=buildJsPath('ide.js'))
 	meta(id="ol-authMethod" content=authMethod)
@@ -147,7 +148,9 @@ block content
 										.row(ng-if="createAdminSuccess")
 											.col-md-12.text-center
 												.alert.alert-success
-													| {{translate('admin_user_created_message', {link: '/login?redir=/launchpad'})}}
+													span(
+														ng-bind-html="translate('admin_user_created_message', {link: '/login?redir=/launchpad'})"
+													)
 
 										<!-- error message -->
 										.row(ng-if="createAdminError")
@@ -261,4 +264,4 @@ block content
 												br
 
 block prepend foot-scripts
-	script(defer src=(wsUrl || '/socket.io') + '/socket.io.js')
+	script(type="text/javascript" defer src=wsAssetUrl)

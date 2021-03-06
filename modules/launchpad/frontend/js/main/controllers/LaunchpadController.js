@@ -13,6 +13,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../../../../frontend/js/base'
+import getMeta from '../../../../../../frontend/js/utils/meta'
+import SocketIoShim from '../../../../../../frontend/js/ide/connection/SocketIoShim'
 
 export default App.controller('LaunchpadController', function(
   $scope,
@@ -102,7 +104,19 @@ export default App.controller('LaunchpadController', function(
         $scope.statusChecks.websocket.error = 'socket.io not loaded'
         return
       }
-      const socket = io.connect(null, {
+      const wsUrl = getMeta('ol-wsUrl') || '/socket.io'
+      let parsedURL
+      try {
+        parsedURL = new URL(wsUrl, window.location)
+      } catch (e) {
+        // hello IE11
+        parsedURL = {
+          origin: null,
+          pathname: wsUrl
+        }
+      }
+      const socket = SocketIoShim.connect(parsedURL.origin, {
+        resource: parsedURL.pathname.slice(1),
         reconnect: false,
         'connect timeout': 30 * 1000,
         'force new connection': true

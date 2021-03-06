@@ -1,16 +1,17 @@
 const { expect } = require('chai')
 const async = require('async')
-const MockV1Api = require('./helpers/MockV1Api')
 const User = require('./helpers/User')
 const request = require('./helpers/request')
 const settings = require('@overleaf/settings')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongodb')
-
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
+const MockV1ApiClass = require('./mocks/MockV1Api')
 const expectErrorResponse = require('./helpers/expectErrorResponse')
+
+let MockV1Api
+
+before(function() {
+  MockV1Api = MockV1ApiClass.instance()
+})
 
 const tryEditorAccess = (user, projectId, test, callback) =>
   async.series(

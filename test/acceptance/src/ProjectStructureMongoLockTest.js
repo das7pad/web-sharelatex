@@ -11,8 +11,6 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-require('./helpers/MockProjectHistoryApi')
-
 const APP_PATH = '../../../app/src'
 
 const LockManager = require(`${APP_PATH}/infrastructure/LockManager`)

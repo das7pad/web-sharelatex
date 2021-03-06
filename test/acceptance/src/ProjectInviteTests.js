@@ -5,11 +5,6 @@ const settings = require('@overleaf/settings')
 const CollaboratorsEmailHandler = require('../../../app/src/Features/Collaborators/CollaboratorsEmailHandler')
 const Features = require('../../../app/src/infrastructure/Features')
 
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-require('./helpers/MockNotificationsApi')
-
 const createInvite = (sendingUser, projectId, email, callback) => {
   sendingUser.getCsrfToken(err => {
     if (err) {

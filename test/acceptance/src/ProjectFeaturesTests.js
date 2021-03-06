@@ -17,10 +17,6 @@ const User = require('./helpers/User')
 const request = require('./helpers/request')
 const settings = require('@overleaf/settings')
 
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
 const joinProject = (user_id, project_id, callback) =>
   request.post(
     {

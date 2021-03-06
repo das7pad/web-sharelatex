@@ -61,6 +61,8 @@ docker-shared.yml
 config/*.js
 !config/settings.defaults.js
 config/*.coffee
+!config/settings.defaults.coffee
+!config/settings.webpack.coffee
 
 modules/**/Makefile
 

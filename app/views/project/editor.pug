@@ -8,16 +8,7 @@ block vars
 block content
 	.editor(ng-controller="IdeController").full-size
 		//- required by react2angular-shared-context, must be rendered as a top level component
-		div(
-			ng-controller="ReactRootContextController"
-		)
-			shared-context-react(
-				editor-loading="editorLoading"
-				chat-is-open-angular="chatIsOpenAngular"
-				set-chat-is-open-angular="setChatIsOpenAngular"
-				open-doc="openDoc"
-				online-users-array="onlineUsersArray"
-			)
+		shared-context-react()
 		.loading-screen(ng-if="state.loading")
 			.loading-screen-brand-container
 				.loading-screen-brand.loading-screen-brand-20(
@@ -33,7 +24,6 @@ block content
 		.global-alerts(ng-cloak ng-hide="editor.error_state")
 			.alert.alert-danger.small(ng-if="connection.forced_disconnect")
 				strong {{translate("disconnected")}}
-				| &nbsp;{{translate("please_refresh")}}
 
 			.alert.alert-warning.small(ng-if="connection.reconnection_countdown")
 				strong {{translate("lost_connection")}}.
@@ -123,7 +113,7 @@ block content
 					aside.chat(
 						ng-controller="ReactChatController"
 					)
-						chat(reset-unread-messages="resetUnreadMessages" chat-is-open="chatIsOpen")
+						chat()
 
 	script(type="text/ng-template", id="genericMessageModalTemplate")
 		.modal-header
@@ -184,7 +174,6 @@ block content
 	meta(id="ol-trackChangesState" data-json content=trackChangesState)
 	meta(id="ol-wikiEnabled" data-boolean content=!!(settings.apis.wiki && settings.apis.wiki.url))
 	meta(id="ol-gitBridgePublicBaseUrl" content=gitBridgePublicBaseUrl)
-	meta(id="ol-uiConfig" data-json content=settings.uiConfig)
 	meta(id="ol-useShareJsHash" data-boolean content=true)
 	meta(id="ol-wsUrl" content=wsUrl)
 	meta(id="ol-wsRetryHandshake" data-json content=settings.wsRetryHandshake)

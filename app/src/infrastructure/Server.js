@@ -223,16 +223,7 @@ if (Settings.enabledServices.includes('api')) {
 if (Settings.enabledServices.includes('web')) {
   logger.info('providing web router')
 
-  if (Settings.loadPrecompiledPugViews) {
-    Views.loadPrecompiledViews(app)
-  } else if (app.get('env') === 'production') {
-    logger.info('precompiling views for web in production environment')
-    Views.precompileViews(app)
-  }
-  if (app.get('env') === 'test') {
-    logger.info('enabling view cache for acceptance tests')
-    app.enable('view cache')
-  }
+  Views.setup(app)
 
   app.use(publicApiRouter) // public API goes with web router for public access
   app.use(Validation.errorMiddleware)

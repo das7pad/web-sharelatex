@@ -472,8 +472,10 @@ const ProjectController = {
         const notificationsInstitution = []
 
         // Institution SSO Notifications
+        let reconfirmedViaSAML
         if (Features.hasFeature('saml')) {
           const samlSession = req.session.saml
+          reconfirmedViaSAML = samlSession && samlSession.reconfirmed
           // Notification: SSO Available
           const linkedInstitutionIds = []
           user.emails.forEach(email => {
@@ -578,6 +580,7 @@ const ProjectController = {
             userAffiliations,
             userEmails,
             hasSubscription: results.hasSubscription,
+            reconfirmedViaSAML,
             samlBeta: req.session.samlBeta,
             isIE,
             zipFileSizeLimit: Settings.maxUploadSize

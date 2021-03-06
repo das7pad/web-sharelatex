@@ -113,6 +113,8 @@ describe('LaunchpadController', function() {
           this.res.render.callCount.should.equal(1)
           return this.res.render
             .calledWith(viewPath, {
+              wsAssetUrl: '/socket.io/socket.io.js',
+              wsUrl: '/socket.io',
               adminUserExists: false,
               authMethod: 'local'
             })
@@ -177,7 +179,8 @@ describe('LaunchpadController', function() {
           this.res.render.callCount.should.equal(1)
           return this.res.render
             .calledWith(viewPath, {
-              wsUrl: undefined,
+              wsAssetUrl: '/socket.io/socket.io.js',
+              wsUrl: '/socket.io',
               adminUserExists: true,
               authMethod: 'local'
             })

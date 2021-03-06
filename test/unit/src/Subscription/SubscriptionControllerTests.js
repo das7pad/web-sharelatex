@@ -109,7 +109,8 @@ describe('SubscriptionController', function() {
         '../../infrastructure/GeoIpLookup': this.GeoIpLookup,
         'logger-sharelatex': {
           log() {},
-          warn() {}
+          warn() {},
+          error() {}
         },
         '@overleaf/settings': this.settings,
         '../User/UserGetter': this.UserGetter,

@@ -1,10 +1,6 @@
 const { expect } = require('chai')
 const User = require('./helpers/User').promises
 
-require('./helpers/MockDocstoreApi')
-require('./helpers/MockDocUpdaterApi')
-require('./helpers/MockProjectHistoryApi')
-
 describe('Sharing', function() {
   this.timeout(50000)
 

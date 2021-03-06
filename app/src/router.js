@@ -336,25 +336,6 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     CompileController.stopCompile
   )
 
-  // LEGACY: Used by the web download buttons, adds filename header, TODO: remove at some future date
-  webRouter.get(
-    '/project/:Project_id/output/output.pdf',
-    AuthorizationMiddleware.ensureUserCanReadProject,
-    CompileController.downloadPdf
-  )
-
-  // PDF Download button
-  webRouter.get(
-    /^\/download\/project\/([^/]*)\/output\/output\.pdf$/,
-    function(req, res, next) {
-      const params = { Project_id: req.params[0] }
-      req.params = params
-      next()
-    },
-    AuthorizationMiddleware.ensureUserCanReadProject,
-    CompileController.downloadPdf
-  )
-
   // PDF Download button for specific build
   webRouter.get(
     /^\/download\/project\/([^/]*)\/build\/([0-9a-f-]+)\/output\/output\.pdf$/,
@@ -378,21 +359,6 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     timeInterval: 60 * 60
   })
 
-  // Used by the pdf viewers
-  webRouter.get(
-    /^\/project\/([^/]*)\/output\/(.*)$/,
-    function(req, res, next) {
-      const params = {
-        Project_id: req.params[0],
-        file: req.params[1]
-      }
-      req.params = params
-      next()
-    },
-    rateLimiterMiddlewareOutputFiles,
-    AuthorizationMiddleware.ensureUserCanReadProject,
-    CompileController.getFileFromClsi
-  )
   // direct url access to output files for a specific build (query string not required)
   webRouter.get(
     /^\/project\/([^/]*)\/build\/([0-9a-f-]+)\/output\/(.*)$/,
@@ -400,23 +366,6 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       const params = {
         Project_id: req.params[0],
         build_id: req.params[1],
-        file: req.params[2]
-      }
-      req.params = params
-      next()
-    },
-    rateLimiterMiddlewareOutputFiles,
-    AuthorizationMiddleware.ensureUserCanReadProject,
-    CompileController.getFileFromClsi
-  )
-
-  // direct url access to output files for user but no build, to retrieve files when build fails
-  webRouter.get(
-    /^\/project\/([^/]*)\/user\/([0-9a-f-]+)\/output\/(.*)$/,
-    function(req, res, next) {
-      const params = {
-        Project_id: req.params[0],
-        user_id: req.params[1],
         file: req.params[2]
       }
       req.params = params
@@ -960,14 +909,19 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     UserController.register
   )
   webRouter.post(
+    '/admin/openEditor',
+    AuthorizationMiddleware.ensureUserIsSiteAdmin,
+    AdminController.openEditor
+  )
+  webRouter.post(
     '/admin/closeEditor',
     AuthorizationMiddleware.ensureUserIsSiteAdmin,
     AdminController.closeEditor
   )
   webRouter.post(
-    '/admin/dissconectAllUsers',
+    '/admin/disconnectAllUsers',
     AuthorizationMiddleware.ensureUserIsSiteAdmin,
-    AdminController.dissconectAllUsers
+    AdminController.disconnectAllUsers
   )
   webRouter.post(
     '/admin/flushProjectToTpds',
@@ -992,14 +946,20 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
 
   privateApiRouter.post(
     '/disconnectAllUsers',
-    AdminController.dissconectAllUsers
+    AdminController.disconnectAllUsers
   )
 
   privateApiRouter.get('/perfTest', (req, res) => res.send('hello'))
 
-  publicApiRouter.get('/status', (req, res) =>
-    res.send('web sharelatex is alive (web)')
-  )
+  publicApiRouter.get('/status', (req, res) => {
+    if (!Settings.siteIsOpen) {
+      res.send('web site is closed (web)')
+    } else if (!Settings.editorIsOpen) {
+      res.send('web editor is closed (web)')
+    } else {
+      res.send('web sharelatex is alive (web)')
+    }
+  })
   privateApiRouter.get('/status', (req, res) =>
     res.send('web sharelatex is alive (api)')
   )

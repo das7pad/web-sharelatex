@@ -26,13 +26,13 @@ DOCKER_COMPOSE := docker-compose $(DOCKER_COMPOSE_FLAGS)
 export DOCKER_REGISTRY ?= local
 export SHARELATEX_DOCKER_REPOS ?= $(DOCKER_REGISTRY)/sharelatex
 
-export IMAGE_NODE ?= $(DOCKER_REGISTRY)/node:14.15.4
+export IMAGE_NODE ?= $(DOCKER_REGISTRY)/node:14.16.0
 export IMAGE_PROJECT ?= $(SHARELATEX_DOCKER_REPOS)/$(PROJECT_NAME)
 export IMAGE_BRANCH ?= $(IMAGE_PROJECT):$(BRANCH_NAME)
 export IMAGE ?= $(IMAGE_BRANCH)-$(BUILD_NUMBER)
 
 export CACHE_CONTENT_SHA := $(shell sh -c ' \
-	echo "14.15.4"; \
+	echo "14.16.0"; \
 	cat docker_cleanup.sh; \
 	cat package.json package-lock.json; \
 	' | sha256sum | cut -d' ' -f1)
@@ -74,7 +74,7 @@ test: format
 format:
 
 LINT_RUNNER_IMAGE ?= \
-	$(SHARELATEX_DOCKER_REPOS)/lint-runner:7.0.0-web
+	$(SHARELATEX_DOCKER_REPOS)/lint-runner:7.0.1-web
 LINT_RUNNER = \
 	docker run \
 		--rm \
@@ -367,7 +367,7 @@ endif
 
 pull_node:
 	docker pull $(IMAGE_NODE)
-	docker tag $(IMAGE_NODE) node:14.15.4
+	docker tag $(IMAGE_NODE) node:14.16.0
 
 pull_cache_branch:
 	docker pull $(IMAGE_CACHE_BRANCH)
@@ -449,7 +449,7 @@ public.tar.gz:
 		--entrypoint sh \
 		$(IMAGE_CI)-webpack \
 		-c '/compress.sh && $(TAR_CREATE_REPRODUCIBLE) .' \
-	| gzip -9 \
+	| gzip -6 \
 	> public.tar.gz
 	sha256sum public.tar.gz | awk '{ print $$1 }' > public.tar.gz.checksum.txt
 	$(TOUCH_REPRODUCIBLE) public.tar.gz public.tar.gz.checksum.txt

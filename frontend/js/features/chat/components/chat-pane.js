@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import MessageList from './message-list'
 import MessageInput from './message-input'
 import InfiniteScroll from './infinite-scroll'
 import Icon from '../../../shared/components/icon'
 import t from '../../../misc/t'
-import { useEditorContext } from '../../../shared/context/editor-context'
+import { useLayoutContext } from '../../../shared/context/layout-context'
 import withErrorBoundary from '../../../infrastructure/error-boundary'
 import { useChatContext } from '../context/chat-context'
 
 function ChatPane() {
-  const {
-    ui: { chatIsOpen }
-  } = useEditorContext()
+  const { chatIsOpen } = useLayoutContext({ chatIsOpen: PropTypes.bool })
 
   const {
     userId,

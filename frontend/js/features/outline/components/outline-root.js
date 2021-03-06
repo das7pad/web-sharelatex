@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { t } from '../../../misc/t'
+import t from '../../../misc/t'
 
 import OutlineList from './outline-list'
 

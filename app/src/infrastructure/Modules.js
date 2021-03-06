@@ -2,10 +2,10 @@ const fs = require('fs')
 const Path = require('path')
 const Views = require('./Views')
 const async = require('async')
-const Settings = require('@overleaf/settings')
 const { promisify } = require('util')
 
 const MODULE_BASE_PATH = Path.resolve(__dirname + '/../../../modules')
+const RELOAD_MODULE_VIEWS_ON_EACH_REQUEST = !Views.CACHE_VIEWS
 
 const _modules = []
 const _hooks = {}
@@ -50,7 +50,7 @@ function applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter) {
 }
 
 function attachViewIncludesReloadMiddleware(webRouter) {
-  if (Settings.reloadModuleViewsOnEachRequest) {
+  if (RELOAD_MODULE_VIEWS_ON_EACH_REQUEST) {
     webRouter.use((req, res, next) => {
       const actualRender = res.render
       res.render = function() {

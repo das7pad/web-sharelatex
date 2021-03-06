@@ -789,19 +789,6 @@ module.exports = {
 
   statusPageUrl: process.env.OVERLEAF_STATUS_URL || 'status.overleaf.com',
 
-  uiConfig: {
-    defaultResizerSizeOpen: 7,
-    defaultResizerSizeClosed: 7,
-    eastResizerCursor: 'ew-resize',
-    westResizerCursor: 'ew-resize',
-    chatResizerSizeOpen: 7,
-    chatResizerSizeClosed: 0,
-    chatMessageBorderSaturation: '85%',
-    chatMessageBorderLightness: '40%',
-    chatMessageBgSaturation: '85%',
-    chatMessageBgLightness: '40%'
-  },
-
   nav: {
     title: 'ShareLaTeX Community Edition',
 
@@ -904,7 +891,6 @@ module.exports = {
     '/templates/index': '/templates/'
   },
 
-  reloadModuleViewsOnEachRequest: process.env.NODE_ENV === 'development',
   disableModule: {
     'user-activate': process.env.DISABLE_MODULE_USER_ACTIVATE === 'true',
     launchpad: process.env.DISABLE_MODULE_LAUNCHPAD === 'true'
@@ -1070,5 +1056,9 @@ module.exports = {
         }
       }
     }
+  },
+
+  overleafModuleImports: {
+    // modules to import (an empty array for each set of modules)
   }
 }

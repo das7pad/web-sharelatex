@@ -21,15 +21,13 @@ module.exports = merge(base, {
   ],
 
   devServer: {
-    // Disable webpack dev server auto-reload
-    inline: false,
-
     // serve regular static files too
     contentBase: Path.join(__dirname, 'public'),
 
     // Expose dev server as localhost with dev box
     host: '0.0.0.0',
     port: 3808,
+    public: 'www.dev-overleaf.com:443',
 
     // Server from all hosts and emit CORS headers, e.g. for fonts
     disableHostCheck: true,

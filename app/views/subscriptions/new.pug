@@ -11,7 +11,7 @@ block head-scripts
 	meta(id="ol-ITMContent" content=ITMContent)
 
 block content
-	.content.content-alt
+	main.content.content-alt
 		.container(ng-controller="NewSubscriptionController" ng-cloak)
 			.row.card-group
 				.col-md-5.col-md-push-4
@@ -175,7 +175,7 @@ block content
 											.row
 												.col-xs-12
 													.form-group(ng-class="validation.errorFields.address1 || inputHasError(simpleCCForm.address1) ? 'has-external-error' : ''")
-														label(for="address-line-1") #{translate('address_line_1')}
+														label(for="address-line-1") {{translate('address_line_1')}}
 														input#address-line-1.form-control(
 															type="text"
 															maxlength="255"
@@ -189,7 +189,7 @@ block content
 											.row
 												.col-xs-12
 													.form-group.has-feedback(ng-class="validation.errorFields.address2 ? 'has-external-error' : ''")
-														label(for="address-line-2") #{translate('address_line_2')}
+														label(for="address-line-2") {{translate('address_line_2')}}
 														input#address-line-2.form-control(
 															type="text"
 															maxlength="255"
@@ -201,7 +201,7 @@ block content
 											.row
 												.col-xs-4
 													.form-group(ng-class="validation.errorFields.postal_code || inputHasError(simpleCCForm.postalCode) ? 'has-external-error' : ''")
-														label(for="postal-code") #{translate('postal_code')}
+														label(for="postal-code") {{translate('postal_code')}}
 														input#postal-code.form-control(
 															type="text"
 															maxlength="255"
@@ -333,9 +333,10 @@ block content
 								else
 									- var collaboratorCount = plan.features.collaborators
 								if plan.features.collaborators == 1
-									| #{translate("collabs_per_proj_single", {collabcount:collaboratorCount})}
+									| {{translate("collabs_per_proj_single", {collabcount: 1})}}
 								else
-									| {{translate("collabs_per_proj", {collabcount:'#{collaboratorCount}'})}}
+									meta(id="ol-collabscount" content={ collabcount: collaboratorCount })
+									| {{translate("collabs_per_proj", getMeta("ol-collabcount"))}}
 							p {{translate("work_on_single_version")}}. {{translate("view_collab_edits")}} in real time.
 
 							h3 {{translate("full_doc_history")}}

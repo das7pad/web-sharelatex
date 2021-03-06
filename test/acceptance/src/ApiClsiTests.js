@@ -15,8 +15,6 @@ const { expect } = require('chai')
 const request = require('./helpers/request')
 const Settings = require('@overleaf/settings')
 
-require('./helpers/MockClsiApi')
-
 const auth = Buffer.from('sharelatex:password').toString('base64')
 const authed_request = request.defaults({
   headers: {
