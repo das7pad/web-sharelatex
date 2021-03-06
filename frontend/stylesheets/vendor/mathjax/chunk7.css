@@ -26,5 +26,4 @@ img.MathJax_strut {border: 0!important; padding: 0!important; margin: 0!importan
 .MathJax .MathJax_HitBox {cursor: text; background: white; opacity: 0; filter: alpha(opacity=0)}
 .MathJax .MathJax_HitBox * {filter: none; opacity: 1; background: transparent}
 #MathJax_Tooltip * {filter: none; opacity: 1; background: transparent}
-@font-face {font-family: MathJax_Blank; src: url('about:blank')}
-.MathJax .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+.MathJax .noError {font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
