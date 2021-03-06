@@ -891,7 +891,6 @@ module.exports = {
     '/templates/index': '/templates/'
   },
 
-  reloadModuleViewsOnEachRequest: process.env.NODE_ENV === 'development',
   disableModule: {
     'user-activate': process.env.DISABLE_MODULE_USER_ACTIVATE === 'true',
     launchpad: process.env.DISABLE_MODULE_LAUNCHPAD === 'true'

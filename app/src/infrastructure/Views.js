@@ -2,6 +2,10 @@ const glob = require('glob')
 const Settings = require('@overleaf/settings')
 const Path = require('path')
 
+const DEBUG_VIEWS = Boolean(Settings.debugPugTemplates)
+const CACHE_VIEWS = ['production', 'test'].includes(process.env.NODE_ENV)
+const LOAD_PRECOMPILED_VIEWS = Boolean(Settings.loadPrecompiledPugViews)
+
 function getBuiltViewList() {
   const ROOT = Path.join(__dirname, '../../..')
   const GENERATED_VIEWS = Path.join(__dirname, '../../../generated/views')
@@ -17,48 +21,70 @@ function getBuiltViewList() {
   })
 }
 
-const PRELOADED_TEMPLATES = new Map()
+const CACHED_TEMPLATES = new Map()
 function generateTemplate(path) {
-  // block compiles at runtime when there are existing preloaded templates
-  if (PRELOADED_TEMPLATES.size) {
-    throw new Error(`template not preloaded: ${path}`)
-  }
   // Load the generator ad-hoc in development.
-  // In production we do not ship 'pug', but just 'pug-runtime'.
+  // In production we do not ship 'pug' -- which is needed for generating
+  //  templates --, but just 'pug-runtime' which can render templates.
   return require('../../../build/views/generator').generateModuleInMemory({
     path,
     cache: false,
-    debug: Settings.debugPugTemplates
+    debug: DEBUG_VIEWS
   })
 }
 
 function getTemplate(path) {
-  return PRELOADED_TEMPLATES.get(path) || generateTemplate(path)
+  const cachedTemplate = CACHED_TEMPLATES.get(path)
+  if (cachedTemplate) return cachedTemplate
+
+  if (LOAD_PRECOMPILED_VIEWS) {
+    // block compiles at runtime when preloading templates
+    throw new Error(`template not preloaded: ${path}`)
+  }
+
+  const generatedTemplate = generateTemplate(path)
+  if (CACHE_VIEWS) {
+    CACHED_TEMPLATES.set(path, generatedTemplate)
+  }
+  return generatedTemplate
 }
 
 function loadPrecompiledViews(app) {
   app.engines['.pug'] = function render(path, locals, callback) {
-    const template = PRELOADED_TEMPLATES.get(path)
+    const template = CACHED_TEMPLATES.get(path)
     // express already has a try/catch wrapper around this invocation.
     // There is no need for any error handling in here.
     callback(null, template(locals))
   }
 
   getBuiltViewList().forEach(({ pugViewPath, builtViewPath }) => {
-    PRELOADED_TEMPLATES.set(pugViewPath, require(builtViewPath))
+    CACHED_TEMPLATES.set(pugViewPath, require(builtViewPath))
   })
 }
 
-function precompileViews() {
-  require('../../../build/views').processViews({
-    write: false,
-    cache: true,
-    debug: Settings.debugPugTemplates
-  })
+function generateViewsAtRuntime(app) {
+  app.engines['.pug'] = function render(path, locals, callback) {
+    const template = getTemplate(path)
+    // express already has a try/catch wrapper around this invocation.
+    // There is no need for any error handling in here.
+    callback(null, template(locals))
+  }
+}
+
+function setup(app) {
+  if (LOAD_PRECOMPILED_VIEWS) {
+    loadPrecompiledViews(app)
+  } else {
+    generateViewsAtRuntime(app)
+  }
+  if (CACHE_VIEWS) {
+    // Cache express internals
+    app.enable('view cache')
+  }
 }
 
 module.exports = {
+  CACHE_VIEWS,
   getTemplate,
-  loadPrecompiledViews,
-  precompileViews
+  setup
 }
