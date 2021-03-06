@@ -257,7 +257,27 @@ module.exports = {
           return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
         })
         .concat(
-          ['mathjax', 'sigma-master'].map(path => {
+          // Copy the required files for loading MathJax from MathJax NPM package
+          [
+            'MathJax.js',
+            'config/**/*',
+            'extensions/**/*',
+            'localization/en/**/*',
+            'jax/output/HTML-CSS/fonts/TeX/**/*',
+            'jax/output/HTML-CSS/**/*.js',
+            'jax/element/**/*',
+            'jax/input/**/*',
+            'fonts/HTML-CSS/TeX/woff/*'
+          ].map(from => {
+            return {
+              context: 'node_modules/mathjax',
+              from,
+              to: `${VENDOR_PATH}/mathjax-2-7-9`
+            }
+          })
+        )
+        .concat(
+          ['sigma-master'].map(path => {
             return {
               from: `frontend/js/vendor/libs/${path}`,
               to: `${VENDOR_PATH}/${path}`

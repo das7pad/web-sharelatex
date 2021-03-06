@@ -139,6 +139,7 @@
     "less": "^3.11.1",
     "less-loader": "^6.0.0",
     "less-plugin-clean-css": "^1.5.1",
+    "mathjax": "^2.7.9",
     "mini-css-extract-plugin": "^0.8.0",
     "mocha": "^6.2.2",
     "mock-fs": "^4.11.0",
