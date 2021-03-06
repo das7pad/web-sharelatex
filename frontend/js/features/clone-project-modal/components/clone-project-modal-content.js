@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Trans } from 'react-i18next'
 import {
   Modal,
   Alert,
@@ -10,6 +9,7 @@ import {
   FormGroup
 } from 'react-bootstrap'
 import AccessibleModal from '../../../shared/components/accessible-modal'
+import { Trans } from '../../../components/trans'
 
 export default function CloneProjectModalContent({
   animation = true,

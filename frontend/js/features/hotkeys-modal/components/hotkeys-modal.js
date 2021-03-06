@@ -1,8 +1,9 @@
 import React from 'react'
 import { Button, Modal, Row, Col } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { Trans, useTranslation } from 'react-i18next'
 import AccessibleModal from '../../../shared/components/accessible-modal'
+import t from '../../../misc/t'
+import { Trans } from '../../../components/trans'
 
 export default function HotkeysModal({
   animation = true,
@@ -11,8 +12,6 @@ export default function HotkeysModal({
   isMac = false,
   trackChangesVisible = false
 }) {
-  const { t } = useTranslation()
-
   const ctrl = isMac ? 'Cmd' : 'Ctrl'
 
   return (
@@ -115,7 +114,7 @@ export default function HotkeysModal({
         <h3>
           <Trans
             i18nKey="autocomplete_references"
-            components={{ code: <code /> }}
+            components={[<code key={0} />]}
           />
         </h3>
 
