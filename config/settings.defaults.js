@@ -1056,5 +1056,9 @@ module.exports = {
         }
       }
     }
+  },
+
+  overleafModuleImports: {
+    // modules to import (an empty array for each set of modules)
   }
 }
