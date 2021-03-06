@@ -1,13 +1,13 @@
 const pug = require('pug')
 
-function generateModule({ path, cache, debug }) {
+function generateModule({ path, debug }) {
   return (
     "const pug = require('pug-runtime'); module.exports = template; " +
-    generateModuleInMemory({ path, cache, debug }).toString()
+    generateModuleInMemory({ path, debug }).toString()
   )
 }
 
-function generateModuleInMemory({ path, cache, debug }) {
+function generateModuleInMemory({ path, debug }) {
   const OL_META = new RegExp('(^|\\b)meta\\(id="ol-', 'g')
   return pug.compileFile(path, {
     plugins: [
@@ -19,7 +19,7 @@ function generateModuleInMemory({ path, cache, debug }) {
         }
       }
     ],
-    cache,
+    cache: false,
     compileDebug: debug,
     doctype: 'html'
   })

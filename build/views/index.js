@@ -29,7 +29,7 @@ function getAvailableViews() {
     .map(stripExtension)
 }
 
-function processViews({ write, cache, debug }) {
+function processViews({ write, debug }) {
   const startTime = Date.now()
   let success = 0
   let failures = 0
@@ -37,7 +37,6 @@ function processViews({ write, cache, debug }) {
     try {
       const blob = Generator.generateModule({
         path: view + '.pug',
-        cache,
         debug
       })
       logger.log({ view }, 'generated view')
@@ -56,7 +55,6 @@ function processViews({ write, cache, debug }) {
 function main() {
   const failures = processViews({
     write: process.env.DRY_RUN !== 'true',
-    cache: false,
     debug: process.env.DEBUG_VIEWS === 'true'
   })
   process.exit(failures)
