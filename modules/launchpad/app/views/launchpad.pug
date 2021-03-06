@@ -147,7 +147,9 @@ block content
 										.row(ng-if="createAdminSuccess")
 											.col-md-12.text-center
 												.alert.alert-success
-													| {{translate('admin_user_created_message', {link: '/login?redir=/launchpad'})}}
+													span(
+														ng-bind-html="translate('admin_user_created_message', {link: '/login?redir=/launchpad'})"
+													)
 
 										<!-- error message -->
 										.row(ng-if="createAdminError")
