@@ -138,6 +138,13 @@ async function buildTestBundleForBrowser(entrypoint) {
   return buildTestBundle(entrypoint, 'browser', 'chrome89')
 }
 
+async function buildTestBundleForNode(entrypoint) {
+  // process.version is v prefixed -- e.g. v14.16.0
+  const nodeVersion = process.version.slice(1)
+  return buildTestBundle(entrypoint, 'node', `node${nodeVersion}`)
+}
+
 module.exports = {
-  buildTestBundleForBrowser
+  buildTestBundleForBrowser,
+  buildTestBundleForNode
 }
