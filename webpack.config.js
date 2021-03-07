@@ -1,5 +1,4 @@
 const path = require('path')
-const webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
 const WebpackAssetsManifest = require('webpack-assets-manifest')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -12,8 +11,6 @@ const entryPoints = {
   style: './frontend/stylesheets/style.less',
   'light-style': './frontend/stylesheets/light-style.less'
 }
-
-const TRANSLATIONS_FILES = require('glob').sync('./generated/lng/*.js')
 
 module.exports = {
   // Defines the "entry point(s)" for the application - i.e. the file which
@@ -35,26 +32,6 @@ module.exports = {
   // Define how file types are handled by webpack
   module: {
     rules: [
-      {
-        // Pass application JS files through babel-loader, compiling to ES5
-        test: /\.js$/,
-        // Only compile application files (npm and vendored dependencies are in
-        // ES5 already)
-        exclude: [
-          /node_modules\/(?!react-dnd\/)/,
-          path.resolve(__dirname, 'frontend/js/vendor')
-        ].concat(TRANSLATIONS_FILES.map(file => path.join(__dirname, file))),
-        use: [
-          {
-            loader: 'babel-loader',
-            options: {
-              // Configure babel-loader to cache compiled output so that
-              // subsequent compile runs are much faster
-              cacheDirectory: true
-            }
-          }
-        ]
-      },
       {
         // preserve assets that are already in the output directory
         test: new RegExp(`^${path.join(__dirname, 'public')}`),
@@ -103,83 +80,8 @@ module.exports = {
             }
           }
         ]
-      },
-      {
-        // Load translations files with custom loader, to extract and apply
-        // fallbacks
-        test: /locales\/(\w{2}(-\w{2})?)\.json$/,
-        use: [
-          {
-            loader: path.resolve('frontend/translations-loader.js')
-          }
-        ]
-      },
-      // Allow for injection of modules dependencies by reading contents of
-      // modules directory and adding necessary dependencies
-      {
-        test: path.join(__dirname, 'modules/modules-main.js'),
-        use: [
-          {
-            loader: 'val-loader'
-          }
-        ]
-      },
-      {
-        test: path.join(__dirname, 'modules/modules-ide.js'),
-        use: [
-          {
-            loader: 'val-loader'
-          }
-        ]
-      },
-      {
-        // Expose jQuery and $ global variables
-        test: require.resolve('jquery'),
-        use: [
-          {
-            loader: 'expose-loader',
-            options: 'jQuery'
-          },
-          {
-            loader: 'expose-loader',
-            options: '$'
-          }
-        ]
-      },
-      {
-        // Expose angular global variable
-        test: require.resolve('angular'),
-        use: [
-          {
-            loader: 'expose-loader',
-            options: 'angular'
-          }
-        ]
       }
     ]
-  },
-  resolve: {
-    alias: {
-      // Aliases for AMD modules
-
-      // Shortcut to vendored dependencies in frontend/js/vendor/libs
-      libs: path.join(__dirname, 'frontend/js/vendor/libs'),
-      // Enables ace/ace shortcut
-      ace: 'ace-builds/src-noconflict'
-    }
-  },
-
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      cacheGroups: {
-        defaultVendors: {
-          test: /\/node_modules\/|\/vendor\//,
-          minChunks: 1,
-          enforce: true
-        }
-      }
-    }
   },
 
   plugins: [
@@ -211,22 +113,6 @@ module.exports = {
         }
         return entry
       }
-    }),
-
-    // Silence react messages in the dev-tools console
-    new webpack.DefinePlugin({
-      __REACT_DEVTOOLS_GLOBAL_HOOK__: '({ isDisabled: true })'
-    }),
-
-    new webpack.DefinePlugin({
-      // CSP fix for regenerator, bundled inside ES5 compatible pdf.js
-      regeneratorRuntime: 'window.regeneratorRuntime'
-    }),
-
-    // Prevent moment from loading (very large) locale files that aren't used
-    new webpack.IgnorePlugin({
-      resourceRegExp: /^\.\/locale$/,
-      contextRegExp: /moment$/
     }),
 
     new CopyPlugin(
