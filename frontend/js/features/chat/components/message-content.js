@@ -1,14 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import Linkify from 'react-linkify'
+import { loadMathJax } from '../../../MathJaxLoader'
 
 function MessageContent({ content }) {
   const root = useRef(null)
 
   const [MJHub, setMJHub] = useState(undefined)
   useEffect(() => {
-    import('../../../MathJaxBundle')
-      .then(({ default: MathJax }) => {
+    loadMathJax()
+      .then(MathJax => {
         setMJHub(MathJax.Hub)
       })
       .catch(error => console.error('Cannot load MathJaxBundle', error))

@@ -60,6 +60,13 @@ const CONFIGS = [
     loader: { '.js': 'jsx' }
   },
 
+  // mathjax in non-strict
+  {
+    entryPoints: [Path.join(FRONTEND_PATH, 'js/MathJaxBundle.js')],
+    outbase: Path.join(FRONTEND_PATH, 'js'),
+    outdir: Path.join(PUBLIC_PATH, 'js')
+  },
+
   // translations bundles
   {
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
