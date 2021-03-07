@@ -29,8 +29,7 @@ const App = angular
     'ng-context-menu',
     'ngSanitize',
     'ErrorCatcher',
-    'localStorage',
-    'sessionStorage',
+    'storage',
     'ngTagsInput',
     'ui.select'
   ])
