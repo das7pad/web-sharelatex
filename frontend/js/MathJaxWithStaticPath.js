@@ -8,6 +8,6 @@ import staticPath from './utils/staticPath'
 // NOTE: Changing the base url invalidates the cache of preloaded sub
 //        resources, like configs/extensions.
 //       We are required to change it here - before any dependent is loaded.
-window.MathJax.Ajax.config.root = staticPath('/vendor/mathjax-2-7-9')
+window.MathJax.Ajax.config.root = staticPath('/vendor/mathjax')
 
 export const MathJaxWithStaticPath = window.MathJax

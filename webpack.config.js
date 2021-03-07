@@ -144,7 +144,7 @@ module.exports = {
             return {
               context: 'node_modules/mathjax',
               from,
-              to: `${VENDOR_PATH}/mathjax-2-7-9`
+              to: `${VENDOR_PATH}/mathjax`
             }
           })
         )
