@@ -106,3 +106,38 @@ if (ACTION === 'watch') {
 if (ACTION === 'build' || ACTION === 'watch') {
   Promise.all(CONFIGS.map(esbuild.build)).catch(() => process.exit(1))
 }
+
+async function buildTestBundle(entrypoint, platform, target) {
+  const OUTPUT_PATH = Path.join('/tmp', 'web', 'testBundle', platform)
+  const { define, inject, plugins, loader } = CONFIGS[0]
+  const cfg = {
+    entryPoints: [entrypoint],
+    plugins: [
+      valLoader(Path.join(__dirname, 'test/frontend/allTests.js')),
+      valLoader(Path.join(__dirname, 'test/karma/allTests.js')),
+      ...plugins
+    ],
+    outdir: OUTPUT_PATH,
+    platform,
+    target,
+    define,
+    inject,
+    loader
+  }
+
+  try {
+    await esbuild.build(Object.assign({}, COMMON_CFG, cfg))
+  } catch (error) {
+    console.error('esbuild error:', error)
+    throw new Error(`esbuild failed: ${error.message}`)
+  }
+  return Path.join(OUTPUT_PATH, Path.basename(entrypoint))
+}
+
+async function buildTestBundleForBrowser(entrypoint) {
+  return buildTestBundle(entrypoint, 'browser', 'chrome89')
+}
+
+module.exports = {
+  buildTestBundleForBrowser
+}
