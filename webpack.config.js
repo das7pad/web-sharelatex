@@ -15,14 +15,6 @@ const entryPoints = {
 
 const TRANSLATIONS_FILES = require('glob').sync('./generated/lng/*.js')
 
-// Attempt to load frontend entry-points from modules, if they exist
-require('glob')
-  .sync('./modules/*/frontend/js/index.js')
-  .forEach(file => {
-    const moduleName = file.split('/')[2]
-    entryPoints[moduleName] = file
-  })
-
 module.exports = {
   // Defines the "entry point(s)" for the application - i.e. the file which
   // bootstraps the application
