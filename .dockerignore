@@ -50,6 +50,8 @@
 
 !/karma.conf.js
 
+!/populatePublicVendor.js
+
 !/webpack.config.js
 !/webpack.config.prod.js
 !/webpack.config.test.js

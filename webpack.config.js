@@ -1,10 +1,7 @@
 const path = require('path')
-const CopyPlugin = require('copy-webpack-plugin')
 const WebpackAssetsManifest = require('webpack-assets-manifest')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const AutoPrefixer = require('autoprefixer')
-
-const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
 // Generate a hash of entry points, including modules
 const entryPoints = {
@@ -95,79 +92,9 @@ module.exports = {
           // omit fonts, they are loaded via css only
           return false
         }
-        if (/cmaps/.test(entry.value)) {
-          // omit the vendored cmaps
-          return false
-        }
-        if (/ace-builds/.test(entry.value)) {
-          // omit minified ace source, they are loaded via ace internals
-          return false
-        }
-        if (/sigma-master/.test(entry.value)) {
-          // loaded via staticPath
-          return false
-        }
-        if (/vendor\/mathjax/.test(entry.value)) {
-          // booted via MathJaxBundle and then loaded via staticPath
-          return false
-        }
         return entry
       }
-    }),
-
-    new CopyPlugin(
-      [
-        // pdfjs worker
-        'pdfjs-dist/build/pdf.worker.min.js',
-        // Copy CMap files from pdfjs-dist package to build output. These are used
-        // to provide support for non-Latin characters
-        'pdfjs-dist/cmaps',
-        // optional package ace files - minified: keymaps, modes, themes, worker
-        'ace-builds/src-min-noconflict'
-      ]
-        .map(path => {
-          return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
-        })
-        .concat(
-          // Copy the required files for loading MathJax from MathJax NPM package
-          [
-            'MathJax.js',
-            'config/**/*',
-            'extensions/**/*',
-            'localization/en/**/*',
-            'jax/output/HTML-CSS/fonts/TeX/**/*',
-            'jax/output/HTML-CSS/**/*.js',
-            'jax/element/**/*',
-            'jax/input/**/*',
-            'fonts/HTML-CSS/TeX/woff/*'
-          ].map(from => {
-            return {
-              context: 'node_modules/mathjax',
-              from,
-              to: `${VENDOR_PATH}/mathjax`
-            }
-          })
-        )
-        .concat(
-          ['sigma-master'].map(path => {
-            return {
-              from: `frontend/js/vendor/libs/${path}`,
-              to: `${VENDOR_PATH}/${path}`
-            }
-          })
-        )
-        .concat(
-          [
-            // open-in-overleaf
-            'highlight-github.css'
-          ].map(path => {
-            return {
-              from: `frontend/stylesheets/vendor/${path}`,
-              to: `${VENDOR_PATH}/stylesheets/${path}`
-            }
-          })
-        )
-    )
+    })
   ],
 
   stats: {
