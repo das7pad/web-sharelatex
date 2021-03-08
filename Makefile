@@ -267,7 +267,6 @@ $(LNGS): generated/lng/%.js: locales/%.json
 
 webpack_production:
 	$(MAKE) --no-print-directory -j build_lng
-	npm run webpack:production
 
 build_dev_deps: clean_build_artifacts
 	docker build \
