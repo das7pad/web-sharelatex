@@ -138,7 +138,7 @@
     "karma-mocha": "^2.0.0",
     "karma-mocha-reporter": "^2.2.5",
     "karma-webpack": "^4.0.2",
-    "less": "^3.11.1",
+    "less": "^4.1.1",
     "less-loader": "^6.0.0",
     "less-plugin-clean-css": "^1.5.1",
     "mathjax": "https://github.com/das7pad/MathJax/archive/0e004a20ed7e40782374977d2b5dc23a969f2ee1.tar.gz",

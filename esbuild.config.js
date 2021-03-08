@@ -2,7 +2,7 @@ const Path = require('path')
 const esbuild = require('esbuild')
 const TARGETS = require('./esbuild/getTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
-// const lessLoader = require('./esbuild/lessLoader')
+const lessLoader = require('./esbuild/lessLoader')
 const valLoader = require('./esbuild/valLoader')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
@@ -72,18 +72,23 @@ const CONFIGS = [
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
     outdir: Path.join(PUBLIC_PATH, 'js/t')
-  }
+  },
 
   // stylesheets
-  // {
-  //   plugins: [lessLoader()],
-  //   entryPoints: [
-  //     Path.join(FRONTEND_PATH, 'stylesheets/style.less'),
-  //     Path.join(FRONTEND_PATH, 'stylesheets/light-style.less')
-  //   ],
-  //   outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
-  //   outdir: Path.join(PUBLIC_PATH, 'stylesheets')
-  // }
+  {
+    plugins: [
+      lessLoader({
+        // resolve all the math expressions
+        math: 'always'
+      })
+    ],
+    entryPoints: [
+      Path.join(FRONTEND_PATH, 'stylesheets/style.less'),
+      Path.join(FRONTEND_PATH, 'stylesheets/light-style.less')
+    ],
+    outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
+    outdir: Path.join(PUBLIC_PATH, 'stylesheets')
+  }
 ].map(cfg => Object.assign({}, COMMON_CFG, cfg))
 
 const ACTION = process.argv.pop()

@@ -1,12 +1,12 @@
 const Settings =
   require('@overleaf/settings') || require('../../../config/settings.defaults')
 
-let webpackManifest
-if (Settings.useDevAssets) {
-  webpackManifest = require('../../../public/manifest-dev.json')
-} else {
-  webpackManifest = require('../../../public/manifest.json')
-}
+// let webpackManifest
+// if (Settings.useDevAssets) {
+//   webpackManifest = require('../../../public/manifest-dev.json')
+// } else {
+//   webpackManifest = require('../../../public/manifest.json')
+// }
 
 const STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
 
@@ -19,7 +19,9 @@ const STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
 // )
 
 function buildCssPath(themeModifier = '') {
-  return STATIC_FILES_BASE + webpackManifest[themeModifier + 'style.css']
+  return (
+    STATIC_FILES_BASE + '/esbuild/stylesheets/' + themeModifier + 'style.css'
+  )
 }
 function buildImgPath(path) {
   return STATIC_FILES_BASE + '/img/' + path

@@ -32,14 +32,26 @@ module.exports = function lessLoader(options = {}) {
       build.onLoad({ filter: /.*/, namespace }, async args => {
         const content = await fs.readFile(args.path, 'utf-8')
         const dir = path.dirname(args.path)
-        const filename = path.basename(args.path)
 
-        const result = await less.render(content, {
-          filename,
-          rootpath: dir,
+        const lessOpts = {
+          // CHANGED: filename must be the full path -- see lessc
+          filename: args.path,
+
+          // CHANGED: Importing relative files works!
+          rootpath: './',
+          rewriteUrls: 'all',
+
           ...options,
-          paths: [...(options.paths || []), dir]
-        })
+
+          // CHANGED: align with lessc and put the dir first.
+          paths: [dir, ...(options.paths || [])]
+
+          // NOTE: Source map support for css is not there yet in esbuild.
+          // REF: https://github.com/evanw/esbuild/issues/519
+          // sourceMap: { sourceMapFileInline: true }
+        }
+
+        const result = await less.render(content, lessOpts)
 
         return {
           contents: result.css,
