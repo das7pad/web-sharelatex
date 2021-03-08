@@ -9,6 +9,7 @@ const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, './generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
 const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
+const METAFILE_BASE = Path.join(PUBLIC_PATH, 'metafiles')
 
 const COMMON_CFG = {
   bundle: true,
@@ -33,6 +34,7 @@ const COMMON_CFG = {
 const CONFIGS = [
   // main bundles
   {
+    metafile: Path.join(METAFILE_BASE, 'main-bundles.json'),
     splitting: true,
     format: 'esm',
     entryPoints: [
@@ -69,6 +71,7 @@ const CONFIGS = [
 
   // translations bundles
   {
+    metafile: Path.join(METAFILE_BASE, 't.json'),
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
     outdir: Path.join(PUBLIC_PATH, 'js/t')
@@ -76,6 +79,7 @@ const CONFIGS = [
 
   // stylesheets
   {
+    metafile: Path.join(METAFILE_BASE, 'stylesheets.json'),
     plugins: [
       lessLoader({
         // resolve all the math expressions
