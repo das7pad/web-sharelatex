@@ -25,9 +25,6 @@ const COMMON_CFG = {
     '.png': 'file',
     '.svg': 'file',
     '.gif': 'file'
-    // inline loader images
-    // 'overleaf-o.svg': 'dataurl',
-    // 'overleaf-o-grey.svg': 'dataurl',
   }
 }
 
