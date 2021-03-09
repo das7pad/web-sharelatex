@@ -68,6 +68,6 @@ html(
 		include _sentry
 
 		block foot-scripts
-			script(type='text/javascript' defer src=buildJsPath(`t/${currentLngCode}.js`))
-			each file in entrypointSources('main')
+			script(type='text/javascript' defer src=buildTPath(currentLngCode))
+			each file in entrypointSources('frontend/js/main.js')
 				script(type="module" defer src=file)

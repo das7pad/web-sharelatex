@@ -4,12 +4,17 @@ const TARGETS = require('./esbuild/getTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
 const lessLoader = require('./esbuild/lessLoader')
 const valLoader = require('./esbuild/valLoader')
+const writeManifest = require('./esbuild/writeManifest')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, './generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
 const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
-const METAFILE_BASE = Path.join(PUBLIC_PATH, 'metafiles')
+
+const METAFILE_BASE = Path.join('/tmp', 'web-metafiles')
+const MAIN_BUNDLES_METAFILE = Path.join(METAFILE_BASE, 'main-bundles.json')
+const STYLESHEETS_METAFILE = Path.join(METAFILE_BASE, 'stylesheets.json')
+const T_METAFILE = Path.join(METAFILE_BASE, 't.json')
 
 const COMMON_CFG = {
   bundle: true,
@@ -31,7 +36,7 @@ const COMMON_CFG = {
 const CONFIGS = [
   // main bundles
   {
-    metafile: Path.join(METAFILE_BASE, 'main-bundles.json'),
+    metafile: MAIN_BUNDLES_METAFILE,
     splitting: true,
     format: 'esm',
     entryPoints: [
@@ -68,7 +73,7 @@ const CONFIGS = [
 
   // translations bundles
   {
-    metafile: Path.join(METAFILE_BASE, 't.json'),
+    metafile: T_METAFILE,
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
     outdir: Path.join(PUBLIC_PATH, 'js/t')
@@ -76,7 +81,7 @@ const CONFIGS = [
 
   // stylesheets
   {
-    metafile: Path.join(METAFILE_BASE, 'stylesheets.json'),
+    metafile: STYLESHEETS_METAFILE,
     plugins: [
       lessLoader({
         // resolve all the math expressions
@@ -102,6 +107,7 @@ if (ACTION === 'watch') {
             console.error('watch build failed:', error)
           } else {
             console.error('watch build succeeded:', result)
+            writeManifest(cfg.metafile, PUBLIC_PATH).catch(() => {})
           }
         }
       }
@@ -110,7 +116,13 @@ if (ACTION === 'watch') {
 }
 
 if (ACTION === 'build' || ACTION === 'watch') {
-  Promise.all(CONFIGS.map(esbuild.build)).catch(() => process.exit(1))
+  Promise.all(CONFIGS.map(esbuild.build))
+    .then(async () => {
+      await writeManifest(MAIN_BUNDLES_METAFILE, PUBLIC_PATH)
+      await writeManifest(STYLESHEETS_METAFILE, PUBLIC_PATH)
+      await writeManifest(T_METAFILE, PUBLIC_PATH)
+    })
+    .catch(() => process.exit(1))
 }
 
 async function buildTestBundle(entrypoint, platform, target) {

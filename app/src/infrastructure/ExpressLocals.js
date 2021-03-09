@@ -10,6 +10,7 @@ const {
   buildCssPath,
   buildImgPath,
   buildJsPath,
+  buildTPath,
   entrypointSources,
   staticPath
 } = require('./WebpackAssets')
@@ -27,6 +28,7 @@ module.exports = function(app, webRouter) {
   app.locals.buildCssPath = buildCssPath
   app.locals.buildImgPath = buildImgPath
   app.locals.buildJsPath = buildJsPath
+  app.locals.buildTPath = buildTPath
   app.locals.entrypointSources = entrypointSources
   app.locals.staticPath = staticPath
 

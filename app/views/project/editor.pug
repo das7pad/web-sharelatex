@@ -182,6 +182,6 @@ block content
 
 block foot-scripts
 	script(type='text/javascript', defer, src=wsAssetUrl)
-	script(type='text/javascript', defer, src=buildJsPath(`t/${currentLngCode}.js`))
-	each file in entrypointSources('ide')
+	script(type='text/javascript' defer src=buildTPath(currentLngCode))
+	each file in entrypointSources('frontend/js/ide.js')
 		script(type="module" defer src=file)

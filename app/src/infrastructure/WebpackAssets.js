@@ -1,37 +1,47 @@
 const Settings =
   require('@overleaf/settings') || require('../../../config/settings.defaults')
 
-// let webpackManifest
-// if (Settings.useDevAssets) {
-//   webpackManifest = require('../../../public/manifest-dev.json')
-// } else {
-//   webpackManifest = require('../../../public/manifest.json')
-// }
+// TODO: watch manifest
+let manifest
+if (Settings.useDevAssets) {
+  manifest = toMap(require('../../../public/manifest-dev.json'))
+} else {
+  manifest = toMap(require('../../../public/manifest.json'))
+}
 
 const STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
+const ENTRYPOINTS = new Map(
+  Object.entries(manifest.get('entrypoints')).map(([entrypoint, childs]) => {
+    return [entrypoint, childs.map(path => STATIC_FILES_BASE + path)]
+  })
+)
 
-// const ENTRYPOINTS = new Map(
-//   Object.entries(webpackManifest.entrypoints).map(
-//     ([entrypoint, entrypointSpec]) => {
-//       return [entrypoint, entrypointSpec.js.map(staticPath)]
-//     }
-//   )
-// )
+function toMap(obj) {
+  return new Map(Object.entries(obj))
+}
 
 function buildCssPath(themeModifier = '') {
-  return (
-    STATIC_FILES_BASE + '/esbuild/stylesheets/' + themeModifier + 'style.css'
-  )
+  const src = `frontend/stylesheets/${themeModifier}style.less`
+  return STATIC_FILES_BASE + manifest.get(src)
 }
 function buildImgPath(path) {
-  return STATIC_FILES_BASE + '/img/' + path
+  const src = `public/img/${path}`
+  return STATIC_FILES_BASE + (manifest.get(src) || '/img/' + path)
+}
+function buildFontPath(file) {
+  const src = `frontend/fonts/${file}`
+  return STATIC_FILES_BASE + manifest.get(src)
 }
 function buildJsPath(path) {
-  return STATIC_FILES_BASE + '/esbuild/js/' + path
+  const src = `frontend/js/${path}`
+  return STATIC_FILES_BASE + manifest.get(src)
+}
+function buildTPath(lng) {
+  const src = `generated/lng/${lng}.js`
+  return STATIC_FILES_BASE + manifest.get(src)
 }
 function entrypointSources(entrypoint) {
-  // TODO: use meta
-  return [buildJsPath(entrypoint + '.js')]
+  return ENTRYPOINTS.get(entrypoint)
 }
 function staticPath(path) {
   return STATIC_FILES_BASE + path
@@ -39,8 +49,10 @@ function staticPath(path) {
 
 module.exports = {
   buildCssPath,
+  buildFontPath,
   buildImgPath,
   buildJsPath,
+  buildTPath,
   entrypointSources,
   staticPath
 }

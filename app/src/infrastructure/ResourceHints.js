@@ -1,6 +1,6 @@
 const Settings =
   require('@overleaf/settings') || require('../../../config/settings.defaults')
-const { buildCssPath } = require('./WebpackAssets')
+const { buildCssPath, buildFontPath, buildImgPath } = require('./WebpackAssets')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 
@@ -24,13 +24,11 @@ function getPreloadMiddleware() {
       //  https://caniuse.com/#search=woff2
       // They both ignore the preload header, so this is OK
       //  https://caniuse.com/#search=preload
-      // TODO: needs resolving from esbuild metafile
-      // const uri = staticPath(`/fonts/${name}.woff2`)
-      // preload(uri, 'font', true)
+      const uri = buildFontPath(`${name}.woff2`)
+      preload(uri, 'font', true)
     }
     function preloadImg(path) {
-      // TODO: needs resolving from esbuild metafile
-      // preload(buildImgPath(path), 'image')
+      preload(buildImgPath(path), 'image')
     }
 
     if (cfg.usesBoldItalicFont) {

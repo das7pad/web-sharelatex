@@ -27,6 +27,9 @@ describe('ResourceHints', function() {
         buildCssPath(themeModifier) {
           return `/stylesheets/${themeModifier}style.css`
         },
+        buildFontPath(name) {
+          return '/fonts/' + name
+        },
         buildImgPath(path) {
           return '/img/' + path
         },
@@ -100,45 +103,44 @@ describe('ResourceHints', function() {
       )
     })
 
-    // TODO: add back in after sorting out esbuild metafile parsing
-    // it('should set the header for images', function() {
-    //   this.res.render('project/editor', {})
-    //   expect(this.res.headers.Link).to.include(
-    //     '</img/ol-brand/overleaf-o.svg>;rel=preload;as=image'
-    //   )
-    // })
-    //
-    // it('should set the crossorigin flag for a font', function() {
-    //   this.res.render('template', {})
-    //   expect(this.res.headers.Link).to.include(
-    //     '.woff2>;rel=preload;as=font;crossorigin'
-    //   )
-    // })
-    //
-    // it('should inject the tooltip font on the dashboard', function() {
-    //   const tooltipFont = 'merriweather-v21-latin-700italic'
-    //   this.res.render('project/list', {})
-    //   expect(this.res.headers.Link).to.include(
-    //     `</fonts/${tooltipFont}.woff2>;rel=preload;as=font;crossorigin`
-    //   )
-    // })
-    //
-    // it('should inject common resources for user pages', function() {
-    //   this.res.render('template', {})
-    //   expect(this.res.headers.Link).to.exist
-    //   const Link = this.res.headers.Link
-    //   expect(Link).to.include('fonts/font-awesome')
-    //   expect(Link).to.include('fonts/merriweather')
-    //   expect(Link).to.include('img/sprite.png')
-    // })
-    //
-    // it('should inject default brand specific resources', function() {
-    //   this.res.render('template', {})
-    //   expect(this.res.headers.Link).to.exist
-    //   const Link = this.res.headers.Link
-    //   expect(Link).to.include('stylesheets/style.css')
-    //   expect(Link).to.include('fonts/lato')
-    // })
+    it('should set the header for images', function() {
+      this.res.render('project/editor', {})
+      expect(this.res.headers.Link).to.include(
+        '</img/ol-brand/overleaf-o.svg>;rel=preload;as=image'
+      )
+    })
+
+    it('should set the crossorigin flag for a font', function() {
+      this.res.render('template', {})
+      expect(this.res.headers.Link).to.include(
+        '.woff2>;rel=preload;as=font;crossorigin'
+      )
+    })
+
+    it('should inject the tooltip font on the dashboard', function() {
+      const tooltipFont = 'merriweather-v21-latin-700italic'
+      this.res.render('project/list', {})
+      expect(this.res.headers.Link).to.include(
+        `</fonts/${tooltipFont}.woff2>;rel=preload;as=font;crossorigin`
+      )
+    })
+
+    it('should inject common resources for user pages', function() {
+      this.res.render('template', {})
+      expect(this.res.headers.Link).to.exist
+      const Link = this.res.headers.Link
+      expect(Link).to.include('fonts/font-awesome')
+      expect(Link).to.include('fonts/merriweather')
+      expect(Link).to.include('img/sprite.png')
+    })
+
+    it('should inject default brand specific resources', function() {
+      this.res.render('template', {})
+      expect(this.res.headers.Link).to.exist
+      const Link = this.res.headers.Link
+      expect(Link).to.include('stylesheets/style.css')
+      expect(Link).to.include('fonts/lato')
+    })
   })
 
   describe('with only one language', function() {
