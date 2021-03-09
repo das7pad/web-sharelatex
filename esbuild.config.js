@@ -11,11 +11,6 @@ const GENERATED_PATH = Path.join(__dirname, './generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
 const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
 
-const METAFILE_BASE = Path.join('/tmp', 'web-metafiles')
-const MAIN_BUNDLES_METAFILE = Path.join(METAFILE_BASE, 'main-bundles.json')
-const STYLESHEETS_METAFILE = Path.join(METAFILE_BASE, 'stylesheets.json')
-const T_METAFILE = Path.join(METAFILE_BASE, 't.json')
-
 const COMMON_CFG = {
   bundle: true,
   minifyWhitespace: true,
@@ -36,7 +31,7 @@ const COMMON_CFG = {
 const CONFIGS = [
   // main bundles
   {
-    metafile: MAIN_BUNDLES_METAFILE,
+    metafile: true,
     splitting: true,
     format: 'esm',
     entryPoints: [
@@ -73,7 +68,7 @@ const CONFIGS = [
 
   // translations bundles
   {
-    metafile: T_METAFILE,
+    metafile: true,
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
     outdir: Path.join(PUBLIC_PATH, 'js/t')
@@ -81,7 +76,7 @@ const CONFIGS = [
 
   // stylesheets
   {
-    metafile: STYLESHEETS_METAFILE,
+    metafile: true,
     plugins: [
       lessLoader({
         // resolve all the math expressions
@@ -107,7 +102,7 @@ if (ACTION === 'watch') {
             console.error('watch build failed:', error)
           } else {
             console.error('watch build succeeded:', result)
-            writeManifest(cfg.metafile, PUBLIC_PATH).catch(() => {})
+            writeManifest(result.metafile, PUBLIC_PATH).catch(() => {})
           }
         }
       }
@@ -117,10 +112,10 @@ if (ACTION === 'watch') {
 
 if (ACTION === 'build' || ACTION === 'watch') {
   Promise.all(CONFIGS.map(esbuild.build))
-    .then(async () => {
-      await writeManifest(MAIN_BUNDLES_METAFILE, PUBLIC_PATH)
-      await writeManifest(STYLESHEETS_METAFILE, PUBLIC_PATH)
-      await writeManifest(T_METAFILE, PUBLIC_PATH)
+    .then(async results => {
+      for (const result of results) {
+        await writeManifest(result.metafile, PUBLIC_PATH)
+      }
     })
     .catch(() => process.exit(1))
 }

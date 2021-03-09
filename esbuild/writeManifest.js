@@ -6,7 +6,8 @@ const manifest = {}
 const ROOT = Path.dirname(__dirname)
 const MANIFEST_PATH = Path.join(ROOT, 'public', 'manifest.json')
 
-module.exports = async function(metafile) {
+module.exports = async function(meta) {
+  if (!meta) return // some builds do not emit a metafile
   const entrypoints = (manifest.entrypoints = manifest.entrypoints || {})
 
   function pathInPublic(path) {
@@ -19,8 +20,6 @@ module.exports = async function(metafile) {
     }
     return blob
   }
-
-  const meta = JSON.parse(await fs.promises.readFile(metafile, 'utf-8'))
 
   Object.entries(meta.outputs)
     .filter(([path, details]) => details.entryPoint)
