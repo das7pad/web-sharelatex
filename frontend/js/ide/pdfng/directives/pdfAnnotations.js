@@ -3,7 +3,7 @@ import PDFJS from './../../../pdfjsBundle'
 const EXTERNAL_LINK_TARGET = '_blank'
 const REL_NOOPENER = 'noreferrer noopener'
 
-export default App.factory('pdfAnnotations', function() {
+App.factory('pdfAnnotations', function() {
   class pdfAnnotations {
     constructor(options) {
       this.annotationsLayerDiv = options.annotations

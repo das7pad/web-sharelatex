@@ -623,7 +623,7 @@ export default App.directive('pdfViewer', ($q, $timeout, pdfSpinner) => ({
         .commonAncestorContainer
       return (
         element.find(selectionAncestorNode).length > 0 ||
-        $(element).is(selectionAncestorNode)
+        element.is(selectionAncestorNode)
       )
     }
 
