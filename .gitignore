@@ -72,3 +72,6 @@ modules/**/Makefile
 
 # via dev-environment
 .npmrc
+
+# Intellij
+.idea

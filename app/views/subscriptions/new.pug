@@ -3,12 +3,8 @@ extends ../_layout
 block head-scripts
 	script(type="text/javascript", src="https://js.recurly.com/v4/recurly.js")
 	meta(id="ol-countryCode" content=countryCode)
-	meta(id="ol-plan_code" content=plan_code)
 	meta(id="ol-recurlyApiKey" content=settings.apis.recurly.publicKey)
-	meta(id="ol-couponCode" content=couponCode)
-	meta(id="ol-recomendedCurrency" content=currency.slice(0,3))
-	meta(id="ol-ITMCampaign" content=ITMCampaign)
-	meta(id="ol-ITMContent" content=ITMContent)
+	meta(id="ol-recomendedCurrency" content=String(currency).slice(0,3))
 
 block content
 	main.content.content-alt
@@ -185,7 +181,7 @@ block content
 															required
 														)
 														span.input-feedback-message  {{ simpleCCForm.address1.$error.required ? 'This field is required' : '' }}
-											
+
 											.row
 												.col-xs-12
 													.form-group.has-feedback(ng-class="validation.errorFields.address2 ? 'has-external-error' : ''")
@@ -197,7 +193,7 @@ block content
 															name="address2"
 															ng-model="data.address2"
 														)
-												
+
 											.row
 												.col-xs-4
 													.form-group(ng-class="validation.errorFields.postal_code || inputHasError(simpleCCForm.postalCode) ? 'has-external-error' : ''")
@@ -211,7 +207,7 @@ block content
 															required
 														)
 														span.input-feedback-message  {{ simpleCCForm.postalCode.$error.required ? 'This field is required' : '' }}
-												
+
 												.col-xs-8
 													.form-group(ng-class="validation.errorFields.country || inputHasError(simpleCCForm.country) ? 'has-external-error' : ''")
 														label(for="country") {{translate('country')}}
@@ -316,7 +312,7 @@ block content
 
 
 				.col-md-3.col-md-pull-4
-					if showStudentPlan == 'true'
+					if showStudentPlan
 						a.btn-primary.btn.plansPageStudentLink(
 							href,
 							ng-click="switchToStudent()"

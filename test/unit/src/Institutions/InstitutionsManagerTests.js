@@ -1,14 +1,3 @@
-/* eslint-disable
-    max-len,
-    no-return-assign,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const should = require('chai').should()
 const SandboxedModule = require('sandboxed-module')
 const path = require('path')
@@ -55,18 +44,16 @@ describe('InstitutionsManager', function() {
     }
     const SubscriptionModel = {
       Subscription: {
-        find: () => {
-          return {
-            populate: () => {
-              return { exec: this.subscriptionExec }
-            }
-          }
-        }
+        find: () => ({
+          populate: () => ({
+            exec: this.subscriptionExec
+          })
+        })
       }
     }
     this.Mongo = { ObjectId: sinon.stub().returnsArg(0) }
 
-    return (this.InstitutionsManager = SandboxedModule.require(modulePath, {
+    this.InstitutionsManager = SandboxedModule.require(modulePath, {
       globals: {
         process,
         console: console
@@ -87,10 +74,10 @@ describe('InstitutionsManager', function() {
         mongodb: this.Mongo,
         '../User/SAMLIdentityManager': this.SAMLIdentityManager
       }
-    }))
+    })
   })
 
-  describe('upgradeInstitutionUsers', function() {
+  describe('refreshInstitutionUsers', function() {
     beforeEach(function() {
       this.user1Id = '123abc123abc123abc123abc'
       this.user2Id = '456def456def456def456def'
@@ -111,23 +98,33 @@ describe('InstitutionsManager', function() {
         .withArgs(this.user2)
         .callsArgWith(1, null, this.subscription)
       this.refreshFeatures.withArgs(this.user1Id).yields(null, {}, true)
-      return this.getInstitutionAffiliations.yields(null, this.affiliations)
+      this.getInstitutionAffiliations.yields(null, this.affiliations)
     })
 
     it('refresh all users Features', function(done) {
-      return this.InstitutionsManager.upgradeInstitutionUsers(
+      this.InstitutionsManager.refreshInstitutionUsers(
         this.institutionId,
+        false,
         error => {
           should.not.exist(error)
           sinon.assert.calledTwice(this.refreshFeatures)
-          return done()
+
+          // expect no notifications
+          sinon.assert.notCalled(
+            this.NotificationsBuilder.featuresUpgradedByAffiliation
+          )
+          sinon.assert.notCalled(
+            this.NotificationsBuilder.redundantPersonalSubscription
+          )
+          done()
         }
       )
     })
 
     it('notifies users if their features have been upgraded', function(done) {
-      return this.InstitutionsManager.upgradeInstitutionUsers(
+      this.InstitutionsManager.refreshInstitutionUsers(
         this.institutionId,
+        true,
         error => {
           should.not.exist(error)
           sinon.assert.calledOnce(
@@ -138,14 +135,15 @@ describe('InstitutionsManager', function() {
             this.affiliations[0],
             this.user1
           )
-          return done()
+          done()
         }
       )
     })
 
     it('notifies users if they have a subscription that should be cancelled', function(done) {
-      return this.InstitutionsManager.upgradeInstitutionUsers(
+      this.InstitutionsManager.refreshInstitutionUsers(
         this.institutionId,
+        true,
         error => {
           should.not.exist(error)
           sinon.assert.calledOnce(
@@ -156,7 +154,7 @@ describe('InstitutionsManager', function() {
             this.affiliations[1],
             this.user2
           )
-          return done()
+          done()
         }
       )
     })
@@ -184,7 +182,7 @@ describe('InstitutionsManager', function() {
       this.SAMLIdentityManager.userHasEntitlement.onCall(0).returns(true)
       this.SAMLIdentityManager.userHasEntitlement.onCall(1).returns(true)
       this.SAMLIdentityManager.userHasEntitlement.onCall(2).returns(false)
-      return this.InstitutionsManager.checkInstitutionUsers(
+      this.InstitutionsManager.checkInstitutionUsers(
         this.institutionId,
         (error, usersSummary) => {
           should.not.exist(error)
@@ -203,7 +201,7 @@ describe('InstitutionsManager', function() {
           expect(usersSummary.entitledSSOUsers.nonProUsers).to.deep.equal([
             '456def456def456def456def'
           ])
-          return done()
+          done()
         }
       )
     })
@@ -217,12 +215,12 @@ describe('InstitutionsManager', function() {
         { user_id: '789def789def789def789def' }
       ]
       this.getInstitutionAffiliations.yields(null, stubbedUsers)
-      return this.InstitutionsManager.getInstitutionUsersSubscriptions(
+      this.InstitutionsManager.getInstitutionUsersSubscriptions(
         this.institutionId,
         (error, subscriptions) => {
           should.not.exist(error)
           sinon.assert.calledOnce(this.subscriptionExec)
-          return done()
+          done()
         }
       )
     })

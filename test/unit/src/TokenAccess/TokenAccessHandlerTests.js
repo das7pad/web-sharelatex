@@ -48,7 +48,10 @@ describe('TokenAccessHandler', function() {
         '../V1/V1Api': (this.V1Api = {
           request: sinon.stub()
         }),
-        crypto: (this.Crypto = require('crypto'))
+        crypto: (this.Crypto = require('crypto')),
+        '../Analytics/AnalyticsManager': (this.Analytics = {
+          recordEvent: sinon.stub()
+        })
       }
     }))
   })
@@ -141,6 +144,12 @@ describe('TokenAccessHandler', function() {
           expect(
             this.Project.updateOne.lastCall.args[1].$addToSet
           ).to.have.keys('tokenAccessReadOnly_refs')
+          sinon.assert.calledWith(
+            this.Analytics.recordEvent,
+            this.userId,
+            'project-joined',
+            { mode: 'read-only' }
+          )
           return done()
         }
       )
@@ -196,6 +205,12 @@ describe('TokenAccessHandler', function() {
           expect(
             this.Project.updateOne.lastCall.args[1].$addToSet
           ).to.have.keys('tokenAccessReadAndWrite_refs')
+          sinon.assert.calledWith(
+            this.Analytics.recordEvent,
+            this.userId,
+            'project-joined',
+            { mode: 'read-write' }
+          )
           return done()
         }
       )
