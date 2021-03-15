@@ -7,9 +7,6 @@ ApplicationContext.Provider.propTypes = {
   value: PropTypes.shape({
     user: PropTypes.shape({
       id: PropTypes.string.isRequired
-    }),
-    exposedSettings: PropTypes.shape({
-      enableSubscriptions: PropTypes.bool
     })
   })
 }

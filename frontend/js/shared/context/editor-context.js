@@ -1,8 +1,8 @@
 import React, { createContext, useCallback, useContext } from 'react'
 import PropTypes from 'prop-types'
 import useScopeValue from './util/scope-value-hook'
-import { useApplicationContext } from './application-context'
 import useBrowserWindow from '../../infrastructure/browser-window-hook'
+import getMeta from '../../utils/meta'
 
 export const EditorContext = createContext()
 
@@ -23,12 +23,7 @@ EditorContext.Provider.propTypes = {
 }
 
 export function EditorProvider({ children, ide, settings }) {
-  const {
-    exposedSettings: { appName }
-  } = useApplicationContext({
-    exposedSettings: PropTypes.shape({ appName: PropTypes.string.isRequired })
-      .isRequired
-  })
+  const appName = getMeta('ol-appName')
 
   const cobranding = window.brandVariation
     ? {

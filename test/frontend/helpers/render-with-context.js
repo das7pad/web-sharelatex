@@ -11,7 +11,6 @@ export function renderWithEditorContext(
   { user = { id: '123abd' }, projectId = 'project123' } = {}
 ) {
   window.user = user || window.user
-  window.ExposedSettings.appName = 'test'
   window.project_id = projectId != null ? projectId : window.project_id
   window._ide = {
     $scope: {

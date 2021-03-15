@@ -5,10 +5,12 @@ import {
   putJSON
 } from '../../../infrastructure/fetch-json'
 import { executeV2Captcha } from './captcha'
+import getMeta from '../../../utils/meta'
 
 export function sendInvite(project, email, privileges) {
+  const recaptchaDisabled = getMeta('ol-recaptchaDisabled')
   return executeV2Captcha(
-    window.ExposedSettings.recaptchaDisabled?.invite
+    recaptchaDisabled ? recaptchaDisabled.invite : true
   ).then(grecaptchaResponse => {
     return postJSON(`/project/${project._id}/invite`, {
       body: {
