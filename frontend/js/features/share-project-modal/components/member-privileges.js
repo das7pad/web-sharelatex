@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Trans } from 'react-i18next'
+import { Trans } from '../../../components/trans'
 
 export default function MemberPrivileges({ privileges }) {
   switch (privileges) {

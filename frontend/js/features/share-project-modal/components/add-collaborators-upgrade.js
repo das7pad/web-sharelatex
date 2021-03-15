@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Trans } from 'react-i18next'
 import { Button } from 'react-bootstrap'
 import Icon from '../../../shared/components/icon'
 import { startFreeTrial, upgradePlan } from '../../../main/account-upgrade'
 import { useShareProjectContext } from './share-project-modal'
+import { Trans } from '../../../components/trans'
 
 export default function AddCollaboratorsUpgrade() {
   const { eventTracking } = useShareProjectContext()

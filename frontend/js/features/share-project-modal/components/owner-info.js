@@ -1,7 +1,7 @@
 import React from 'react'
 import { useProjectContext } from './share-project-modal'
 import { Col, Row } from 'react-bootstrap'
-import { Trans } from 'react-i18next'
+import { Trans } from '../../../components/trans'
 
 export default function OwnerInfo() {
   const project = useProjectContext()

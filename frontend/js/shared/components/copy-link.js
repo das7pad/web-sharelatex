@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import PropTypes from 'prop-types'
-import { Trans } from 'react-i18next'
 import Icon from './icon'
+import { Trans } from '../../components/trans'
 
 export default function CopyLink({ link, tooltipId }) {
   const [copied, setCopied] = useState(false)

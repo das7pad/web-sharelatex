@@ -1,11 +1,11 @@
 import React, { useMemo, useState, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { Trans } from 'react-i18next'
 import { matchSorter } from 'match-sorter'
 import { useCombobox } from 'downshift'
 import classnames from 'classnames'
 
 import Icon from '../../../shared/components/icon'
+import { Trans } from '../../../components/trans'
 
 export default function SelectCollaborators({
   loading,

@@ -6,9 +6,9 @@ import {
 } from './share-project-modal'
 import Icon from '../../../shared/components/icon'
 import { Button, Col, Row, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { Trans } from 'react-i18next'
 import MemberPrivileges from './member-privileges'
 import { resendInvite, revokeInvite } from '../utils/api'
+import { Trans } from '../../../components/trans'
 
 export default function Invite({ invite, isAdmin }) {
   return (

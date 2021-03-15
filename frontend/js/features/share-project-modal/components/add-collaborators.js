@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
-import { useTranslation, Trans } from 'react-i18next'
 import { Form, FormGroup, FormControl, Button } from 'react-bootstrap'
 import { useMultipleSelection } from 'downshift'
 import {
@@ -9,6 +8,8 @@ import {
 import SelectCollaborators from './select-collaborators'
 import { resendInvite, sendInvite } from '../utils/api'
 import { useUserContacts } from '../hooks/use-user-contacts'
+import { Trans } from '../../../components/trans'
+import t from '../../../misc/t'
 
 export default function AddCollaborators() {
   const [privileges, setPrivileges] = useState('readAndWrite')
@@ -25,8 +26,6 @@ export default function AddCollaborators() {
   }, [isMounted])
 
   const { data: contacts } = useUserContacts()
-
-  const { t } = useTranslation()
 
   const { updateProject, setInFlight, setError } = useShareProjectContext()
 

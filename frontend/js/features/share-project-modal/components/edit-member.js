@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { Trans, useTranslation } from 'react-i18next'
 import {
   useProjectContext,
   useShareProjectContext
@@ -17,6 +16,8 @@ import {
   Tooltip
 } from 'react-bootstrap'
 import { removeMemberFromProject, updateMember } from '../utils/api'
+import t from '../../../misc/t'
+import { Trans } from '../../../components/trans'
 
 export default function EditMember({ member }) {
   const [privileges, setPrivileges] = useState(member.privileges)
@@ -93,8 +94,6 @@ EditMember.propTypes = {
 }
 
 function SelectPrivilege({ value, handleChange }) {
-  const { t } = useTranslation()
-
   return (
     <FormControl
       componentClass="select"
