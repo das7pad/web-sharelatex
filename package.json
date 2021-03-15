@@ -70,7 +70,6 @@
     "marked": "^0.7.0",
     "mmmagic": "^0.5.3",
     "moment": "^2.24.0",
-    "mongojs": "https://github.com/das7pad/mongojs/archive/e39e97bf289435e2d111c6201d3306b6b776d31e.tar.gz",
     "mongoose": "^5.10.7",
     "multer": "https://github.com/overleaf/multer/archive/7a2928d7ea2da02dd92888ea1c9ba5704e07aeeb.tar.gz",
     "nocache": "^2.1.0",
