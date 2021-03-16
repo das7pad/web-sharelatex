@@ -151,6 +151,7 @@
     "postcss-loader": "^3.0.0",
     "prop-types": "^15.7.2",
     "pug": "2.0.4",
+    "recurly": "^4.0.0",
     "react": "^16.13.1",
     "react-bootstrap": "^0.33.1",
     "react-dnd": "^11.1.3",

@@ -53,7 +53,8 @@ module.exports = {
     recurly: {
       // Set up our own mock recurly server
       url: `http://${process.env.RECURLY_HOST || 'localhost'}:6034`,
-      subdomain: 'test'
+      subdomain: 'test',
+      apiKey: 'private-nonsense'
     }
   },
 
