@@ -1,4 +1,3 @@
-const recurly = require('recurly')
 const Settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
 const { callbackify } = require('util')
@@ -7,7 +6,11 @@ const UserGetter = require('../User/UserGetter')
 const recurlySettings = Settings.apis.recurly
 const recurlyApiKey = recurlySettings ? recurlySettings.apiKey : undefined
 
-const client = new recurly.Client(recurlyApiKey)
+let client, recurly
+if (recurlyApiKey) {
+  recurly = require('recurly')
+  client = new recurly.Client(recurlyApiKey)
+}
 
 module.exports = {
   errors: recurly.errors,
