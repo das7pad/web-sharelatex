@@ -12,6 +12,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const { expect } = require('chai')
+const Settings = require('@overleaf/settings')
 
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongodb')
 const User = require('./helpers/User')
@@ -22,6 +23,9 @@ let MockV1HistoryApi
 before(function() {
   MockV1HistoryApi = MockV1HistoryApiClass.instance()
 })
+
+const initialPollDelay = Settings.historyZipDownloadRetryDelay || 2000
+const generalRequestLatency = 100
 
 describe('History', function() {
   this.timeout(10000)
@@ -158,7 +162,7 @@ describe('History', function() {
         setTimeout(() => {
           expect(MockV1HistoryApi.requestedZipPacks).to.equal(0)
           done()
-        }, 500)
+        }, generalRequestLatency)
       })
 
       it('should skip the async-polling', function(done) {
@@ -172,7 +176,7 @@ describe('History', function() {
         setTimeout(() => {
           expect(MockV1HistoryApi.fakeZipCall).to.equal(0)
           done()
-        }, 3000) // initial polling delay is 2s
+        }, initialPollDelay + generalRequestLatency)
       })
 
       it('should skip the upstream request', function(done) {
@@ -182,13 +186,13 @@ describe('History', function() {
         MockV1HistoryApi.events.on('v1-history-pack-zip', () => {
           setTimeout(() => {
             request.abort()
-          }, 1000)
+          }, generalRequestLatency)
         })
         request.on('error', done)
         setTimeout(() => {
           expect(MockV1HistoryApi.fakeZipCall).to.equal(0)
           done()
-        }, 3000) // initial polling delay is 2s
+        }, initialPollDelay + generalRequestLatency)
       })
     })
 

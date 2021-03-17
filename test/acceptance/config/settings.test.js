@@ -18,6 +18,10 @@ module.exports = {
       `mongodb://${process.env.MONGO_HOST || '127.0.0.1'}/sharelatex_dev`
   },
 
+  // faster zip download tests
+  historyZipDownloadRetryDelay: 200,
+  historyZipDownloadRetryDelayInc: 100,
+
   cacheStaticAssets: true,
   enableSubscriptions: true,
   allowPublicAccess: true,

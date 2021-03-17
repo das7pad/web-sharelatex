@@ -357,7 +357,7 @@ module.exports = HistoryController = {
         return
       }
       let retryAttempt = 0
-      let retryDelay = 2000
+      let retryDelay = settings.historyZipDownloadRetryDelay || 2000
       // retry for about 6 minutes starting with short delay
       async.retry(
         40,
@@ -370,7 +370,7 @@ module.exports = HistoryController = {
 
             // increase delay by 1 second up to 10
             if (retryDelay < 10000) {
-              retryDelay += 1000
+              retryDelay += settings.historyZipDownloadRetryDelayInc || 1000
             }
             retryAttempt++
             const getReq = request({
