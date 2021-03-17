@@ -11,7 +11,6 @@ import {
 } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import ShareProjectModal from '../../../../../frontend/js/features/share-project-modal/components/share-project-modal'
-import * as locationModule from '../../../../../frontend/js/features/share-project-modal/utils/location'
 
 describe('<ShareProjectModal/>', function() {
   const project = {
@@ -514,7 +513,12 @@ describe('<ShareProjectModal/>', function() {
       hidden: true
     })
 
-    const reloadStub = sinon.stub(locationModule, 'reload')
+    // Monkey patch window.location.reload()
+    // jsdom does not implement the underlying `navigation` constructs.
+    const oldLocation = window.location
+    delete window.location
+    const reloadStub = sinon.stub()
+    window.location = { reload: reloadStub }
 
     await act(async () => {
       await fireEvent.click(confirmButton)
@@ -526,7 +530,9 @@ describe('<ShareProjectModal/>', function() {
 
     expect(fetchMock.done()).to.be.true
     expect(reloadStub.calledOnce).to.be.true
-    reloadStub.restore()
+
+    // Restore location object
+    window.location = oldLocation
   })
 
   it('sends invites to input email addresses', async function() {
