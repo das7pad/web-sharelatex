@@ -52,6 +52,7 @@ describe('AuthenticationController', function() {
         '../../infrastructure/SessionStoreManager': (this.SessionStoreManager = {}),
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
+          fatal: sinon.stub(),
           warn: sinon.stub(),
           error: sinon.stub(),
           err: sinon.stub()
@@ -161,26 +162,32 @@ describe('AuthenticationController', function() {
       })
     })
 
-    it('should block an admin with a missing email', function(done) {
+    it('should block an admin with a missing email', function() {
       this.AuthenticationController.getSessionUser = sinon
         .stub()
         .returns({ isAdmin: true })
-      this.AuthenticationController.validateAdmin(this.req, this.res, err => {
-        this.AuthenticationController.getSessionUser.called.should.equal(true)
-        expect(err).to.exist
-        done()
-      })
+      this.AuthenticationController.validateAdmin(this.req, this.res, this.next)
+
+      this.AuthenticationController.getSessionUser.called.should.equal(true)
+      expect(this.logger.fatal).to.have.been.calledWith(
+        sinon.match.any,
+        '[ValidateAdmin] Admin user without email address'
+      )
+      expect(this.res.statusCode).to.equal(403)
+      expect(this.next).to.not.have.been.called
     })
 
-    it('should block an admin with a bad domain', function(done) {
+    it('should block an admin with a bad domain', function() {
       this.AuthenticationController.getSessionUser = sinon
         .stub()
         .returns(this.badAdmin)
-      this.AuthenticationController.validateAdmin(this.req, this.res, err => {
-        this.AuthenticationController.getSessionUser.called.should.equal(true)
-        expect(err).to.exist
-        done()
-      })
+      this.AuthenticationController.validateAdmin(this.req, this.res, this.next)
+      expect(this.logger.fatal).to.have.been.calledWith(
+        sinon.match.any,
+        '[ValidateAdmin] Admin user with invalid email domain'
+      )
+      expect(this.res.statusCode).to.equal(403)
+      expect(this.next).to.not.have.been.called
     })
   })
 

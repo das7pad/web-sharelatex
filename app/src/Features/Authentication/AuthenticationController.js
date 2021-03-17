@@ -332,22 +332,18 @@ const AuthenticationController = {
       return next()
     }
     const email = user.email
+    let errMessage
     if (email == null) {
-      return next(
-        new OError('[ValidateAdmin] Admin user without email address', {
-          userId: user._id
-        })
-      )
+      errMessage = '[ValidateAdmin] Admin user without email address'
+    } else if (!adminDomains.some(domain => email.endsWith(`@${domain}`))) {
+      errMessage = '[ValidateAdmin] Admin user with invalid email domain'
     }
-    if (!adminDomains.find(domain => email.endsWith(`@${domain}`))) {
-      return next(
-        new OError('[ValidateAdmin] Admin user with invalid email domain', {
-          email: email,
-          userId: user._id
-        })
-      )
+    if (errMessage) {
+      logger.fatal({ req, email, userId: user._id }, errMessage)
+      res.sendStatus(403)
+    } else {
+      next()
     }
-    return next()
   },
 
   httpAuth: basicAuth(function(user, pass) {
