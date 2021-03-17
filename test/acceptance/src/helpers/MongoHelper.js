@@ -3,20 +3,13 @@ const { waitForDb, db } = require('../../../../app/src/infrastructure/mongodb')
 
 module.exports = {
   initialize() {
-    before(waitForDb)
+    before('waitForDb', waitForDb)
 
-    before(function(done) {
-      exec('bin/east migrate', (error, stdout, stderr) => {
-        console.log(stdout)
-        console.error(stderr)
-        if (error) {
-          throw error
-        }
-        done()
-      })
+    before('migrate', function(done) {
+      exec('bin/east migrate', done)
     })
 
-    afterEach(async function() {
+    afterEach('clearDb', async function() {
       return Promise.all(
         Object.values(db).map(collection => collection.deleteMany({}))
       )
