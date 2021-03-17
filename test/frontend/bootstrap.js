@@ -38,7 +38,19 @@ const fetch = require('node-fetch')
 global.fetch = (url, ...options) => fetch('http://localhost' + url, ...options)
 
 // Mock global settings
-window.ExposedSettings = {}
+function insertMeta(id, content, type) {
+  const meta = document.createElement('meta')
+  meta.id = id
+  meta.content = content
+  if (typeof content === 'boolean') {
+    meta.setAttribute('data-boolean', true)
+  }
+  if (typeof content === 'object') {
+    meta.setAttribute('data-json', true)
+  }
+  document.body.appendChild(meta)
+}
+insertMeta('ol-appName', 'Overleaf')
 
 // Work around bundler hack in react-dom
 // esbuild does not populate the obfuscated require call when bundling.

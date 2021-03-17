@@ -20,7 +20,8 @@ export function renderWithEditorContext(
         }
       },
       ui: {
-        chatOpen: true
+        chatOpen: true,
+        pdfLayout: 'flat'
       },
       $watch: () => {}
     },
@@ -31,11 +32,7 @@ export function renderWithEditorContext(
   }
   return render(
     <ApplicationProvider>
-      <EditorProvider
-        openDoc={() => {}}
-        onlineUsersArray={[]}
-        $scope={window._ide.$scope}
-      >
+      <EditorProvider ide={window._ide} settings={{}}>
         <LayoutProvider $scope={window._ide.$scope}>{children}</LayoutProvider>
       </EditorProvider>
     </ApplicationProvider>

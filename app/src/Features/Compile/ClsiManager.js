@@ -482,6 +482,7 @@ const ClsiManager = {
             compileOptions: req.compile.options,
             rootResourcePath: req.compile.rootResourcePath,
             clsiResponse: body,
+            headers: response.headers,
             statusCode: response.statusCode
           })
         )
