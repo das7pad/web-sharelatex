@@ -308,9 +308,9 @@ form.row(
 								| &nbsp;{{translate("generic_something_went_wrong")}}.
 								br
 								if samlError.translatedMessage
-									| !{samlError.translatedMessage}
+									span(ng-non-bindable) !{samlError.translatedMessage}
 								else if samlError.message
-									| #{samlError.message}
+									span(ng-non-bindable) #{samlError.message}
 								if samlError.tryAgain
 									br
 									| &nbsp;{{translate("try_again")}}.
