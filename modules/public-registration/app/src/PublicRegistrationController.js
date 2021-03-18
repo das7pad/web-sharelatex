@@ -73,8 +73,7 @@ module.exports = PublicRegistrationController = {
     return res.render(Path.resolve(__dirname, '../views/register'), {
       title: 'register',
       sharedProjectData,
-      newTemplateData,
-      new_email: req.query.new_email || ''
+      newTemplateData
     })
   },
 
