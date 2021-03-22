@@ -136,6 +136,14 @@ const AuthenticationManager = {
     if (Settings.security.disableBcryptRoundsUpgrades) {
       return callback()
     }
+
+    if (
+      user._id.toString() === (Settings.smokeTest && Settings.smokeTest.userId)
+    ) {
+      // PERF: keep the smoke test users password cheap on the CPU
+      return callback()
+    }
+
     // check current number of rounds and rehash if necessary
     const currentRounds = bcrypt.getRounds(hashedPassword)
     if (currentRounds < BCRYPT_ROUNDS) {
