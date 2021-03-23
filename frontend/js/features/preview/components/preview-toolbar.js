@@ -235,6 +235,10 @@ function PreviewToolbar({
         <PreviewLogsToggleButton
           logsState={logsState}
           showLogs={showLogs}
+          autoCompileLintingError={
+            compilerState.isAutoCompileOn &&
+            compilerState.autoCompileHasLintingError
+          }
           compileFailed={compilerState.compileFailed}
           onToggle={onToggleLogs}
           showText={showToggleText}
@@ -255,6 +259,7 @@ function PreviewToolbar({
 
 PreviewToolbar.propTypes = {
   compilerState: PropTypes.shape({
+    autoCompileHasLintingError: PropTypes.bool,
     isAutoCompileOn: PropTypes.bool.isRequired,
     isCompiling: PropTypes.bool.isRequired,
     isDraftModeOn: PropTypes.bool.isRequired,
@@ -264,8 +269,7 @@ PreviewToolbar.propTypes = {
   }),
   logsState: PropTypes.shape({
     nErrors: PropTypes.number.isRequired,
-    nWarnings: PropTypes.number.isRequired,
-    nLogEntries: PropTypes.number.isRequired
+    nWarnings: PropTypes.number.isRequired
   }),
   showLogs: PropTypes.bool.isRequired,
   splitLayout: PropTypes.bool.isRequired,
