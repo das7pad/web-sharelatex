@@ -2,7 +2,14 @@
 require('@babel/register')
 
 // Load JSDOM to mock the DOM in Node
-require('jsdom-global/register')
+// Set pretendToBeVisual to enable requestAnimationFrame
+require('jsdom-global')(undefined, { pretendToBeVisual: true })
+
+const path = require('path')
+process.env.SHARELATEX_CONFIG = path.resolve(
+  __dirname,
+  '../../config/settings.webpack.coffee'
+)
 
 // Load sinon-chai assertions so expect(stubFn).to.have.been.calledWith('abc')
 // has a nicer failure messages
@@ -54,6 +61,15 @@ function insertMeta(id, content, type) {
   if (typeof content === 'object') {
     meta.setAttribute('data-json', true)
   }
+  if (typeof content === 'number') {
+    meta.setAttribute('data-json', true)
+  }
   document.body.appendChild(meta)
 }
 insertMeta('ol-appName', 'Overleaf')
+insertMeta('ol-maxEntitiesPerProject', 10)
+insertMeta('ol-maxUploadSize', 5 * 1024 * 1024)
+
+// ignore CSS files
+const { addHook } = require('pirates')
+addHook(() => '', { exts: ['.css'], ignoreNodeModules: false })
