@@ -12,7 +12,7 @@ const cache = new Map()
 
 export default function getMeta(name, fallback) {
   if (cache.has(name)) return cache.get(name)
-  const element = document.head.querySelector(`meta[name="${name}"]`)
+  const element = document.querySelector(`meta[name="${name}"]`)
   if (!element) {
     return fallback
   }
