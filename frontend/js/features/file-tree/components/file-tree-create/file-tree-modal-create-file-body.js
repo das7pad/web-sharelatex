@@ -8,9 +8,7 @@ import FileTreeCreateNameProvider from '../../contexts/file-tree-create-name'
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import { useFileTreeMutable } from '../../contexts/file-tree-mutable'
 
-import importOverleafModules from '../../../../../macros/import-overleaf-module.macro'
-
-const createFileModeModules = importOverleafModules('createFileModes')
+const createFileModeModules = []
 
 export default function FileTreeModalCreateFileBody() {
   const { newFileCreateMode } = useFileTreeActionable()
