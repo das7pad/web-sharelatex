@@ -51,10 +51,6 @@ function PreviewPane({
     compilerState.logEntries && compilerState.logEntries.warnings
       ? compilerState.logEntries.warnings.length
       : 0
-  const nLogEntries =
-    compilerState.logEntries && compilerState.logEntries.all
-      ? compilerState.logEntries.all.length
-      : 0
 
   const hasCLSIErrors =
     compilerState.errors &&
@@ -82,7 +78,7 @@ function PreviewPane({
     <>
       <PreviewToolbar
         compilerState={compilerState}
-        logsState={{ nErrors, nWarnings, nLogEntries }}
+        logsState={{ nErrors, nWarnings }}
         showLogs={showLogs}
         onRecompile={onRecompile}
         onRecompileFromScratch={onRecompileFromScratch}
@@ -128,6 +124,7 @@ function PreviewPane({
           rawLog={compilerState.rawLog}
           validationIssues={compilerState.validationIssues}
           errors={compilerState.errors}
+          autoCompileHasLintingError={compilerState.autoCompileHasLintingError}
           outputFiles={outputFiles}
           onLogEntryLocationClick={onLogEntryLocationClick}
           isClearingCache={compilerState.isClearingCache}
@@ -141,6 +138,7 @@ function PreviewPane({
 
 PreviewPane.propTypes = {
   compilerState: PropTypes.shape({
+    autoCompileHasLintingError: PropTypes.bool,
     isAutoCompileOn: PropTypes.bool.isRequired,
     isCompiling: PropTypes.bool.isRequired,
     isDraftModeOn: PropTypes.bool.isRequired,

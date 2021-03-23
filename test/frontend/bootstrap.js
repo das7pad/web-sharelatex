@@ -38,19 +38,28 @@ const fetch = require('node-fetch')
 global.fetch = (url, ...options) => fetch('http://localhost' + url, ...options)
 
 // Mock global settings
-function insertMeta(id, content, type) {
+function insertMeta(name, content) {
   const meta = document.createElement('meta')
-  meta.id = id
+  meta.name = name
   meta.content = content
   if (typeof content === 'boolean') {
-    meta.setAttribute('data-boolean', true)
+    meta.setAttribute('data-type', 'boolean')
   }
   if (typeof content === 'object') {
-    meta.setAttribute('data-json', true)
+    meta.setAttribute('data-type', 'json')
   }
-  document.body.appendChild(meta)
+  if (typeof content === 'number') {
+    meta.setAttribute('data-type', 'json')
+  }
+  document.head.appendChild(meta)
 }
 insertMeta('ol-appName', 'Overleaf')
+insertMeta('ol-maxEntitiesPerProject', 10)
+insertMeta('ol-maxUploadSize', 5 * 1024 * 1024)
+
+// ignore CSS files
+const { addHook } = require('pirates')
+addHook(() => '', { exts: ['.css'], ignoreNodeModules: false })
 
 // Work around bundler hack in react-dom
 // esbuild does not populate the obfuscated require call when bundling.

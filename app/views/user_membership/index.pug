@@ -5,7 +5,7 @@ block content
 		.container
 			.row
 				.col-md-10.col-md-offset-1(ng-cloak)
-					meta(id="ol-userMembershipName" content=name)
+					meta(name="ol-userMembershipName" content=name)
 					h1 {{getMeta("ol-userMembershipName") || translate("#{translations.title}")}}
 					.card(ng-controller="UserMembershipController")
 						.page-header
@@ -108,6 +108,6 @@ block content
 								.col-xs-2.col-xs-offset-10(ng-if="paths.exportMembers", ng-cloak)
 									a(href=paths.exportMembers) {{translate('export_csv')}}
 
-	meta(id="ol-users" data-json content=users)
-	meta(id="ol-paths" data-json content=paths)
-	meta(id="ol-groupSize" data-json content=groupSize)
+	meta(name="ol-users" data-type="json" content=users)
+	meta(name="ol-paths" data-type="json" content=paths)
+	meta(name="ol-groupSize" data-type="json" content=groupSize)

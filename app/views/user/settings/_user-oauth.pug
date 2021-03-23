@@ -1,7 +1,7 @@
 block head-scripts
-	meta(id="ol-oauthProviders" data-json content=oauthProviders)
-	meta(id="ol-thirdPartyIds" data-json content=thirdPartyIds)
-	meta(id="ol-isOverleaf" data-boolean content=!!settings.overleaf)
+	meta(name="ol-oauthProviders" data-type="json" content=oauthProviders)
+	meta(name="ol-thirdPartyIds" data-type="json" content=thirdPartyIds)
+	meta(name="ol-isOverleaf" data-type="boolean" content=!!settings.overleaf)
 
 mixin providerList()
 	ul.list-like-table

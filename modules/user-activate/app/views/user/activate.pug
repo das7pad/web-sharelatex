@@ -57,4 +57,4 @@ block content
 									span(ng-show="!activationForm.inflight") {{translate("activate")}}
 									span(ng-show="activationForm.inflight") {{translate("activating")}}…
 
-	meta(id="ol-passwordStrengthOptions" data-json content=(settings.passwordStrengthOptions || {}))
+	meta(name="ol-passwordStrengthOptions" data-type="json" content=(settings.passwordStrengthOptions || {}))

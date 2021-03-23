@@ -5,48 +5,51 @@
 // - stage 3: refactor window access to getMeta()
 // - stage 4: delete convertMetaToWindowAttributes()
 // ----------------
+import _ from 'lodash'
 
 // cache for parsed values
 const cache = new Map()
 
-export default function getMeta(id, fallback) {
-  if (cache.has(id)) return cache.get(id)
-  const element = document.getElementById(id)
+export default function getMeta(name, fallback) {
+  if (cache.has(name)) return cache.get(name)
+  const element = document.querySelector(`meta[name="${name}"]`)
   if (!element) {
     return fallback
   }
-  let value = element.content
-  if (element.hasAttribute('data-boolean')) {
-    // in pug: content=false -> no content field
-    // in pug: content=true -> empty content field
-    value = element.hasAttribute('content')
-  } else if (element.hasAttribute('data-json')) {
-    if (!value) {
-      // JSON.parse('') throws
-      value = undefined
-    } else {
-      value = JSON.parse(value)
-    }
+  const plainTextValue = element.content
+  let value
+  switch (element.dataset.type) {
+    case 'boolean':
+      // in pug: content=false -> no content field
+      // in pug: content=true  -> empty content field
+      value = element.hasAttribute('content')
+      break
+    case 'json':
+      if (!plainTextValue) {
+        // JSON.parse('') throws
+        value = undefined
+      } else {
+        value = JSON.parse(plainTextValue)
+      }
+      break
+    default:
+      value = plainTextValue
   }
-  cache.set(id, value)
+  cache.set(name, value)
   return value
 }
 
-export function convertMetaToWindowAttributes() {
-  window.data = {}
-  Array.from(document.querySelectorAll('meta[id^="ol-"]'))
-    .map(element => element.id)
+function convertMetaToWindowAttributes() {
+  window.data = window.data || {}
+  Array.from(document.querySelectorAll('meta[name^="ol-"]'))
+    .map(element => element.name)
     // process short labels before long ones:
     // e.g. assign 'sharelatex' before 'sharelatex.templates'
     .sort()
-    .forEach(id => {
-      const path = id.slice(3).split('.')
-      const label = path.pop()
-      const parent = path.reduce((container, field) => {
-        return container[field]
-      }, window)
-      parent[label] = getMeta(id)
-      window.data[label] = getMeta(id)
+    .forEach(nameWithNamespace => {
+      const label = nameWithNamespace.slice('ol-'.length)
+      _.set(window, label, getMeta(nameWithNamespace))
+      _.set(window.data, label, getMeta(nameWithNamespace))
     })
 }
 convertMetaToWindowAttributes()

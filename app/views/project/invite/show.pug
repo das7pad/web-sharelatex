@@ -7,7 +7,7 @@ block content
 				.col-md-8.col-md-offset-2
 					.card.project-invite-accept
 						.page-header.text-centered
-							meta(id="ol-projectInviteContext" data-json content={username: owner.first_name, projectname: project.name})
+							meta(name="ol-projectInviteContext" data-type="json" content={username: owner.first_name, projectname: project.name})
 							h1(ng-cloak) {{translate("user_wants_you_to_see_project", getMeta("ol-projectInviteContext"))}}
 						.row.text-center
 							.col-md-12

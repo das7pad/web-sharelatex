@@ -8,8 +8,8 @@ block head-scripts
 	script(src=staticPath("/vendor/sigma-master/plugins/sigma.renderers.parallelEdges.min.js"))
 
 block content
-	meta(id="ol-user" data-json content=user)
-	meta(id="ol-graph" data-json content=graph)
+	meta(name="ol-user" data-type="json" content=user)
+	meta(name="ol-graph" data-type="json" content=graph)
 
 	.content.content-alt(ng-controller="AdminGraphController")
 		.container(ng-cloak)

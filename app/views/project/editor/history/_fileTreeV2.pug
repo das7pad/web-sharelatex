@@ -56,4 +56,4 @@ script(type="text/ng-template", id="historyFileEntityTpl")
 				file-entity="childEntity"
 			)
 
-meta(id="ol-fileActionI18n" data-json content=['edited', 'renamed', 'created', 'deleted'].reduce((acc, i) => {acc[i] = translate('file_action_' + i); return acc}, {}))
+meta(name="ol-fileActionI18n" data-type="json" content=['edited', 'renamed', 'created', 'deleted'].reduce((acc, i) => {acc[i] = translate('file_action_' + i); return acc}, {}))
