@@ -12,6 +12,7 @@ import '@uppy/core/dist/style.css'
 import '@uppy/dashboard/dist/style.css'
 import { refreshProjectMetadata } from '../../../util/api'
 import ErrorMessage from '../error-message'
+import getMeta from '../../../../../utils/meta'
 
 export default function FileTreeUploadDoc() {
   const { parentFolderId, cancel, isDuplicate } = useFileTreeActionable()
@@ -23,7 +24,7 @@ export default function FileTreeUploadDoc() {
   const [overwrite, setOverwrite] = useState(false)
 
   const maxNumberOfFiles = 40
-  const maxFileSize = window.ExposedSettings.maxUploadSize
+  const maxFileSize = getMeta('ol-maxUploadSize')
 
   // calculate conflicts
   const buildConflicts = files =>

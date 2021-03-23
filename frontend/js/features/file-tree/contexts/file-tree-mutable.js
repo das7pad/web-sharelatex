@@ -12,6 +12,7 @@ import {
   moveInTree,
   createEntityInTree
 } from '../util/mutate-in-tree'
+import getMeta from '../../../utils/meta'
 
 const FileTreeMutableContext = createContext()
 
@@ -196,7 +197,7 @@ function countFiles(fileTreeData) {
   // count all the non-deleted entities
   const value = files.filter(item => !item.deleted).length
 
-  const limit = window.ExposedSettings.maxEntitiesPerProject
+  const limit = getMeta('ol-maxEntitiesPerProject')
   const status = fileCountStatus(value, limit, Math.ceil(limit / 20))
 
   return { value, status, limit }
