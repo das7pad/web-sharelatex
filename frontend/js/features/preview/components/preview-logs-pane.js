@@ -125,7 +125,6 @@ function PreviewLogsPane({
 }
 
 function AutoCompileLintingErrorEntry() {
-  const { t } = useTranslation()
   return (
     <div className="log-entry">
       <div className="log-entry-header log-entry-header-error">

@@ -106,7 +106,6 @@ function CompilationResult({
 }
 
 function ViewPdf({ textStyle }) {
-  const { t } = useTranslation()
   return (
     <>
       <Icon type="file-pdf-o" />
