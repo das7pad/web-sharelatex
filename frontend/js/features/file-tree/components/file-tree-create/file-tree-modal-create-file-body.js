@@ -7,6 +7,7 @@ import FileTreeModalCreateFileMode from './file-tree-modal-create-file-mode'
 import FileTreeCreateNameProvider from '../../contexts/file-tree-create-name'
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import { useFileTreeMutable } from '../../contexts/file-tree-mutable'
+import getMeta from '../../../../utils/meta'
 
 const createFileModeModules = []
 
@@ -42,7 +43,7 @@ export default function FileTreeModalCreateFileBody() {
                 label="From Another Project"
               />
 
-              {window.ExposedSettings.hasLinkUrlFeature && (
+              {getMeta('ol-hasLinkUrlFeature') && (
                 <FileTreeModalCreateFileMode
                   mode="url"
                   icon="globe"
