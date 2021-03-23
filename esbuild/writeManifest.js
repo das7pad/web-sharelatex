@@ -25,10 +25,20 @@ module.exports = async function(meta) {
     .filter(([path, details]) => details.entryPoint)
     .forEach(([path, details]) => {
       const src = normalizeEntrypoint(details.entryPoint)
+
+      // Load entrypoint individually
       manifest[src] = pathInPublic(path)
+
+      // Load entrypoint with chunks
       entrypoints[src] = details.imports
         .map(item => pathInPublic(item.path))
         .concat([pathInPublic(path)])
+
+      // Optionally provide access to extracted css
+      const cssChunk = path.slice(0, -3) + '.css'
+      if (meta.outputs[cssChunk]) {
+        manifest[src + '.css'] = pathInPublic(cssChunk)
+      }
     })
 
   const assetFileTypes = ['.woff', '.woff2', '.png', '.svg', '.gif']
