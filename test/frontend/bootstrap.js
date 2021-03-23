@@ -51,18 +51,18 @@ const fetch = require('node-fetch')
 global.fetch = (url, ...options) => fetch('http://localhost' + url, ...options)
 
 // Mock global settings
-function insertMeta(id, content, type) {
+function insertMeta(name, content) {
   const meta = document.createElement('meta')
-  meta.id = id
+  meta.name = name
   meta.content = content
   if (typeof content === 'boolean') {
-    meta.setAttribute('data-boolean', true)
+    meta.setAttribute('data-type', 'boolean')
   }
   if (typeof content === 'object') {
-    meta.setAttribute('data-json', true)
+    meta.setAttribute('data-type', 'json')
   }
   if (typeof content === 'number') {
-    meta.setAttribute('data-json', true)
+    meta.setAttribute('data-type', 'json')
   }
   document.body.appendChild(meta)
 }

@@ -4,16 +4,16 @@ block vars
 	- var suppressNavContentLinks = true
 
 block content
-	meta(id="ol-projects" data-json content=projects)
-	meta(id="ol-tags" data-json content=tags)
-	meta(id="ol-publicUrlNotifications", content=settings.apis.notifications.publicUrl)
-	meta(id="ol-jwtNotifications" content=jwtNotifications)
-	meta(id="ol-notificationsInstitution" data-json content=notificationsInstitution)
-	meta(id="ol-userAffiliations" data-json content=userAffiliations)
-	meta(id="ol-userEmails" data-json content=userEmails)
-	meta(id="ol-allInReconfirmNotificationPeriods" data-json content=allInReconfirmNotificationPeriods)
-	meta(id="ol-reconfirmedViaSAML" content=reconfirmedViaSAML)
-	meta(id="ol-algolia" data-json content={
+	meta(name="ol-projects" data-type="json" content=projects)
+	meta(name="ol-tags" data-type="json" content=tags)
+	meta(name="ol-publicUrlNotifications", content=settings.apis.notifications.publicUrl)
+	meta(name="ol-jwtNotifications" content=jwtNotifications)
+	meta(name="ol-notificationsInstitution" data-type="json" content=notificationsInstitution)
+	meta(name="ol-userAffiliations" data-type="json" content=userAffiliations)
+	meta(name="ol-userEmails" data-type="json" content=userEmails)
+	meta(name="ol-allInReconfirmNotificationPeriods" data-type="json" content=allInReconfirmNotificationPeriods)
+	meta(name="ol-reconfirmedViaSAML" content=reconfirmedViaSAML)
+	meta(name="ol-algolia" data-type="json" content={
 			institutions: {
 				app_id:  algolia_app_id,
 				api_key: algolia_api_key

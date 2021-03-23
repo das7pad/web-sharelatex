@@ -1,8 +1,8 @@
 extends ../../../../../app/views/_layout
 
 block content
-	meta(id="ol-user" data-json content=user)
-	meta(id="ol-projects" data-json content=projects)
+	meta(name="ol-user" data-type="json" content=user)
+	meta(name="ol-projects" data-type="json" content=projects)
 
 	.content.content-alt(ng-controller="AdminUserController")
 		.container(ng-cloak)

@@ -1,10 +1,10 @@
 extends ../../../../app/views/_layout
 
 block content
-	meta(id="ol-wsUrl" content=wsUrl)
-	meta(id="ol-adminUserExists" data-boolean content=adminUserExists)
-	meta(id="ol-ideJsPath" content=buildJsPath('ide.js'))
-	meta(id="ol-authMethod" content=authMethod)
+	meta(name="ol-wsUrl" content=wsUrl)
+	meta(name="ol-adminUserExists" data-type="boolean" content=adminUserExists)
+	meta(name="ol-ideJsPath" content=buildJsPath('ide.js'))
+	meta(name="ol-authMethod" content=authMethod)
 
 	style.
 		hr { margin-bottom: 5px; }

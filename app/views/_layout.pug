@@ -23,27 +23,27 @@ html(
 				if !subdomainDetails.hide
 					link(rel="alternate", href=getTranslationUrl(subdomainDetails), hreflang=subdomainDetails.lngCode)
 
-		meta(id="ol-staticPath", content=staticPath('/'))
-		meta(id="ol-csrfToken" content=csrfToken)
-		meta(id="ol-appName" content=settings.appName)
+		meta(name="ol-staticPath", content=staticPath('/'))
+		meta(name="ol-csrfToken" content=csrfToken)
+		meta(name="ol-appName" content=settings.appName)
 
 		block head-scripts
 
-		meta(id="ol-usersEmail" content=getUserEmail())
-		meta(id="ol-sharelatex" data-json content={
+		meta(name="ol-usersEmail" content=getUserEmail())
+		meta(name="ol-sharelatex" data-type="json" content={
 				siteUrl: settings.siteUrl,
 			})
-		meta(id="ol-user_id" content=getLoggedInUserId())
+		meta(name="ol-user_id" content=getLoggedInUserId())
 
 		- if (typeof(settings.algolia) != "undefined")
-			meta(id="ol-sharelatex.algolia" data-json content={
+			meta(name="ol-sharelatex.algolia" data-type="json" content={
 					app_id: settings.algolia.app_id,
 					api_key: settings.algolia.read_only_api_key,
 					indexes: settings.algolia.indexes
 				})
 
 		- if (typeof(settings.templates) != "undefined")
-			meta(id="ol-sharelatex.templates" data-json content={
+			meta(name="ol-sharelatex.templates" data-type="json" content={
 					user_id : settings.templates.user_id,
 					cdnDomain : settings.templates.cdnDomain,
 					indexName : settings.templates.indexName
@@ -52,7 +52,7 @@ html(
 
 	body(ng-csp)
 		if(settings.recaptcha && settings.recaptcha.siteKeyV3)
-			meta(id='ol-recaptchaSiteKeyV3' content=settings.recaptcha.siteKeyV3)
+			meta(name="ol-recaptchaSiteKeyV3" content=settings.recaptcha.siteKeyV3)
 			script(type="text/javascript", src="https://www.google.com/recaptcha/api.js?render="+settings.recaptcha.siteKeyV3)
 
 

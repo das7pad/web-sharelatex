@@ -6,7 +6,7 @@ block content
 			.row
 				.registration_message(ng-cloak)
 					if sharedProjectData.username
-						meta(id="ol-sharedProjectData" data-json content=sharedProjectData)
+						meta(name="ol-sharedProjectData" data-type="json" content=sharedProjectData)
 						h1 {{translate("user_wants_you_to_see_project", getMeta("ol-sharedProjectData"))}}
 						div
 							| {{translate("join_sl_to_view_project")}}.
@@ -14,7 +14,7 @@ block content
 							| {{translate("if_you_are_registered")}},
 							a(href="/login")  {{translate("login_here")}}
 					else if newTemplateData.templateName
-						meta(id="ol-newTemplateData" data-json content=newTemplateData)
+						meta(name="ol-newTemplateData" data-type="json" content=newTemplateData)
 						h1 {{translate("register_to_edit_template", getMeta("ol-newTemplateData"))}}
 
 						div
