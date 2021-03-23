@@ -66,6 +66,7 @@ describe('Features', function() {
         expect(this.Features.hasFeature('oauth')).to.be.false
         expect(this.Features.hasFeature('overleaf-integration')).to.be.false
         expect(this.Features.hasFeature('references')).to.be.false
+        expect(this.Features.hasFeature('link-url')).to.be.false
         expect(this.Features.hasFeature('affiliations')).to.be.false
         expect(this.Features.hasFeature('analytics')).to.be.false
         expect(this.Features.hasFeature('github-sync')).to.be.false
@@ -89,6 +90,7 @@ describe('Features', function() {
           expect(this.Features.hasFeature('oauth')).to.be.false
           expect(this.Features.hasFeature('references')).to.be.false
           expect(this.Features.hasFeature('templates-server-pro')).to.be.false
+          expect(this.Features.hasFeature('link-url')).to.be.false
           expect(this.Features.hasFeature('affiliations')).to.be.false
           expect(this.Features.hasFeature('analytics')).to.be.false
           expect(this.Features.hasFeature('github-sync')).to.be.false
