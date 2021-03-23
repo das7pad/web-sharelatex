@@ -35,7 +35,7 @@ function insertMeta(name, content) {
   if (typeof content === 'number') {
     meta.setAttribute('data-type', 'json')
   }
-  document.body.appendChild(meta)
+  document.head.appendChild(meta)
 }
 insertMeta('ol-staticPath', '/base/public')
 
