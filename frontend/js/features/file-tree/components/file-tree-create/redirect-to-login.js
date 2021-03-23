@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Trans } from 'react-i18next'
 import { useFileTreeMainContext } from '../../contexts/file-tree-main'
+import { Trans } from '../../../../components/trans'
 
 // handle "not-logged-in" errors by redirecting to the login page
 export default function RedirectToLogin() {

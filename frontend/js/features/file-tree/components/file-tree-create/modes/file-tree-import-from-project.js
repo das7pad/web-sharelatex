@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react'
 import { Button, ControlLabel, FormControl, FormGroup } from 'react-bootstrap'
 import Icon from '../../../../../shared/components/icon'
 import FileTreeCreateNameInput from '../file-tree-create-name-input'
-import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { useUserProjects } from '../../../hooks/use-user-projects'
 import { useProjectEntities } from '../../../hooks/use-project-entities'
@@ -12,10 +11,9 @@ import { useFileTreeCreateName } from '../../../contexts/file-tree-create-name'
 import { useFileTreeCreateForm } from '../../../contexts/file-tree-create-form'
 import { useFileTreeMainContext } from '../../../contexts/file-tree-main'
 import ErrorMessage from '../error-message'
+import t from '../../../../../misc/t'
 
 export default function FileTreeImportFromProject() {
-  const { t } = useTranslation()
-
   const { name, setName, validName } = useFileTreeCreateName()
   const { setValid } = useFileTreeCreateForm()
   const { projectId } = useFileTreeMainContext()

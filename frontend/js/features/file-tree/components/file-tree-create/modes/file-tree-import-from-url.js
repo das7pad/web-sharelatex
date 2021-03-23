@@ -1,14 +1,13 @@
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap'
 import React, { useCallback, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import FileTreeCreateNameInput from '../file-tree-create-name-input'
 import { useFileTreeActionable } from '../../../contexts/file-tree-actionable'
 import { useFileTreeCreateName } from '../../../contexts/file-tree-create-name'
 import { useFileTreeCreateForm } from '../../../contexts/file-tree-create-form'
 import ErrorMessage from '../error-message'
+import t from '../../../../../misc/t'
 
 export default function FileTreeImportFromUrl() {
-  const { t } = useTranslation()
   const { name, setName, validName } = useFileTreeCreateName()
   const { setValid } = useFileTreeCreateForm()
   const { finishCreatingLinkedFile, error } = useFileTreeActionable()

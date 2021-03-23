@@ -1,4 +1,3 @@
-import { Trans } from 'react-i18next'
 import { Alert, Button } from 'react-bootstrap'
 import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
@@ -13,6 +12,7 @@ import '@uppy/dashboard/dist/style.css'
 import { refreshProjectMetadata } from '../../../util/api'
 import ErrorMessage from '../error-message'
 import getMeta from '../../../../../utils/meta'
+import { Trans } from '../../../../../components/trans'
 
 export default function FileTreeUploadDoc() {
   const { parentFolderId, cancel, isDuplicate } = useFileTreeActionable()

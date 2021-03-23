@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import { FetchError } from '../../../../infrastructure/fetch-json'
 import RedirectToLogin from './redirect-to-login'
 import {
@@ -9,10 +8,9 @@ import {
   InvalidFilenameError
 } from '../../errors'
 import DangerMessage from './danger-message'
+import t from '../../../../misc/t'
 
 export default function ErrorMessage({ error }) {
-  const { t } = useTranslation()
-
   // the error is a string
   // TODO: translate? always? is this a key or a message?
   if (typeof error === 'string') {

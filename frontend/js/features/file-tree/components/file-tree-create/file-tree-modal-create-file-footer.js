@@ -1,10 +1,10 @@
 import React from 'react'
-import { useTranslation } from 'react-i18next'
 import { Alert, Button } from 'react-bootstrap'
 import { useFileTreeCreateForm } from '../../contexts/file-tree-create-form'
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import { useFileTreeMutable } from '../../contexts/file-tree-mutable'
 import PropTypes from 'prop-types'
+import t from '../../../../misc/t'
 
 export default function FileTreeModalCreateFileFooter() {
   const { valid } = useFileTreeCreateForm()
@@ -29,8 +29,6 @@ export function FileTreeModalCreateFileFooterContent({
   newFileCreateMode,
   cancel
 }) {
-  const { t } = useTranslation()
-
   return (
     <>
       {fileCount.status === 'warning' && (

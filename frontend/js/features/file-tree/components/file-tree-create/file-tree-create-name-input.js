@@ -2,7 +2,6 @@ import ControlLabel from 'react-bootstrap/lib/ControlLabel'
 import { Alert, FormControl } from 'react-bootstrap'
 import FormGroup from 'react-bootstrap/lib/FormGroup'
 import React, { useCallback } from 'react'
-import { Trans } from 'react-i18next'
 import { useFileTreeCreateName } from '../../contexts/file-tree-create-name'
 import PropTypes from 'prop-types'
 import {
@@ -10,6 +9,7 @@ import {
   DuplicateFilenameError,
   InvalidFilenameError
 } from '../../errors'
+import { Trans } from '../../../../components/trans'
 
 /**
  * A form component that renders a text input with label,
