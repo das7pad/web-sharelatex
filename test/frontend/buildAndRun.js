@@ -5,9 +5,10 @@ const ENTRYPOINT = Path.join(__dirname, 'entrypoint.js')
 buildTestBundleForNode(ENTRYPOINT)
   .then(bundlePath => {
     // Load JSDOM to mock the DOM in Node.
+    // Set pretendToBeVisual to enable requestAnimationFrame
     // NOTE: It does not work when bundled with esbuild due to require.resolve
     //        usage with relative paths.
-    require('jsdom-global/register')
+    require('jsdom-global')(undefined, { pretendToBeVisual: true })
 
     // Load the bundle which in turn registers all the mocha test suites
     require(bundlePath)
