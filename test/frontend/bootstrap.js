@@ -57,10 +57,6 @@ insertMeta('ol-appName', 'Overleaf')
 insertMeta('ol-maxEntitiesPerProject', 10)
 insertMeta('ol-maxUploadSize', 5 * 1024 * 1024)
 
-// ignore CSS files
-const { addHook } = require('pirates')
-addHook(() => '', { exts: ['.css'], ignoreNodeModules: false })
-
 // Work around bundler hack in react-dom
 // esbuild does not populate the obfuscated require call when bundling.
 // https://github.com/facebook/react/blob/f04bcb8139cfa341640ea875c2eae15523ae9cd9/packages/shared/enqueueTask.js#L14-L47
