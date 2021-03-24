@@ -1285,10 +1285,6 @@ describe('AuthenticationController', function() {
         this.UserHandler.setupLoginData.calledWith(this.user).should.equal(true)
       })
 
-      it('should set res.session.justLoggedIn', function() {
-        this.req.session.justLoggedIn.should.equal(true)
-      })
-
       it('should record the successful login', function() {
         this.AuthenticationController._recordSuccessfulLogin
           .calledWith(this.user._id)

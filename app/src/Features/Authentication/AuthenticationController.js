@@ -514,7 +514,6 @@ function _loginAsyncHandlers(req, user) {
     { email: user.email, user_id: user._id.toString() },
     'successful log in'
   )
-  req.session.justLoggedIn = true
   // capture the request ip for use when creating the session
   return (user._login_req_ip = req.ip)
 }
