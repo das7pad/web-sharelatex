@@ -133,20 +133,6 @@ webRouter.use(
     rolling: true
   })
 )
-webRouter.use(function(req, res, next) {
-  const originalRender = res.render
-  res.render = (...args) => {
-    // An empty session has a 'cookie' and 'validationToken' field.
-    const [key1, key2, key3] = Object.keys(req.session)
-    const sessionIsEmpty =
-      key1 === 'cookie' && key2 === 'validationToken' && !key3
-    if (!sessionIsEmpty) {
-      touchSession(req.sessionID, req.session, () => {})
-    }
-    originalRender.apply(res, args)
-  }
-  next()
-})
 
 // patch the session store to generate a validation token for every new session
 SessionStoreManager.enableValidationToken(sessionStore)
@@ -182,11 +168,16 @@ webRouter.csrf = new Csrf()
 webRouter.use(webRouter.csrf.middleware)
 webRouter.use(translations.middleware)
 
-// Measure expiry from last request, not last login
+// Measure expiry from last top-level request, not last login or ajax request
 webRouter.use(function(req, res, next) {
-  if (!req.session.noSessionCallback) {
+  // skip stub sessions
+  if (!req.session || req.session.noSessionCallback) return next()
+
+  const originalRender = res.render
+  res.render = (...args) => {
     req.session.touch()
     if (AuthenticationController.isUserLoggedIn(req)) {
+      // Extend the life time of the collection of users session ids
       UserSessionsManager.touch(
         AuthenticationController.getSessionUser(req),
         err => {
@@ -196,6 +187,16 @@ webRouter.use(function(req, res, next) {
         }
       )
     }
+
+    // An empty session has a 'cookie' and 'validationToken' field.
+    const [key1, key2, key3] = Object.keys(req.session)
+    const sessionIsEmpty =
+      key1 === 'cookie' && key2 === 'validationToken' && key3 === undefined
+    if (!sessionIsEmpty) {
+      // Extend the lifetime of this very session
+      touchSession(req.sessionID, req.session, () => {})
+    }
+    originalRender.apply(res, args)
   }
   next()
 })
