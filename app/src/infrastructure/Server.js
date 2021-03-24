@@ -39,9 +39,15 @@ const AuthenticationController = require('../Features/Authentication/Authenticat
 // Init the session store
 const sessionStore = new RedisStore({
   client: sessionsRedisClient,
+  ttl: Math.floor(Settings.cookieSessionLength / 1000),
   serializer: {
+    stringify(session) {
+      // Omit the cookie config from the session blob in redis
+      return JSON.stringify(Object.assign({}, session, { cookie: undefined }))
+    },
     parse(blob) {
       const session = JSON.parse(blob)
+      // rebuild the cookie config as we do not persist it into redis
       session.cookie = {
         expires: new Date(
           Date.now() + Settings.cookieSessionLength / 1000
@@ -52,17 +58,14 @@ const sessionStore = new RedisStore({
         sameSite: Settings.sameSiteCookie,
         secure: Settings.secureCookie
       }
-      console.error('parse', { blob, session })
       return session
-    },
-    stringify(session) {
-      delete session.cookie
-      const blob = JSON.stringify(session)
-      console.error('serialize', { blob, session })
-      return blob
     }
   }
 })
+// Preserve touch
+const touchSession = sessionStore.touch.bind(sessionStore)
+// Do not bump the expiry in redis on every request
+sessionStore.touch = false
 
 const app = express()
 
@@ -130,6 +133,20 @@ webRouter.use(
     rolling: true
   })
 )
+webRouter.use(function(req, res, next) {
+  const originalRender = res.render
+  res.render = (...args) => {
+    // An empty session has a 'cookie' and 'validationToken' field.
+    const [key1, key2, key3] = Object.keys(req.session)
+    const sessionIsEmpty =
+      key1 === 'cookie' && key2 === 'validationToken' && !key3
+    if (!sessionIsEmpty) {
+      touchSession(req.sessionID, req.session, () => {})
+    }
+    originalRender.apply(res, args)
+  }
+  next()
+})
 
 // patch the session store to generate a validation token for every new session
 SessionStoreManager.enableValidationToken(sessionStore)
