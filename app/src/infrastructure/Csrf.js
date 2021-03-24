@@ -21,7 +21,7 @@ const csrf = csurf({
     sameSite: Settings.sameSiteCookie,
     secure: Settings.secureCookie,
     domain: Settings.cookieDomain,
-    maxAge: Settings.cookieSessionLength,
+    maxAge: Settings.cookieSessionLength / 1000,
     signed: true
   }
 })
