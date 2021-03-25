@@ -21,8 +21,7 @@ import ShareJs from 'libs/sharejs'
 import EditorWatchdogManager from '../connection/EditorWatchdogManager'
 
 let ShareJsDoc
-const SINGLE_USER_FLUSH_DELAY = 2000 // ms
-const MULTI_USER_FLUSH_DELAY = 500 // ms
+const SINGLE_USER_FLUSH_DELAY = 1000 // ms
 
 export default ShareJsDoc = (function() {
   ShareJsDoc = class ShareJsDoc extends EventEmitter {
@@ -107,8 +106,8 @@ export default ShareJsDoc = (function() {
       })
       this._doc.on('remoteop', (...args) => {
         // As soon as we're working with a collaborator, start sending
-        // ops more frequently for low latency.
-        this._doc.setFlushDelay(MULTI_USER_FLUSH_DELAY)
+        // ops as quickly as possible for low latency.
+        this._doc.setFlushDelay(0)
         return this.trigger('remoteop', ...Array.from(args))
       })
       this._doc.on('flipped_pending_to_inflight', () => {
