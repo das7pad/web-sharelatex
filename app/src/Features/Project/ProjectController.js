@@ -35,7 +35,7 @@ const UserController = require('../User/UserController')
 const SpellingHandler = require('../Spelling/SpellingHandler')
 const AnalyticsManager = require('../Analytics/AnalyticsManager')
 const Modules = require('../../infrastructure/Modules')
-const { shouldUserSeeNewLogsUI } = require('../Helpers/NewLogsUI')
+const { getNewLogsUIVariantForUser } = require('../Helpers/NewLogsUI')
 
 const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
   if (!affiliation.institution) return false
@@ -834,7 +834,8 @@ const ProjectController = {
               ]
             }
 
-            const userShouldSeeNewLogsUI = shouldUserSeeNewLogsUI(user)
+            const logsUIVariant = getNewLogsUIVariantForUser(user)
+            const userShouldSeeNewLogsUI = logsUIVariant.newLogsUI
             const wantsOldLogsUI =
               req.query && req.query.new_logs_ui === 'false'
 
@@ -898,6 +899,7 @@ const ProjectController = {
               wsAssetUrl,
               showSupport: Features.hasFeature('support'),
               showNewLogsUI: userShouldSeeNewLogsUI && !wantsOldLogsUI,
+              logsUISubvariant: logsUIVariant.subvariant,
               showNewNavigationUI:
                 req.query && req.query.new_navigation_ui === 'true',
               showReactFileTree: !wantsOldFileTreeUI,

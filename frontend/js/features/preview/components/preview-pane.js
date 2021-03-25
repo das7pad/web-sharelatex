@@ -22,6 +22,7 @@ function PreviewPane({
   pdfDownloadUrl,
   onLogEntryLocationClick,
   showLogs,
+  variantWithFirstErrorPopup = true,
   splitLayout
 }) {
   const [lastCompileTimestamp, setLastCompileTimestamp] = useState(
@@ -65,6 +66,7 @@ function PreviewPane({
     !compilerState.isCompiling
 
   const showFirstErrorPopUp =
+    variantWithFirstErrorPopup &&
     nErrors > 0 &&
     !seenLogsForCurrentCompile &&
     !dismissedFirstErrorPopUp &&
@@ -166,6 +168,7 @@ PreviewPane.propTypes = {
   outputFiles: PropTypes.array,
   pdfDownloadUrl: PropTypes.string,
   showLogs: PropTypes.bool.isRequired,
+  variantWithFirstErrorPopup: PropTypes.bool,
   splitLayout: PropTypes.bool.isRequired
 }
 

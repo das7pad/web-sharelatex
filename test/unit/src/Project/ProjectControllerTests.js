@@ -148,7 +148,9 @@ describe('ProjectController', function() {
       inc: sinon.stub()
     }
     this.NewLogsUIHelper = {
-      shouldUserSeeNewLogsUI: sinon.stub().returns(false)
+      getNewLogsUIVariantForUser: sinon
+        .stub()
+        .returns({ newLogsUI: false, subvariant: null })
     }
 
     this.ProjectController = SandboxedModule.require(MODULE_PATH, {
