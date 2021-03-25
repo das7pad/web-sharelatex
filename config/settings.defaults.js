@@ -372,7 +372,16 @@ module.exports = {
     process.env.LOGS_UI_PERCENTAGE_BETA || '0',
     10
   ),
+  logsUIPercentageWithoutPopupBeta: parseInt(
+    process.env.LOGS_UI_WITHOUT_POPUP_PERCENTAGE_BETA || '0',
+    10
+  ),
+
   logsUIPercentage: parseInt(process.env.LOGS_UI_PERCENTAGE || '0', 10),
+  logsUIPercentageWithoutPopup: parseInt(
+    process.env.LOGS_UI_WITHOUT_POPUP_PERCENTAGE || '0',
+    10
+  ),
 
   // cookie domain
   // use full domain for cookies to only be accessible from that domain,
