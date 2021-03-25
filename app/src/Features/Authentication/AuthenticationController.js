@@ -36,7 +36,13 @@ const AuthenticationController = {
     let staffAccess
     if (user.staffAccess) {
       const enabledStaffAccess = Object.entries(user.staffAccess).filter(
-        entry => entry[1]
+        ([key, value]) => {
+          if (key === '$init' && value === true) {
+            // mongoose internal
+            return false
+          }
+          return value
+        }
       )
       if (enabledStaffAccess.length) {
         staffAccess = Object.fromEntries(enabledStaffAccess)
