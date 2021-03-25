@@ -78,10 +78,9 @@ class Csrf {
   }
 
   static invalidateState(res) {
-    res.setHeader(
-      'set-cookie',
-      '_csrf=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
-    )
+    // omit request cookies in order to get a new cookie in the response
+    const req = { method: 'GET', signedCookies: {}, secret: res.req.secret }
+    csrf(req, res, () => {})
   }
 
   static validateRequest(req, cb) {
