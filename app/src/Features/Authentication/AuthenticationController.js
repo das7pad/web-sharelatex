@@ -16,6 +16,7 @@ const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
 const UrlHelper = require('../Helpers/UrlHelper')
 const RedirectManager = require('../../infrastructure/RedirectManager')
 const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
+const Csrf = require('../../infrastructure/Csrf')
 const {
   acceptsJson
 } = require('../../infrastructure/RequestContentTypeDetection')
@@ -470,6 +471,7 @@ function _afterLoginSessionSetup(req, user, callback) {
     // Regenerate the session to get a new sessionID (cookie value) to
     // protect against session fixation attacks
     const oldSession = req.session
+    Csrf.invalidateState(req.res)
     req.session.destroy(function(err) {
       if (err) {
         OError.tag(err, 'error when trying to destroy old session', {

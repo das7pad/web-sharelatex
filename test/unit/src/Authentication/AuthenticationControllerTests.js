@@ -27,6 +27,9 @@ describe('AuthenticationController', function() {
         '../../infrastructure/RedirectManager': {
           getQueryString: sinon.stub().returns('?extra_query=foo')
         },
+        '../../infrastructure/Csrf': {
+          invalidateState: sinon.stub()
+        },
         '../Helpers/AsyncFormHelper': (this.AsyncFormHelper = {
           redirect: sinon.stub()
         }),
@@ -103,6 +106,7 @@ describe('AuthenticationController', function() {
     this.password = 'banana'
     this.req = new MockRequest()
     this.res = new MockResponse()
+    this.req.res = this.res
     this.callback = sinon.stub()
     this.next = sinon.stub()
   })
