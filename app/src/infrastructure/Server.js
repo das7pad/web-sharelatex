@@ -49,6 +49,7 @@ const sessionStore = new RedisStore({
       const session = JSON.parse(blob)
       // rebuild the cookie config as we do not persist it into redis
       session.cookie = {
+        domain: Settings.cookieDomain,
         expires: new Date(
           Date.now() + Settings.cookieSessionLength / 1000
         ).toISOString(),
