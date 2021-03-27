@@ -6,7 +6,6 @@ import AccessibleModal from '../../../shared/components/accessible-modal'
 import PropTypes from 'prop-types'
 import { ReadOnlyTokenLink } from './link-sharing'
 import { Trans } from '../../../components/trans'
-import getMeta from '../../../utils/meta'
 
 export default function ShareProjectModalContent({
   show,
@@ -66,10 +65,9 @@ ShareProjectModalContent.propTypes = {
 }
 
 function ErrorMessage({ error }) {
-  const appName = getMeta('ol-appName')
   switch (error) {
     case 'cannot_invite_non_user':
-      return <Trans i18nKey="cannot_invite_non_user" values={{ appName }} />
+      return <Trans i18nKey="cannot_invite_non_user" />
 
     case 'cannot_verify_user_not_robot':
       return <Trans i18nKey="cannot_verify_user_not_robot" />
