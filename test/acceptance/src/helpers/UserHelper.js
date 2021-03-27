@@ -239,6 +239,8 @@ class UserHelper {
       error.response = response
       throw error
     }
+    delete userHelper._csrfToken
+    await userHelper.getCsrfToken()
     userHelper.user = await UserGetter.promises.getUser({
       email: userData.email
     })
