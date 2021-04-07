@@ -13,6 +13,7 @@ const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
 
 const COMMON_CFG = {
   bundle: true,
+  entryNames: '[dir]/[name]-[hash]',
   minifyWhitespace: true,
   minifySyntax: true,
   sourcemap: true,
