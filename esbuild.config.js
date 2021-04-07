@@ -127,6 +127,7 @@ async function buildTestBundle(entrypoint, platform, target) {
   const OUTPUT_PATH = Path.join('/tmp', 'web', 'testBundle', platform)
   const { define, inject, plugins, loader } = CONFIGS[0]
   const cfg = {
+    entryNames: '[dir]/[name]',
     entryPoints: [entrypoint],
     plugins: [
       valLoader(Path.join(__dirname, 'test/frontend/allTests.js')),
