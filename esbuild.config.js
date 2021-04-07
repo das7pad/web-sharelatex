@@ -12,7 +12,9 @@ const NODE_MODULES = Path.join(__dirname, 'node_modules')
 const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
 
 const COMMON_CFG = {
+  assetNames: 'assets/[name]-[hash]',
   bundle: true,
+  chunkNames: 'chunks/[name]-[hash]',
   entryNames: '[dir]/[name]-[hash]',
   minifyWhitespace: true,
   minifySyntax: true,
