@@ -22,7 +22,7 @@ module.exports = async function(meta) {
   }
 
   Object.entries(meta.outputs)
-    .filter(([path, details]) => details.entryPoint)
+    .filter(([, details]) => details.entryPoint)
     .forEach(([path, details]) => {
       const src = normalizeEntrypoint(details.entryPoint)
 
