@@ -2,13 +2,13 @@ const fs = require('fs')
 const Path = require('path')
 
 // Accumulate manifest artifacts from all builds
-const manifest = {}
+const entrypoints = {}
+const manifest = { entrypoints }
 const ROOT = Path.dirname(__dirname)
 const MANIFEST_PATH = Path.join(ROOT, 'public', 'manifest.json')
 
 module.exports = async function(meta) {
   if (!meta) return // some builds do not emit a metafile
-  const entrypoints = (manifest.entrypoints = manifest.entrypoints || {})
 
   function pathInPublic(path) {
     return path.slice('public'.length)
