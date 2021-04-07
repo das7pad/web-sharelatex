@@ -35,9 +35,18 @@ module.exports = async function(meta) {
         .concat([pathInPublic(path)])
 
       // Optionally provide access to extracted css
-      const cssChunk = path.slice(0, -3) + '.css'
-      if (meta.outputs[cssChunk]) {
-        manifest[src + '.css'] = pathInPublic(cssChunk)
+      if (path.endsWith('.js')) {
+        // Match ide-HASH1.js with ide-HASH2.css
+        const prefix = path.replace(/(.+-)\w+\.js$/, '$1')
+        const cssBundle = Object.keys(meta.outputs).find(
+          candidatePath =>
+            candidatePath.startsWith(prefix) &&
+            candidatePath.endsWith('.css') &&
+            candidatePath.slice(prefix.length).match(/^\w+\.css$/)
+        )
+        if (cssBundle) {
+          manifest[src + '.css'] = pathInPublic(cssBundle)
+        }
       }
     })
 
