@@ -2,13 +2,13 @@ const fs = require('fs')
 const Path = require('path')
 
 // Accumulate manifest artifacts from all builds
-const manifest = {}
+const entrypoints = {}
+const manifest = { entrypoints }
 const ROOT = Path.dirname(__dirname)
 const MANIFEST_PATH = Path.join(ROOT, 'public', 'manifest.json')
 
 module.exports = async function(meta) {
   if (!meta) return // some builds do not emit a metafile
-  const entrypoints = (manifest.entrypoints = manifest.entrypoints || {})
 
   function pathInPublic(path) {
     return path.slice('public'.length)
@@ -22,7 +22,7 @@ module.exports = async function(meta) {
   }
 
   Object.entries(meta.outputs)
-    .filter(([path, details]) => details.entryPoint)
+    .filter(([, details]) => details.entryPoint)
     .forEach(([path, details]) => {
       const src = normalizeEntrypoint(details.entryPoint)
 
@@ -35,9 +35,18 @@ module.exports = async function(meta) {
         .concat([pathInPublic(path)])
 
       // Optionally provide access to extracted css
-      const cssChunk = path.slice(0, -3) + '.css'
-      if (meta.outputs[cssChunk]) {
-        manifest[src + '.css'] = pathInPublic(cssChunk)
+      if (path.endsWith('.js')) {
+        // Match ide-HASH1.js with ide-HASH2.css
+        const prefix = path.replace(/(.+-)\w+\.js$/, '$1')
+        const cssBundle = Object.keys(meta.outputs).find(
+          candidatePath =>
+            candidatePath.startsWith(prefix) &&
+            candidatePath.endsWith('.css') &&
+            candidatePath.slice(prefix.length).match(/^\w+\.css$/)
+        )
+        if (cssBundle) {
+          manifest[src + '.css'] = pathInPublic(cssBundle)
+        }
       }
     })
 
