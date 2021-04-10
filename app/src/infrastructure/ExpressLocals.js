@@ -32,6 +32,8 @@ module.exports = function(app, webRouter) {
   app.locals.entrypointSources = entrypointSources
   app.locals.staticPath = staticPath
 
+  app.locals.mathJaxEntrypoint = buildJsPath('MathJaxBundle.js')
+
   webRouter.use(function(req, res, next) {
     const actualRender = res.render
     res.render = function() {

@@ -64,6 +64,7 @@ const CONFIGS = [
 
   // mathjax in non-strict
   {
+    metafile: true,
     entryPoints: [Path.join(FRONTEND_PATH, 'js/MathJaxBundle.js')],
     outbase: Path.join(FRONTEND_PATH, 'js'),
     outdir: Path.join(PUBLIC_PATH, 'js')

@@ -1,4 +1,4 @@
-import staticPath from './utils/staticPath'
+import getMeta from './utils/meta'
 
 let pending
 
@@ -7,7 +7,7 @@ export function loadMathJax() {
 
   pending = new Promise((resolve, reject) => {
     const script = document.createElement('script')
-    script.src = staticPath('/esbuild/js/MathJaxBundle.js')
+    script.src = getMeta('ol-mathJaxEntrypoint')
     script.onload = () => resolve(window.MathJax)
     script.onerror = error => {
       pending = undefined
