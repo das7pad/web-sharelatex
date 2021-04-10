@@ -5,7 +5,8 @@
 			ng-if="editor.wantTrackChanges"
 			ng-click="toggleReviewPanel();"
 			ng-class="{ 'rp-track-changes-indicator-on-dark' : darkTheme }"
-		) {{translate("track_changes_is_on")}}
+		)
+			span(ng-bind-html="translate('track_changes_is_on')")
 		a.rp-bulk-actions-btn(
 			href
 			ng-if="reviewPanel.nVisibleSelectedChanges > 1"
