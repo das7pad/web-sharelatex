@@ -1,6 +1,6 @@
 const Path = require('path')
 const esbuild = require('esbuild')
-const TARGETS = require('./esbuild/getTargets')
+const BROWSER_TARGETS = require('./esbuild/getBrowserTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
 const lessLoader = require('./esbuild/lessLoader')
 const valLoader = require('./esbuild/valLoader')
@@ -19,7 +19,7 @@ const COMMON_CFG = {
   minifyWhitespace: true,
   minifySyntax: true,
   sourcemap: true,
-  target: TARGETS,
+  target: BROWSER_TARGETS,
   outdir: PUBLIC_PATH,
   loader: {
     '.woff': 'file',
