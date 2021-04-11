@@ -152,7 +152,7 @@ async function buildTestBundle(entrypoint, platform, target) {
 }
 
 async function buildTestBundleForBrowser(entrypoint) {
-  return buildTestBundle(entrypoint, 'browser', 'chrome89')
+  return buildTestBundle(entrypoint, 'browser', BROWSER_TARGETS)
 }
 
 async function buildTestBundleForNode(entrypoint) {
