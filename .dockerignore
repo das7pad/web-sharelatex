@@ -44,7 +44,7 @@
 !/.prettierignore
 
 !/esbuild
-!/esbuild.config.js
+!/esbuild.js
 
 !/Gruntfile.js
 

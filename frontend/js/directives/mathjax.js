@@ -1,7 +1,8 @@
 import App from '../base'
 import { loadMathJax } from '../MathJaxLoader'
+import getMeta from '../utils/meta'
 
-if (window.preLoadMathJax) {
+if (getMeta('ol-preLoadMathJax')) {
   // preload mathJax for e.g. /learn pages
   // eslint-disable-next-line no-unused-expressions
   loadMathJax().catch(() => {})

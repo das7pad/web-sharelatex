@@ -1,15 +1,15 @@
 const Path = require('path')
 const esbuild = require('esbuild')
-const TARGETS = require('./esbuild/getTargets')
+const BROWSER_TARGETS = require('./esbuild/getBrowserTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
 const lessLoader = require('./esbuild/lessLoader')
 const valLoader = require('./esbuild/valLoader')
 const writeManifest = require('./esbuild/writeManifest')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
-const GENERATED_PATH = Path.join(__dirname, './generated')
+const GENERATED_PATH = Path.join(__dirname, 'generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
-const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
+const PUBLIC_PATH = Path.join(__dirname, 'public')
 
 const COMMON_CFG = {
   assetNames: 'assets/[name]-[hash]',
@@ -19,9 +19,8 @@ const COMMON_CFG = {
   minifyWhitespace: true,
   minifySyntax: true,
   sourcemap: true,
-  target: TARGETS,
+  target: BROWSER_TARGETS,
   outdir: PUBLIC_PATH,
-  external: [Path.join(PUBLIC_PATH, '/*')],
   loader: {
     '.woff': 'file',
     '.woff2': 'file',
@@ -32,8 +31,9 @@ const COMMON_CFG = {
 }
 
 const CONFIGS = [
-  // main bundles
   {
+    DESCRIPTION: 'main bundles',
+
     metafile: true,
     splitting: true,
     format: 'esm',
@@ -62,23 +62,27 @@ const CONFIGS = [
     loader: { '.js': 'jsx' }
   },
 
-  // mathjax in non-strict
   {
+    DESCRIPTION: 'MathJax in non-strict mode',
+
+    metafile: true,
     entryPoints: [Path.join(FRONTEND_PATH, 'js/MathJaxBundle.js')],
     outbase: Path.join(FRONTEND_PATH, 'js'),
     outdir: Path.join(PUBLIC_PATH, 'js')
   },
 
-  // translations bundles
   {
+    DESCRIPTION: 'translations bundles',
+
     metafile: true,
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
     outdir: Path.join(PUBLIC_PATH, 'js/t')
   },
 
-  // stylesheets
   {
+    DESCRIPTION: 'stylesheets',
+
     metafile: true,
     plugins: [
       lessLoader({
@@ -93,34 +97,62 @@ const CONFIGS = [
     outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
     outdir: Path.join(PUBLIC_PATH, 'stylesheets')
   }
-].map(cfg => Object.assign({}, COMMON_CFG, cfg))
+]
 
-const ACTION = process.argv.pop()
-if (ACTION === 'watch') {
-  CONFIGS.forEach(cfg => {
-    Object.assign(cfg, {
-      watch: {
-        onRebuild(error, result) {
-          if (error) {
-            console.error('watch build failed:', error)
-          } else {
-            console.error('watch build succeeded:', result)
-            writeManifest(result.metafile, PUBLIC_PATH).catch(() => {})
-          }
-        }
-      }
-    })
-  })
+function logWithTimestamp(...args) {
+  console.error(`[${new Date().toISOString()}]`, ...args)
 }
 
-if (ACTION === 'build' || ACTION === 'watch') {
-  Promise.all(CONFIGS.map(esbuild.build))
-    .then(async results => {
-      for (const result of results) {
-        await writeManifest(result.metafile, PUBLIC_PATH)
-      }
-    })
-    .catch(() => process.exit(1))
+async function onRebuild(error, result) {
+  if (error) {
+    logWithTimestamp('watch build failed.')
+    return
+  }
+
+  logWithTimestamp('watch build succeeded.')
+  try {
+    await writeManifest(result.metafile)
+  } catch (error) {
+    logWithTimestamp('writing manifest failed in watch mode:', error)
+  }
+}
+
+function inflateConfig(cfg) {
+  return Object.assign({}, COMMON_CFG, cfg)
+}
+
+function trackDurationInMS() {
+  const t0 = process.hrtime()
+  return function() {
+    const [s, ns] = process.hrtime(t0)
+    return (s * 1e9 + ns) / 1e6
+  }
+}
+
+async function buildConfig(isWatchMode, cfg) {
+  cfg = inflateConfig(cfg)
+  if (isWatchMode) {
+    cfg.watch = { onRebuild }
+  }
+  const { DESCRIPTION } = cfg
+  delete cfg.DESCRIPTION
+
+  const done = trackDurationInMS()
+  const { metafile } = await esbuild.build(cfg)
+  const duration = done()
+
+  await writeManifest(metafile)
+  return { DESCRIPTION, duration }
+}
+
+async function buildAllConfigs(isWatchMode) {
+  const done = trackDurationInMS()
+  const timings = await Promise.all(
+    CONFIGS.map(cfg => buildConfig(isWatchMode, cfg))
+  )
+  const duration = done()
+  timings.push({ DESCRIPTION: 'total', duration })
+  return timings
 }
 
 async function buildTestBundle(entrypoint, platform, target) {
@@ -143,7 +175,7 @@ async function buildTestBundle(entrypoint, platform, target) {
   }
 
   try {
-    await esbuild.build(Object.assign({}, COMMON_CFG, cfg))
+    await esbuild.build(inflateConfig(cfg))
   } catch (error) {
     console.error('esbuild error:', error)
     throw new Error(`esbuild failed: ${error.message}`)
@@ -152,7 +184,7 @@ async function buildTestBundle(entrypoint, platform, target) {
 }
 
 async function buildTestBundleForBrowser(entrypoint) {
-  return buildTestBundle(entrypoint, 'browser', 'chrome89')
+  return buildTestBundle(entrypoint, 'browser', BROWSER_TARGETS)
 }
 
 async function buildTestBundleForNode(entrypoint) {
@@ -164,4 +196,33 @@ async function buildTestBundleForNode(entrypoint) {
 module.exports = {
   buildTestBundleForBrowser,
   buildTestBundleForNode
+}
+
+if (require.main === module) {
+  const ACTION = process.argv.pop()
+
+  if (ACTION === 'build') {
+    buildAllConfigs(false)
+      .then(timings => {
+        console.table(timings)
+        console.error('esbuild build succeeded.')
+        process.exit(0)
+      })
+      .catch(error => {
+        console.error('esbuild build failed:', error)
+        process.exit(1)
+      })
+  } else if (ACTION === 'watch') {
+    buildAllConfigs(true)
+      .then(() => {
+        logWithTimestamp('esbuild is ready in watch mode.')
+      })
+      .catch(error => {
+        console.error('esbuild initial build in watch mode failed:', error)
+        process.exit(1)
+      })
+  } else {
+    console.error(`unknown action: ${JSON.stringify(ACTION)}`)
+    process.exit(101)
+  }
 }

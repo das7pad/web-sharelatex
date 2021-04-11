@@ -30,12 +30,13 @@ module.exports = function lessLoader(options = {}) {
 
       // Build .less files
       build.onLoad({ filter: /.*/, namespace }, async args => {
-        const content = await fs.readFile(args.path, 'utf-8')
-        const dir = path.dirname(args.path)
+        const entrypointPath = args.path
+        const entrypointSrc = await fs.readFile(entrypointPath, 'utf-8')
+        const dir = path.dirname(entrypointPath)
 
         const lessOpts = {
           // CHANGED: filename must be the full path -- see lessc
-          filename: args.path,
+          filename: entrypointPath,
 
           // CHANGED: Importing relative files works!
           rootpath: './',
@@ -51,12 +52,20 @@ module.exports = function lessLoader(options = {}) {
           // sourceMap: { sourceMapFileInline: true }
         }
 
-        const result = await less.render(content, lessOpts)
+        // CHANGED: add support for watch mode
+        const { css: bundleContents, imports: watchFiles } = await less.render(
+          entrypointSrc,
+          lessOpts
+        )
+
+        // Back fill entrypoint, it is not part of the `imports` list
+        watchFiles.push(entrypointPath)
 
         return {
-          contents: result.css,
+          contents: bundleContents,
           loader: 'css',
-          resolveDir: dir
+          resolveDir: dir,
+          watchFiles
         }
       })
     }

@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { buildTestBundleForBrowser } = require('./esbuild.config')
+const { buildTestBundleForBrowser } = require('./esbuild')
 let junitDest
 const reporters = ['mocha']
 if (process.env.HOME === '/home/node') {

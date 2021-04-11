@@ -7,7 +7,8 @@ const manifest = { entrypoints }
 const ROOT = Path.dirname(__dirname)
 const MANIFEST_PATH = Path.join(ROOT, 'public', 'manifest.json')
 
-module.exports = async function(meta) {
+module.exports = writeManifest
+async function writeManifest(meta) {
   if (!meta) return // some builds do not emit a metafile
 
   function pathInPublic(path) {
@@ -58,5 +59,25 @@ module.exports = async function(meta) {
       manifest[src] = pathInPublic(path)
     })
 
-  await fs.promises.writeFile(MANIFEST_PATH, JSON.stringify(manifest, null, 2))
+  await flushManifest()
+}
+
+// The web app is watching MANIFEST_PATH and immediately loads the contents
+//  upon changes.
+// A change could be truncating the file to 0 for a new write.
+// We must write atomically to the MANIFEST_PATH in order to provide 100%
+//  accurate reads.
+// Use a simple queue for atomic writes.
+let pendingWrite = Promise.resolve()
+
+async function flushManifest() {
+  pendingWrite = pendingWrite.finally(() => flushManifestAtomically())
+  await pendingWrite
+}
+
+async function flushManifestAtomically() {
+  const tmpPath = MANIFEST_PATH + '~'
+  const blob = JSON.stringify(manifest, null, 2)
+  await fs.promises.writeFile(tmpPath, blob)
+  await fs.promises.rename(tmpPath, MANIFEST_PATH)
 }

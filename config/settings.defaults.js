@@ -685,6 +685,11 @@ module.exports = {
       ? process.env.USE_DEV_ASSETS === 'true'
       : ['development', 'test'].includes(process.env.NODE_ENV),
 
+  watchManifest:
+    process.env.WATCH_MANIFEST !== undefined
+      ? process.env.WATCH_MANIFEST === 'true'
+      : ['development', 'test'].includes(process.env.NODE_ENV),
+
   // If you are running ShareLaTeX over https, set this to true to send the
   // cookie with a secure flag (recommended).
   secureCookie: false,
