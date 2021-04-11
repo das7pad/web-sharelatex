@@ -9,7 +9,7 @@ const writeManifest = require('./esbuild/writeManifest')
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, './generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
-const PUBLIC_PATH = Path.join(__dirname, 'public/esbuild')
+const PUBLIC_PATH = Path.join(__dirname, 'public')
 
 const COMMON_CFG = {
   assetNames: 'assets/[name]-[hash]',
