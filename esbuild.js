@@ -98,18 +98,16 @@ const CONFIGS = [
 const ACTION = process.argv.pop()
 if (ACTION === 'watch') {
   CONFIGS.forEach(cfg => {
-    Object.assign(cfg, {
-      watch: {
-        onRebuild(error, result) {
-          if (error) {
-            console.error('watch build failed:', error)
-          } else {
-            console.error('watch build succeeded:', result)
-            writeManifest(result.metafile, PUBLIC_PATH).catch(() => {})
-          }
+    cfg.watch = {
+      onRebuild(error, result) {
+        if (error) {
+          console.error('watch build failed.')
+        } else {
+          console.error('watch build succeeded.')
+          writeManifest(result.metafile, PUBLIC_PATH).catch(() => {})
         }
       }
-    })
+    }
   })
 }
 
