@@ -31,8 +31,9 @@ const COMMON_CFG = {
 }
 
 const CONFIGS = [
-  // main bundles
   {
+    DESCRIPTION: 'main bundles',
+
     metafile: true,
     splitting: true,
     format: 'esm',
@@ -61,24 +62,27 @@ const CONFIGS = [
     loader: { '.js': 'jsx' }
   },
 
-  // mathjax in non-strict
   {
+    DESCRIPTION: 'MathJax in non-strict mode',
+
     metafile: true,
     entryPoints: [Path.join(FRONTEND_PATH, 'js/MathJaxBundle.js')],
     outbase: Path.join(FRONTEND_PATH, 'js'),
     outdir: Path.join(PUBLIC_PATH, 'js')
   },
 
-  // translations bundles
   {
+    DESCRIPTION: 'translations bundles',
+
     metafile: true,
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
     outdir: Path.join(PUBLIC_PATH, 'js/t')
   },
 
-  // stylesheets
   {
+    DESCRIPTION: 'stylesheets',
+
     metafile: true,
     plugins: [
       lessLoader({
@@ -117,17 +121,38 @@ function inflateConfig(cfg) {
   return Object.assign({}, COMMON_CFG, cfg)
 }
 
+function trackDurationInMS() {
+  const t0 = process.hrtime()
+  return function() {
+    const [s, ns] = process.hrtime(t0)
+    return (s * 1e9 + ns) / 1e6
+  }
+}
+
 async function buildConfig(isWatchMode, cfg) {
   cfg = inflateConfig(cfg)
   if (isWatchMode) {
     cfg.watch = { onRebuild }
   }
+  const { DESCRIPTION } = cfg
+  delete cfg.DESCRIPTION
+
+  const done = trackDurationInMS()
   const { metafile } = await esbuild.build(cfg)
+  const duration = done()
+
   await writeManifest(metafile)
+  return { DESCRIPTION, duration }
 }
 
 async function buildAllConfigs(isWatchMode) {
-  return Promise.all(CONFIGS.map(cfg => buildConfig(isWatchMode, cfg)))
+  const done = trackDurationInMS()
+  const timings = await Promise.all(
+    CONFIGS.map(cfg => buildConfig(isWatchMode, cfg))
+  )
+  const duration = done()
+  timings.push({ DESCRIPTION: 'total', duration })
+  return timings
 }
 
 async function buildTestBundle(entrypoint, platform, target) {
@@ -178,7 +203,8 @@ if (require.main === module) {
 
   if (ACTION === 'build') {
     buildAllConfigs(false)
-      .then(() => {
+      .then(timings => {
+        console.table(timings)
         console.error('esbuild build succeeded.')
         process.exit(0)
       })
