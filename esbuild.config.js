@@ -7,7 +7,7 @@ const valLoader = require('./esbuild/valLoader')
 const writeManifest = require('./esbuild/writeManifest')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
-const GENERATED_PATH = Path.join(__dirname, './generated')
+const GENERATED_PATH = Path.join(__dirname, 'generated')
 const NODE_MODULES = Path.join(__dirname, 'node_modules')
 const PUBLIC_PATH = Path.join(__dirname, 'public')
 
@@ -21,7 +21,6 @@ const COMMON_CFG = {
   sourcemap: true,
   target: TARGETS,
   outdir: PUBLIC_PATH,
-  external: [Path.join(PUBLIC_PATH, '/*')],
   loader: {
     '.woff': 'file',
     '.woff2': 'file',
