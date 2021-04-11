@@ -7,7 +7,8 @@ const manifest = { entrypoints }
 const ROOT = Path.dirname(__dirname)
 const MANIFEST_PATH = Path.join(ROOT, 'public', 'manifest.json')
 
-module.exports = async function(meta) {
+module.exports = writeManifest
+async function writeManifest(meta) {
   if (!meta) return // some builds do not emit a metafile
 
   function pathInPublic(path) {

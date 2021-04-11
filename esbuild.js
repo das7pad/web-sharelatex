@@ -93,32 +93,41 @@ const CONFIGS = [
     outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
     outdir: Path.join(PUBLIC_PATH, 'stylesheets')
   }
-].map(cfg => Object.assign({}, COMMON_CFG, cfg))
+]
 
-const ACTION = process.argv.pop()
-if (ACTION === 'watch') {
-  CONFIGS.forEach(cfg => {
-    cfg.watch = {
-      onRebuild(error, result) {
-        if (error) {
-          console.error('watch build failed.')
-        } else {
-          console.error('watch build succeeded.')
-          writeManifest(result.metafile, PUBLIC_PATH).catch(() => {})
-        }
-      }
-    }
-  })
+function logWithTimestamp(...args) {
+  console.error(`[${new Date().toISOString()}]`, ...args)
 }
 
-if (ACTION === 'build' || ACTION === 'watch') {
-  Promise.all(CONFIGS.map(esbuild.build))
-    .then(async results => {
-      for (const result of results) {
-        await writeManifest(result.metafile, PUBLIC_PATH)
-      }
-    })
-    .catch(() => process.exit(1))
+async function onRebuild(error, result) {
+  if (error) {
+    logWithTimestamp('watch build failed.')
+    return
+  }
+
+  logWithTimestamp('watch build succeeded.')
+  try {
+    await writeManifest(result.metafile)
+  } catch (error) {
+    logWithTimestamp('writing manifest failed in watch mode:', error)
+  }
+}
+
+function inflateConfig(cfg) {
+  return Object.assign({}, COMMON_CFG, cfg)
+}
+
+async function buildConfig(isWatchMode, cfg) {
+  cfg = inflateConfig(cfg)
+  if (isWatchMode) {
+    cfg.watch = { onRebuild }
+  }
+  const { metafile } = await esbuild.build(cfg)
+  await writeManifest(metafile)
+}
+
+async function buildAllConfigs(isWatchMode) {
+  return Promise.all(CONFIGS.map(cfg => buildConfig(isWatchMode, cfg)))
 }
 
 async function buildTestBundle(entrypoint, platform, target) {
@@ -141,7 +150,7 @@ async function buildTestBundle(entrypoint, platform, target) {
   }
 
   try {
-    await esbuild.build(Object.assign({}, COMMON_CFG, cfg))
+    await esbuild.build(inflateConfig(cfg))
   } catch (error) {
     console.error('esbuild error:', error)
     throw new Error(`esbuild failed: ${error.message}`)
@@ -162,4 +171,32 @@ async function buildTestBundleForNode(entrypoint) {
 module.exports = {
   buildTestBundleForBrowser,
   buildTestBundleForNode
+}
+
+if (require.main === module) {
+  const ACTION = process.argv.pop()
+
+  if (ACTION === 'build') {
+    buildAllConfigs(false)
+      .then(() => {
+        console.error('esbuild build succeeded.')
+        process.exit(0)
+      })
+      .catch(error => {
+        console.error('esbuild build failed:', error)
+        process.exit(1)
+      })
+  } else if (ACTION === 'watch') {
+    buildAllConfigs(true)
+      .then(() => {
+        logWithTimestamp('esbuild is ready in watch mode.')
+      })
+      .catch(error => {
+        console.error('esbuild initial build in watch mode failed:', error)
+        process.exit(1)
+      })
+  } else {
+    console.error(`unknown action: ${JSON.stringify(ACTION)}`)
+    process.exit(101)
+  }
 }
