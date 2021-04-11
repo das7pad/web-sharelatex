@@ -34,7 +34,7 @@ USER root
 # generate the translations modules -- used by backend and frontend
 RUN /docker_cleanup.sh make build_lngs_full
 
-RUN /docker_cleanup.sh node esbuild.config build
+RUN /docker_cleanup.sh node esbuild build
 RUN /docker_cleanup.sh node populatePublicVendor
 
 # precompile views
