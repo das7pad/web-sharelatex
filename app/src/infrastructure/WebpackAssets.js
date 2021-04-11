@@ -11,10 +11,10 @@ const MANIFEST_PATH = Path.join(
 )
 const STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
 let MANIFEST
-let ENTRYPOINTS
+let ENTRYPOINT_CHUNKS
 
-function inflateEntrypoints(entryPointsWithRelativeChunkPaths) {
-  ENTRYPOINTS = new Map(
+function inflateEntrypointChunks(entryPointsWithRelativeChunkPaths) {
+  ENTRYPOINT_CHUNKS = new Map(
     Object.entries(entryPointsWithRelativeChunkPaths).map(
       ([entrypoint, chunks]) => {
         return [entrypoint, chunks.map(staticPath)]
@@ -25,7 +25,7 @@ function inflateEntrypoints(entryPointsWithRelativeChunkPaths) {
 function inflateManifest(blob) {
   MANIFEST = new Map(Object.entries(JSON.parse(blob)))
 
-  inflateEntrypoints(MANIFEST.get('entrypoints'))
+  inflateEntrypointChunks(MANIFEST.get('entrypoints'))
   MANIFEST.delete('entrypoints')
 }
 
@@ -80,8 +80,8 @@ function buildTPath(lng) {
   const src = `generated/lng/${lng}.js`
   return STATIC_FILES_BASE + MANIFEST.get(src)
 }
-function entrypointSources(entrypoint) {
-  return ENTRYPOINTS.get(entrypoint)
+function getEntrypointChunks(entrypoint) {
+  return ENTRYPOINT_CHUNKS.get(entrypoint)
 }
 function staticPath(path) {
   return STATIC_FILES_BASE + path
@@ -93,6 +93,6 @@ module.exports = {
   buildImgPath,
   buildJsPath,
   buildTPath,
-  entrypointSources,
+  getEntrypointChunks,
   staticPath
 }
