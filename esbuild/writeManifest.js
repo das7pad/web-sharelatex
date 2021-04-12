@@ -32,6 +32,7 @@ async function writeManifest(meta) {
 
       // Load entrypoint with chunks
       entrypoints[src] = details.imports
+        .filter(item => item.kind === 'import-statement')
         .map(item => pathInPublic(item.path))
         .concat([pathInPublic(path)])
 
