@@ -14,13 +14,7 @@ let MANIFEST
 let ENTRYPOINT_CHUNKS
 
 function inflateEntrypointChunks(entryPointsWithRelativeChunkPaths) {
-  ENTRYPOINT_CHUNKS = new Map(
-    Object.entries(entryPointsWithRelativeChunkPaths).map(
-      ([entrypoint, chunks]) => {
-        return [entrypoint, chunks.map(staticPath)]
-      }
-    )
-  )
+  ENTRYPOINT_CHUNKS = new Map(Object.entries(entryPointsWithRelativeChunkPaths))
 }
 function inflateManifest(blob) {
   MANIFEST = new Map(Object.entries(JSON.parse(blob)))
@@ -81,7 +75,7 @@ function buildTPath(lng) {
   return STATIC_FILES_BASE + MANIFEST.get(src)
 }
 function getEntrypointChunks(entrypoint) {
-  return ENTRYPOINT_CHUNKS.get(entrypoint)
+  return ENTRYPOINT_CHUNKS.get(entrypoint).map(staticPath)
 }
 function staticPath(path) {
   return STATIC_FILES_BASE + path
