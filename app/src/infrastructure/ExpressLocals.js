@@ -32,7 +32,7 @@ module.exports = function(app, webRouter) {
   app.locals.getEntrypointChunks = getEntrypointChunks
   app.locals.staticPath = staticPath
 
-  app.locals.mathJaxEntrypoint = buildJsPath('MathJaxBundle.js')
+  app.locals.buildMathJaxEntrypoint = () => buildJsPath('MathJaxBundle.js')
 
   webRouter.use(function(req, res, next) {
     const actualRender = res.render
