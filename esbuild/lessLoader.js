@@ -52,11 +52,21 @@ module.exports = function lessLoader(options = {}) {
           // sourceMap: { sourceMapFileInline: true }
         }
 
+        let result
+        try {
+          result = await less.render(entrypointSrc, lessOpts)
+        } catch (error) {
+          const message = convertLessError(error)
+          return {
+            errors: [message],
+            resolveDir: dir,
+            // CHANGED: add support for watch mode
+            watchFiles: [message.location.file]
+          }
+        }
+
         // CHANGED: add support for watch mode
-        const { css: bundleContents, imports: watchFiles } = await less.render(
-          entrypointSrc,
-          lessOpts
-        )
+        const { css: bundleContents, imports: watchFiles } = result
 
         // Back fill entrypoint, it is not part of the `imports` list
         watchFiles.push(entrypointPath)
@@ -68,6 +78,25 @@ module.exports = function lessLoader(options = {}) {
           watchFiles
         }
       })
+    }
+  }
+}
+
+/** Convert less error into esbuild error
+ *  https://github.com/iam-medvedev/esbuild-plugin-less/pull/12
+ * */
+function convertLessError(error) {
+  const sourceLine = error.extract.filter(line => line)
+  const lineText = sourceLine.length === 3 ? sourceLine[1] : sourceLine[0]
+
+  return {
+    text: error.message,
+    location: {
+      namespace: 'file',
+      file: error.filename,
+      line: error.line,
+      column: error.column,
+      lineText
     }
   }
 }
