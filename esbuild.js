@@ -1,10 +1,12 @@
+const http = require('http')
 const Path = require('path')
 const esbuild = require('esbuild')
 const BROWSER_TARGETS = require('./esbuild/getBrowserTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
 const lessLoader = require('./esbuild/lessLoader')
 const valLoader = require('./esbuild/valLoader')
-const writeManifest = require('./esbuild/writeManifest')
+const { handleRequest, trackOutput } = require('./esbuild/inMemory')
+const { manifest, writeManifest } = require('./esbuild/writeManifest')
 
 const FRONTEND_PATH = Path.join(__dirname, 'frontend')
 const GENERATED_PATH = Path.join(__dirname, 'generated')
@@ -103,13 +105,15 @@ function logWithTimestamp(...args) {
   console.error(`[${new Date().toISOString()}]`, ...args)
 }
 
-async function onRebuild(error, result) {
+async function onRebuild(name, error, result) {
   if (error) {
     logWithTimestamp('watch build failed.')
     return
   }
 
   logWithTimestamp('watch build succeeded.')
+
+  trackOutput(name, result.outputFiles)
   try {
     await writeManifest(result.metafile)
   } catch (error) {
@@ -129,30 +133,63 @@ function trackDurationInMS() {
   }
 }
 
-async function buildConfig(isWatchMode, cfg) {
+async function buildConfig(isWatchMode, inMemory, cfg) {
   cfg = inflateConfig(cfg)
-  if (isWatchMode) {
-    cfg.watch = { onRebuild }
-  }
   const { DESCRIPTION } = cfg
   delete cfg.DESCRIPTION
 
+  if (isWatchMode) {
+    cfg.watch = {
+      async onRebuild(error, result) {
+        await onRebuild(DESCRIPTION, error, result)
+      }
+    }
+  }
+  if (inMemory) {
+    cfg.write = false
+  }
+
   const done = trackDurationInMS()
-  const { metafile } = await esbuild.build(cfg)
+  const { metafile, outputFiles } = await esbuild.build(cfg)
   const duration = done()
 
-  await writeManifest(metafile)
+  trackOutput(DESCRIPTION, outputFiles)
+  await writeManifest(metafile, inMemory)
   return { DESCRIPTION, duration }
 }
 
-async function buildAllConfigs(isWatchMode) {
+async function buildAllConfigs(isWatchMode, inMemory) {
   const done = trackDurationInMS()
   const timings = await Promise.all(
-    CONFIGS.map(cfg => buildConfig(isWatchMode, cfg))
+    CONFIGS.map(cfg => buildConfig(isWatchMode, inMemory, cfg))
   )
   const duration = done()
   timings.push({ DESCRIPTION: 'total', duration })
   return timings
+}
+
+function watchAndServe({ host, port, proxyForInMemoryRequests }) {
+  const server = http
+    .createServer((request, response) => {
+      return handleRequest(setCORSHeader, request, response)
+    })
+    .listen(port, host)
+  const address = server.address()
+  const setCORSHeader = !proxyForInMemoryRequests
+
+  const initialBuild = buildAllConfigs(true, true)
+    .then(() => {
+      logWithTimestamp('esbuild is ready in watch-and-serve mode.')
+    })
+    .catch(error => {
+      console.error(
+        'esbuild initial build in watch-and-serve mode failed:',
+        error
+      )
+      process.exit(1)
+    })
+
+  return { manifest, address, initialBuild }
 }
 
 async function buildTestBundle(entrypoint, platform, target) {
@@ -194,6 +231,7 @@ async function buildTestBundleForNode(entrypoint) {
 }
 
 module.exports = {
+  watchAndServe,
   buildTestBundleForBrowser,
   buildTestBundleForNode
 }

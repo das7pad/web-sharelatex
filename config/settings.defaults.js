@@ -690,6 +690,16 @@ module.exports = {
       ? process.env.WATCH_MANIFEST === 'true'
       : ['development', 'test'].includes(process.env.NODE_ENV),
 
+  esbuild: {
+    inMemory:
+      process.env.ESBUILD_IN_MEMORY !== undefined
+        ? process.env.ESBUILD_IN_MEMORY === 'true'
+        : ['development', 'test'].includes(process.env.ESBUILD_IN_MEMORY),
+    host: process.env.ESBUILD_HOST,
+    port: parseInt(process.env.ESBUILD_PORT, 10) || undefined,
+    proxyForInMemoryRequests: process.env.ESBUILD_PROXY_FOR_IN_MEMORY_REQUESTS
+  },
+
   // If you are running ShareLaTeX over https, set this to true to send the
   // cookie with a secure flag (recommended).
   secureCookie: false,

@@ -9,9 +9,10 @@ const MANIFEST_PATH = Path.join(
     ? '../../../public/manifest-dev.json'
     : '../../../public/manifest.json'
 )
-const STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
+let STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
 let MANIFEST
 let ENTRYPOINT_CHUNKS
+let waitForBuild = Promise.resolve()
 
 function inflateEntrypointChunks(entryPointsWithRelativeChunkPaths) {
   ENTRYPOINT_CHUNKS = new Map(Object.entries(entryPointsWithRelativeChunkPaths))
@@ -49,9 +50,26 @@ function watchManifest() {
   })
 }
 
-inflateManifest(fs.readFileSync(MANIFEST_PATH, 'utf-8'))
-if (Settings.watchManifest) {
-  watchManifest()
+function setupInMemoryServing() {
+  const esbuild = require('../../../esbuild')
+  const { manifest, address, initialBuild } = esbuild.watchAndServe(
+    Settings.esbuild
+  )
+  STATIC_FILES_BASE =
+    Settings.esbuild.proxyForInMemoryRequests ||
+    `http://localhost:${address.port}`
+  MANIFEST = manifest
+  ENTRYPOINT_CHUNKS = manifest.get('entrypoints')
+  waitForBuild = initialBuild
+}
+
+if (Settings.esbuild.inMemory) {
+  setupInMemoryServing()
+} else {
+  inflateManifest(fs.readFileSync(MANIFEST_PATH, 'utf-8'))
+  if (Settings.watchManifest) {
+    watchManifest()
+  }
 }
 
 function buildCssPath(themeModifier = '') {
@@ -89,5 +107,6 @@ module.exports = {
   buildJsPath,
   buildTPath,
   getEntrypointChunks,
-  staticPath
+  staticPath,
+  waitForBuild
 }

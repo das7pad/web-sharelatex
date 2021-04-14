@@ -26,6 +26,7 @@ const Server = require('./app/src/infrastructure/Server')
 const mongodb = require('./app/src/infrastructure/mongodb')
 const mongoose = require('./app/src/infrastructure/Mongoose')
 const Queues = require('./app/src/infrastructure/Queues')
+const { waitForBuild } = require('./app/src/infrastructure/WebpackAssets')
 
 Queues.initialize()
 
@@ -44,6 +45,7 @@ if (!module.parent) {
     .catch(err => {
       throw new OError('cannot connect to mongo').withCause(err)
     })
+    .then(() => waitForBuild)
     .then(() =>
       promisify(cb => Server.server.listen(port, host, cb))().catch(err => {
         throw new OError('cannot start http server').withCause(err)
