@@ -88,6 +88,7 @@ function staticPath(path) {
 }
 
 module.exports = {
+  STATIC_FILES_BASE,
   buildCssPath,
   buildFontPath,
   buildImgPath,
