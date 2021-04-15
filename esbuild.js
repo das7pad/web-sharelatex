@@ -5,6 +5,10 @@ const BROWSER_TARGETS = require('./esbuild/getBrowserTargets')
 const aliasResolver = require('./esbuild/aliasResolver')
 const lessLoader = require('./esbuild/lessLoader')
 const valLoader = require('./esbuild/valLoader')
+const {
+  handleEventSourceRequest,
+  notifyFrontendAboutRebuild
+} = require('./esbuild/autoReload')
 const { handleRequest, trackOutput } = require('./esbuild/inMemory')
 const { manifest, writeManifest } = require('./esbuild/writeManifest')
 
@@ -106,6 +110,7 @@ function logWithTimestamp(...args) {
 }
 
 async function onRebuild(name, error, result) {
+  notifyFrontendAboutRebuild(name, error, result)
   if (error) {
     logWithTimestamp('watch build failed.')
     return
@@ -133,7 +138,7 @@ function trackDurationInMS() {
   }
 }
 
-async function buildConfig(isWatchMode, inMemory, cfg) {
+async function buildConfig({ isWatchMode, inMemory, autoReload }, cfg) {
   cfg = inflateConfig(cfg)
   const { DESCRIPTION } = cfg
   delete cfg.DESCRIPTION
@@ -148,6 +153,9 @@ async function buildConfig(isWatchMode, inMemory, cfg) {
   if (inMemory) {
     cfg.write = false
   }
+  if (autoReload && DESCRIPTION === 'main bundles') {
+    cfg.inject.push(Path.join(__dirname, 'esbuild/listenForRebuild.js'))
+  }
 
   const done = trackDurationInMS()
   const { metafile, outputFiles } = await esbuild.build(cfg)
@@ -158,26 +166,40 @@ async function buildConfig(isWatchMode, inMemory, cfg) {
   return { DESCRIPTION, duration }
 }
 
-async function buildAllConfigs(isWatchMode, inMemory) {
+async function buildAllConfigs(options) {
   const done = trackDurationInMS()
   const timings = await Promise.all(
-    CONFIGS.map(cfg => buildConfig(isWatchMode, inMemory, cfg))
+    CONFIGS.map(cfg => buildConfig(options, cfg))
   )
   const duration = done()
   timings.push({ DESCRIPTION: 'total', duration })
   return timings
 }
 
-function watchAndServe({ host, port, proxyForInMemoryRequests }) {
+function watchAndServe({ host, port, proxyForInMemoryRequests, autoReload }) {
   const server = http
     .createServer((request, response) => {
-      return handleRequest(setCORSHeader, request, response)
+      if (setCORSHeader) {
+        response.setHeader(
+          'Access-Control-Allow-Origin',
+          request.headers.origin || '*'
+        )
+      }
+      if (request.url.endsWith('/event-source')) {
+        return handleEventSourceRequest(request, response)
+      }
+      return handleRequest(request, response)
     })
     .listen(port, host)
   const address = server.address()
+  // Assume that the proxy sets all the CORS headers.
   const setCORSHeader = !proxyForInMemoryRequests
 
-  const initialBuild = buildAllConfigs(true, true)
+  const initialBuild = buildAllConfigs({
+    isWatchMode: true,
+    inMemory: true,
+    autoReload
+  })
     .then(() => {
       logWithTimestamp('esbuild is ready in watch-and-serve mode.')
     })
@@ -240,7 +262,7 @@ if (require.main === module) {
   const ACTION = process.argv.pop()
 
   if (ACTION === 'build') {
-    buildAllConfigs(false)
+    buildAllConfigs({ isWatchMode: false })
       .then(timings => {
         console.table(timings)
         console.error('esbuild build succeeded.')
@@ -251,7 +273,7 @@ if (require.main === module) {
         process.exit(1)
       })
   } else if (ACTION === 'watch') {
-    buildAllConfigs(true)
+    buildAllConfigs({ isWatchMode: true })
       .then(() => {
         logWithTimestamp('esbuild is ready in watch mode.')
       })

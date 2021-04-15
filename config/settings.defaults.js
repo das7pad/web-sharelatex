@@ -691,6 +691,7 @@ module.exports = {
       : ['development', 'test'].includes(process.env.NODE_ENV),
 
   esbuild: {
+    autoReload: process.env.ESBUILD_AUTO_RELOAD === 'true',
     inMemory:
       process.env.ESBUILD_IN_MEMORY !== undefined
         ? process.env.ESBUILD_IN_MEMORY === 'true'

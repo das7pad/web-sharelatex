@@ -53,7 +53,7 @@ function getContentType(path) {
   return CONTENT_TYPES.get(Path.extname(path)) || DEFAULT_CONTENT_TYPE
 }
 
-async function handleRequest(setCORSHeader, request, response) {
+async function handleRequest(request, response) {
   const path = request.url
   let body
   try {
@@ -69,13 +69,9 @@ async function handleRequest(setCORSHeader, request, response) {
     response.end()
     return
   }
-  const headers = {
+  response.writeHead(200, {
     'Content-Type': getContentType(path)
-  }
-  if (setCORSHeader) {
-    headers['Access-Control-Allow-Origin'] = request.headers.origin || '*'
-  }
-  response.writeHead(200, headers)
+  })
   response.write(body)
   response.end()
 }

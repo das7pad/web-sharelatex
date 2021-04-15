@@ -148,7 +148,7 @@ function getCspMiddleware() {
       fontSrc.push('fonts.googleapis.com')
     }
 
-    if (cdnOrigin && cfg.connectCDN) {
+    if (cdnOrigin && (cfg.connectCDN || Settings.esbuild.autoReload)) {
       // e.g. pdfjs cmaps or /launchpad for ide blob check
       connectSrc.push(cdnOrigin)
     }
