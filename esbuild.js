@@ -2,9 +2,9 @@ const http = require('http')
 const Path = require('path')
 const esbuild = require('esbuild')
 const BROWSER_TARGETS = require('./esbuild/getBrowserTargets')
-const aliasResolver = require('./esbuild/aliasResolver')
-const lessLoader = require('./esbuild/lessLoader')
-const valLoader = require('./esbuild/valLoader')
+const aliasResolver = require('./esbuild/plugins/aliasResolver')
+const lessLoader = require('./esbuild/plugins/lessLoader')
+const valLoader = require('./esbuild/plugins/valLoader')
 const {
   handleEventSourceRequest,
   notifyFrontendAboutRebuild
@@ -49,7 +49,7 @@ const CONFIGS = [
     ],
     outbase: Path.join(FRONTEND_PATH, 'js'),
     outdir: Path.join(PUBLIC_PATH, 'js'),
-    inject: [Path.join(__dirname, 'esbuild/bootstrap.js')],
+    inject: [Path.join(__dirname, 'esbuild/inject/bootstrap.js')],
     define: {
       'process.env.NODE_ENV': '"production"',
       // work around 'process' usage in algoliasearch
@@ -154,7 +154,7 @@ async function buildConfig({ isWatchMode, inMemory, autoReload }, cfg) {
     cfg.write = false
   }
   if (autoReload && DESCRIPTION === 'main bundles') {
-    cfg.inject.push(Path.join(__dirname, 'esbuild/listenForRebuild.js'))
+    cfg.inject.push(Path.join(__dirname, 'esbuild/inject/listenForRebuild.js'))
   }
 
   const done = trackDurationInMS()
