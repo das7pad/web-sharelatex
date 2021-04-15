@@ -2,108 +2,18 @@ const http = require('http')
 const Path = require('path')
 const esbuild = require('esbuild')
 const BROWSER_TARGETS = require('./esbuild/getBrowserTargets')
-const aliasResolver = require('./esbuild/plugins/aliasResolver')
-const lessLoader = require('./esbuild/plugins/lessLoader')
 const valLoader = require('./esbuild/plugins/valLoader')
+const {
+  CONFIGS,
+  MAIN_BUNDLES_CONFIG,
+  inflateConfig
+} = require('./esbuild/configs')
 const {
   handleEventSourceRequest,
   notifyFrontendAboutRebuild
 } = require('./esbuild/autoReload')
 const { handleRequest, trackOutput } = require('./esbuild/inMemory')
 const { manifest, writeManifest } = require('./esbuild/writeManifest')
-
-const FRONTEND_PATH = Path.join(__dirname, 'frontend')
-const GENERATED_PATH = Path.join(__dirname, 'generated')
-const NODE_MODULES = Path.join(__dirname, 'node_modules')
-const PUBLIC_PATH = Path.join(__dirname, 'public')
-
-const COMMON_CFG = {
-  assetNames: 'assets/[name]-[hash]',
-  bundle: true,
-  chunkNames: 'chunks/[name]-[hash]',
-  entryNames: '[dir]/[name]-[hash]',
-  minifyWhitespace: true,
-  minifySyntax: true,
-  sourcemap: true,
-  target: BROWSER_TARGETS,
-  outdir: PUBLIC_PATH,
-  loader: {
-    '.woff': 'file',
-    '.woff2': 'file',
-    '.png': 'file',
-    '.svg': 'file',
-    '.gif': 'file'
-  }
-}
-
-const CONFIGS = [
-  {
-    DESCRIPTION: 'main bundles',
-
-    metafile: true,
-    splitting: true,
-    format: 'esm',
-    entryPoints: [
-      Path.join(FRONTEND_PATH, 'js/ide.js'),
-      Path.join(FRONTEND_PATH, 'js/main.js')
-    ],
-    outbase: Path.join(FRONTEND_PATH, 'js'),
-    outdir: Path.join(PUBLIC_PATH, 'js'),
-    inject: [Path.join(__dirname, 'esbuild/inject/bootstrap.js')],
-    define: {
-      'process.env.NODE_ENV': '"production"',
-      // work around 'process' usage in algoliasearch
-      'process.env.RESET_APP_DATA_TIMER': 'null',
-      // silence ad
-      __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }'
-    },
-    plugins: [
-      aliasResolver({
-        libs: Path.join(FRONTEND_PATH, 'js/vendor/libs'),
-        ace: Path.join(NODE_MODULES, 'ace-builds/src-noconflict')
-      }),
-      valLoader(Path.join(__dirname, 'modules/modules-ide.js')),
-      valLoader(Path.join(__dirname, 'modules/modules-main.js'))
-    ],
-    loader: { '.js': 'jsx' }
-  },
-
-  {
-    DESCRIPTION: 'MathJax in non-strict mode',
-
-    metafile: true,
-    entryPoints: [Path.join(FRONTEND_PATH, 'js/MathJaxBundle.js')],
-    outbase: Path.join(FRONTEND_PATH, 'js'),
-    outdir: Path.join(PUBLIC_PATH, 'js')
-  },
-
-  {
-    DESCRIPTION: 'translations bundles',
-
-    metafile: true,
-    entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
-    outbase: Path.join(GENERATED_PATH, 'lng'),
-    outdir: Path.join(PUBLIC_PATH, 'js/t')
-  },
-
-  {
-    DESCRIPTION: 'stylesheets',
-
-    metafile: true,
-    plugins: [
-      lessLoader({
-        // resolve all the math expressions
-        math: 'always'
-      })
-    ],
-    entryPoints: [
-      Path.join(FRONTEND_PATH, 'stylesheets/style.less'),
-      Path.join(FRONTEND_PATH, 'stylesheets/light-style.less')
-    ],
-    outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
-    outdir: Path.join(PUBLIC_PATH, 'stylesheets')
-  }
-]
 
 function logWithTimestamp(...args) {
   console.error(`[${new Date().toISOString()}]`, ...args)
@@ -124,10 +34,6 @@ async function onRebuild(name, error, result) {
   } catch (error) {
     logWithTimestamp('writing manifest failed in watch mode:', error)
   }
-}
-
-function inflateConfig(cfg) {
-  return Object.assign({}, COMMON_CFG, cfg)
 }
 
 function trackDurationInMS() {
@@ -216,7 +122,7 @@ function watchAndServe({ host, port, proxyForInMemoryRequests, autoReload }) {
 
 async function buildTestBundle(entrypoint, platform, target) {
   const OUTPUT_PATH = Path.join('/tmp', 'web', 'testBundle', platform)
-  const { define, inject, plugins, loader } = CONFIGS[0]
+  const { define, inject, plugins, loader } = MAIN_BUNDLES_CONFIG
   const cfg = {
     entryNames: '[dir]/[name]',
     entryPoints: [entrypoint],
