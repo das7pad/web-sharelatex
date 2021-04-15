@@ -53,8 +53,15 @@ function getContentType(path) {
   return CONTENT_TYPES.get(Path.extname(path)) || DEFAULT_CONTENT_TYPE
 }
 
+function getPathFromURL(url) {
+  // drop query flags
+  const path = url.split('?')[0]
+  // resolve ../ and friends
+  return Path.normalize(path)
+}
+
 async function handleRequest(request, response) {
-  const path = request.url
+  const path = getPathFromURL(request.url)
   let body
   try {
     body = await getBody(PUBLIC_PATH + path)
