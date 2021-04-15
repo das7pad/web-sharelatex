@@ -1,5 +1,5 @@
 const Path = require('path')
-const { buildTestBundleForNode } = require('../../esbuild')
+const { buildTestBundleForNode } = require('../../esbuild/buildCI')
 const ENTRYPOINT = Path.join(__dirname, 'entrypoint.js')
 
 buildTestBundleForNode(ENTRYPOINT)

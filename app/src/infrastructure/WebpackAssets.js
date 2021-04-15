@@ -51,10 +51,9 @@ function watchManifest() {
 }
 
 function setupInMemoryServing() {
-  const esbuild = require('../../../esbuild')
-  const { manifest, address, initialBuild } = esbuild.watchAndServe(
-    Settings.esbuild
-  )
+  // run-time import in development mode.
+  const { watchAndServe } = require('../../../esbuild/watchAndServe')
+  const { manifest, address, initialBuild } = watchAndServe(Settings.esbuild)
   STATIC_FILES_BASE =
     Settings.esbuild.proxyForInMemoryRequests ||
     `http://localhost:${address.port}`
