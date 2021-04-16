@@ -21,17 +21,17 @@ function toAbsolute(paths) {
 }
 
 function genLoaderTarget(pattern) {
-  return function() {
+  return function({ isWatchMode }) {
     // Generate new listings on every invocation.
     const files = list(pattern)
-    const parents = getAllParents(pattern)
+    const parents = isWatchMode ? getAllParents(pattern) : []
 
     // Import relative to entrypoint. The output is _public_.
     const code = files.map(file => `import '${file}'`).join('\n')
 
     // Watch on absolute path.
-    const watchDirs = toAbsolute(parents)
-    const watchFiles = toAbsolute(files)
+    const watchDirs = isWatchMode ? toAbsolute(parents) : undefined
+    const watchFiles = isWatchMode ? toAbsolute(files) : undefined
     return {
       code,
       watchDirs,
