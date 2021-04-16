@@ -72,9 +72,16 @@ async function flushManifest() {
   await pendingWrite
 }
 
+function serializeMapToJSON(key, value) {
+  if (value instanceof Map) {
+    return Object.fromEntries(value.entries())
+  }
+  return value
+}
+
 async function flushManifestAtomically() {
   const tmpPath = MANIFEST_PATH + '~'
-  const blob = JSON.stringify(Object.fromEntries(manifest.entries()), null, 2)
+  const blob = JSON.stringify(manifest, serializeMapToJSON, 2)
   await fs.promises.writeFile(tmpPath, blob)
   await fs.promises.rename(tmpPath, MANIFEST_PATH)
 }
