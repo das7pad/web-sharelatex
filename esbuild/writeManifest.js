@@ -14,18 +14,10 @@ async function writeManifest(meta, inMemory) {
   function pathInPublic(path) {
     return path.slice('public'.length)
   }
-  const loaders = ['less']
-  function normalizeEntrypoint(blob) {
-    if (loaders.some(loader => blob.startsWith(`${loader}:${ROOT}`))) {
-      blob = Path.relative(ROOT, blob.replace(/.+?:/, ''))
-    }
-    return blob
-  }
-
   Object.entries(meta.outputs)
     .filter(([, details]) => details.entryPoint)
     .forEach(([path, details]) => {
-      const src = normalizeEntrypoint(details.entryPoint)
+      const src = details.entryPoint
 
       // Load entrypoint individually
       manifest.set(src, pathInPublic(path))

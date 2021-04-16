@@ -9,27 +9,13 @@ const path = require('path')
 const { promises: fs } = require('fs')
 const less = require('less')
 
-const namespace = 'less'
-
 /** Less-loader for esbuild */
 module.exports = function lessLoader(options = {}) {
   return {
     name: 'less-loader',
     setup: build => {
-      // Resolve *.less files with namespace
-      build.onResolve({ filter: /\.less$/ }, args => {
-        return {
-          path: path.resolve(
-            process.cwd(),
-            path.relative(process.cwd(), args.resolveDir),
-            args.path
-          ),
-          namespace
-        }
-      })
-
       // Build .less files
-      build.onLoad({ filter: /.*/, namespace }, async args => {
+      build.onLoad({ filter: /\.less$/ }, async args => {
         const entrypointPath = args.path
         const entrypointSrc = await fs.readFile(entrypointPath, 'utf-8')
         const dir = path.dirname(entrypointPath)
