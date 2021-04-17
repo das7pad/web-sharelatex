@@ -2,39 +2,34 @@ const fs = require('fs')
 const Path = require('path')
 
 // Accumulate manifest artifacts from all builds
-const entrypoints = {}
-const manifest = { entrypoints }
+const entrypoints = new Map()
+const manifest = new Map([['entrypoints', entrypoints]])
 const ROOT = Path.dirname(__dirname)
 const MANIFEST_PATH = Path.join(ROOT, 'public', 'manifest.json')
 
-module.exports = writeManifest
-async function writeManifest(meta) {
+module.exports = { writeManifest, manifest }
+async function writeManifest(meta, inMemory) {
   if (!meta) return // some builds do not emit a metafile
 
   function pathInPublic(path) {
     return path.slice('public'.length)
   }
-  const loaders = ['less']
-  function normalizeEntrypoint(blob) {
-    if (loaders.some(loader => blob.startsWith(`${loader}:${ROOT}`))) {
-      blob = Path.relative(ROOT, blob.replace(/.+?:/, ''))
-    }
-    return blob
-  }
-
   Object.entries(meta.outputs)
     .filter(([, details]) => details.entryPoint)
     .forEach(([path, details]) => {
-      const src = normalizeEntrypoint(details.entryPoint)
+      const src = details.entryPoint
 
       // Load entrypoint individually
-      manifest[src] = pathInPublic(path)
+      manifest.set(src, pathInPublic(path))
 
       // Load entrypoint with chunks
-      entrypoints[src] = details.imports
-        .filter(item => item.kind === 'import-statement')
-        .map(item => pathInPublic(item.path))
-        .concat([pathInPublic(path)])
+      entrypoints.set(
+        src,
+        details.imports
+          .filter(item => item.kind === 'import-statement')
+          .map(item => pathInPublic(item.path))
+          .concat([pathInPublic(path)])
+      )
 
       // Optionally provide access to extracted css
       if (path.endsWith('.js')) {
@@ -47,7 +42,7 @@ async function writeManifest(meta) {
             candidatePath.slice(prefix.length).match(/^\w+\.css$/)
         )
         if (cssBundle) {
-          manifest[src + '.css'] = pathInPublic(cssBundle)
+          manifest.set(src + '.css', pathInPublic(cssBundle))
         }
       }
     })
@@ -57,9 +52,10 @@ async function writeManifest(meta) {
     .filter(([path]) => assetFileTypes.some(ext => path.endsWith(ext)))
     .forEach(([path, details]) => {
       const src = Object.keys(details.inputs).pop()
-      manifest[src] = pathInPublic(path)
+      manifest.set(src, pathInPublic(path))
     })
 
+  if (inMemory) return
   await flushManifest()
 }
 
@@ -76,9 +72,16 @@ async function flushManifest() {
   await pendingWrite
 }
 
+function serializeMapToJSON(key, value) {
+  if (value instanceof Map) {
+    return Object.fromEntries(value.entries())
+  }
+  return value
+}
+
 async function flushManifestAtomically() {
   const tmpPath = MANIFEST_PATH + '~'
-  const blob = JSON.stringify(manifest, null, 2)
+  const blob = JSON.stringify(manifest, serializeMapToJSON, 2)
   await fs.promises.writeFile(tmpPath, blob)
   await fs.promises.rename(tmpPath, MANIFEST_PATH)
 }

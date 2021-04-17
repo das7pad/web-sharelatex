@@ -3,8 +3,9 @@ const Settings =
 const { URL } = require('url')
 const Path = require('path')
 const Crypto = require('crypto')
+const { STATIC_FILES_BASE } = require('./WebpackAssets')
 
-const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
+const staticFilesBase = STATIC_FILES_BASE
 
 const NG_CLOAK =
   '@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}'
@@ -147,7 +148,7 @@ function getCspMiddleware() {
       fontSrc.push('fonts.googleapis.com')
     }
 
-    if (cdnOrigin && cfg.connectCDN) {
+    if (cdnOrigin && (cfg.connectCDN || Settings.esbuild.autoReload)) {
       // e.g. pdfjs cmaps or /launchpad for ide blob check
       connectSrc.push(cdnOrigin)
     }

@@ -55,11 +55,18 @@ const PATTERNS = []
       }
     })
   )
+  .map(({ from, to, context }) => {
+    if (context) {
+      to = Path.join(to, from)
+      from = Path.join(context, from)
+    }
+    return { from, to }
+  })
 
-for (let { from, to, context } of PATTERNS) {
-  if (context) {
-    to = Path.join(to, from)
-    from = Path.join(context, from)
+module.exports = { PATTERNS }
+
+if (require.main === module) {
+  for (let { from, to } of PATTERNS) {
+    fsExtra.copySync(from, to)
   }
-  fsExtra.copySync(from, to)
 }

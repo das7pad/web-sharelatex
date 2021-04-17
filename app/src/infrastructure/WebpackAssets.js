@@ -9,18 +9,13 @@ const MANIFEST_PATH = Path.join(
     ? '../../../public/manifest-dev.json'
     : '../../../public/manifest.json'
 )
-const STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
+let STATIC_FILES_BASE = Settings.cdn.web.host.replace(/\/$/, '')
 let MANIFEST
 let ENTRYPOINT_CHUNKS
+let waitForBuild = Promise.resolve()
 
 function inflateEntrypointChunks(entryPointsWithRelativeChunkPaths) {
-  ENTRYPOINT_CHUNKS = new Map(
-    Object.entries(entryPointsWithRelativeChunkPaths).map(
-      ([entrypoint, chunks]) => {
-        return [entrypoint, chunks.map(staticPath)]
-      }
-    )
-  )
+  ENTRYPOINT_CHUNKS = new Map(Object.entries(entryPointsWithRelativeChunkPaths))
 }
 function inflateManifest(blob) {
   MANIFEST = new Map(Object.entries(JSON.parse(blob)))
@@ -55,9 +50,25 @@ function watchManifest() {
   })
 }
 
-inflateManifest(fs.readFileSync(MANIFEST_PATH, 'utf-8'))
-if (Settings.watchManifest) {
-  watchManifest()
+function setupInMemoryServing() {
+  // run-time import in development mode.
+  const { watchAndServe } = require('../../../esbuild/watchAndServe')
+  const { manifest, address, initialBuild } = watchAndServe(Settings.esbuild)
+  STATIC_FILES_BASE =
+    Settings.esbuild.proxyForInMemoryRequests ||
+    `http://localhost:${address.port}`
+  MANIFEST = manifest
+  ENTRYPOINT_CHUNKS = manifest.get('entrypoints')
+  waitForBuild = initialBuild
+}
+
+if (Settings.esbuild.inMemory) {
+  setupInMemoryServing()
+} else {
+  inflateManifest(fs.readFileSync(MANIFEST_PATH, 'utf-8'))
+  if (Settings.watchManifest) {
+    watchManifest()
+  }
 }
 
 function buildCssPath(themeModifier = '') {
@@ -81,18 +92,20 @@ function buildTPath(lng) {
   return STATIC_FILES_BASE + MANIFEST.get(src)
 }
 function getEntrypointChunks(entrypoint) {
-  return ENTRYPOINT_CHUNKS.get(entrypoint)
+  return ENTRYPOINT_CHUNKS.get(entrypoint).map(staticPath)
 }
 function staticPath(path) {
   return STATIC_FILES_BASE + path
 }
 
 module.exports = {
+  STATIC_FILES_BASE,
   buildCssPath,
   buildFontPath,
   buildImgPath,
   buildJsPath,
   buildTPath,
   getEntrypointChunks,
-  staticPath
+  staticPath,
+  waitForBuild
 }

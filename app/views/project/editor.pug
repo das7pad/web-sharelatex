@@ -180,7 +180,7 @@ block content
 	meta(name="ol-wikiEnabled" data-type="boolean" content=!!(settings.apis.wiki && settings.apis.wiki.url))
 	meta(name="ol-gitBridgePublicBaseUrl" content=gitBridgePublicBaseUrl)
 	meta(name="ol-useShareJsHash" data-type="boolean" content=true)
-	meta(name="ol-mathJaxEntrypoint" content=mathJaxEntrypoint)
+	meta(name="ol-mathJaxEntrypoint" content=buildMathJaxEntrypoint())
 	meta(name="ol-wsUrl" content=wsUrl)
 	meta(name="ol-wsRetryHandshake" data-type="json" content=settings.wsRetryHandshake)
 	meta(name="ol-hasLinkUrlFeature" data-type="boolean" content=hasFeature('link-url'))
