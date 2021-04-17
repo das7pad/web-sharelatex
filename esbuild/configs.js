@@ -87,7 +87,7 @@ const CONFIGS = [
     metafile: true,
     plugins: [
       lessLoader({
-        // resolve all the math expressions
+        // Resolve all the math expressions
         math: 'always'
       })
     ],

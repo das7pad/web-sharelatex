@@ -25,8 +25,9 @@ module.exports = function lessLoader(options = {}) {
  *  https://github.com/iam-medvedev/esbuild-plugin-less/pull/12
  * */
 function convertLessError(error) {
-  const sourceLine = error.extract.filter(line => line)
-  const lineText = sourceLine.length === 3 ? sourceLine[1] : sourceLine[0]
+  // error.extract = [lineTextBeforeError, lineText, lineTextAfterError]
+  // NOTE: lineTextBeforeError and lineTextAfterError may be null.
+  const [, lineText] = error.extract
 
   return {
     text: error.message,
@@ -46,22 +47,22 @@ async function main() {
   const less = require('less')
   const options = JSON.parse(process.argv.pop())
   const entrypointPath = process.argv.pop()
-  let out
   const dir = Path.dirname(entrypointPath)
   const blob = await fs.promises.readFile(entrypointPath, 'utf-8')
+  let out
   try {
     const lessOpts = {
-      // CHANGED: filename must be the full path -- see lessc
+      // Emit relative paths from here.
       filename: entrypointPath,
 
-      // CHANGED: Importing relative files works!
-      rootpath: './',
+      // Resolve URL imports per file and emit relative paths from entrypoint.
       rewriteUrls: 'all',
 
+      // Add custom options from the config.
       ...options,
 
-      // CHANGED: align with lessc and put the dir first.
-      paths: [dir, ...(options.paths || [])]
+      // Search imports in here.
+      paths: [dir]
 
       // NOTE: Source map support for css is not there yet in esbuild.
       // REF: https://github.com/evanw/esbuild/issues/519
@@ -69,10 +70,10 @@ async function main() {
     }
 
     const result = await less.render(blob, lessOpts)
-    const { css: bundleContents, imports: watchFiles } = result
+    const { css: bundleContents, imports } = result
 
-    // Back fill entrypoint, it is not part of the `imports` list
-    watchFiles.push(entrypointPath)
+    // Watch for changes in all the less files.
+    const watchFiles = imports.concat([entrypointPath])
 
     out = {
       contents: bundleContents,
@@ -87,7 +88,7 @@ async function main() {
       errors: [message],
       resolveDir: dir,
       warnings: [],
-      // CHANGED: add support for watch mode
+      // Wait for a fix in the file with errors.
       watchFiles: [message.location.file]
     }
   }
