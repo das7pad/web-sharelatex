@@ -8,7 +8,7 @@ const ROOT = Path.dirname(__dirname)
 
 async function buildTestBundle(entrypoint, platform, target) {
   const OUTPUT_PATH = Path.join('/tmp', 'web', 'testBundle', platform)
-  const { define, inject, plugins, loader } = MAIN_BUNDLES_CONFIG
+  const { define, inject, plugins, loader, tsconfig } = MAIN_BUNDLES_CONFIG
   const cfg = {
     entryNames: '[dir]/[name]',
     entryPoints: [entrypoint],
@@ -22,7 +22,8 @@ async function buildTestBundle(entrypoint, platform, target) {
     target,
     define,
     inject,
-    loader
+    loader,
+    tsconfig
   }
 
   try {

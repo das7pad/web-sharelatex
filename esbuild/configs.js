@@ -1,6 +1,5 @@
 const Path = require('path')
 const BROWSER_TARGETS = require('./getBrowserTargets')
-const aliasResolver = require('./plugins/aliasResolver')
 const lessLoader = require('./plugins/lessLoader')
 const valLoader = require('./plugins/valLoader')
 
@@ -8,7 +7,6 @@ const ROOT = Path.dirname(__dirname)
 const FRONTEND_PATH = Path.join(ROOT, 'frontend')
 const GENERATED_PATH = Path.join(ROOT, 'generated')
 const MODULES_PATH = Path.join(ROOT, 'modules')
-const NODE_MODULES = Path.join(ROOT, 'node_modules')
 const PUBLIC_PATH = Path.join(ROOT, 'public')
 
 const COMMON_CFG = {
@@ -53,14 +51,11 @@ const CONFIGS = [
       __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }'
     },
     plugins: [
-      aliasResolver({
-        libs: Path.join(FRONTEND_PATH, 'js/vendor/libs'),
-        ace: Path.join(NODE_MODULES, 'ace-builds/src-noconflict')
-      }),
       valLoader(Path.join(MODULES_PATH, 'modules-ide.js')),
       valLoader(Path.join(MODULES_PATH, 'modules-main.js'))
     ],
-    loader: { '.js': 'jsx' }
+    loader: { '.js': 'jsx' },
+    tsconfig: Path.join(ROOT, 'esbuild/tsconfig.json')
   },
 
   {
