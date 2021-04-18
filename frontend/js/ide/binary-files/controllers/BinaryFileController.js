@@ -1,6 +1,7 @@
 import App from '../../../base'
 import { react2angular } from 'react2angular'
 import ImgPreview from '../../../features/img-preview/components/img-preview'
+import getMeta from '../../../utils/meta'
 
 App.component('imgPreview', react2angular(ImgPreview))
 
@@ -20,7 +21,7 @@ export default App.controller('BinaryFileController', function(
   const TAIL_OF_URL_LENGTH =
     MAX_URL_LENGTH - FRONT_OF_URL_LENGTH - FILLER.length
 
-  const textExtensions = window.ExposedSettings.textExtensions
+  const textExtensions = getMeta('ol-textExtensions')
   const imageExtensions = ['png', 'jpg', 'jpeg', 'gif']
   const previewableExtensions = []
 
