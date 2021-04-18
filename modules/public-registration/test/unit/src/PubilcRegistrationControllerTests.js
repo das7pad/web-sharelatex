@@ -54,7 +54,6 @@ describe('PublicRegistrationController', function() {
           .UserRegistrationHandler,
         '../../../../app/src/Features/Referal/ReferalAllocator': this
           .ReferalAllocator,
-        '../../../../app/src/Features/Email/Layouts/PersonalEmailLayout': {},
         '../../../../app/src/Features/Email/EmailBuilder': {
           templates: { welcome: {} },
           ctaTemplate: sinon.stub()
