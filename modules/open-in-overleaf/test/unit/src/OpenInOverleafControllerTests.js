@@ -22,10 +22,10 @@ const ProjectHelper = require('../../../../../app/src/Features/Project/ProjectHe
 const Errors = require('../../../../../app/src/Features/Errors/Errors')
 const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 
-describe('OpenInOverleafController', function() {
+describe('OpenInOverleafController', function () {
   this.timeout(4000)
 
-  beforeEach(function() {
+  beforeEach(function () {
     this.project_id = '123213jlkj9kdlsaj'
     this.user = {
       _id: '588f3ddae8ebc1bac07c9fa4',
@@ -138,13 +138,13 @@ describe('OpenInOverleafController', function() {
     ))
   })
 
-  describe('openInOverleaf', function() {
-    describe('when there is a raw snippet', function() {
-      beforeEach(function() {
+  describe('openInOverleaf', function () {
+    describe('when there is a raw snippet', function () {
+      beforeEach(function () {
         return (this.req.body.snip = this.snip)
       })
 
-      it('should process the snippet, create a project and redirect to it', function(done) {
+      it('should process the snippet, create a project and redirect to it', function (done) {
         this.res.json = content => {
           sinon.assert.calledWith(
             this.OpenInOverleafHelper.getDocumentLinesFromSnippet,
@@ -165,7 +165,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      it('should update the project with the requested engine, if supplied', function(done) {
+      it('should update the project with the requested engine, if supplied', function (done) {
         this.req.body.engine = 'latex_dvipdf'
         this.res.json = () => {
           sinon.assert.calledWith(
@@ -178,7 +178,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      it('should update the project with the requested brand variation id, if supplied', function(done) {
+      it('should update the project with the requested brand variation id, if supplied', function (done) {
         this.req.body.brand_variation_id = 'wombat'
         this.res.json = () => {
           sinon.assert.calledWith(
@@ -191,7 +191,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      it('should use the default title if the document has no title', function(done) {
+      it('should use the default title if the document has no title', function (done) {
         this.res.json = () => {
           sinon.assert.calledWith(
             this.ProjectDetailsHandler.generateUniqueName,
@@ -204,7 +204,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      it('should use the document title from the snippet, if present', function(done) {
+      it('should use the document title from the snippet, if present', function (done) {
         this.snip = '\\title{wombat}'
         this.req.body.snip = this.snip
         this.OpenInOverleafHelper.getDocumentLinesFromSnippet = sinon
@@ -221,7 +221,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      return it('should create a project with the snip name, if supplied', function(done) {
+      return it('should create a project with the snip name, if supplied', function (done) {
         this.req.body.snip_name = 'potato'
         this.OpenInOverleafHelper.getDocumentLinesFromSnippet = sinon
           .stub()
@@ -238,8 +238,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is no snippet', function() {
-      return it('should send a missing parameters error', function(done) {
+    describe('when there is no snippet', function () {
+      return it('should send a missing parameters error', function (done) {
         this.OpenInOverleafController._populateSnippetFromRequest = sinon.stub()
         delete this.req.body.snip
         return this.OpenInOverleafController.openInOverleaf(
@@ -256,12 +256,12 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is an encoded snippet', function() {
-      beforeEach(function() {
+    describe('when there is an encoded snippet', function () {
+      beforeEach(function () {
         return (this.req.body.encoded_snip = encodeURIComponent(this.snip))
       })
 
-      return it('should create a project and send a redirect to it', function(done) {
+      return it('should create a project and send a redirect to it', function (done) {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
@@ -273,12 +273,12 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is a snippet uri', function() {
-      beforeEach(function() {
+    describe('when there is a snippet uri', function () {
+      beforeEach(function () {
         return (this.req.body.snip_uri = this.snip_uri)
       })
 
-      return it('should create a project and redirect to it', function(done) {
+      return it('should create a project and redirect to it', function (done) {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
@@ -290,12 +290,12 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is a snippet uri passed as zip_uri', function() {
-      beforeEach(function() {
+    describe('when there is a snippet uri passed as zip_uri', function () {
+      beforeEach(function () {
         return (this.req.body.zip_uri = this.snip_uri)
       })
 
-      return it('should create a project and redirect to it', function(done) {
+      return it('should create a project and redirect to it', function (done) {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
@@ -307,15 +307,15 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is an array of uris', function() {
-      beforeEach(function() {
+    describe('when there is an array of uris', function () {
+      beforeEach(function () {
         return (this.req.body.snip_uri = [
           this.snip_uri,
           'http://foo.net/foo.tex'
         ])
       })
 
-      it('should create a project and redirect to it', function(done) {
+      it('should create a project and redirect to it', function (done) {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
@@ -326,7 +326,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      return it('should cate a blank project and populate it with a list of files', function(done) {
+      return it('should cate a blank project and populate it with a list of files', function (done) {
         this.res.json = () => {
           sinon.assert.called(this.ProjectDetailsHandler.generateUniqueName)
           sinon.assert.called(this.ProjectDetailsHandler.fixProjectName)
@@ -340,8 +340,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when the snippet uri is a zip file', function() {
-      beforeEach(function() {
+    describe('when the snippet uri is a zip file', function () {
+      beforeEach(function () {
         this.req.body.snip_uri = 'http://foo.net/foo.zip'
         return (this.OpenInOverleafHelper.populateSnippetFromUri = sinon
           .stub()
@@ -351,7 +351,7 @@ describe('OpenInOverleafController', function() {
           }))
       })
 
-      it('should create a project from the zip file and redirect to it', function(done) {
+      it('should create a project from the zip file and redirect to it', function (done) {
         this.res.json = content => {
           sinon.assert.calledWith(
             this.ProjectUploadManager.createProjectFromZipArchive,
@@ -368,7 +368,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      return it('should use the snip_name if supplied', function(done) {
+      return it('should use the snip_name if supplied', function (done) {
         this.OpenInOverleafHelper.populateSnippetFromUri = sinon
           .stub()
           .callsArgWith(2, null, {
@@ -393,8 +393,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is a publisher slug', function() {
-      beforeEach(function() {
+    describe('when there is a publisher slug', function () {
+      beforeEach(function () {
         this.req.body.snip_uri = `${this.snip_uri}.zip`
         return (this.OpenInOverleafController._populateSnippetFromRequest = sinon
           .stub()
@@ -405,7 +405,7 @@ describe('OpenInOverleafController', function() {
           }))
       })
 
-      return it('should set the brand variation on the project', function(done) {
+      return it('should set the brand variation on the project', function (done) {
         this.res.json = content => {
           sinon.assert.calledWith(
             this.OpenInOverleafHelper.setProjectBrandVariationFromSlug,
@@ -418,9 +418,9 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is a partner and client_media_id', function() {
-      describe('when the partner and client_media_id exist', function() {
-        beforeEach(function() {
+    describe('when there is a partner and client_media_id', function () {
+      describe('when the partner and client_media_id exist', function () {
+        beforeEach(function () {
           this.req.body.partner = 'ieee_latexqc'
           this.req.body.client_media_id = 'wombat1'
           return (this.OpenInOverleafHelper.populateSnippetFromConversionJob = sinon
@@ -432,7 +432,7 @@ describe('OpenInOverleafController', function() {
             }))
         })
 
-        it('should populate the snippet from the conversion job', function(done) {
+        it('should populate the snippet from the conversion job', function (done) {
           this.res.json = content => {
             sinon.assert.calledWith(
               this.OpenInOverleafHelper.populateSnippetFromConversionJob,
@@ -447,7 +447,7 @@ describe('OpenInOverleafController', function() {
           )
         })
 
-        it('should set the brand variation on the project', function(done) {
+        it('should set the brand variation on the project', function (done) {
           this.res.json = content => {
             sinon.assert.calledWith(
               this.OpenInOverleafHelper.setProjectBrandVariationFromId,
@@ -462,7 +462,7 @@ describe('OpenInOverleafController', function() {
           )
         })
 
-        return it('should create a project from the zip file and redirect to it', function(done) {
+        return it('should create a project from the zip file and redirect to it', function (done) {
           this.res.json = content => {
             sinon.assert.calledWith(
               this.ProjectUploadManager.createProjectFromZipArchive,
@@ -483,8 +483,8 @@ describe('OpenInOverleafController', function() {
         })
       })
 
-      return describe('when the partner does not have a brand variation', function() {
-        beforeEach(function() {
+      return describe('when the partner does not have a brand variation', function () {
+        beforeEach(function () {
           this.req.body.partner = 'ieee_latexqc'
           this.req.body.client_media_id = 'wombat1'
           return (this.OpenInOverleafHelper.populateSnippetFromConversionJob = sinon
@@ -495,7 +495,7 @@ describe('OpenInOverleafController', function() {
             }))
         })
 
-        it('should create a project from the zip file and redirect to it', function(done) {
+        it('should create a project from the zip file and redirect to it', function (done) {
           this.res.json = content => {
             sinon.assert.calledWith(
               this.ProjectUploadManager.createProjectFromZipArchive,
@@ -515,7 +515,7 @@ describe('OpenInOverleafController', function() {
           )
         })
 
-        return it('should not the brand variation on the project', function(done) {
+        return it('should not the brand variation on the project', function (done) {
           this.res.json = content => {
             sinon.assert.notCalled(
               this.OpenInOverleafHelper.setProjectBrandVariationFromId
@@ -530,8 +530,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is a template parameter', function() {
-      beforeEach(function() {
+    describe('when there is a template parameter', function () {
+      beforeEach(function () {
         this.req.body.template = 'wombat'
         return (this.OpenInOverleafHelper.populateSnippetFromTemplate = sinon
           .stub()
@@ -541,7 +541,7 @@ describe('OpenInOverleafController', function() {
           }))
       })
 
-      it('should not raise an error', function(done) {
+      it('should not raise an error', function (done) {
         const next = sinon.stub()
         this.res.json = () => {
           sinon.assert.notCalled(next)
@@ -554,7 +554,7 @@ describe('OpenInOverleafController', function() {
         )
       })
 
-      it('should populate the snippet from the template', function(done) {
+      it('should populate the snippet from the template', function (done) {
         this.res.json = () => {
           sinon.assert.calledWith(
             this.OpenInOverleafHelper.populateSnippetFromTemplate,
@@ -565,7 +565,7 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      it('should create a project from the associated zip', function(done) {
+      it('should create a project from the associated zip', function (done) {
         this.res.json = () => {
           sinon.assert.called(
             this.ProjectUploadManager.createProjectFromZipArchive
@@ -575,8 +575,8 @@ describe('OpenInOverleafController', function() {
         return this.OpenInOverleafController.openInOverleaf(this.req, this.res)
       })
 
-      return describe('when the template has a brand variation', function() {
-        beforeEach(function() {
+      return describe('when the template has a brand variation', function () {
+        beforeEach(function () {
           return (this.OpenInOverleafHelper.populateSnippetFromTemplate = sinon
             .stub()
             .callsArgWith(2, null, {
@@ -586,7 +586,7 @@ describe('OpenInOverleafController', function() {
             }))
         })
 
-        return it('should set the brand variation id on the project', function(done) {
+        return it('should set the brand variation id on the project', function (done) {
           this.res.json = () => {
             sinon.assert.calledWith(
               this.OpenInOverleafHelper.setProjectBrandVariationFromId,
@@ -603,8 +603,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when populating the snippet returns an error', function() {
-      beforeEach(function() {
+    describe('when populating the snippet returns an error', function () {
+      beforeEach(function () {
         this.req.body.snip_uri = this.snip_uri
         this.next = sinon.stub()
         this.error = new Error('Something bad happened')
@@ -613,7 +613,7 @@ describe('OpenInOverleafController', function() {
           .callsArgWith(1, this.error, null))
       })
 
-      return it('should call the callback with an error', function() {
+      return it('should call the callback with an error', function () {
         this.OpenInOverleafController.openInOverleaf(
           this.req,
           this.res,
@@ -626,8 +626,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    return describe('when there are multiple types of snippet requested', function() {
-      return it("should return an 'ambiguous parameters' error", function() {
+    return describe('when there are multiple types of snippet requested', function () {
+      return it("should return an 'ambiguous parameters' error", function () {
         this.req.body.snip_uri = this.snip_uri
         this.req.body.snip = 'foo'
         const next = sinon.stub()
@@ -640,14 +640,14 @@ describe('OpenInOverleafController', function() {
     })
   })
 
-  describe('_populateSnippetFromRequest', function() {
-    beforeEach(function() {
+  describe('_populateSnippetFromRequest', function () {
+    beforeEach(function () {
       return (this.OpenInOverleafController._getMainFileCommentFromSnipRequest = sinon
         .stub()
         .returns(this.comment))
     })
 
-    it('should return a snippet object with a comment, snippet and default title', function(done) {
+    it('should return a snippet object with a comment, snippet and default title', function (done) {
       this.OpenInOverleafController._getSnippetContentsFromRequest = sinon
         .stub()
         .callsArgWith(1, null, { snip: this.snip })
@@ -663,7 +663,7 @@ describe('OpenInOverleafController', function() {
       )
     })
 
-    it('should add the engine to the snippet, if present', function(done) {
+    it('should add the engine to the snippet, if present', function (done) {
       this.req.body.engine = 'latex_dvipdf'
       this.OpenInOverleafController._getSnippetContentsFromRequest = sinon
         .stub()
@@ -679,7 +679,7 @@ describe('OpenInOverleafController', function() {
       )
     })
 
-    it('should return an error if retrieving the snippet returns an error', function(done) {
+    it('should return an error if retrieving the snippet returns an error', function (done) {
       this.OpenInOverleafController._getSnippetContentsFromRequest = sinon
         .stub()
         .callsArgWith(1, new Error())
@@ -692,7 +692,7 @@ describe('OpenInOverleafController', function() {
       )
     })
 
-    return it('should return an error if there is no error, but no snippet', function(done) {
+    return it('should return an error if there is no error, but no snippet', function (done) {
       this.OpenInOverleafController._getSnippetContentsFromRequest = sinon
         .stub()
         .callsArgWith(1, null, {})
@@ -706,21 +706,21 @@ describe('OpenInOverleafController', function() {
     })
   })
 
-  describe('_getMainFileCommentFromSnipRequest', function() {
-    it('should return the default comment by default', function() {
+  describe('_getMainFileCommentFromSnipRequest', function () {
+    it('should return the default comment by default', function () {
       return this.OpenInOverleafController._getMainFileCommentFromSnipRequest(
         this.req
       ).should.equal('% default_snippet_comment\n')
     })
 
-    it('should return an empty string if no comment is requested', function() {
+    it('should return an empty string if no comment is requested', function () {
       this.req.body.comment = 'none'
       return this.OpenInOverleafController._getMainFileCommentFromSnipRequest(
         this.req
       ).should.equal('')
     })
 
-    return it('should return the texample comment if the referrer is texample', function() {
+    return it('should return the texample comment if the referrer is texample', function () {
       this.req.body.referrer = 'https://asdf.texample.net/1/2/3'
       return this.OpenInOverleafController._getMainFileCommentFromSnipRequest(
         this.req
@@ -728,8 +728,8 @@ describe('OpenInOverleafController', function() {
     })
   })
 
-  return describe('_sendResponse', function() {
-    it('should send a json response for xhr requests', function() {
+  return describe('_sendResponse', function () {
+    it('should send a json response for xhr requests', function () {
       const project = { _id: this.project_id }
       this.OpenInOverleafController._sendResponse(this.req, this.res, project)
       sinon.assert.calledWith(this.res.json, {
@@ -739,7 +739,7 @@ describe('OpenInOverleafController', function() {
       return sinon.assert.notCalled(this.res.redirect)
     })
 
-    return it('should send a redirect for standard requests', function() {
+    return it('should send a redirect for standard requests', function () {
       const project = { _id: this.project_id }
       delete this.req.headers.accept
       this.OpenInOverleafController._sendResponse(this.req, this.res, project)

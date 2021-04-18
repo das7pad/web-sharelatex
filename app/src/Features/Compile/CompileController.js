@@ -217,10 +217,10 @@ module.exports = CompileController = {
         const filename = `${CompileController._getSafeProjectName(project)}.pdf`
 
         res.setHeader(
-        'Content-Disposition',
-        contentDisposition(filename, {
-          type: req.query.popupDownload ? 'attachment' : 'inline'
-        })
+          'Content-Disposition',
+          contentDisposition(filename, {
+            type: req.query.popupDownload ? 'attachment' : 'inline'
+          })
         )
 
         return rateLimit(function (err, canContinue) {

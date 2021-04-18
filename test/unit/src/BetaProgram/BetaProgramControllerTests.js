@@ -69,12 +69,12 @@ describe('BetaProgramController', function () {
       this.BetaProgramHandler.optIn.callCount.should.equal(1)
     })
 
-    describe('ajax request', function() {
-      beforeEach(function() {
+    describe('ajax request', function () {
+      beforeEach(function () {
         this.req.accepts = () => 'json'
       })
 
-      it("should not redirect to '/beta/participate'", function() {
+      it("should not redirect to '/beta/participate'", function () {
         this.BetaProgramController.optIn(this.req, this.res, this.next)
         this.res.redirect.callCount.should.equal(0)
         this.res.json.callCount.should.equal(1)
@@ -120,12 +120,12 @@ describe('BetaProgramController', function () {
       this.BetaProgramHandler.optOut.callCount.should.equal(1)
     })
 
-    describe('ajax request', function() {
-      beforeEach(function() {
+    describe('ajax request', function () {
+      beforeEach(function () {
         this.req.accepts = () => 'json'
       })
 
-      it("should not redirect to '/beta/participate'", function() {
+      it("should not redirect to '/beta/participate'", function () {
         this.BetaProgramController.optOut(this.req, this.res, this.next)
         this.res.redirect.callCount.should.equal(0)
         this.res.json.callCount.should.equal(1)

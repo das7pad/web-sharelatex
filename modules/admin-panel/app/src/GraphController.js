@@ -58,7 +58,7 @@ module.exports = GraphController = {
           }
         }
       )
-      .toArray(function(err, relations) {
+      .toArray(function (err, relations) {
         if (err != null) {
           return cb(err)
         }
@@ -67,7 +67,7 @@ module.exports = GraphController = {
           usersObjId,
           graphPrev,
           (err, graphNext) =>
-            GraphController._getNames(graphNext, function(err, graphNamed) {
+            GraphController._getNames(graphNext, function (err, graphNamed) {
               if (level - 1) {
                 return GraphController._nextLevel(
                   usersObjId,
@@ -157,7 +157,7 @@ module.exports = GraphController = {
           }
         }
       )
-      .toArray(function(err, users) {
+      .toArray(function (err, users) {
         if (err != null) {
           logger.err({ err }, 'error getting users name in admin graphGen')
           return cb(err)
@@ -180,7 +180,7 @@ module.exports = GraphController = {
     return UserGetter.getUser(
       req.params.user_id,
       { _id: 1, first_name: 1, last_name: 1, email: 1 },
-      function(err, user) {
+      function (err, user) {
         let Level
         const userObjId = req.params.user_id
         if (req.query.level == null) {
@@ -192,7 +192,7 @@ module.exports = GraphController = {
           [userObjId],
           sigmaGraph.new(),
           Level,
-          function(err, graph) {
+          function (err, graph) {
             if (err != null) {
               return next(err)
             }

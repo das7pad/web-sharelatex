@@ -37,7 +37,7 @@ module.exports = {
   }
 }
 
-var removeRoute = function(webRouter, method, path) {
+var removeRoute = function (webRouter, method, path) {
   let index = null
   for (let i = 0; i < webRouter.stack.length; i++) {
     const route = webRouter.stack[i]

@@ -32,7 +32,7 @@ describe('Translations', function () {
         'accept-language': ''
       },
       query: {},
-      acceptsLanguages: function() {
+      acceptsLanguages: function () {
         const accept = accepts(this)
         return accept.languages.apply(accept, arguments)
       }

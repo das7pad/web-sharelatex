@@ -65,8 +65,8 @@ export default App.factory(
           this.pdfjs = PDFJS.getDocument({
             url: this.url,
             // lazy loaded worker
-          worker: PDFJSWorker,
-          cMapUrl: staticPath('/vendor/pdfjs-dist/cmaps/'),
+            worker: PDFJSWorker,
+            cMapUrl: staticPath('/vendor/pdfjs-dist/cmaps/'),
             cMapPacked: true,
             disableFontFace,
             // Enable fetching with Range headers to restrict individual

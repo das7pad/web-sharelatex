@@ -4,87 +4,89 @@ import { escapeForInnerHTML } from '../../misc/escape'
 import t from '../../misc/t'
 import { localStorage } from '../../modules/storage'
 
-App.controller('NotificationsController', function (
-  $scope,
-  $http,
-  eventTracking
-) {
-  // initialize
-  $scope.notifications = []
+App.controller(
+  'NotificationsController',
+  function ($scope, $http, eventTracking) {
+    // initialize
+    $scope.notifications = []
 
-  $scope.samlInitPath = getMeta('ol-samlInitPath')
+    $scope.samlInitPath = getMeta('ol-samlInitPath')
 
-  $scope.dismiss = notification => {
-    if (!notification._id) {
-      notification.hide = true
-      return
+    $scope.dismiss = notification => {
+      if (!notification._id) {
+        notification.hide = true
+        return
+      }
+      apiRequest({
+        url: `/notifications/${notification._id}`,
+        method: 'DELETE'
+      }).then(() => (notification.hide = true))
     }
-    apiRequest({
-      url: `/notifications/${notification._id}`,
-      method: 'DELETE'
-    }).then(() => (notification.hide = true))
-  }
 
-  let jwtNotifications = getMeta('ol-jwtNotifications')
-  function apiRequest({ url, method }) {
-    let headers
-    if (jwtNotifications) {
-      const publicUrlNotifications = getMeta('ol-publicUrlNotifications') || ''
-      url = publicUrlNotifications + '/jwt' + url
-      headers = { Authorization: 'Bearer ' + jwtNotifications }
-    } else if (method !== 'GET') {
-      headers = { 'X-Csrf-Token': getMeta('ol-csrfToken') }
+    let jwtNotifications = getMeta('ol-jwtNotifications')
+    function apiRequest({ url, method }) {
+      let headers
+      if (jwtNotifications) {
+        const publicUrlNotifications =
+          getMeta('ol-publicUrlNotifications') || ''
+        url = publicUrlNotifications + '/jwt' + url
+        headers = { Authorization: 'Bearer ' + jwtNotifications }
+      } else if (method !== 'GET') {
+        headers = { 'X-Csrf-Token': getMeta('ol-csrfToken') }
+      }
+      return $http({ method, url, headers })
     }
-    return $http({ method, url, headers })
-  }
 
-  function fetchNotifications() {
-    return apiRequest({ method: 'GET', url: '/notifications' })
-      .then(response => {
-        if (response.status === 200) {
-          return response.data
-        }
-        if (jwtNotifications && response.status === 401) {
-          eventTracking.sendMB('jwt-notifications-error')
-          // use a proxied request
-          jwtNotifications = null
-          // immediately retry without the jwt
-          return fetchNotifications()
-        }
-        throw new Error(`unexpected status ${response.status}`)
-      })
-      .catch(error => {
-        sl_console.log('[NotificationsController] failed to fetch', error)
-        // retry with delay
-        return new Promise(resolve => {
-          setTimeout(() => {
-            fetchNotifications().then(resolve)
-          }, 10000)
+    function fetchNotifications() {
+      return apiRequest({ method: 'GET', url: '/notifications' })
+        .then(response => {
+          if (response.status === 200) {
+            return response.data
+          }
+          if (jwtNotifications && response.status === 401) {
+            eventTracking.sendMB('jwt-notifications-error')
+            // use a proxied request
+            jwtNotifications = null
+            // immediately retry without the jwt
+            return fetchNotifications()
+          }
+          throw new Error(`unexpected status ${response.status}`)
         })
-      })
-  }
-
-  function setNotifications(notifications) {
-    for (const notification of notifications) {
-      notification.html = t(notification.templateKey, notification.messageOpts)
-      notification.hide = false
+        .catch(error => {
+          sl_console.log('[NotificationsController] failed to fetch', error)
+          // retry with delay
+          return new Promise(resolve => {
+            setTimeout(() => {
+              fetchNotifications().then(resolve)
+            }, 10000)
+          })
+        })
     }
-    $scope.notifications = notifications
+
+    function setNotifications(notifications) {
+      for (const notification of notifications) {
+        notification.html = t(
+          notification.templateKey,
+          notification.messageOpts
+        )
+        notification.hide = false
+      }
+      $scope.notifications = notifications
+    }
+
+    fetchNotifications().then(setNotifications)
   }
+)
 
-  fetchNotifications().then(setNotifications)
-})
-
-App.controller('DismissableNotificationsController', function($scope) {
+App.controller('DismissableNotificationsController', function ($scope) {
   $scope.shouldShowNotification =
     localStorage('dismissed-covid-19-notification-extended') !== true
 
-    $scope.dismiss = () => {
-      localStorage('dismissed-covid-19-notification-extended', true)
-      $scope.shouldShowNotification = false
-    }
+  $scope.dismiss = () => {
+    localStorage('dismissed-covid-19-notification-extended', true)
+    $scope.shouldShowNotification = false
   }
-)
+})
 
 App.controller('ProjectInviteNotificationController', function ($scope, $http) {
   const projectName = escapeForInnerHTML(
@@ -138,13 +140,12 @@ App.controller(
       if (email.samlProviderId) return true
       if (!email.affiliation || !email.affiliation.institution) return false
       if (email.affiliation.institution.ssoEnabled) return true
-      if (
-        getMeta('ol-hasSamlBeta') && email.affiliation.institution.ssoBeta) {
-      return true
+      if (getMeta('ol-hasSamlBeta') && email.affiliation.institution.ssoBeta) {
+        return true
+      }
+      return false
     }
-    return false
-  }
-  $scope.showConfirmEmail = email => {
+    $scope.showConfirmEmail = email => {
       if (!email.confirmedAt && !email.hide) {
         if (_ssoAvailable(email)) {
           return false

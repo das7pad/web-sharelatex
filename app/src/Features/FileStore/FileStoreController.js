@@ -35,37 +35,37 @@ module.exports = {
               return res.sendStatus(500)
             }
             readReq.on('error', () => {
-            // The error is logged in FileStoreHandler.
-            res.sendStatus(500)
-          })
-          readReq.on('response', function(response) {
-            for (const name of Settings.apis.filestore.passthroughHeaders) {
-              const passThroughValue = response.headers[name]
-              if (passThroughValue) res.append(name, passThroughValue)
-            }
-
-            const { statusCode } = response
-            if (statusCode !== 200) {
-              logger.err(
-                { err, projectId, fileId, queryString, statusCode },
-                'unexpected response status for downloading file'
-              )
-              return res.sendStatus(500)
-            }
-            // mobile safari will try to render html files, prevent this
-            if (isMobileSafari(userAgent) && isHtml(file)) {
-              res.setHeader('Content-Type', 'text/plain')
-            }
-            res.attachment(file.name)
-            pipeline(response, res, err => {
-              if (err) {
-                logger.warn(
-                  { err, projectId, fileId, queryString },
-                  'proxying error for downloading file'
-                )
-              }
+              // The error is logged in FileStoreHandler.
+              res.sendStatus(500)
             })
-          })
+            readReq.on('response', function (response) {
+              for (const name of Settings.apis.filestore.passthroughHeaders) {
+                const passThroughValue = response.headers[name]
+                if (passThroughValue) res.append(name, passThroughValue)
+              }
+
+              const { statusCode } = response
+              if (statusCode !== 200) {
+                logger.err(
+                  { err, projectId, fileId, queryString, statusCode },
+                  'unexpected response status for downloading file'
+                )
+                return res.sendStatus(500)
+              }
+              // mobile safari will try to render html files, prevent this
+              if (isMobileSafari(userAgent) && isHtml(file)) {
+                res.setHeader('Content-Type', 'text/plain')
+              }
+              res.attachment(file.name)
+              pipeline(response, res, err => {
+                if (err) {
+                  logger.warn(
+                    { err, projectId, fileId, queryString },
+                    'proxying error for downloading file'
+                  )
+                }
+              })
+            })
           }
         )
       }

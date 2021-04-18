@@ -19,8 +19,8 @@ const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const assert = require('assert')
 
-describe('PublicRegistrationController', function() {
-  beforeEach(function() {
+describe('PublicRegistrationController', function () {
+  beforeEach(function () {
     this.user_id = '323123'
 
     this.user = {
@@ -36,10 +36,7 @@ describe('PublicRegistrationController', function() {
       sendConfirmationEmail: sinon.stub().yields()
     }
     this.UserHandler = {
-      populateTeamInvites: sinon
-        .stub()
-        .callsArgWith(1)
-        .yields()
+      populateTeamInvites: sinon.stub().callsArgWith(1).yields()
     }
     this.AuthenticationController = {
       passportLogin: sinon.stub(),
@@ -88,15 +85,15 @@ describe('PublicRegistrationController', function() {
     return (this.next = sinon.stub())
   })
 
-  return describe('register', function() {
-    beforeEach(function() {
+  return describe('register', function () {
+    beforeEach(function () {
       this.AuthenticationController._getRedirectFromSession = sinon
         .stub()
         .returns(null)
       return (this.req.session.passport = { user: { _id: this.user_id } })
     })
 
-    it('should ask the UserRegistrationHandler to register user', function(done) {
+    it('should ask the UserRegistrationHandler to register user', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         null,
@@ -111,7 +108,7 @@ describe('PublicRegistrationController', function() {
       return this.PublicRegistrationController.register(this.req, this.res)
     })
 
-    it('should try and log the user in if there is an EmailAlreadyRegistered error', function(done) {
+    it('should try and log the user in if there is an EmailAlreadyRegistered error', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         new Error('EmailAlreadyRegistered')
@@ -126,7 +123,7 @@ describe('PublicRegistrationController', function() {
       return done()
     })
 
-    it('should tell the user about the overleaf beta if trying to register with an existing linked overleaf email', function(done) {
+    it('should tell the user about the overleaf beta if trying to register with an existing linked overleaf email', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         new Error('EmailAlreadyRegistered'),
@@ -145,7 +142,7 @@ describe('PublicRegistrationController', function() {
       )
     })
 
-    it('should put the user on the session and mark them as justRegistered', function(done) {
+    it('should put the user on the session and mark them as justRegistered', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         null,
@@ -159,7 +156,7 @@ describe('PublicRegistrationController', function() {
       return this.PublicRegistrationController.register(this.req, this.res)
     })
 
-    it('should redirect to project page', function(done) {
+    it('should redirect to project page', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         null,
@@ -172,7 +169,7 @@ describe('PublicRegistrationController', function() {
       return this.PublicRegistrationController.register(this.req, this.res)
     })
 
-    it('should redirect passed redir if it exists', function(done) {
+    it('should redirect passed redir if it exists', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         null,
@@ -188,7 +185,7 @@ describe('PublicRegistrationController', function() {
       return this.PublicRegistrationController.register(this.req, this.res)
     })
 
-    it('should allocate the referals', function(done) {
+    it('should allocate the referals', function (done) {
       this.req.session = {
         referal_id: '23123',
         referal_source: 'email',
@@ -218,7 +215,7 @@ describe('PublicRegistrationController', function() {
       return this.PublicRegistrationController.register(this.req, this.res)
     })
 
-    it('should call populateTeamInvites', function(done) {
+    it('should call populateTeamInvites', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         null,
@@ -233,7 +230,7 @@ describe('PublicRegistrationController', function() {
       return this.PublicRegistrationController.register(this.req, this.res)
     })
 
-    return it('should send a welcome email', function(done) {
+    return it('should send a welcome email', function (done) {
       this.UserRegistrationHandler.registerNewUser.callsArgWith(
         1,
         null,

@@ -38,27 +38,27 @@ module.exports = CommentsController = {
       thread_id,
       user_id,
       content,
-      function(err, comment) {
+      function (err, comment) {
         if (err != null) {
           return next(err)
         }
-        return UserInfoManager.getPersonalInfo(comment.user_id, function(
-          err,
-          user
-        ) {
-          if (err != null) {
-            return next(err)
+        return UserInfoManager.getPersonalInfo(
+          comment.user_id,
+          function (err, user) {
+            if (err != null) {
+              return next(err)
+            }
+            comment.user = UserInfoController.formatPersonalInfo(user)
+            EditorRealTimeController.emitToRoom(
+              project_id,
+              'new-comment',
+              thread_id,
+              comment,
+              function (err) {}
+            )
+            return res.sendStatus(204)
           }
-          comment.user = UserInfoController.formatPersonalInfo(user)
-          EditorRealTimeController.emitToRoom(
-            project_id,
-            'new-comment',
-            thread_id,
-            comment,
-            function(err) {}
-          )
-          return res.sendStatus(204)
-        })
+        )
       }
     )
   },
@@ -66,19 +66,19 @@ module.exports = CommentsController = {
   getThreads(req, res, next) {
     const { project_id } = req.params
     logger.log({ project_id }, 'getting comment threads for project')
-    return ChatApiHandler.getThreads(project_id, function(err, threads) {
+    return ChatApiHandler.getThreads(project_id, function (err, threads) {
       if (err != null) {
         return next(err)
       }
-      return ChatController._injectUserInfoIntoThreads(threads, function(
-        error,
-        threads
-      ) {
-        if (err != null) {
-          return next(err)
+      return ChatController._injectUserInfoIntoThreads(
+        threads,
+        function (error, threads) {
+          if (err != null) {
+            return next(err)
+          }
+          return res.json(threads)
         }
-        return res.json(threads)
-      })
+      )
     })
   },
 
@@ -90,11 +90,11 @@ module.exports = CommentsController = {
       project_id,
       thread_id,
       user_id,
-      function(err) {
+      function (err) {
         if (err != null) {
           return next(err)
         }
-        return UserInfoManager.getPersonalInfo(user_id, function(err, user) {
+        return UserInfoManager.getPersonalInfo(user_id, function (err, user) {
           if (err != null) {
             return next(err)
           }
@@ -103,7 +103,7 @@ module.exports = CommentsController = {
             'resolve-thread',
             thread_id,
             UserInfoController.formatPersonalInfo(user),
-            function(err) {}
+            function (err) {}
           )
           return res.sendStatus(204)
         })
@@ -114,21 +114,22 @@ module.exports = CommentsController = {
   reopenThread(req, res, next) {
     const { project_id, thread_id } = req.params
     logger.log({ project_id, thread_id }, 'reopening comment thread')
-    return ChatApiHandler.reopenThread(project_id, thread_id, function(
-      err,
-      threads
-    ) {
-      if (err != null) {
-        return next(err)
+    return ChatApiHandler.reopenThread(
+      project_id,
+      thread_id,
+      function (err, threads) {
+        if (err != null) {
+          return next(err)
+        }
+        EditorRealTimeController.emitToRoom(
+          project_id,
+          'reopen-thread',
+          thread_id,
+          function (err) {}
+        )
+        return res.sendStatus(204)
       }
-      EditorRealTimeController.emitToRoom(
-        project_id,
-        'reopen-thread',
-        thread_id,
-        function(err) {}
-      )
-      return res.sendStatus(204)
-    })
+    )
   },
 
   deleteThread(req, res, next) {
@@ -138,25 +139,26 @@ module.exports = CommentsController = {
       project_id,
       doc_id,
       thread_id,
-      function(err) {
+      function (err) {
         if (err != null) {
           return next(err)
         }
-        return ChatApiHandler.deleteThread(project_id, thread_id, function(
-          err,
-          threads
-        ) {
-          if (err != null) {
-            return next(err)
+        return ChatApiHandler.deleteThread(
+          project_id,
+          thread_id,
+          function (err, threads) {
+            if (err != null) {
+              return next(err)
+            }
+            EditorRealTimeController.emitToRoom(
+              project_id,
+              'delete-thread',
+              thread_id,
+              function (err) {}
+            )
+            return res.sendStatus(204)
           }
-          EditorRealTimeController.emitToRoom(
-            project_id,
-            'delete-thread',
-            thread_id,
-            function(err) {}
-          )
-          return res.sendStatus(204)
-        })
+        )
       }
     )
   },
@@ -170,7 +172,7 @@ module.exports = CommentsController = {
       thread_id,
       message_id,
       content,
-      function(err) {
+      function (err) {
         if (err != null) {
           return next(err)
         }
@@ -180,7 +182,7 @@ module.exports = CommentsController = {
           thread_id,
           message_id,
           content,
-          function(err) {}
+          function (err) {}
         )
         return res.sendStatus(204)
       }
@@ -194,7 +196,7 @@ module.exports = CommentsController = {
       project_id,
       thread_id,
       message_id,
-      function(err, threads) {
+      function (err, threads) {
         if (err != null) {
           return next(err)
         }
@@ -203,7 +205,7 @@ module.exports = CommentsController = {
           'delete-message',
           thread_id,
           message_id,
-          function(err) {}
+          function (err) {}
         )
         return res.sendStatus(204)
       }

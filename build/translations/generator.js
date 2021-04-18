@@ -26,7 +26,7 @@ function moduleGenerator(locales, inMemory, FIELDS, LOCALES) {
 
   function translate(key, vars) {
     vars = vars || {}
-    return getLocale(key, vars).replace(FIELDS, function(field, label) {
+    return getLocale(key, vars).replace(FIELDS, function (field, label) {
       // fallback to no replacement
       // ('__appName__', 'appName') => vars['appName'] || '__appName__'
       return typeof vars[label] !== 'undefined' ? vars[label] : field
@@ -39,7 +39,7 @@ function moduleGenerator(locales, inMemory, FIELDS, LOCALES) {
   function initMap(iterable) {
     // IE11 does not have 'new Map(iterable)' support.
     // Fallback/Pony-fill to manual setting in all environments.
-    iterable.forEach(function(keyLocalePair) {
+    iterable.forEach(function (keyLocalePair) {
       LOCALES.set.apply(LOCALES, keyLocalePair)
     })
   }
@@ -54,7 +54,7 @@ function moduleGenerator(locales, inMemory, FIELDS, LOCALES) {
 }
 
 function generateModule(lng) {
-  function serializeFunction(fn = function() {}) {
+  function serializeFunction(fn = function () {}) {
     return fn
       .toString()
       .replace(/\n\s+\/\/.+/g, '') // multi-line comment

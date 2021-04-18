@@ -25,7 +25,7 @@ async function unsetDeletedFiles(projectId) {
 describe('BackFillDeletedFiles', function () {
   let user, projectId1, projectId2, projectId3, projectId4, projectId5
 
-  before('skip unless the script exists', async function() {
+  before('skip unless the script exists', async function () {
     const scriptPath = Path.join(
       __dirname,
       '../../../scripts/back_fill_deleted_files.js'

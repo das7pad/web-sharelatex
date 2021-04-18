@@ -28,7 +28,7 @@ const settings = require('@overleaf/settings')
 module.exports = ProjectAdminController = {
   undeleteProject(req, res, next) {
     const projectId = ObjectId(req.params.Project_id)
-    ProjectDeleter.undeleteProject(projectId, function(err) {
+    ProjectDeleter.undeleteProject(projectId, function (err) {
       if (err) {
         return next(err)
       }
@@ -38,17 +38,17 @@ module.exports = ProjectAdminController = {
 
   show(req, res, next) {
     logger.log('getting admin request for list of users')
-    return ProjectGetter.getProject(req.params.Project_id, function(
-      err,
-      project
-    ) {
-      if (err != null) {
-        return next(err)
+    return ProjectGetter.getProject(
+      req.params.Project_id,
+      function (err, project) {
+        if (err != null) {
+          return next(err)
+        }
+        return res.render(Path.resolve(__dirname, '../views/project/show'), {
+          project
+        })
       }
-      return res.render(Path.resolve(__dirname, '../views/project/show'), {
-        project
-      })
-    })
+    )
   },
 
   updateBrandVariationId(req, res, next) {

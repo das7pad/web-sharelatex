@@ -16,7 +16,7 @@ async function setDeletedDocs(projectId, deletedDocs) {
 }
 
 describe('BackFillDocNameForDeletedDocs', function () {
-  before('skip unless the script exists', async function() {
+  before('skip unless the script exists', async function () {
     const scriptPath = Path.join(
       __dirname,
       '../../../scripts/back_fill_doc_name_for_deleted_docs.js'

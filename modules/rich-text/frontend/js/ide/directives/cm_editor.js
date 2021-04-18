@@ -61,7 +61,7 @@ export default App.directive(
       // `editor:` will listened for by the rich text editor
       scope.name = 'editor'
 
-      const init = function() {
+      const init = function () {
         editor = new scope.bundle.Editor(
           bodyEl[0],
           new RichTextAdapter(ide.fileTreeManager),
@@ -74,7 +74,7 @@ export default App.directive(
         return setUpFormattingEventListeners()
       }
 
-      var switchAttachment = function(sharejsDoc, oldSharejsDoc) {
+      var switchAttachment = function (sharejsDoc, oldSharejsDoc) {
         if (sharejsDoc === oldSharejsDoc) {
           return
         }
@@ -93,13 +93,13 @@ export default App.directive(
       // If doc is changed, switch the CodeMirror/ShareJS attachment
       scope.$watch('sharejsDoc', switchAttachment)
 
-      scope.$watch('readOnly', function(value) {
+      scope.$watch('readOnly', function (value) {
         if (value != null) {
           return editor.setReadOnly(value)
         }
       })
 
-      var setUpFormattingEventListeners = function() {
+      var setUpFormattingEventListeners = function () {
         scope.formattingEvents.on('section', () => editor.wrapSection())
         scope.formattingEvents.on('subsection', () => editor.wrapSubsection())
         scope.formattingEvents.on('bold', () => editor.wrapBold())
@@ -114,7 +114,7 @@ export default App.directive(
         )
       }
 
-      const tearDownFormattingEventListeners = function() {
+      const tearDownFormattingEventListeners = function () {
         scope.formattingEvents.off('section')
         scope.formattingEvents.off('subsection')
         scope.formattingEvents.off('bold')
@@ -131,7 +131,7 @@ export default App.directive(
       // the 'beforeChange' event fires for changes before they are executed.
       // you can modify the input with event.update() or reject the event with
       // event.cancel().
-      const handleBeforeChangeEvent = function(cm, event) {
+      const handleBeforeChangeEvent = function (cm, event) {
         if (event.update) {
           const originalText = event.text.join('\n')
           if (BAD_CHARS_REGEXP.test(originalText)) {
@@ -148,12 +148,12 @@ export default App.directive(
         }
       }
 
-      const setUpChangeFilter = function() {
+      const setUpChangeFilter = function () {
         const codeMirror = editor.getCodeMirror()
         codeMirror.on('beforeChange', handleBeforeChangeEvent)
       }
 
-      const tearDownChangeFilter = function() {
+      const tearDownChangeFilter = function () {
         const codeMirror = editor.getCodeMirror()
         codeMirror.off('beforeChange', handleBeforeChangeEvent)
       }
@@ -166,7 +166,7 @@ export default App.directive(
       )
 
       var attachToCM = sharejsDoc =>
-        scope.$applyAsync(function() {
+        scope.$applyAsync(function () {
           editor.openDoc(sharejsDoc.getSnapshot())
           sharejsDoc.attachToCM(editor.getCodeMirror())
           editor.enable()
@@ -182,7 +182,7 @@ export default App.directive(
           return setUpMetadataEventListener()
         })
 
-      var detachFromCM = function(sharejsDoc) {
+      var detachFromCM = function (sharejsDoc) {
         tearDownSpellCheck()
         tearDownTrackChanges()
         tearDownMetadataEventListener()
@@ -191,11 +191,11 @@ export default App.directive(
         return sharejsDoc.off('remoteop.richtext')
       }
 
-      const handleChangeForSpellCheck = function(_, event) {
+      const handleChangeForSpellCheck = function (_, event) {
         return spellCheckManager.onChange(event)
       }
 
-      var initSpellCheck = function() {
+      var initSpellCheck = function () {
         spellCheckManager = new SpellCheckManager(
           scope,
           $cacheFactory,
@@ -213,7 +213,7 @@ export default App.directive(
         return codeMirror.on('scroll', spellCheckManager.onScroll)
       }
 
-      var tearDownSpellCheck = function() {
+      var tearDownSpellCheck = function () {
         const codeMirror = editor.getCodeMirror()
         codeMirror.off('change', handleChangeForSpellCheck)
         if (spellCheckManager) {
@@ -225,7 +225,7 @@ export default App.directive(
         }
       }
 
-      const initTrackChanges = function() {
+      const initTrackChanges = function () {
         const codeMirror = editor.getCodeMirror()
 
         trackChangesManager = new TrackChangesManager(
@@ -243,14 +243,14 @@ export default App.directive(
         codeMirror.on('swapDoc', trackChangesManager.onChangeSession)
       }
 
-      const tearDownTrackChanges = function() {
+      const tearDownTrackChanges = function () {
         const codeMirror = editor.getCodeMirror()
 
         trackChangesManager.tearDown()
         codeMirror.off('swapDoc', trackChangesManager.onChangeSession)
       }
 
-      var initCursorPosition = function() {
+      var initCursorPosition = function () {
         cursorPositionManager = new CursorPositionManager(
           scope,
           new CursorPositionAdapter(editor),
@@ -262,7 +262,7 @@ export default App.directive(
         return $(window).on('unload', cursorPositionManager.onUnload)
       }
 
-      const tearDownCursorPosition = function() {
+      const tearDownCursorPosition = function () {
         editor
           .getCodeMirror()
           .off('cursorActivity', cursorPositionManager.onCursorChange)
@@ -279,7 +279,7 @@ export default App.directive(
 
       var getSetting = key => scope[key]
 
-      scope.$on('$destroy', function() {
+      scope.$on('$destroy', function () {
         scope.$broadcast('changeEditor')
         tearDownSpellCheck()
         tearDownCursorPosition()
@@ -301,7 +301,7 @@ export default App.directive(
         }
       }
 
-      scope.$watch('fontSize', function(value) {
+      scope.$watch('fontSize', function (value) {
         bodyEl.css({ 'font-size': `${value}px` })
         return __guard__(
           editor != null ? editor.getCodeMirror() : undefined,
@@ -309,7 +309,7 @@ export default App.directive(
         )
       })
 
-      return scope.$watch('lineHeight', function(value) {
+      return scope.$watch('lineHeight', function (value) {
         let lineHeight
         if (!value) {
           return

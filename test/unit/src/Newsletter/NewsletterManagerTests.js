@@ -5,7 +5,7 @@ const SandboxedModule = require('sandboxed-module')
 const MODULE_PATH = '../../../../app/src/Features/Newsletter/NewsletterManager'
 
 describe('NewsletterManager', function () {
-  before(function() {
+  before(function () {
     try {
       require('mailchimp-api-v3')
     } catch (e) {

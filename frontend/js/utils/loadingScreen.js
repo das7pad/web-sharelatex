@@ -1,5 +1,5 @@
 export default function showFakeProgress() {
-  setTimeout(function() {
+  setTimeout(function () {
     const loadingScreen = document.getElementById('loadingScreen')
     if (!loadingScreen) return
 

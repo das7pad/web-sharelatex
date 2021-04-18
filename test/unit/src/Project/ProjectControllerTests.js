@@ -519,8 +519,8 @@ describe('ProjectController', function () {
       this.ProjectController.projectListPage(this.req, this.res)
     })
 
-    describe('jwtNotifications', function() {
-      it('should generate a jwt when the publicUrl exists', function(done) {
+    describe('jwtNotifications', function () {
+      it('should generate a jwt when the publicUrl exists', function (done) {
         this.settings.apis.notifications.publicUrl = 'http://notifications.test'
         this.res.render = (pageName, opts) => {
           expect(this.NotificationsHandler.getJWT.called).to.equal(true)
@@ -530,7 +530,7 @@ describe('ProjectController', function () {
         this.ProjectController.projectListPage(this.req, this.res)
       })
 
-      it('should not generate a jwt when no publicUrl exists', function(done) {
+      it('should not generate a jwt when no publicUrl exists', function (done) {
         this.settings.apis.notifications.publicUrl = undefined
         this.res.render = (pageName, opts) => {
           expect(this.NotificationsHandler.getJWT.called).to.equal(false)
@@ -988,8 +988,8 @@ describe('ProjectController', function () {
       this.ProjectController.loadEditor(this.req, this.res)
     })
 
-    describe('jwtSpelling', function() {
-      it('should generate a jwt when the publicUrl exists', function(done) {
+    describe('jwtSpelling', function () {
+      it('should generate a jwt when the publicUrl exists', function (done) {
         this.settings.apis.spelling.publicUrl = 'http://spelling.test'
         this.res.render = (pageName, opts) => {
           expect(this.SpellingHandler.getJWT.called).to.equal(true)
@@ -999,7 +999,7 @@ describe('ProjectController', function () {
         this.ProjectController.loadEditor(this.req, this.res)
       })
 
-      it('should not generate a jwt when no publicUrl exists', function(done) {
+      it('should not generate a jwt when no publicUrl exists', function (done) {
         this.settings.apis.spelling.publicUrl = undefined
         this.res.render = (pageName, opts) => {
           expect(this.SpellingHandler.getJWT.called).to.equal(false)
@@ -1163,7 +1163,7 @@ describe('ProjectController', function () {
       checkLoadEditorWsMetric('load-editor-ws')
       checkWsFallback(false)
 
-      it('should set the implicit wsAssetUrl', function(done) {
+      it('should set the implicit wsAssetUrl', function (done) {
         this.res.render = (pageName, opts) => {
           opts.wsAssetUrl.should.equal('/other.socket.io/socket.io.js')
           done()
@@ -1171,13 +1171,13 @@ describe('ProjectController', function () {
         this.ProjectController.loadEditor(this.req, this.res)
       })
 
-      describe('custom wsAssetUrl', function() {
+      describe('custom wsAssetUrl', function () {
         const wsAssetUrl = 'https://foo.bar/socket.io.js'
-        beforeEach(function() {
+        beforeEach(function () {
           this.settings.wsAssetUrl = wsAssetUrl
         })
 
-        it('should set the custom wsAssetUrl', function(done) {
+        it('should set the custom wsAssetUrl', function (done) {
           this.res.render = (pageName, opts) => {
             opts.wsAssetUrl.should.equal(wsAssetUrl)
             done()

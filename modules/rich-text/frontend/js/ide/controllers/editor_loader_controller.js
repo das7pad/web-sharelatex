@@ -3,14 +3,14 @@ import EventEmitter from '../../../../../../frontend/js/utils/EventEmitter'
 import { localStorage } from '../../../../../../frontend/js/modules/storage'
 import { loadMathJax } from '../../../../../../frontend/js/MathJaxLoader'
 
-App.controller('EditorLoaderController', function($scope) {
+App.controller('EditorLoaderController', function ($scope) {
   $scope.richText = {
     bundle: null,
     bundleLoading: null,
     formattingEvents: new EventEmitter()
   }
 
-  $scope.$watch('editor.showRichText', function(val) {
+  $scope.$watch('editor.showRichText', function (val) {
     localStorage(
       `editor.mode.${$scope.project_id}`,
       val === true ? 'rich-text' : 'source'

@@ -172,7 +172,12 @@ module.exports = {
         if (error != null) {
           return next(error)
         }
-        AsyncFormHelper.redirect(req, res, entityConfig.pathsFor(entityId).index)
-    })
+        AsyncFormHelper.redirect(
+          req,
+          res,
+          entityConfig.pathsFor(entityId).index
+        )
+      }
+    )
   }
 }

@@ -103,18 +103,18 @@ export default App.controller(
           return
         }
         const wsUrl = getMeta('ol-wsUrl') || '/socket.io'
-      let parsedURL
-      try {
-        parsedURL = new URL(wsUrl, window.location)
-      } catch (e) {
-        // hello IE11
-        parsedURL = {
-          origin: null,
-          pathname: wsUrl
+        let parsedURL
+        try {
+          parsedURL = new URL(wsUrl, window.location)
+        } catch (e) {
+          // hello IE11
+          parsedURL = {
+            origin: null,
+            pathname: wsUrl
+          }
         }
-      }
-      const socket = SocketIoShim.connect(parsedURL.origin, {
-        resource: parsedURL.pathname.slice(1),
+        const socket = SocketIoShim.connect(parsedURL.origin, {
+          resource: parsedURL.pathname.slice(1),
           reconnect: false,
           'connect timeout': 30 * 1000,
           'force new connection': true

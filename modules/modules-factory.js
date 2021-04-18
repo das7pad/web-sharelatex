@@ -21,7 +21,7 @@ function toAbsolute(paths) {
 }
 
 function genLoaderTarget(pattern) {
-  return function({ isWatchMode }) {
+  return function ({ isWatchMode }) {
     // Generate new listings on every invocation.
     const files = list(pattern)
     const parents = isWatchMode ? getAllParents(pattern) : []

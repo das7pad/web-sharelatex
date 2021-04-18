@@ -18,16 +18,8 @@ App.filter('trusted', $sce => url => $sce.trustAsResourceUrl(url))
 
 App.controller(
   'PdfController',
-  function (
-    $scope,
-    $http,
-    ide,
-    $modal,
-    synctex,
-    eventTracking,
-    $q
-) {
-  let autoCompile = true
+  function ($scope, $http, ide, $modal, synctex, eventTracking, $q) {
+    let autoCompile = true
 
     // pdf.view = uncompiled | pdf | errors
     $scope.pdf.view = $scope.pdf.url ? 'pdf' : 'uncompiled'

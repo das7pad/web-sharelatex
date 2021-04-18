@@ -14,10 +14,10 @@ import '../../../../frontend/js/ide/controllers/editor_loader_controller'
 import EventEmitter from '../../../../../../frontend/js/utils/EventEmitter'
 import 'angular-mocks'
 
-describe('EditorLoaderController', function() {
+describe('EditorLoaderController', function () {
   beforeEach(window.module('SharelatexApp'))
 
-  it('inits richText scope', function() {
+  it('inits richText scope', function () {
     inject(($rootScope, $controller) => {
       const $scope = $rootScope.$new()
       $controller('EditorLoaderController', { $scope })
@@ -29,7 +29,7 @@ describe('EditorLoaderController', function() {
     })
   })
 
-  it('watches showRichText and loads bundle if true', function(done) {
+  it('watches showRichText and loads bundle if true', function (done) {
     return inject(($rootScope, $controller) => {
       const $scope = $rootScope.$new()
       $scope.editor = { showRichText: false }
@@ -51,7 +51,7 @@ describe('EditorLoaderController', function() {
     })
   })
 
-  return it('watches showRichText and does nothing if false', function() {
+  return it('watches showRichText and does nothing if false', function () {
     return inject(($rootScope, $controller) => {
       const $scope = $rootScope.$new()
       $scope.editor = { showRichText: true }

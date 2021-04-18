@@ -342,9 +342,10 @@ module.exports = CollaboratorsInviteController = {
                       project,
                       owner,
                       currentUsersEmail: currentUser.email,
-                    title: 'Project Invite'
-                  })
-                })
+                      title: 'Project Invite'
+                    })
+                  }
+                )
               }
             )
           }

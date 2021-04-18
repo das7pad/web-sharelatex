@@ -7,7 +7,7 @@ const { STATIC_FILES_BASE } = require('./WebpackAssets')
 
 const staticFilesBase = STATIC_FILES_BASE
 
-module.exports = function(app, webRouter) {
+module.exports = function (app, webRouter) {
   if (
     Settings.security &&
     Settings.security.csp &&
@@ -15,8 +15,8 @@ module.exports = function(app, webRouter) {
   ) {
     webRouter.use(getCspMiddleware())
   } else {
-    webRouter.use(function(req, res, next) {
-      res.setCSPFor = function(topic) {}
+    webRouter.use(function (req, res, next) {
+      res.setCSPFor = function (topic) {}
       next()
     })
   }
@@ -351,7 +351,7 @@ function getCspMiddleware() {
     res.setCSPFor = setCSPFor
     res.setCSPFor('initial')
     const actualRender = res.render
-    res.render = function(view) {
+    res.render = function (view) {
       res.setCSPFor(view)
       actualRender.apply(res, arguments)
     }

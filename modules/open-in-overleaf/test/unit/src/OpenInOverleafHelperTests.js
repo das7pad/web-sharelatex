@@ -26,10 +26,10 @@ const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 
 const mmmagic = { Magic: sinon.stub() }
 
-describe('OpenInOverleafHelper', function() {
+describe('OpenInOverleafHelper', function () {
   this.timeout(3000)
 
-  beforeEach(function() {
+  beforeEach(function () {
     this.snip = 'snippety snip\nsnap snap'
     this.tmpfile = '/tmp/wombat.foo'
     this.templateUriPrefix = 'http://example.org/'
@@ -132,8 +132,8 @@ snap snap
     })
   })
 
-  describe('getDocumentLinesFromSnippet', function() {
-    beforeEach(function() {
+  describe('getDocumentLinesFromSnippet', function () {
+    beforeEach(function () {
       this.OpenInOverleafHelper._normalizeMainSrcContent = sinon
         .stub()
         .returns(this.snippet.snip)
@@ -142,15 +142,15 @@ snap snap
       ))
     })
 
-    it('should return an array', function() {
+    it('should return an array', function () {
       return expect(this.result).to.be.an('array')
     })
 
-    it('should start with the comment, if provided', function() {
+    it('should start with the comment, if provided', function () {
       return expect(this.result[0]).to.equal('% commenty comment')
     })
 
-    return it('should normalize the content', function() {
+    return it('should normalize the content', function () {
       return expect(
         this.OpenInOverleafHelper._normalizeMainSrcContent.calledWith(
           this.snippet
@@ -159,22 +159,22 @@ snap snap
     })
   })
 
-  describe('normalizeLatexContent', function() {
-    return it('returns the input', function() {
+  describe('normalizeLatexContent', function () {
+    return it('returns the input', function () {
       return expect(
         this.OpenInOverleafHelper.normalizeLatexContent(this.snippet.snip)
       ).to.equal(this.snippet.snip)
     })
   })
 
-  describe('populateSnippetFromUri', function() {
-    beforeEach(function() {
+  describe('populateSnippetFromUri', function () {
+    beforeEach(function () {
       this.cb = sinon.stub()
       return (this.snippet = {})
     })
 
-    describe('when downloading a .tex file', function() {
-      beforeEach(function(done) {
+    describe('when downloading a .tex file', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromUri(
           this.snip_uri,
           this.snippet,
@@ -186,14 +186,14 @@ snap snap
         )
       })
 
-      it('wraps the snippet with the proxy', function() {
+      it('wraps the snippet with the proxy', function () {
         return sinon.assert.calledWith(
           this.UrlHelper.wrapUrlWithProxy,
           this.snip_uri
         )
       })
 
-      it('downloads the file with FileWriter', function() {
+      it('downloads the file with FileWriter', function () {
         return sinon.assert.calledWith(
           this.FileWriter.writeUrlToDisk,
           'open_in_overleaf_snippet',
@@ -201,30 +201,30 @@ snap snap
         )
       })
 
-      it('detects the file type', function() {
+      it('detects the file type', function () {
         return sinon.assert.calledWith(
           mmmagic.Magic.prototype.detectFile,
           this.tmpfile
         )
       })
 
-      it('reads the file contents', function() {
+      it('reads the file contents', function () {
         return sinon.assert.calledWith(this.fs.readFile, this.tmpfile, {
           encoding: 'utf8'
         })
       })
 
-      it('adds the .tex file contents to the snippet', function() {
+      it('adds the .tex file contents to the snippet', function () {
         return expect(this.snippet.snip).to.equal(this.snip)
       })
 
-      return it('calls the callback without an error', function() {
+      return it('calls the callback without an error', function () {
         return expect(this.err).not.to.exist
       })
     })
 
-    describe('when downloading a zip file', function() {
-      beforeEach(function(done) {
+    describe('when downloading a zip file', function () {
+      beforeEach(function (done) {
         mmmagic.Magic.prototype.detectFile = sinon
           .stub()
           .withArgs(this.tmpFile)
@@ -240,24 +240,24 @@ snap snap
         )
       })
 
-      it('detects the file type', function() {
+      it('detects the file type', function () {
         return sinon.assert.calledWith(
           mmmagic.Magic.prototype.detectFile,
           this.tmpfile
         )
       })
 
-      it('adds the filesystem path to the snippet', function() {
+      it('adds the filesystem path to the snippet', function () {
         return expect(this.snippet.projectFile).to.equal(this.tmpfile)
       })
 
-      return it('calls the callback without error', function() {
+      return it('calls the callback without error', function () {
         return expect(this.err).not.to.exist
       })
     })
 
-    describe('when downloading an incorrect file type', function() {
-      beforeEach(function() {
+    describe('when downloading an incorrect file type', function () {
+      beforeEach(function () {
         mmmagic.Magic.prototype.detectFile = sinon
           .stub()
           .withArgs(this.tmpfile)
@@ -269,22 +269,22 @@ snap snap
         )
       })
 
-      it('detects the file type', function() {
+      it('detects the file type', function () {
         return sinon.assert.calledWith(
           mmmagic.Magic.prototype.detectFile,
           this.tmpfile
         )
       })
 
-      return it('raises an error', function() {
+      return it('raises an error', function () {
         this.cb.calledWith(
           sinon.match.instanceOf(OpenInOverleafErrors.InvalidFileTypeError)
         )
       })
     })
 
-    return describe('when trying to download an invalid uri', function() {
-      return it('raises an invalid URI error', function(done) {
+    return describe('when trying to download an invalid uri', function () {
+      return it('raises an invalid URI error', function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromUri(
           'htt::/a',
           {},
@@ -297,8 +297,8 @@ snap snap
     })
   })
 
-  describe('populateSnippetFromTemplate', function() {
-    beforeEach(function() {
+  describe('populateSnippetFromTemplate', function () {
+    beforeEach(function () {
       this.cb = sinon.stub()
       this.snippet = {}
       this.fs.readFile.callsArgWith(2, null, this.templatesJson)
@@ -315,8 +315,8 @@ snap snap
       )
     })
 
-    describe('when requesting a template that exists', function() {
-      beforeEach(function(done) {
+    describe('when requesting a template that exists', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromTemplate(
           'wombat',
           this.snippet,
@@ -328,28 +328,28 @@ snap snap
         )
       })
 
-      it('should not raise an error', function() {
+      it('should not raise an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should download the zip file', function() {
+      it('should download the zip file', function () {
         return sinon.assert.calledWith(
           this.UrlHelper.wrapUrlWithProxy,
           `${this.templateUriPrefix}wombat.zip`
         )
       })
 
-      it('adds thefilesystem path to the snippet', function() {
+      it('adds thefilesystem path to the snippet', function () {
         return expect(this.snippet.projectFile).to.equal(this.tmpfile)
       })
 
-      return it('does not add a brand variation', function() {
+      return it('does not add a brand variation', function () {
         return expect(this.snippet.brandVariationId).not.to.exist
       })
     })
 
-    describe('when requesting a template that has a brand variation', function() {
-      beforeEach(function(done) {
+    describe('when requesting a template that has a brand variation', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromTemplate(
           'potato',
           this.snippet,
@@ -361,28 +361,28 @@ snap snap
         )
       })
 
-      it('should not raise an error', function() {
+      it('should not raise an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should download the zip file', function() {
+      it('should download the zip file', function () {
         return sinon.assert.calledWith(
           this.UrlHelper.wrapUrlWithProxy,
           `${this.templateUriPrefix}potato.zip`
         )
       })
 
-      it('adds thefilesystem path to the snippet', function() {
+      it('adds thefilesystem path to the snippet', function () {
         return expect(this.snippet.projectFile).to.equal(this.tmpfile)
       })
 
-      return it('does not add a brand variation', function() {
+      return it('does not add a brand variation', function () {
         return expect(this.snippet.brandVariationId).to.equal(1234)
       })
     })
 
-    return describe('when requesting a template that does not exist', function() {
-      beforeEach(function(done) {
+    return describe('when requesting a template that does not exist', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromTemplate(
           'banana',
           this.snippet,
@@ -394,18 +394,18 @@ snap snap
         )
       })
 
-      it('should raise a template not found error', function() {
+      it('should raise a template not found error', function () {
         return expect(this.err.name).to.equal('TemplateNotFoundError')
       })
 
-      return it('should not try and download anything', function() {
+      return it('should not try and download anything', function () {
         return sinon.assert.notCalled(this.UrlHelper.wrapUrlWithProxy)
       })
     })
   })
 
-  describe('populateSnippetFromConversionJob', function() {
-    beforeEach(function() {
+  describe('populateSnippetFromConversionJob', function () {
+    beforeEach(function () {
       this.V1Api.request
         .withArgs({ uri: '/api/v2/partners/ieee_latexqc/conversions/wombat-1' })
         .callsArgWith(
@@ -430,8 +430,8 @@ snap snap
         )
     })
 
-    describe('when the conversion job exists', function() {
-      beforeEach(function(done) {
+    describe('when the conversion job exists', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromConversionJob(
           'OSF',
           'wombat-1',
@@ -444,15 +444,15 @@ snap snap
         )
       })
 
-      it('should not raise an error', function() {
+      it('should not raise an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should add the brand variation id to the snippet', function() {
+      it('should add the brand variation id to the snippet', function () {
         return expect(this.snippet.brandVariationId).to.equal('1234')
       })
 
-      return it('downloads the file', function() {
+      return it('downloads the file', function () {
         return sinon.assert.calledWith(
           this.FileWriter.writeUrlToDisk,
           sinon.match.any,
@@ -461,8 +461,8 @@ snap snap
       })
     })
 
-    describe('when the conversion job exists, but has no brand variation', function() {
-      beforeEach(function(done) {
+    describe('when the conversion job exists, but has no brand variation', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromConversionJob(
           'ieee_latexqc',
           'wombat-1',
@@ -475,15 +475,15 @@ snap snap
         )
       })
 
-      it('should not raise an error', function() {
+      it('should not raise an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should not add a brand variation id to the snippet', function() {
+      it('should not add a brand variation id to the snippet', function () {
         return expect(this.snippet.brandVariationId).not.to.exist
       })
 
-      return it('downloads the file', function() {
+      return it('downloads the file', function () {
         return sinon.assert.calledWith(
           this.FileWriter.writeUrlToDisk,
           sinon.match.any,
@@ -492,8 +492,8 @@ snap snap
       })
     })
 
-    return describe('when the conversion job does not exist', function() {
-      beforeEach(function(done) {
+    return describe('when the conversion job does not exist', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.populateSnippetFromConversionJob(
           'wombat_university',
           'wombat-1',
@@ -506,14 +506,14 @@ snap snap
         )
       })
 
-      return it('should not raise an error', function() {
+      return it('should not raise an error', function () {
         return expect(this.err.name).to.equal('ConversionNotFoundError')
       })
     })
   })
 
-  describe('populateSnippetFromUriArray', function() {
-    beforeEach(function() {
+  describe('populateSnippetFromUriArray', function () {
+    beforeEach(function () {
       this.uris = [
         'http://a.aa/main.tex',
         'http://b.bb/main.tex',
@@ -571,7 +571,7 @@ snap snap
       return (this.source = { wombat: 'potato' })
     })
 
-    it('succeeds', function(done) {
+    it('succeeds', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -582,7 +582,7 @@ snap snap
       )
     })
 
-    it('downloads all of the URIs', function(done) {
+    it('downloads all of the URIs', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -599,7 +599,7 @@ snap snap
       )
     })
 
-    it('checks the filetypes of all the files', function(done) {
+    it('checks the filetypes of all the files', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -633,7 +633,7 @@ snap snap
       )
     })
 
-    it('reads the tex and text file contents, but not the binaries', function(done) {
+    it('reads the tex and text file contents, but not the binaries', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -649,7 +649,7 @@ snap snap
       )
     })
 
-    it('adds the file list to the snippet', function(done) {
+    it('adds the file list to the snippet', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -661,7 +661,7 @@ snap snap
       )
     })
 
-    it("keeps the snippet's original fields", function(done) {
+    it("keeps the snippet's original fields", function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -672,7 +672,7 @@ snap snap
       )
     })
 
-    it('extracts the filename from the URL', function(done) {
+    it('extracts the filename from the URL', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -684,7 +684,7 @@ snap snap
       )
     })
 
-    it('ensures the filenames are unique', function(done) {
+    it('ensures the filenames are unique', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -696,7 +696,7 @@ snap snap
       )
     })
 
-    it('reads the project title from the tex content', function(done) {
+    it('reads the project title from the tex content', function (done) {
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
@@ -707,7 +707,7 @@ snap snap
       )
     })
 
-    return it('uses filenames from snip_name if supplied', function(done) {
+    return it('uses filenames from snip_name if supplied', function (done) {
       this.source.snip_name = ['1.tex', '2.tex', '3.tex']
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
@@ -723,8 +723,8 @@ snap snap
     })
   })
 
-  describe('populateProjectFromFileList', function() {
-    beforeEach(function(done) {
+  describe('populateProjectFromFileList', function () {
+    beforeEach(function (done) {
       this.project = {
         _id: '1234',
         rootFolder: [{ _id: 'asdf' }]
@@ -750,19 +750,19 @@ snap snap
       )
     })
 
-    it('succeeds', function() {
+    it('succeeds', function () {
       return expect(this.error).not.to.exist
     })
 
-    it('adds the tex files as documents', function() {
+    it('adds the tex files as documents', function () {
       return sinon.assert.calledTwice(this.ProjectEntityUpdateHandler.addDoc)
     })
 
-    it('adds the zip files as files', function() {
+    it('adds the zip files as files', function () {
       return sinon.assert.calledTwice(this.ProjectEntityUpdateHandler.addFile)
     })
 
-    return it('sets the root document', function() {
+    return it('sets the root document', function () {
       return sinon.assert.calledWith(
         this.ProjectRootDocManager.setRootDocFromName,
         sinon.match.any,
@@ -771,15 +771,15 @@ snap snap
     })
   })
 
-  describe('setProjectBrandVariationFromSlug', function() {
-    beforeEach(function() {
+  describe('setProjectBrandVariationFromSlug', function () {
+    beforeEach(function () {
       return (this.project = {
         _id: '1234'
       })
     })
 
-    describe('when the slug exists in v1', function() {
-      beforeEach(function(done) {
+    describe('when the slug exists in v1', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.setProjectBrandVariationFromSlug(
           this.project,
           'OSF',
@@ -790,17 +790,17 @@ snap snap
         )
       })
 
-      it('calls the V1 API with the slug', function() {
+      it('calls the V1 API with the slug', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
           uri: '/api/v2/brands/OSF'
         })
       })
 
-      it('calls the callback without error', function() {
+      it('calls the callback without error', function () {
         return expect(this.err).to.not.exist
       })
 
-      return it('sets the brand variation for the project', function() {
+      return it('sets the brand variation for the project', function () {
         return sinon.assert.calledWith(
           this.ProjectOptionsHandler.setBrandVariationId,
           this.project._id,
@@ -809,8 +809,8 @@ snap snap
       })
     })
 
-    return describe("when the slug doesn't exist in v1", function() {
-      beforeEach(function(done) {
+    return describe("when the slug doesn't exist in v1", function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.setProjectBrandVariationFromSlug(
           this.project,
           'wombat',
@@ -821,17 +821,17 @@ snap snap
         )
       })
 
-      it('calls the V1 API with the slug', function() {
+      it('calls the V1 API with the slug', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
           uri: '/api/v2/brands/wombat'
         })
       })
 
-      it('calls the callback with an error', function() {
+      it('calls the callback with an error', function () {
         return expect(this.err.name).to.equal('PublisherNotFoundError')
       })
 
-      return it('does not try to set the brand variation', function() {
+      return it('does not try to set the brand variation', function () {
         return sinon.assert.notCalled(
           this.ProjectOptionsHandler.setBrandVariationId
         )
@@ -839,15 +839,15 @@ snap snap
     })
   })
 
-  describe('setProjectBrandVariationFromId', function() {
-    beforeEach(function() {
+  describe('setProjectBrandVariationFromId', function () {
+    beforeEach(function () {
       return (this.project = {
         _id: '1234'
       })
     })
 
-    describe('when the brand variation id exists in v1', function() {
-      beforeEach(function(done) {
+    describe('when the brand variation id exists in v1', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.setProjectBrandVariationFromId(
           this.project,
           'wombat',
@@ -858,17 +858,17 @@ snap snap
         )
       })
 
-      it('calls the V1 API with the variation id', function() {
+      it('calls the V1 API with the variation id', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
           uri: '/api/v2/brand_variations/wombat'
         })
       })
 
-      it('calls the callback without error', function() {
+      it('calls the callback without error', function () {
         return expect(this.err).to.not.exist
       })
 
-      return it('sets the brand variation for the project', function() {
+      return it('sets the brand variation for the project', function () {
         return sinon.assert.calledWith(
           this.ProjectOptionsHandler.setBrandVariationId,
           this.project._id,
@@ -877,8 +877,8 @@ snap snap
       })
     })
 
-    return describe('when the brand variation id does not exist in v1', function() {
-      beforeEach(function(done) {
+    return describe('when the brand variation id does not exist in v1', function () {
+      beforeEach(function (done) {
         return this.OpenInOverleafHelper.setProjectBrandVariationFromId(
           this.project,
           'potato',
@@ -889,17 +889,17 @@ snap snap
         )
       })
 
-      it('calls the V1 API with the variation id', function() {
+      it('calls the V1 API with the variation id', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
           uri: '/api/v2/brand_variations/potato'
         })
       })
 
-      it('calls the callback with an error', function() {
+      it('calls the callback with an error', function () {
         return expect(this.err.name).to.equal('PublisherNotFoundError')
       })
 
-      return it('does not try to set the brand variation', function() {
+      return it('does not try to set the brand variation', function () {
         return sinon.assert.notCalled(
           this.ProjectOptionsHandler.setBrandVariationId
         )
@@ -907,8 +907,8 @@ snap snap
     })
   })
 
-  describe('_normalizeMainSrcContent', function() {
-    beforeEach(function() {
+  describe('_normalizeMainSrcContent', function () {
+    beforeEach(function () {
       this.OpenInOverleafHelper.normalizeLatexContent = sinon
         .stub()
         .returnsArg(0)
@@ -920,7 +920,7 @@ snap snap
       ))
     })
 
-    it('should normalize the latex content', function() {
+    it('should normalize the latex content', function () {
       return expect(
         this.OpenInOverleafHelper.normalizeLatexContent.calledWith(
           this.snippet.snip
@@ -928,7 +928,7 @@ snap snap
       ).to.equal(true)
     })
 
-    return it('should wrap the snippet in a document block if necessary', function() {
+    return it('should wrap the snippet in a document block if necessary', function () {
       return expect(
         this.OpenInOverleafHelper._wrapSnippetIfNoDocumentClass.calledWith(
           this.snippet.snip,
@@ -938,8 +938,8 @@ snap snap
     })
   })
 
-  return describe('_wrapSnippetIfNoDocumentClass', function() {
-    it('should wrap the snippet if there is no document class', function() {
+  return describe('_wrapSnippetIfNoDocumentClass', function () {
+    it('should wrap the snippet if there is no document class', function () {
       return expect(
         this.OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(
           this.snippet.snip,
@@ -948,7 +948,7 @@ snap snap
       ).to.equal(this.wrappedDocument)
     })
 
-    it('should not wrap the snippet if there is a document class', function() {
+    it('should not wrap the snippet if there is a document class', function () {
       return expect(
         this.OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(
           this.wrappedDocument,
@@ -957,7 +957,7 @@ snap snap
       ).to.equal(this.wrappedDocument)
     })
 
-    return it('should add a title when it wraps the document', function() {
+    return it('should add a title when it wraps the document', function () {
       return expect(
         this.OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(
           this.snippet.snip,

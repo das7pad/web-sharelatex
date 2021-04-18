@@ -69,7 +69,7 @@ describe('SecurityHeaders', function () {
     })
   })
 
-  it('should have cache headers when user is logged in', function(done) {
+  it('should have cache headers when user is logged in', function (done) {
     this.timeout(5000)
     return async.series(
       [

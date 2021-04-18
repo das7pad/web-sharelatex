@@ -21,10 +21,7 @@ export default SpellCheckAdapter = class SpellCheckAdapter {
   }
 
   getLines() {
-    return this.editor
-      .getCodeMirror()
-      .getValue()
-      .split('\n')
+    return this.editor.getCodeMirror().getValue().split('\n')
   }
 
   getLineCount() {

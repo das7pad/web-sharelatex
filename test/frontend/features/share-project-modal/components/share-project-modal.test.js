@@ -85,7 +85,7 @@ describe('<ShareProjectModal/>', function () {
     handleHide: sinon.stub()
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     fetchMock.get('/user/contacts', { contacts })
   })
 

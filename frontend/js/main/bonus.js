@@ -16,17 +16,17 @@ App.controller('BonusLinksController', ($scope, $modal) => {
       controller: 'BonusModalController'
     })
 
-  $(function() {
-    $('.twitter').click(function() {
+  $(function () {
+    $('.twitter').click(function () {
       ga('send', 'event', 'referal-button', 'clicked', 'twitter')
     })
-    $('.email').click(function() {
+    $('.email').click(function () {
       ga('send', 'event', 'referal-button', 'clicked', 'email')
     })
-    $('.facebook').click(function() {
+    $('.facebook').click(function () {
       ga('send', 'event', 'referal-button', 'clicked', 'facebook')
     })
-    $('.link').click(function() {
+    $('.link').click(function () {
       ga('send', 'event', 'referal-button', 'clicked', 'direct-link')
     })
   })

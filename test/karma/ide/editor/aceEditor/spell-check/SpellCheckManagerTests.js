@@ -52,7 +52,7 @@ export default describe('SpellCheckManager', function () {
     return this.timelord.restore()
   })
 
-  beforeEach(function() {
+  beforeEach(function () {
     this.$httpBackend.expect('GET', '/spelling/v20200714/dict').respond([])
     this.spellCheckManager.userDictFetched = false
   })

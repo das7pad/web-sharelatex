@@ -96,7 +96,7 @@ describe('FileStoreController', function () {
       this.controller.getFile(this.req, this.res)
     })
 
-    it('should flag the response body as attachment', function(done) {
+    it('should flag the response body as attachment', function (done) {
       this.pipeline.callsFake(() => {
         this.res.attachment.calledWith(this.file.name).should.equal(true)
         done()
@@ -104,11 +104,11 @@ describe('FileStoreController', function () {
       this.controller.getFile(this.req, this.res)
     })
 
-    describe('when filestore responds with a 500', function() {
-      beforeEach(function() {
+    describe('when filestore responds with a 500', function () {
+      beforeEach(function () {
         this.getResp.statusCode = 500
       })
-      it('should send a 500', function(done) {
+      it('should send a 500', function (done) {
         this.res.sendStatus.callsFake(code => {
           expect(code).to.equal(500)
           done()
@@ -117,11 +117,11 @@ describe('FileStoreController', function () {
       })
     })
 
-    describe('when filestore responds with a 404', function() {
-      beforeEach(function() {
+    describe('when filestore responds with a 404', function () {
+      beforeEach(function () {
         this.getResp.statusCode = 404
       })
-      it('should send a 500', function(done) {
+      it('should send a 500', function (done) {
         this.res.sendStatus.callsFake(code => {
           expect(code).to.equal(500)
           done()
@@ -130,9 +130,9 @@ describe('FileStoreController', function () {
       })
     })
 
-    describe('passthroughHeaders with x-served-by', function() {
-      describe('when filestore emits x-served-by header', function() {
-        beforeEach(function() {
+    describe('passthroughHeaders with x-served-by', function () {
+      describe('when filestore emits x-served-by header', function () {
+        beforeEach(function () {
           this.settings.apis.filestore.passthroughHeaders = ['x-served-by']
           this.getResp.headers['x-served-by'] = 'some-filestore-pod'
         })
@@ -148,12 +148,12 @@ describe('FileStoreController', function () {
         })
       })
 
-      describe('when filestore does not emit x-served-by header', function() {
-        beforeEach(function() {
+      describe('when filestore does not emit x-served-by header', function () {
+        beforeEach(function () {
           delete this.getResp.headers['x-served-by']
         })
 
-        it('should not extend the X-Served-By header', function(done) {
+        it('should not extend the X-Served-By header', function (done) {
           this.pipeline.callsFake(() => {
             this.res.append.calledWith('x-served-by').should.equal(false)
             done()

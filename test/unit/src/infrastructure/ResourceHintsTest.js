@@ -10,8 +10,8 @@ const MODULE_PATH = Path.join(
   '../../../../app/src/infrastructure/ResourceHints.js'
 )
 
-describe('ResourceHints', function() {
-  beforeEach(function() {
+describe('ResourceHints', function () {
+  beforeEach(function () {
     this.settings = {
       i18n: {
         subdomainLang: {
@@ -74,50 +74,50 @@ describe('ResourceHints', function() {
     }
   })
 
-  describe('resource hints disabled', function() {
-    beforeEach(function() {
+  describe('resource hints disabled', function () {
+    beforeEach(function () {
       this.settings.addResourceHints = false
       this.require()
     })
 
-    it('should not load the preloadMiddleware', function() {
+    it('should not load the preloadMiddleware', function () {
       this.shouldNotHaveLoadedMiddleware('preloadMiddleware')
     })
   })
 
-  describe('resource hints enabled', function() {
-    beforeEach(function() {
+  describe('resource hints enabled', function () {
+    beforeEach(function () {
       this.settings.addResourceHints = true
       this.require()
       this.loadMiddleware('preloadMiddleware')
     })
 
-    it('should load the preloadMiddleware', function() {
+    it('should load the preloadMiddleware', function () {
       this.shouldHaveLoadedMiddleware('preloadMiddleware')
     })
 
-    it('should set the header for custom css', function() {
+    it('should set the header for custom css', function () {
       this.res.render('project/editor', { themeModifier: 'light-' })
       expect(this.res.headers.Link).to.include(
         '</stylesheets/light-style.css>;rel=preload;as=style'
       )
     })
 
-    it('should set the header for images', function() {
+    it('should set the header for images', function () {
       this.res.render('project/editor', {})
       expect(this.res.headers.Link).to.include(
         '</img/ol-brand/overleaf-o.svg>;rel=preload;as=image'
       )
     })
 
-    it('should set the crossorigin flag for a font', function() {
+    it('should set the crossorigin flag for a font', function () {
       this.res.render('template', {})
       expect(this.res.headers.Link).to.include(
         '.woff2>;rel=preload;as=font;crossorigin'
       )
     })
 
-    it('should inject the tooltip font on the dashboard', function() {
+    it('should inject the tooltip font on the dashboard', function () {
       const tooltipFont = 'merriweather-v21-latin-700italic'
       this.res.render('project/list', {})
       expect(this.res.headers.Link).to.include(
@@ -125,7 +125,7 @@ describe('ResourceHints', function() {
       )
     })
 
-    it('should inject common resources for user pages', function() {
+    it('should inject common resources for user pages', function () {
       this.res.render('template', {})
       expect(this.res.headers.Link).to.exist
       const Link = this.res.headers.Link
@@ -134,7 +134,7 @@ describe('ResourceHints', function() {
       expect(Link).to.include('img/sprite.png')
     })
 
-    it('should inject default brand specific resources', function() {
+    it('should inject default brand specific resources', function () {
       this.res.render('template', {})
       expect(this.res.headers.Link).to.exist
       const Link = this.res.headers.Link
@@ -143,8 +143,8 @@ describe('ResourceHints', function() {
     })
   })
 
-  describe('with only one language', function() {
-    beforeEach(function() {
+  describe('with only one language', function () {
+    beforeEach(function () {
       this.settings.i18n = {
         subdomainLang: {
           www: { lngCode: 'en', url: 'http://localhost:3000' }
@@ -155,7 +155,7 @@ describe('ResourceHints', function() {
       this.loadMiddleware('preloadMiddleware')
     })
 
-    it('should not inject the flags sprite', function() {
+    it('should not inject the flags sprite', function () {
       this.res.render('template', {})
       expect(this.res.headers.Link).to.exist
       expect(this.res.headers.Link).to.not.include('img/sprite.png')

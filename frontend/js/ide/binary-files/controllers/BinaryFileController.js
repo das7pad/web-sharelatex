@@ -91,8 +91,8 @@ export default App.controller(
     }
 
     if ($scope.isTextFile()) {
-    loadTextFilePreview()
-  }
+      loadTextFilePreview()
+    }
 
     function loadTextFilePreview() {
       const url = `/project/${window.project_id}/file/${$scope.openFile.id}`

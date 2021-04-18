@@ -18,8 +18,8 @@ buildTestBundleForNode(ENTRYPOINT)
     run()
   })
   .catch(error => {
-    describe('esbuild', function() {
-      it('should build a working bundle', function() {
+    describe('esbuild', function () {
+      it('should build a working bundle', function () {
         throw error
       })
     })

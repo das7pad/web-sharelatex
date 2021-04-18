@@ -38,7 +38,7 @@ if (process.env.V1_API_URL || process.env.V1_HOST) {
   }
 }
 
-const intFromEnv = function(name, defaultValue) {
+const intFromEnv = function (name, defaultValue) {
   if (
     [null, undefined].includes(defaultValue) ||
     typeof defaultValue !== 'number'
@@ -221,26 +221,27 @@ module.exports = {
     }
   },
 
-  gitBridgePublicBaseUrl: `http://${process.env.GIT_BRIDGE_HOST ||
-    'localhost'}:8000`,
+  gitBridgePublicBaseUrl: `http://${
+    process.env.GIT_BRIDGE_HOST || 'localhost'
+  }:8000`,
 
   // Tell each service where to find the other services. If everything
   // is running locally then this is easy, but they exist as separate config
   // options incase you want to run some services on remote hosts.
   apis: {
     web: {
-      url: `http://${process.env.WEB_API_HOST ||
-        process.env.WEB_HOST ||
-        'localhost'}:${process.env.WEB_API_PORT ||
-        process.env.WEB_PORT ||
-        3000}`,
+      url: `http://${
+        process.env.WEB_API_HOST || process.env.WEB_HOST || 'localhost'
+      }:${process.env.WEB_API_PORT || process.env.WEB_PORT || 3000}`,
       user: httpAuthUser,
       pass: httpAuthPass
     },
     documentupdater: {
-      url: `http://${process.env.DOCUPDATER_HOST ||
+      url: `http://${
+        process.env.DOCUPDATER_HOST ||
         process.env.DOCUMENT_UPDATER_HOST ||
-        'localhost'}:${docUpdaterPort}`
+        'localhost'
+      }:${docUpdaterPort}`
     },
     thirdPartyDataStore: {
       url: `http://${process.env.TPDS_HOST || 'localhost'}:3002`,
@@ -306,9 +307,9 @@ module.exports = {
       publicKey: process.env.RECURLY_PUBLIC_KEY || ''
     },
     geoIpLookup: {
-      url: `http://${process.env.GEOIP_HOST ||
-        process.env.FREEGEOIP_HOST ||
-        'localhost'}:8080/json/`
+      url: `http://${
+        process.env.GEOIP_HOST || process.env.FREEGEOIP_HOST || 'localhost'
+      }:8080/json/`
     },
     realTime: {
       url: `http://${process.env.REALTIME_HOST || 'localhost'}:3026`
@@ -334,8 +335,9 @@ module.exports = {
       url: process.env.LINKED_URL_PROXY
     },
     thirdpartyreferences: {
-      url: `http://${process.env.THIRD_PARTY_REFERENCES_HOST ||
-        'localhost'}:3046`,
+      url: `http://${
+        process.env.THIRD_PARTY_REFERENCES_HOST || 'localhost'
+      }:3046`,
       timeout: parseInt(
         process.env.THIRD_PARTY_REFERENCES_TIMEOUT || '30000',
         10

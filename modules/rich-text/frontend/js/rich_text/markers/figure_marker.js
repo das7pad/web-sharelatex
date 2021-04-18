@@ -74,15 +74,11 @@ function makeCaptionDiv(cm, region) {
   const { from, to } = region
   const caption = deTex(cm.getRange(from, to))
 
-  return $('<div>')
-    .text(caption)
-    .addClass('wl-figure-caption')
+  return $('<div>').text(caption).addClass('wl-figure-caption')
 }
 
 function makeImg(previewUrl) {
-  return $('<img>')
-    .attr('src', previewUrl)
-    .addClass('img-responsive wl-figure')
+  return $('<img>').attr('src', previewUrl).addClass('img-responsive wl-figure')
 }
 
 function makeNotFoundSpan(path) {

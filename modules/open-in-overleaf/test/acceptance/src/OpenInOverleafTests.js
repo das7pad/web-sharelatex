@@ -27,15 +27,15 @@ const PROJECT_URI_REGEX = /^\/project\/([0-9a-fA-F]{24})$/
 
 let MockV1Api
 
-before(function() {
+before(function () {
   MockV1Api = MockV1ApiClass.instance()
   MockV1Api.reset()
 })
 
-describe('Open In Overleaf', function() {
+describe('Open In Overleaf', function () {
   this.timeout(25000)
 
-  before(function(done) {
+  before(function (done) {
     const LinkedUrlProxy = express()
     LinkedUrlProxy.get('/', (req, res, next) => {
       if (req.query.url === 'http://example.org/test.tex') {
@@ -86,7 +86,7 @@ I have a bad name
     LinkedUrlProxy.listen(6543, done)
   })
 
-  beforeEach(function() {
+  beforeEach(function () {
     MockV1Api.brands.OSF = {
       id: 176,
       name: 'Open Science Framework',
@@ -113,18 +113,18 @@ I have a bad name
     })
   })
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     this.user = new User()
     return this.user.login(done)
   })
 
-  it('should warm caches', function() {
+  it('should warm caches', function () {
     expect(true).to.equal(true)
   })
 
-  return describe('when creating a project from a snippet', function() {
-    describe('when POSTing a snippet with a valid csrf token via xhr', function() {
-      beforeEach(function(done) {
+  return describe('when creating a project from a snippet', function () {
+    describe('when POSTing a snippet with a valid csrf token via xhr', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -145,11 +145,11 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(200)
         expect(this.res.headers['content-type']).to.match(/^application\/json/)
         return expect(JSON.parse(this.body).redirect).to.match(
@@ -157,7 +157,7 @@ I have a bad name
         )
       })
 
-      return it('should create a project with the returned id', function(done) {
+      return it('should create a project with the returned id', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -174,8 +174,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snippet with a valid csrf token via a form', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snippet with a valid csrf token via a form', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -193,16 +193,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      return it('should create a project with the returned id', function(done) {
+      return it('should create a project with the returned id', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -217,8 +217,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snippet which specifies a compiler', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snippet which specifies a compiler', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -240,7 +240,7 @@ I have a bad name
         )
       })
 
-      return it('should create a project with the requested compiler', function(done) {
+      return it('should create a project with the requested compiler', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -258,8 +258,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snippet which specifies a brand_variation_id', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snippet which specifies a brand_variation_id', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -281,7 +281,7 @@ I have a bad name
         )
       })
 
-      return it('should create a project with the requested brand variation', function(done) {
+      return it('should create a project with the requested brand variation', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -299,8 +299,8 @@ I have a bad name
       })
     })
 
-    describe('when GETing with a snippet in the query', function() {
-      beforeEach(function(done) {
+    describe('when GETing with a snippet in the query', function () {
+      beforeEach(function (done) {
         return this.user.request.get('/docs?snip=test', (_err, _res, _body) => {
           this.err = _err
           this.res = _res
@@ -309,15 +309,15 @@ I have a bad name
         })
       })
 
-      return it('should render the gateway page', function() {
+      return it('should render the gateway page', function () {
         expect(this.err).not.to.exist
         expect(this.res.headers.location).not.to.exist
         return expect(this.res.statusCode).to.equal(200)
       })
     })
 
-    describe('when GETing with a csrf token', function() {
-      beforeEach(function(done) {
+    describe('when GETing with a csrf token', function () {
+      beforeEach(function (done) {
         return this.user.request.get(
           `/docs?snip=test?_csrf=${this.user.csrfToken}`,
           (_err, _res, _body) => {
@@ -329,15 +329,15 @@ I have a bad name
         )
       })
 
-      return it('should render the gateway page', function() {
+      return it('should render the gateway page', function () {
         expect(this.err).not.to.exist
         expect(this.res.headers.location).not.to.exist
         return expect(this.res.statusCode).to.equal(200)
       })
     })
 
-    describe('when POSTing a snippet without a csrf token', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snippet without a csrf token', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -355,13 +355,13 @@ I have a bad name
         )
       })
 
-      it('should render to the gateway page', function() {
+      it('should render to the gateway page', function () {
         expect(this.err).not.to.exist
         expect(this.res.headers.location).not.to.exist
         return expect(this.res.statusCode).to.equal(200)
       })
 
-      return it('should allow rendering of the gateway page without redirecting', function(done) {
+      return it('should allow rendering of the gateway page without redirecting', function (done) {
         return this.user.request.get('/docs', (err, res, body) => {
           expect(err).not.to.exist
           expect(res.headers.location).not.to.exist
@@ -371,8 +371,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snippet for a non-logged-in user', function() {
-      return it('should render the gateway page', function(done) {
+    describe('when POSTing a snippet for a non-logged-in user', function () {
+      return it('should render the gateway page', function (done) {
         const guest = new User()
         return guest.request.post(
           {
@@ -391,8 +391,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing without a snippet', function() {
-      return it('should render an error page', function(done) {
+    describe('when POSTing without a snippet', function () {
+      return it('should render an error page', function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -409,8 +409,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing an encoded snippet with valid csrf', function() {
-      beforeEach(function(done) {
+    describe('when POSTing an encoded snippet with valid csrf', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -431,11 +431,11 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should send a json response to redirect to a project', function() {
+      it('should send a json response to redirect to a project', function () {
         expect(this.res.statusCode).to.equal(200)
         expect(this.res.headers['content-type']).to.match(/application\/json/)
         return expect(JSON.parse(this.body).redirect).to.match(
@@ -443,7 +443,7 @@ I have a bad name
         )
       })
 
-      return it('should create a project containing the decoded snippet', function(done) {
+      return it('should create a project containing the decoded snippet', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -471,8 +471,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snip_uri with valid csrf', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snip_uri with valid csrf', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -493,11 +493,11 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should send a json response to redirect to a project', function() {
+      it('should send a json response to redirect to a project', function () {
         expect(this.res.statusCode).to.equal(200)
         expect(this.res.headers['content-type']).to.match(/application\/json/)
         return expect(JSON.parse(this.body).redirect).to.match(
@@ -505,7 +505,7 @@ I have a bad name
         )
       })
 
-      return it('should create a project containing the retrieved snippet', function(done) {
+      return it('should create a project containing the retrieved snippet', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -533,8 +533,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snip_uri for a zip file', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snip_uri for a zip file', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -552,16 +552,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      return it('should create a project containing the retrieved snippet', function(done) {
+      return it('should create a project containing the retrieved snippet', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -587,8 +587,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a zip_uri for a zip file', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a zip_uri for a zip file', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -606,16 +606,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      it('should create a project containing the retrieved snippet', function(done) {
+      it('should create a project containing the retrieved snippet', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -640,7 +640,7 @@ I have a bad name
         })
       })
 
-      return it("should read the name from the zip's main.tex file", function(done) {
+      return it("should read the name from the zip's main.tex file", function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -655,8 +655,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a zip_uri that contains a publisher_slug', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a zip_uri that contains a publisher_slug', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -675,16 +675,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      return it('should create a project with the correct brand variation id', function(done) {
+      return it('should create a project with the correct brand variation id', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -699,8 +699,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a zip_uri that contains a brand variation id', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a zip_uri that contains a brand variation id', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -719,16 +719,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      return it('should create a project with the correct brand variation id', function(done) {
+      return it('should create a project with the correct brand variation id', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -743,8 +743,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a zip_uri that contains an invalid publisher_slug', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a zip_uri that contains an invalid publisher_slug', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -763,17 +763,17 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      return it("should return a 'not found' error", function() {
+      return it("should return a 'not found' error", function () {
         return expect(this.res.statusCode).to.equal(404)
       })
     })
 
-    describe('when POSTing a snip_uri for a zip file with an invalid name in the tex contents', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snip_uri for a zip file with an invalid name in the tex contents', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -791,7 +791,7 @@ I have a bad name
         )
       })
 
-      return it('should not create a project with an invalid name', function(done) {
+      return it('should not create a project with an invalid name', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -806,8 +806,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snip_uri that does not exist', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a snip_uri that does not exist', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -828,7 +828,7 @@ I have a bad name
         )
       })
 
-      return it("should return a 'not found' error", function() {
+      return it("should return a 'not found' error", function () {
         expect(this.res.statusCode).to.equal(404)
         return expect(JSON.parse(this.body).error).to.equal(
           translations.i18n.translate('not_found_error_from_the_supplied_url')
@@ -836,8 +836,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a template name', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a template name', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -855,18 +855,18 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      return it('should redirect to a project', function() {
+      return it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
     })
 
-    describe('when POSTing a template name that links to a template with a brand variation', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a template name that links to a template with a brand variation', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -884,16 +884,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      return it('should not create a project with an invalid name', function(done) {
+      return it('should not create a project with an invalid name', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -908,8 +908,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a template name that does not exist', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a template name that does not exist', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -930,7 +930,7 @@ I have a bad name
         )
       })
 
-      return it("should return a 'not found' error", function() {
+      return it("should return a 'not found' error", function () {
         expect(this.res.statusCode).to.equal(404)
         return expect(JSON.parse(this.body).error).to.equal(
           'the_requested_template_was_not_found'
@@ -938,8 +938,8 @@ I have a bad name
       })
     })
 
-    describe('when sending more than one kind of snippet parameter', function() {
-      beforeEach(function(done) {
+    describe('when sending more than one kind of snippet parameter', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -961,7 +961,7 @@ I have a bad name
         )
       })
 
-      return it("should return an 'ambiguous parameters' error", function() {
+      return it("should return an 'ambiguous parameters' error", function () {
         expect(this.res.statusCode).to.equal(400)
         return expect(JSON.parse(this.body).error).to.equal(
           translations.i18n.translate(
@@ -971,8 +971,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a partner and client_media_id', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a partner and client_media_id', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -991,16 +991,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      return it("should use the partner's brand variation", function(done) {
+      return it("should use the partner's brand variation", function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -1015,8 +1015,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a partner and client_media_id that does not exist', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a partner and client_media_id that does not exist', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -1035,18 +1035,18 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      return it('should redirect to a project', function() {
+      return it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(404)
         return expect(this.res.headers.location).not.to.exist
       })
     })
 
-    describe('when POSTing a partner and client_media_id that has no brand variation', function() {
-      beforeEach(function(done) {
+    describe('when POSTing a partner and client_media_id that has no brand variation', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -1065,16 +1065,16 @@ I have a bad name
         )
       })
 
-      it('should not produce an error', function() {
+      it('should not produce an error', function () {
         return expect(this.err).not.to.exist
       })
 
-      it('should redirect to a project', function() {
+      it('should redirect to a project', function () {
         expect(this.res.statusCode).to.equal(302)
         return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
-      return it('should have a null brand variation', function(done) {
+      return it('should have a null brand variation', function (done) {
         const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -1089,8 +1089,8 @@ I have a bad name
       })
     })
 
-    describe('when the document has a title', function() {
-      beforeEach(function(done) {
+    describe('when the document has a title', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -1111,7 +1111,7 @@ I have a bad name
         )
       })
 
-      it('should create a project with the correct name', function(done) {
+      it('should create a project with the correct name', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -1126,7 +1126,7 @@ I have a bad name
         })
       })
 
-      return it('should ensure that the project name is unique', function(done) {
+      return it('should ensure that the project name is unique', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -1162,8 +1162,8 @@ I have a bad name
       })
     })
 
-    describe('when snip_name is supplied', function() {
-      beforeEach(function(done) {
+    describe('when snip_name is supplied', function () {
+      beforeEach(function (done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -1185,7 +1185,7 @@ I have a bad name
         )
       })
 
-      it('should create a project with the correct name', function(done) {
+      it('should create a project with the correct name', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -1200,7 +1200,7 @@ I have a bad name
         })
       })
 
-      return it('should ensure that the project name is unique', function(done) {
+      return it('should ensure that the project name is unique', function (done) {
         const projectId = JSON.parse(this.body).redirect.match(
           PROJECT_URI_REGEX
         )[1]
@@ -1237,9 +1237,9 @@ I have a bad name
       })
     })
 
-    return describe('when opening an array of files', function() {
-      describe('with a basic .tex and a .zip', function() {
-        beforeEach(function(done) {
+    return describe('when opening an array of files', function () {
+      describe('with a basic .tex and a .zip', function () {
+        beforeEach(function (done) {
           return this.user.request.post(
             {
               url: '/docs',
@@ -1263,7 +1263,7 @@ I have a bad name
           )
         })
 
-        it('should create a project with the default project name', function(done) {
+        it('should create a project with the default project name', function (done) {
           const projectId = JSON.parse(this.body).redirect.match(
             PROJECT_URI_REGEX
           )[1]
@@ -1281,7 +1281,7 @@ I have a bad name
           })
         })
 
-        it('should add the .tex file as a document', function(done) {
+        it('should add the .tex file as a document', function (done) {
           const projectId = JSON.parse(this.body).redirect.match(
             PROJECT_URI_REGEX
           )[1]
@@ -1298,7 +1298,7 @@ I have a bad name
           })
         })
 
-        return it('should add the .zip file as a file', function(done) {
+        return it('should add the .zip file as a file', function (done) {
           const projectId = JSON.parse(this.body).redirect.match(
             PROJECT_URI_REGEX
           )[1]
@@ -1318,8 +1318,8 @@ I have a bad name
         })
       })
 
-      describe('when names are supplied for the files', function() {
-        beforeEach(function(done) {
+      describe('when names are supplied for the files', function () {
+        beforeEach(function (done) {
           return this.user.request.post(
             {
               url: '/docs',
@@ -1344,7 +1344,7 @@ I have a bad name
           )
         })
 
-        return it('should use the supplied filenames', function(done) {
+        return it('should use the supplied filenames', function (done) {
           const projectId = JSON.parse(this.body).redirect.match(
             PROJECT_URI_REGEX
           )[1]
@@ -1366,8 +1366,8 @@ I have a bad name
         })
       })
 
-      describe('when the brand variation is supplied', function() {
-        beforeEach(function(done) {
+      describe('when the brand variation is supplied', function () {
+        beforeEach(function (done) {
           return this.user.request.post(
             {
               url: '/docs',
@@ -1392,7 +1392,7 @@ I have a bad name
           )
         })
 
-        return it('should use the supplied brand variation id', function(done) {
+        return it('should use the supplied brand variation id', function (done) {
           const projectId = JSON.parse(this.body).redirect.match(
             PROJECT_URI_REGEX
           )[1]
@@ -1409,8 +1409,8 @@ I have a bad name
         })
       })
 
-      return describe('when the brand variation is supplied but does not exist', function() {
-        beforeEach(function(done) {
+      return describe('when the brand variation is supplied but does not exist', function () {
+        beforeEach(function (done) {
           return this.user.request.post(
             {
               url: '/docs',
@@ -1435,7 +1435,7 @@ I have a bad name
           )
         })
 
-        return it("should generate a 'not found' error", function() {
+        return it("should generate a 'not found' error", function () {
           return expect(this.res.statusCode).to.equal(404)
         })
       })

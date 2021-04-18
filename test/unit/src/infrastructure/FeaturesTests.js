@@ -48,7 +48,7 @@ describe('Features', function () {
         process: { env: {}, cwd: () => process.cwd() }
       }
     })
-    beforeEach(function() {
+    beforeEach(function () {
       Object.assign(this.settings, defaults)
     })
 

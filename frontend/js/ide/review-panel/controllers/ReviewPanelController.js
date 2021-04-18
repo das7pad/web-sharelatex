@@ -22,17 +22,9 @@ import { localStorage } from '../../../modules/storage'
 
 export default App.controller(
   'ReviewPanelController',
-  function (
-    $scope,
-    $element,
-    ide,
-    $timeout,
-    $http,
-    $modal,
-    eventTracking
-) {
-  let UserTCSyncState
-  const $reviewPanelEl = $element.find('#review-panel')
+  function ($scope, $element, ide, $timeout, $http, $modal, eventTracking) {
+    let UserTCSyncState
+    const $reviewPanelEl = $element.find('#review-panel')
 
     const UserTypes = {
       MEMBER: 'member', // Invited, listed in project.members

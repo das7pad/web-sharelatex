@@ -114,23 +114,24 @@ const ProjectCreationHandler = {
       }
     }
     project.rootFolder[0] = rootFolder
-    return User.findById(owner_id, 'ace.spellCheckLanguage', function(
-      err,
-      user
-    ) {
-      if (err) return callback(err)
-      if (!user)
-        return callback(
-          new Errors.UserNotFoundError({ info: { userId: owner_id } })
-        )
-      project.spellCheckLanguage = user.ace.spellCheckLanguage
-      return project.save(function(err) {
-        if (err != null) {
-          return callback(err)
-        }
-        return callback(err, project)
-      })
-    })
+    return User.findById(
+      owner_id,
+      'ace.spellCheckLanguage',
+      function (err, user) {
+        if (err) return callback(err)
+        if (!user)
+          return callback(
+            new Errors.UserNotFoundError({ info: { userId: owner_id } })
+          )
+        project.spellCheckLanguage = user.ace.spellCheckLanguage
+        return project.save(function (err) {
+          if (err != null) {
+            return callback(err)
+          }
+          return callback(err, project)
+        })
+      }
+    )
   },
 
   createProjectFromSnippet(owner_id, projectName, docLines, callback) {
@@ -306,14 +307,15 @@ const ProjectCreationHandler = {
         ]
 
         const data = {
-        project_name,
-        user,
-        year: new Date().getUTCFullYear(),
-        month: monthNames[new Date().getUTCMonth()]
+          project_name,
+          user,
+          year: new Date().getUTCFullYear(),
+          month: monthNames[new Date().getUTCMonth()]
+        }
+        const output = ProjectTemplateFiles[template_name](data)
+        return callback(null, output.split('\n'))
       }
-      const output = ProjectTemplateFiles[template_name](data)
-      return callback(null, output.split('\n'))
-    })
+    )
   }
 }
 

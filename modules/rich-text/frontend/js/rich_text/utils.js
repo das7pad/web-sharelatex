@@ -118,7 +118,7 @@ export function splitAuthors(string) {
  * @param {CodeMirror.TextMarker} mark
  */
 export function clearOnMouseDown(cm, element, mark) {
-  $(element).on('mousedown', function() {
+  $(element).on('mousedown', function () {
     var markPos = mark.find()
     if (markPos) {
       cm.setCursor(markPos.from)

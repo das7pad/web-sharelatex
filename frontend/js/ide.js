@@ -72,24 +72,24 @@ App.controller(
     $timeout,
     ide,
     eventTracking,
-  metadata,
-  $q,
-  CobrandingDataService
-) {
-  // Don't freak out if we're already in an apply callback
-  let err, pdfLayout, userAgent
-  $scope.$originalApply = $scope.$apply
-  $scope.$apply = function(fn) {
-    if (fn == null) {
-      fn = function() {}
+    metadata,
+    $q,
+    CobrandingDataService
+  ) {
+    // Don't freak out if we're already in an apply callback
+    let err, pdfLayout, userAgent
+    $scope.$originalApply = $scope.$apply
+    $scope.$apply = function (fn) {
+      if (fn == null) {
+        fn = function () {}
+      }
+      const phase = this.$root.$$phase
+      if (phase === '$apply' || phase === '$digest') {
+        return fn()
+      } else {
+        return this.$originalApply(fn)
+      }
     }
-    const phase = this.$root.$$phase
-    if (phase === '$apply' || phase === '$digest') {
-      return fn()
-    } else {
-      return this.$originalApply(fn)
-    }
-  }
 
     $scope.state = {
       loading: true,

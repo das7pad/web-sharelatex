@@ -32,39 +32,40 @@ module.exports = SubscriptionAdminController = {
     // breadcrumb trail of where we came from for navigation
     const { subscription_id, user_id } = req.params
     logger.log({ subscription_id }, 'getting admin request for subscription')
-    return SubscriptionLocator.getSubscription(subscription_id, function(
-      err,
-      subscription
-    ) {
-      if (err != null) {
-        return next(err)
-      }
-      if (subscription == null) {
-        return ErrorController.notFound(req, res)
-      }
-      return UserGetter.getUsers(
-        subscription.member_ids,
-        { email: 1 },
-        function(err, members) {
-          if (err != null) {
-            return next(err)
-          }
-          const managerIds = subscription.manager_ids || []
-          return UserGetter.getUsers(managerIds, { email: 1 }, function(
-            err,
-            managers
-          ) {
+    return SubscriptionLocator.getSubscription(
+      subscription_id,
+      function (err, subscription) {
+        if (err != null) {
+          return next(err)
+        }
+        if (subscription == null) {
+          return ErrorController.notFound(req, res)
+        }
+        return UserGetter.getUsers(
+          subscription.member_ids,
+          { email: 1 },
+          function (err, members) {
             if (err != null) {
               return next(err)
             }
-            return res.render(
-              Path.resolve(__dirname, '../views/subscription/show'),
-              { subscription, user_id, members, managers }
+            const managerIds = subscription.manager_ids || []
+            return UserGetter.getUsers(
+              managerIds,
+              { email: 1 },
+              function (err, managers) {
+                if (err != null) {
+                  return next(err)
+                }
+                return res.render(
+                  Path.resolve(__dirname, '../views/subscription/show'),
+                  { subscription, user_id, members, managers }
+                )
+              }
             )
-          })
-        }
-      )
-    })
+          }
+        )
+      }
+    )
   },
 
   ALLOWED_ATTRIBUTES: [
@@ -91,7 +92,7 @@ module.exports = SubscriptionAdminController = {
     return Subscription.findAndModify(
       { _id: subscription_id },
       { $set: update },
-      function(error, subscription) {
+      function (error, subscription) {
         if (error != null) {
           return next(error)
         }
@@ -99,7 +100,7 @@ module.exports = SubscriptionAdminController = {
           [subscription.admin_id].concat(subscription.member_ids),
           (user_id, callback) =>
             FeaturesUpdater.refreshFeatures(user_id, true, callback),
-          function(error) {
+          function (error) {
             if (error != null) {
               return next(error)
             }
@@ -125,7 +126,7 @@ module.exports = SubscriptionAdminController = {
     update.admin_id = req.body.admin_id
     update.manager_ids = [req.body.admin_id]
     logger.log({ update }, 'creating subscription via admin panel')
-    return new Subscription(update).save(function(error, subscription) {
+    return new Subscription(update).save(function (error, subscription) {
       if (error != null) {
         return next(error)
       }
@@ -139,13 +140,14 @@ module.exports = SubscriptionAdminController = {
       { subscription_id },
       'received admin request to delete subscription'
     )
-    return SubscriptionUpdater.deleteSubscription(subscription_id, function(
-      err
-    ) {
-      if (err != null) {
-        return next(err)
+    return SubscriptionUpdater.deleteSubscription(
+      subscription_id,
+      function (err) {
+        if (err != null) {
+          return next(err)
+        }
+        return res.sendStatus(204)
       }
-      return res.sendStatus(204)
-    })
+    )
   }
 }

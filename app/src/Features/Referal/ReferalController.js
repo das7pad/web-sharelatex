@@ -13,7 +13,7 @@ module.exports = {
         } else {
           const currentUser = AuthenticationController.getSessionUser(req)
           const referralId = currentUser && currentUser.referal_id
-          res.locals.buildReferalUrl = function(referralMedium) {
+          res.locals.buildReferalUrl = function (referralMedium) {
             let url = Settings.siteUrl
             if (referralId) {
               // rs=b is Referral source = bonus

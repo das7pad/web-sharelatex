@@ -30,7 +30,7 @@ module.exports = OpenInOverleafMiddleware = {
       )
     }
 
-    return Csrf.validateRequest(req, function(err) {
+    return Csrf.validateRequest(req, function (err) {
       if (req.method === 'POST' && !err) {
         return next()
       }

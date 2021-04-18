@@ -53,7 +53,7 @@ function attachViewIncludesReloadMiddleware(webRouter) {
   if (RELOAD_MODULE_VIEWS_ON_EACH_REQUEST) {
     webRouter.use((req, res, next) => {
       const actualRender = res.render
-      res.render = function() {
+      res.render = function () {
         loadViewIncludes()
         actualRender.apply(res, arguments)
       }

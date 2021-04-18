@@ -96,8 +96,8 @@ module.exports = {
               inviteToken: invite.token,
               hasIndividualRecurlySubscription,
               expired: req.query.expired
-        })
-      }
+            })
+          }
         )
       }
     )

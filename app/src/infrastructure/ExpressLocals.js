@@ -36,8 +36,8 @@ module.exports = function (app, webRouter) {
 
   webRouter.use(function (req, res, next) {
     const actualRender = res.render
-    res.render = function() {
-      res.locals.translate = function(key, vars, components) {
+    res.render = function () {
+      res.locals.translate = function (key, vars, components) {
         vars = vars || {}
         if (Settings.i18n.checkForHTMLInVars) {
           Object.entries(vars).forEach(([field, value]) => {

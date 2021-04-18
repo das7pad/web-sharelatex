@@ -17,11 +17,9 @@ import { localStorage } from '../../../modules/storage'
 
 export default App.controller(
   'FileTreeFolderController',
-  function ($scope,
-  ide,
-  $modal
-) {
-  $scope.expanded = localStorage(`folder.${$scope.entity.id}.expanded`) || false
+  function ($scope, ide, $modal) {
+    $scope.expanded =
+      localStorage(`folder.${$scope.entity.id}.expanded`) || false
 
     $scope.toggleExpanded = function () {
       $scope.expanded = !$scope.expanded

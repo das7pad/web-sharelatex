@@ -35,21 +35,15 @@ function makeOpeningSpan(isFileFound) {
     .css({
       'border-bottom': isFileFound ? '1px dashed #1C8B22' : '1px dashed #bb1111'
     })
-  const bracket = $('<span>')
-    .text('{')
-    .addClass('wl-label-bracket')
+  const bracket = $('<span>').text('{').addClass('wl-label-bracket')
 
-  const span = $('<span>')
-    .append(icon)
-    .append(bracket)
+  const span = $('<span>').append(icon).append(bracket)
 
   return span[0]
 }
 
 function makeClosingSpan() {
-  const span = $('<span>')
-    .text('}')
-    .addClass('wl-label-bracket')
+  const span = $('<span>').text('}').addClass('wl-label-bracket')
   return span[0]
 }
 

@@ -32,7 +32,7 @@ export default App.directive('formattingButtons', () => ({
 
     // Wait until the editor is not "opening" anymore (i.e. it's fully
     // loaded). This means we can acurately measure the element width
-    var unbindOpeningWatcher = scope.$watch('opening', function(isOpening) {
+    var unbindOpeningWatcher = scope.$watch('opening', function (isOpening) {
       if (!isOpening) {
         measure()
         setUpWindowResizeListeners()
@@ -40,7 +40,7 @@ export default App.directive('formattingButtons', () => ({
       }
     })
 
-    var measure = function() {
+    var measure = function () {
       let availableSpace = element.width()
       let noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH)
 
@@ -58,14 +58,14 @@ export default App.directive('formattingButtons', () => ({
     }
 
     var split = splitIndex =>
-      scope.$applyAsync(function() {
+      scope.$applyAsync(function () {
         scope.shownButtons = scope.buttons.slice(0, splitIndex)
         return (scope.overflowedButtons = scope.buttons.slice(splitIndex))
       })
 
     const debouncedMeasure = _.debounce(measure, 300)
 
-    var setUpWindowResizeListeners = function() {
+    var setUpWindowResizeListeners = function () {
       $(window).on('resize', debouncedMeasure)
       if (attrs.resizeOn != null) {
         return Array.from(attrs.resizeOn.split(',')).map(event =>
@@ -79,7 +79,7 @@ export default App.directive('formattingButtons', () => ({
 
     scope.$watch('$destroy', () => tearDownResizeListeners())
 
-    return scope.$watch('isFullscreenEditor', function(oldVal, newVal) {
+    return scope.$watch('isFullscreenEditor', function (oldVal, newVal) {
       if (oldVal === newVal) {
         return
       }

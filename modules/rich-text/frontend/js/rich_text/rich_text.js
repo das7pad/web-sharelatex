@@ -157,7 +157,7 @@ export default function RichText(_cm, rtAdapter) {
     attemptUpdate(false)
   }
 
-  this.enable = function() {
+  this.enable = function () {
     if (!_enabled) {
       _cm.on('cursorActivity', _cursorActivity)
       _cm.on('viewportChange', _viewportChange)
@@ -167,13 +167,13 @@ export default function RichText(_cm, rtAdapter) {
       _enabled = true
       _cm.refresh()
       _cm.scrollIntoView(null, 100)
-      ignoreErrors(function() {
+      ignoreErrors(function () {
         _cm.focus() // can get errors due to popup blockers
       })
     }
   }
 
-  this.disable = function() {
+  this.disable = function () {
     if (_enabled) {
       _cm.off('cursorActivity', _cursorActivity)
       _cm.off('viewportChange', _viewportChange)
@@ -184,13 +184,13 @@ export default function RichText(_cm, rtAdapter) {
       }
 
       // Remove every line class when disabling richText
-      _.forEach(_.range(0, _cm.doc.lineCount()), function(x) {
+      _.forEach(_.range(0, _cm.doc.lineCount()), function (x) {
         _cm.doc.removeLineClass(x, 'text')
       })
 
       _enabled = false
       _cm.refresh()
-      ignoreErrors(function() {
+      ignoreErrors(function () {
         _cm.focus() // can get errors due to popup blockers
       })
     }
@@ -204,11 +204,11 @@ export default function RichText(_cm, rtAdapter) {
 
   this.update = _updateIfEnabled
 
-  this.cmRefresh = function() {
+  this.cmRefresh = function () {
     _cm.refresh()
   }
 
-  this.isEnabled = function() {
+  this.isEnabled = function () {
     return _enabled
   }
 }

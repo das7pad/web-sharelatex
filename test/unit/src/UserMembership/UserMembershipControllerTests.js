@@ -293,7 +293,7 @@ describe('UserMembershipController', function () {
       )
     })
 
-    it('should flag the response body as attached csv file', function() {
+    it('should flag the response body as attached csv file', function () {
       return assertCalledWith(this.res.attachment, 'Group.csv')
     })
 

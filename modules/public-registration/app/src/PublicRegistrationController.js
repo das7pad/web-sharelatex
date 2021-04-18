@@ -79,76 +79,77 @@ module.exports = PublicRegistrationController = {
 
   register(req, res, next) {
     logger.log({ email: req.body.email }, 'attempted register')
-    return UserRegistrationHandler.registerNewUser(req.body, function(
-      err,
-      user
-    ) {
-      const redir =
-        AuthenticationController._getRedirectFromSession(req) || '/project'
-      if (
-        err != null &&
-        (err != null ? err.message : undefined) === 'EmailAlreadyRegistered'
-      ) {
+    return UserRegistrationHandler.registerNewUser(
+      req.body,
+      function (err, user) {
+        const redir =
+          AuthenticationController._getRedirectFromSession(req) || '/project'
         if (
-          __guard__(user != null ? user.overleaf : undefined, x => x.id) != null
+          err != null &&
+          (err != null ? err.message : undefined) === 'EmailAlreadyRegistered'
         ) {
-          return res.json({
-            message: {
-              text:
-                'You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf.'
-            }
-          })
-        } else {
-          return AuthenticationController.passportLogin(req, res, next)
-        }
-      } else if (err != null) {
-        return next(err)
-      } else {
-        metrics.inc('user.register.success')
-
-        // send mail in the background
-        UserEmailsConfirmationHandler.sendConfirmationEmail(
-          user._id,
-          user.email,
-          'welcome',
-          function() {}
-        )
-
-        return req.login(user, function(err) {
-          if (err != null) {
-            return callback(err)
+          if (
+            __guard__(user != null ? user.overleaf : undefined, x => x.id) !=
+            null
+          ) {
+            return res.json({
+              message: {
+                text:
+                  'You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf.'
+              }
+            })
+          } else {
+            return AuthenticationController.passportLogin(req, res, next)
           }
-          req.session.justRegistered = true
-          AnalyticsManager.identifyUser(user._id, req.sessionID)
-          // copy to the old `session.user` location, for backward-comptability
-          req.session.user = req.session.passport.user
-          AuthenticationController._clearRedirectFromSession(req)
+        } else if (err != null) {
+          return next(err)
+        } else {
+          metrics.inc('user.register.success')
 
-          // ignoring errors on these methods. We expect them to log errors, but we want to
-          // continue if the fail as the user has already successfully registered and we dont
-          // want to show them an error page beyond this point.
-          return UserSessionsManager.trackSession(user, req.sessionID, () =>
-            UserHandler.populateTeamInvites(user, () =>
-              ReferalAllocator.allocate(
-                req.session.referal_id,
-                user._id,
-                req.session.referal_source,
-                req.session.referal_medium,
-                () =>
-                  res.json({
-                    redir,
-                    id: user._id.toString(),
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    email: user.email,
-                    created: Date.now()
-                  })
+          // send mail in the background
+          UserEmailsConfirmationHandler.sendConfirmationEmail(
+            user._id,
+            user.email,
+            'welcome',
+            function () {}
+          )
+
+          return req.login(user, function (err) {
+            if (err != null) {
+              return callback(err)
+            }
+            req.session.justRegistered = true
+            AnalyticsManager.identifyUser(user._id, req.sessionID)
+            // copy to the old `session.user` location, for backward-comptability
+            req.session.user = req.session.passport.user
+            AuthenticationController._clearRedirectFromSession(req)
+
+            // ignoring errors on these methods. We expect them to log errors, but we want to
+            // continue if the fail as the user has already successfully registered and we dont
+            // want to show them an error page beyond this point.
+            return UserSessionsManager.trackSession(user, req.sessionID, () =>
+              UserHandler.populateTeamInvites(user, () =>
+                ReferalAllocator.allocate(
+                  req.session.referal_id,
+                  user._id,
+                  req.session.referal_source,
+                  req.session.referal_medium,
+                  () =>
+                    res.json({
+                      redir,
+                      id: user._id.toString(),
+                      first_name: user.first_name,
+                      last_name: user.last_name,
+                      email: user.email,
+                      created: Date.now()
+                    })
+                )
               )
             )
-          )
-        })
+          })
+        }
       }
-    })
+    )
   }
 }
 

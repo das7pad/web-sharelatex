@@ -4,7 +4,7 @@ const { buildCssPath, buildFontPath, buildImgPath } = require('./WebpackAssets')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 
-module.exports = function(app, webRouter) {
+module.exports = function (app, webRouter) {
   if (Settings.addResourceHints) {
     webRouter.use(getPreloadMiddleware(app))
   }
@@ -82,7 +82,7 @@ function getPreloadMiddleware() {
 
   return function preloadMiddleware(req, res, next) {
     const actualRender = res.render
-    res.render = function(view, locals, cb) {
+    res.render = function (view, locals, cb) {
       let headerValue
       switch (view) {
         case 'project/list':

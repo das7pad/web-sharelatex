@@ -91,7 +91,7 @@ module.exports = WikiController = {
       }
     }
 
-    return async.parallel(jobs, function(error, results) {
+    return async.parallel(jobs, function (error, results) {
       if (error != null) {
         return next(error)
       }
@@ -114,7 +114,7 @@ module.exports = WikiController = {
 
         return WikiController._renderPage(pageData, contents, preview, res)
       } else {
-        return WikiController._getPageContent(page, function(error, pageData) {
+        return WikiController._getPageContent(page, function (error, pageData) {
           if (error != null) {
             return next(error)
           }
@@ -141,7 +141,7 @@ module.exports = WikiController = {
     // the callback parameter `data` has a signature of `{content: "", title: ""}`
     // @param {string} page
     if (callback == null) {
-      callback = function(error, data) {}
+      callback = function (error, data) {}
     }
     return request(
       {
@@ -153,7 +153,7 @@ module.exports = WikiController = {
           redirects: true
         }
       },
-      function(err, response, data) {
+      function (err, response, data) {
         if (err != null) {
           return callback(err)
         }

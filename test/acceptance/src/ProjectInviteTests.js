@@ -519,7 +519,7 @@ describe('ProjectInviteTests', function () {
         this.user.login(done)
       })
 
-      describe('user is already a member of the project', function() {
+      describe('user is already a member of the project', function () {
         beforeEach(function checkExpectInvitePage(done) {
           expectInvitePage(this.user, this.link, done)
         })

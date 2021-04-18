@@ -81,7 +81,7 @@ export default function LatexMode() {
   }
 
   function _defer(state, tokenizer) {
-    _push(state, function(stream, state) {
+    _push(state, function (stream, state) {
       _pop(state)
       return tokenizer(stream, state)
     })
@@ -202,7 +202,7 @@ export default function LatexMode() {
   ) {
     if (stream.match(open)) {
       _openMark(stream, state, kind, openPos)
-      _push(state, function(stream, state) {
+      _push(state, function (stream, state) {
         if (_matchBlankLine(stream)) {
           _abandonMark(stream, state)
           return _popAndResume(stream, state)
@@ -303,7 +303,7 @@ export default function LatexMode() {
     innerMode
   ) {
     if (stream.match(open)) {
-      _push(state, function(stream, state) {
+      _push(state, function (stream, state) {
         if (_matchBlankLine(stream)) {
           _pop(state)
         } else if (stream.match(close)) {
@@ -334,7 +334,7 @@ export default function LatexMode() {
    */
   function _matchGroup(stream, state, innerMode) {
     if (stream.eat('{')) {
-      _push(state, function(stream, state) {
+      _push(state, function (stream, state) {
         if (stream.eat('}')) {
           _pop(state)
           return 'bracket'
@@ -385,7 +385,7 @@ export default function LatexMode() {
       stream.match(/^\\title/)
       // want to capture the full title
       var openPos = _startPos(stream, state)
-      _defer(state, function(stream, state) {
+      _defer(state, function (stream, state) {
         return _matchAndMarkRequiredArgument(
           stream,
           state,
@@ -395,7 +395,7 @@ export default function LatexMode() {
         )
       })
       // may have a short title as an optional argument, which we ignore
-      _defer(state, function(stream, state) {
+      _defer(state, function (stream, state) {
         return _matchOptionalArgument(stream, state, _matchText)
       })
       return 'tag'
@@ -462,7 +462,7 @@ export default function LatexMode() {
     if (stream.match(commandInfo.lookaheadPattern, false)) {
       stream.match(commandInfo.matchPattern)
       var openPos = _startPos(stream, state)
-      _defer(state, function(stream, state) {
+      _defer(state, function (stream, state) {
         return _matchAndMarkRequiredArgument(
           stream,
           state,
@@ -478,7 +478,7 @@ export default function LatexMode() {
   function _matchBibCommand(stream, state) {
     var currentVal
     var returnVal = null
-    _.keys(_bibCommands).forEach(function(command) {
+    _.keys(_bibCommands).forEach(function (command) {
       currentVal = _matchCommandWithArgument(stream, state, command)
       if (currentVal) {
         returnVal = currentVal
@@ -528,7 +528,7 @@ export default function LatexMode() {
     var verbMatch = stream.match(/^\\verb\*?([^a-zA-Z])/)
     if (verbMatch) {
       var verbEnd = verbMatch[1]
-      _push(state, function(stream, state) {
+      _push(state, function (stream, state) {
         if (stream.match(verbEnd)) {
           _pop(state)
           return 'tag'
@@ -578,7 +578,7 @@ export default function LatexMode() {
     if (stream.match(commandInfo.lookaheadPattern, false)) {
       stream.match(commandInfo.matchPattern)
       var openPos = _startPos(stream, state)
-      _defer(state, function(stream, state) {
+      _defer(state, function (stream, state) {
         return _matchAndMarkRequiredArgument(
           stream,
           state,
@@ -587,7 +587,7 @@ export default function LatexMode() {
           _matchText
         )
       })
-      _defer(state, function(stream, state) {
+      _defer(state, function (stream, state) {
         return _matchAndMarkOptionalArgument(
           stream,
           state,
@@ -796,55 +796,64 @@ export default function LatexMode() {
   }
 
   function _matchEnvironments(stream, state, environments) {
-    return _lookaheadForBeginEnvironments(stream, state, environments, function(
+    return _lookaheadForBeginEnvironments(
       stream,
       state,
-      envConfig
-    ) {
-      var mark, markOpenPos, markClosePos
+      environments,
+      function (stream, state, envConfig) {
+        var mark, markOpenPos, markClosePos
 
-      mark = Object.prototype.hasOwnProperty.call(envConfig, 'kind')
-      if (mark) {
-        markOpenPos = _startPos(stream, state)
-      }
-
-      return _matchBeginEnvironmentSequence(stream, state, function(
-        stream,
-        state
-      ) {
+        mark = Object.prototype.hasOwnProperty.call(envConfig, 'kind')
         if (mark) {
-          var openMark = _openMark(stream, state, envConfig.kind, markOpenPos)
-          openMark.checkedProperties.openMarksCount = state.openMarks.length - 1
+          markOpenPos = _startPos(stream, state)
         }
-        _push(state, _matchEnvironment)
-      })
 
-      function _matchEnvironment(stream, state) {
-        if (!envConfig.allowBlankLines && _matchBlankLine(stream)) {
-          if (mark) {
-            _abandonMark(stream, state)
-          }
-          return _popAndResume(stream, state)
-        } else if (stream.match(envConfig.endPattern, false)) {
-          if (mark) {
-            markClosePos = _startPos(stream, state)
-          }
-          _pop(state)
-          return _matchEndEnvironmentSequence(stream, state, function(
-            stream,
-            state
-          ) {
+        return _matchBeginEnvironmentSequence(
+          stream,
+          state,
+          function (stream, state) {
             if (mark) {
-              var closedMark = _closeMark(stream, state, markClosePos)
-              closedMark.checkedProperties.openMarksCount =
-                state.openMarks.length
+              var openMark = _openMark(
+                stream,
+                state,
+                envConfig.kind,
+                markOpenPos
+              )
+              openMark.checkedProperties.openMarksCount =
+                state.openMarks.length - 1
             }
-          })
-        } else {
-          return envConfig.tokenizer(stream, state)
+            _push(state, _matchEnvironment)
+          }
+        )
+
+        function _matchEnvironment(stream, state) {
+          if (!envConfig.allowBlankLines && _matchBlankLine(stream)) {
+            if (mark) {
+              _abandonMark(stream, state)
+            }
+            return _popAndResume(stream, state)
+          } else if (stream.match(envConfig.endPattern, false)) {
+            if (mark) {
+              markClosePos = _startPos(stream, state)
+            }
+            _pop(state)
+            return _matchEndEnvironmentSequence(
+              stream,
+              state,
+              function (stream, state) {
+                if (mark) {
+                  var closedMark = _closeMark(stream, state, markClosePos)
+                  closedMark.checkedProperties.openMarksCount =
+                    state.openMarks.length
+                }
+              }
+            )
+          } else {
+            return envConfig.tokenizer(stream, state)
+          }
         }
       }
-    })
+    )
   }
 
   function _matchCommand(stream, state, command, markKind) {
@@ -858,9 +867,9 @@ export default function LatexMode() {
 
   function _matchOtherEnvironmentBeginOrEnd(stream, state) {
     if (stream.match(/^\\begin\s*{[^}]+}/, false)) {
-      return _matchBeginEnvironmentSequence(stream, state, function() {})
+      return _matchBeginEnvironmentSequence(stream, state, function () {})
     } else if (stream.match(/^\\end\s*{[^}]+}/, false)) {
-      return _matchEndEnvironmentSequence(stream, state, function() {})
+      return _matchEndEnvironmentSequence(stream, state, function () {})
     }
   }
 
@@ -952,15 +961,16 @@ export default function LatexMode() {
    */
   function _matchEndDocument(stream, state) {
     if (stream.match(/^\\end\s*{document}/, false)) {
-      return _matchEndEnvironmentSequence(stream, state, function(
+      return _matchEndEnvironmentSequence(
         stream,
-        state
-      ) {
-        _push(state, function(stream, state) {
-          stream.skipToEnd()
-          return 'comment'
-        })
-      })
+        state,
+        function (stream, state) {
+          _push(state, function (stream, state) {
+            stream.skipToEnd()
+            return 'comment'
+          })
+        }
+      )
     }
   }
 
@@ -1053,7 +1063,7 @@ export default function LatexMode() {
     return result
   }
 
-  this.startState = function() {
+  this.startState = function () {
     // console.clear();
     return {
       stack: [_topLevel],
@@ -1062,7 +1072,7 @@ export default function LatexMode() {
       marks: []
     }
   }
-  this.blankLine = function(state) {
+  this.blankLine = function (state) {
     _token(new CodeMirror.StringStream(''), state)
   }
   this.token = _token

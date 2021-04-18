@@ -32,19 +32,19 @@ export default App.controller(
 
     eventTracking.send('pageview', 'payment_form', $scope.planCode)
 
-  $scope.switchToStudent = function() {
-    const currentPlanCode = window.plan_code
-    const planCode = currentPlanCode.replace('collaborator', 'student')
-    eventTracking.sendMB('subscription-form-switch-to-student', {
-      plan: window.plan_code
-    })
-    eventTracking.send(
-      'subscription-funnel',
-      'subscription-form-switch-to-student',
-      window.plan_code
-    )
-    window.location = `/user/subscription/new?planCode=${planCode}&currency=${$scope.currencyCode}&cc=${$scope.data.coupon}&itm_campaign=${window.ITMCampaign}&itm_content=${window.ITMContent}`
-  }
+    $scope.switchToStudent = function () {
+      const currentPlanCode = window.plan_code
+      const planCode = currentPlanCode.replace('collaborator', 'student')
+      eventTracking.sendMB('subscription-form-switch-to-student', {
+        plan: window.plan_code
+      })
+      eventTracking.send(
+        'subscription-funnel',
+        'subscription-form-switch-to-student',
+        window.plan_code
+      )
+      window.location = `/user/subscription/new?planCode=${planCode}&currency=${$scope.currencyCode}&cc=${$scope.data.coupon}&itm_campaign=${window.ITMCampaign}&itm_content=${window.ITMContent}`
+    }
 
     eventTracking.sendMB('subscription-form', { plan: window.plan_code })
     eventTracking.send(
@@ -101,7 +101,7 @@ export default App.controller(
       }
     })
 
-  const pricing = recurly.Pricing()
+    const pricing = recurly.Pricing()
 
     pricing
       .plan(window.plan_code, { quantity: 1 })

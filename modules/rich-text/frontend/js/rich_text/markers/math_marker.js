@@ -36,22 +36,18 @@ const MathMarker = {
 
 function makeInlineMath(math) {
   var mathEl = $('<script type="math/tex">').text(math)
-  var spanEl = $('<span>')
-    .append(mathEl)
-    .css({ 'font-family': 'Times' })
+  var spanEl = $('<span>').append(mathEl).css({ 'font-family': 'Times' })
   return spanEl[0]
 }
 
 function makeDisplayMath(math) {
   var mathEl = $('<script type="math/tex; mode=display">').text(math)
-  var divEl = $('<div>')
-    .append(mathEl)
-    .css({
-      'text-align': 'center',
-      'font-family': 'Times',
-      'padding-bottom': '10pt',
-      'padding-top': '10pt'
-    })
+  var divEl = $('<div>').append(mathEl).css({
+    'text-align': 'center',
+    'font-family': 'Times',
+    'padding-bottom': '10pt',
+    'padding-top': '10pt'
+  })
   return divEl[0]
 }
 

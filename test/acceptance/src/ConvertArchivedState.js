@@ -13,7 +13,7 @@ describe('ConvertArchivedState', function () {
   let projectThree, projectThreeId
   let projectFour, projectFourId
 
-  before(function(done) {
+  before(function (done) {
     const scriptPath = Path.join(
       __dirname,
       '../../../scripts/convert_archived_state.js'

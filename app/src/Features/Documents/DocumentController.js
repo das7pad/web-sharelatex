@@ -68,8 +68,8 @@ module.exports = {
                   return res.send(lines.join('\n'))
                 } else {
                   const projectHistory =
-                  (project.overleaf && project.overleaf.history) || {}
-                const projectHistoryId = projectHistory.id
+                    (project.overleaf && project.overleaf.history) || {}
+                  const projectHistoryId = projectHistory.id
                   const projectHistoryType = projectHistory.display
                     ? 'project-history'
                     : undefined // for backwards compatibility, don't send anything if the project is still on track-changes

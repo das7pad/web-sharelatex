@@ -583,7 +583,7 @@ describe('AuthenticationController', function () {
   })
 
   describe('requireOauth', function () {
-    before(function() {
+    before(function () {
       this.skip()
     })
 
@@ -1327,7 +1327,7 @@ describe('AuthenticationController', function () {
         this.UserHandler.setupLoginData.calledWith(this.user).should.equal(true)
       })
 
-      it('should record the successful login', function() {
+      it('should record the successful login', function () {
         this.AuthenticationController._recordSuccessfulLogin
           .calledWith(this.user._id)
           .should.equal(true)

@@ -10,8 +10,8 @@ const MODULE_PATH = Path.join(
   '../../../../app/src/infrastructure/ExpressLocals.js'
 )
 
-describe('ExpressLocalsTests', function() {
-  beforeEach(function() {
+describe('ExpressLocalsTests', function () {
+  beforeEach(function () {
     this.settings = {
       cdn: { web: { host: '' } },
       i18n: {
@@ -38,7 +38,7 @@ describe('ExpressLocalsTests', function() {
         },
         staticPath
       },
-      'logger-sharelatex': { log: function() {} },
+      'logger-sharelatex': { log: function () {} },
       '@overleaf/settings': this.settings,
       '../Features/Subscription/SubscriptionFormatters': {},
       '../Features/SystemMessages/SystemMessageManager': {},
@@ -91,12 +91,12 @@ describe('ExpressLocalsTests', function() {
     }
   })
 
-  describe('app.locals', function() {
-    beforeEach(function() {
+  describe('app.locals', function () {
+    beforeEach(function () {
       this.require()
     })
 
-    it('should set basic functions', function() {
+    it('should set basic functions', function () {
       expect(this.app.locals.staticPath).to.exist
       expect(this.app.locals.buildJsPath).to.exist
       expect(this.app.locals.buildCssPath).to.exist

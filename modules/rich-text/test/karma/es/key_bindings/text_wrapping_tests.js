@@ -10,8 +10,8 @@ const autocompleteAdapterStub = {
   getBeginCommandArguments: () => ['environmentName']
 }
 
-describe('Text wrapping', function() {
-  beforeEach(function() {
+describe('Text wrapping', function () {
+  beforeEach(function () {
     this.editor = new Editor(
       fixture.load(TEXTAREA_HTML),
       {},
@@ -22,11 +22,11 @@ describe('Text wrapping', function() {
     this.cm = this.editor.getCodeMirror()
   })
 
-  afterEach(function() {
+  afterEach(function () {
     fixture.cleanUp()
   })
 
-  it('wraps with \\textbf', function() {
+  it('wraps with \\textbf', function () {
     this.cm.setValue('foo')
     this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 3 }) // Select all
 
@@ -35,7 +35,7 @@ describe('Text wrapping', function() {
     expect(this.cm.getValue()).to.equal('\\textbf{foo}')
   })
 
-  it('wraps with \\textit', function() {
+  it('wraps with \\textit', function () {
     this.cm.setValue('foo')
     this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 3 }) // Select all
 
@@ -80,13 +80,13 @@ describe('Text wrapping', function() {
   //   expect(_cm.getValue()).toEqual('\\[foo\\]')
   // })
 
-  it('inserts empty mark if nothing selected', function() {
+  it('inserts empty mark if nothing selected', function () {
     TextWrapping.wrapBold(this.cm)
 
     expect(this.cm.getValue()).to.equal('\\textbf{}')
   })
 
-  it('inserts if selection head before anchor', function() {
+  it('inserts if selection head before anchor', function () {
     this.cm.setValue('foo')
     this.cm.setSelection({ line: 0, ch: 3 }, { line: 0, ch: 0 })
 
@@ -95,7 +95,7 @@ describe('Text wrapping', function() {
     expect(this.cm.getValue()).to.equal('\\textbf{foo}')
   })
 
-  it('maintains selection after wrapping', function() {
+  it('maintains selection after wrapping', function () {
     this.cm.setValue('foo')
     this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 3 })
 
@@ -109,7 +109,7 @@ describe('Text wrapping', function() {
     expect(this.cm.getRange(selection.from(), selection.to())).to.equal('foo')
   })
 
-  it('removes unnecessary marks of the same kind within the wrap', function() {
+  it('removes unnecessary marks of the same kind within the wrap', function () {
     this.cm.setValue('\\textbf{foo} \\textbf{bar} baz')
     this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 46 }) // Select all
 
@@ -127,7 +127,7 @@ describe('Text wrapping', function() {
   //   expect(_cm.getValue()).toEqual('\\section*{foo}')
   // })
 
-  it('does not wrap if already nested within outer bold or italic mark', function() {
+  it('does not wrap if already nested within outer bold or italic mark', function () {
     this.cm.setValue('\\textbf{\\textit{foo}}')
     this.cm.setSelection({ line: 0, ch: 16 }, { line: 0, ch: 19 })
 
@@ -141,7 +141,7 @@ describe('Text wrapping', function() {
     // to wrap in \textbf/
   })
 
-  it('removes existing bold or italic mark if entire content is selected', function() {
+  it('removes existing bold or italic mark if entire content is selected', function () {
     this.cm.setValue('\\textbf{foo}')
     // Select all content - "foo"
     this.cm.setSelection({ line: 0, ch: 8 }, { line: 0, ch: 11 })
@@ -151,7 +151,7 @@ describe('Text wrapping', function() {
     expect(this.cm.getValue()).to.equal('foo')
   })
 
-  it('moves selection before bold or italic mark if selection starts at beginning of content', function() {
+  it('moves selection before bold or italic mark if selection starts at beginning of content', function () {
     this.cm.setValue('\\textbf{foo bar}')
     // Select from beginning of content - "foo", but not " bar"
     this.cm.setSelection({ line: 0, ch: 8 }, { line: 0, ch: 11 })
@@ -162,7 +162,7 @@ describe('Text wrapping', function() {
     expect(this.cm.getValue()).to.equal('foo \\textbf{bar}')
   })
 
-  it('moves selection after bold or italic mark if selection ends at end of content', function() {
+  it('moves selection after bold or italic mark if selection ends at end of content', function () {
     this.cm.setValue('\\textbf{foo bar}')
     // Select from end of content - "bar", but not "foo"
     this.cm.setSelection({ line: 0, ch: 12 }, { line: 0, ch: 15 })
@@ -173,7 +173,7 @@ describe('Text wrapping', function() {
     expect(this.cm.getValue()).to.equal('\\textbf{foo} bar')
   })
 
-  it('extracts the selection out of a bold or italic mark when attempting wrap an existing mark', function() {
+  it('extracts the selection out of a bold or italic mark when attempting wrap an existing mark', function () {
     this.cm.setValue('\\textbf{foo bar baz}')
     // Select within the content - "bar", but not "foo " or " baz"
     this.cm.setSelection({ line: 0, ch: 12 }, { line: 0, ch: 15 })
@@ -184,7 +184,7 @@ describe('Text wrapping', function() {
     expect(this.cm.getValue()).to.equal('\\textbf{foo} bar \\textbf{baz}')
   })
 
-  it('handles newlines when extracting selection out of a bold or italic mark when attempting to wrap an existing mark', function() {
+  it('handles newlines when extracting selection out of a bold or italic mark when attempting to wrap an existing mark', function () {
     this.cm.setValue('\\textbf{foo bar \nbaz}')
     // Select multiple lines - "bar\n"
     this.cm.setSelection({ line: 0, ch: 12 }, { line: 1, ch: 0 })

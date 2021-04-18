@@ -73,7 +73,7 @@ describe('ProjectDownloadsController', function () {
       return this.stream.pipe.calledWith(this.res).should.equal(true)
     })
 
-    it('should flush the project to mongo', function() {
+    it('should flush the project to mongo', function () {
       return this.DocumentUpdaterHandler.flushProjectToMongo
         .calledWith(this.project_id)
         .should.equal(true)
@@ -127,7 +127,7 @@ describe('ProjectDownloadsController', function () {
       return this.stream.pipe.calledWith(this.res).should.equal(true)
     })
 
-    it('should flush the projects to mongo', function() {
+    it('should flush the projects to mongo', function () {
       return this.DocumentUpdaterHandler.flushMultipleProjectsToMongo
         .calledWith(this.project_ids)
         .should.equal(true)

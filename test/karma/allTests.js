@@ -1,7 +1,7 @@
 const glob = require('glob')
 const CTX = { cwd: __dirname }
 
-module.exports = function() {
+module.exports = function () {
   return {
     code: []
       .concat(glob.sync('../../test/karma/*/**/*.js', CTX))
