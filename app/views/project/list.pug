@@ -11,6 +11,7 @@ block content
 	meta(name="ol-notificationsInstitution" data-type="json" content=notificationsInstitution)
 	meta(name="ol-userAffiliations" data-type="json" content=userAffiliations)
 	meta(name="ol-userEmails" data-type="json" content=userEmails)
+	meta(name="ol-userHasNoSubscription" data-type="boolean" content=!!(settings.enableSubscriptions && !hasSubscription))
 	meta(name="ol-allInReconfirmNotificationPeriods" data-type="json" content=allInReconfirmNotificationPeriods)
 	meta(name="ol-reconfirmedViaSAML" content=reconfirmedViaSAML)
 	meta(name="ol-algolia" data-type="json" content={
@@ -59,5 +60,3 @@ block content
 								include ./list/_notifications
 
 		include ./list/_modals
-
-	//- include ./list/_front-chat

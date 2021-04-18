@@ -1,11 +1,12 @@
 extends ../../../../app/views/_layout
 
-block content
+block append meta
 	meta(name="ol-wsUrl" content=wsUrl)
 	meta(name="ol-adminUserExists" data-type="boolean" content=adminUserExists)
 	meta(name="ol-ideJsPath" content=buildJsPath('ide.js'))
 	meta(name="ol-authMethod" content=authMethod)
 
+block content
 	style.
 		hr { margin-bottom: 5px; }
 		.status-check {

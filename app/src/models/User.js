@@ -1,6 +1,6 @@
 const Settings = require('@overleaf/settings')
 const mongoose = require('../infrastructure/Mongoose')
-const uuid = require('uuid')
+const TokenGenerator = require('../Features/TokenGenerator/TokenGenerator')
 const { Schema } = mongoose
 const { ObjectId } = Schema
 
@@ -141,7 +141,7 @@ const UserSchema = new Schema({
   referal_id: {
     type: String,
     default() {
-      return uuid.v4().split('-')[0]
+      return TokenGenerator.generateReferralId()
     }
   },
   refered_users: [{ type: ObjectId, ref: 'User' }],

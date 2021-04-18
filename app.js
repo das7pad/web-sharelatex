@@ -25,10 +25,7 @@ const OError = require('@overleaf/o-error')
 const Server = require('./app/src/infrastructure/Server')
 const mongodb = require('./app/src/infrastructure/mongodb')
 const mongoose = require('./app/src/infrastructure/Mongoose')
-const Queues = require('./app/src/infrastructure/Queues')
 const { waitForBuild } = require('./app/src/infrastructure/WebpackAssets')
-
-Queues.initialize()
 
 const port = Settings.port || Settings.internal.web.port || 3000
 const host = Settings.internal.web.host || 'localhost'
