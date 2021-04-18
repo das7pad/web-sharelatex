@@ -18,25 +18,23 @@ describe('EmailSender', function() {
 
     this.Settings = {
       email: {
-        transport: 'ses',
+        transport: 'smtp',
         parameters: {
-          AWSAccessKeyID: 'key',
-          AWSSecretKey: 'secret'
+          host: 'foo',
+          port: 1337
         },
         fromAddress: 'bob@bob.com',
         replyToAddress: 'sally@gmail.com'
       }
     }
 
-    this.sesClient = { sendMail: sinon.stub().resolves() }
+    this.sesClient = this.smtpClient = { sendMail: sinon.stub().resolves() }
 
-    this.ses = { createTransport: () => this.sesClient }
+    this.nodemailer = { createTransport: () => this.smtpClient }
 
     this.EmailSender = SandboxedModule.require(MODULE_PATH, {
       requires: {
-        nodemailer: this.ses,
-        'nodemailer-ses-transport': sinon.stub(),
-        'nodemailer-mandrill-transport': {},
+        nodemailer: this.nodemailer,
         '@overleaf/settings': this.Settings,
         '../../infrastructure/RateLimiter': this.RateLimiter,
         '@overleaf/metrics': {
