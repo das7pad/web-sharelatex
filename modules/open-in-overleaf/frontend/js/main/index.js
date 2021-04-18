@@ -1,12 +1,12 @@
 import App from '../../../../../frontend/js/base'
 import getMeta from '../../../../../frontend/js/utils/meta'
 import showFakeProgress from '../../../../../frontend/js/utils/loadingScreen'
+import { localStorage } from '../../../../../frontend/js/modules/storage'
 
 // For integration-module
 export default App.controller('OpenInOverleafGatewayController', function(
   $scope,
-  $http,
-  localStorage
+  $http
 ) {
   $scope.error = false
 

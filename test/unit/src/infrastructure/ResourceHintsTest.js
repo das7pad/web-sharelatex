@@ -27,6 +27,9 @@ describe('ResourceHints', function() {
         buildCssPath(themeModifier) {
           return `/stylesheets/${themeModifier}style.css`
         },
+        buildFontPath(name) {
+          return '/fonts/' + name
+        },
         buildImgPath(path) {
           return '/img/' + path
         },

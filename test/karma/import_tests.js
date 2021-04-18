@@ -55,5 +55,3 @@ insertMeta('ol-staticPath', '/base/public')
 
 // Import from the top-level any JS files within a test/karma
 // directory
-const context = require.context('../../', true, /test\/karma\/.*\.js$/)
-context.keys().forEach(context)

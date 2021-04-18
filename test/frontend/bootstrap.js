@@ -1,16 +1,3 @@
-// Run babel on tests to allow support for import/export statements in Node
-require('@babel/register')
-
-// Load JSDOM to mock the DOM in Node
-// Set pretendToBeVisual to enable requestAnimationFrame
-require('jsdom-global')(undefined, { pretendToBeVisual: true })
-
-const path = require('path')
-process.env.SHARELATEX_CONFIG = path.resolve(
-  __dirname,
-  '../../config/settings.webpack.coffee'
-)
-
 // Load sinon-chai assertions so expect(stubFn).to.have.been.calledWith('abc')
 // has a nicer failure messages
 const chai = require('chai')
@@ -70,6 +57,8 @@ insertMeta('ol-appName', 'Overleaf')
 insertMeta('ol-maxEntitiesPerProject', 10)
 insertMeta('ol-maxUploadSize', 5 * 1024 * 1024)
 
-// ignore CSS files
-const { addHook } = require('pirates')
-addHook(() => '', { exts: ['.css'], ignoreNodeModules: false })
+// Work around bundler hack in react-dom
+// esbuild does not populate the obfuscated require call when bundling.
+// https://github.com/facebook/react/blob/f04bcb8139cfa341640ea875c2eae15523ae9cd9/packages/shared/enqueueTask.js#L14-L47
+const { MessageChannel } = require('worker_threads')
+global.MessageChannel = MessageChannel

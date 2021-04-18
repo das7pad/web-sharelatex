@@ -43,13 +43,12 @@
 
 !/.prettierignore
 
-!/Gruntfile.js
+!/esbuild
+!/esbuild.js
 
 !/karma.conf.js
 
-!/webpack.config.js
-!/webpack.config.prod.js
-!/webpack.config.test.js
+!/populatePublicVendor.js
 
 !/.eastrc
 # tool config #

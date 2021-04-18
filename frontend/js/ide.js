@@ -29,7 +29,7 @@ import PdfManager from './ide/pdf/PdfManager'
 import BinaryFilesManager from './ide/binary-files/BinaryFilesManager'
 import ReferencesManager from './ide/references/ReferencesManager'
 import MetadataManager from './ide/metadata/MetadataManager'
-import ReviewPanelManager from './ide/review-panel/ReviewPanelManager'
+import './ide/review-panel/ReviewPanelManager'
 import OutlineManager from './features/outline/outline-manager'
 import SafariScrollPatcher from './ide/SafariScrollPatcher'
 import './ide/cobranding/CobrandingDataService'
@@ -63,12 +63,12 @@ import '../../modules/modules-ide'
 import getMeta from './utils/meta'
 import './shared/context/controllers/root-context-controller'
 import './features/editor-navigation-toolbar/controllers/editor-navigation-toolbar-controller'
+import { localStorage } from './modules/storage'
 
 App.controller('IdeController', function(
   $scope,
   $timeout,
   ide,
-  localStorage,
   eventTracking,
   metadata,
   $q,

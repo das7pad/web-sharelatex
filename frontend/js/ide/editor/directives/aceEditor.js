@@ -23,6 +23,7 @@ import '../../metadata/services/metadata'
 import '../../graphics/services/graphics'
 import '../../preamble/services/preamble'
 import '../../files/services/files'
+import { localStorage } from '../../../modules/storage'
 const { EditSession } = ace.require('ace/edit_session')
 const ModeList = ace.require('ace/ext/modelist')
 const { Vim } = ace.require('ace/keyboard/vim')
@@ -38,13 +39,29 @@ ace.config.setDefaultValue('session', 'useWorker', false)
 // CSP disallows loading JS from the main origin.
 ace.config.set('loadWorkerFromBlob', true)
 
-App.directive('aceEditor', function(
+const deps = [
+  'ide',
+  '$timeout',
+  '$compile',
+  '$rootScope',
+  'eventTracking',
+  '$cacheFactory',
+  'metadata',
+  'graphics',
+  'preamble',
+  'files',
+  '$http',
+  '$q',
+  '$window'
+]
+App.directive('aceEditor', [...deps, aceEditorDirective])
+
+function aceEditorDirective(
   ide,
   $timeout,
   $compile,
   $rootScope,
   eventTracking,
-  localStorage,
   $cacheFactory,
   metadata,
   graphics,
@@ -937,7 +954,7 @@ App.directive('aceEditor', function(
 </div>\
 `
   }
-})
+}
 
 function monkeyPatchSearch($rootScope, $compile) {
   const searchHtml = `\

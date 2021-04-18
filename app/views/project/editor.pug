@@ -5,6 +5,9 @@ block vars
 	- var suppressFooter = true
 	- metadata.robotsNoindexNofollow = true
 
+block _headLinks
+	link(rel="stylesheet", href=buildJsPath('ide.js.css'))
+
 block content
 	.editor(ng-controller="IdeController").full-size
 		//- required by react2angular-shared-context, must be rendered as a top level component
@@ -177,6 +180,7 @@ block content
 	meta(name="ol-wikiEnabled" data-type="boolean" content=!!(settings.apis.wiki && settings.apis.wiki.url))
 	meta(name="ol-gitBridgePublicBaseUrl" content=gitBridgePublicBaseUrl)
 	meta(name="ol-useShareJsHash" data-type="boolean" content=true)
+	meta(name="ol-mathJaxEntrypoint" content=buildMathJaxEntrypoint())
 	meta(name="ol-wsUrl" content=wsUrl)
 	meta(name="ol-wsRetryHandshake" data-type="json" content=settings.wsRetryHandshake)
 	meta(name="ol-hasLinkUrlFeature" data-type="boolean" content=hasFeature('link-url'))
@@ -186,6 +190,6 @@ block content
 
 block foot-scripts
 	script(type='text/javascript', defer, src=wsAssetUrl)
-	script(type='text/javascript', defer, src=buildJsPath(`t/${currentLngCode}.js`))
-	each file in entrypointSources('ide')
-		script(type='text/javascript' defer src=file)
+	script(type='text/javascript' defer src=buildTPath(currentLngCode))
+	each chunk in getEntrypointChunks('frontend/js/ide.js')
+		script(type="module" defer src=chunk)

@@ -120,7 +120,7 @@ export default function RichText(_cm, rtAdapter) {
       }
     }
 
-    if (newMathMarks.length > 0) {
+    if (newMathMarks.length > 0 && MathJax && MathJax.Hub) {
       const mathEls = newMathMarks.map(mark => mark.replacedWith)
       // Note: see http://docs.mathjax.org/en/latest/advanced/typeset.html for
       // why we have to reset MathJax's equation numbers when re-rendering an

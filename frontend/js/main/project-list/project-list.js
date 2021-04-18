@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import App from '../../base'
 import './services/project-list'
+import { localStorage } from '../../modules/storage'
 App.controller('ProjectPageController', function(
   $scope,
   $modal,
@@ -8,7 +9,6 @@ App.controller('ProjectPageController', function(
   queuedHttp,
   eventTracking, // eslint-disable-line camelcase
   $timeout,
-  localStorage,
   ProjectListService
 ) {
   $scope.projects = window.data.projects

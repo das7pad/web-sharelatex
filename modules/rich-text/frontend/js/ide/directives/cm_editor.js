@@ -19,10 +19,11 @@ import CursorPositionManager from '../../../../../../frontend/js/ide/editor/dire
 import CursorPositionAdapter from './cursor_position/cursor_position_adapter'
 import TrackChangesManager from '../../../../../../frontend/js/ide/editor/directives/aceEditor/track-changes/TrackChangesManager'
 import TrackChangesAdapter from './track_changes/track_changes_adapter'
+import { localStorage } from '../../../../../../frontend/js/modules/storage'
 
 export default App.directive(
   'cmEditor',
-  (ide, metadata, localStorage, $cacheFactory, $http, $q) => ({
+  (ide, metadata, $cacheFactory, $http, $q) => ({
     scope: {
       bundle: '=',
       formattingEvents: '=',

@@ -19,6 +19,10 @@ describe('<WordCountModal />', function() {
   }
 
   it('renders the translated modal title', async function() {
+    fetchMock.get('express:/project/:projectId/wordcount', () => {
+      return { status: 200, body: { texcount: {} } }
+    })
+
     render(<WordCountModal {...modalProps} />)
 
     await screen.findByText('Word Count')

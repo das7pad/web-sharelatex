@@ -2,7 +2,7 @@
 # Instead run bin/update_build_scripts from
 # https://github.com/das7pad/sharelatex-dev-env
 
-FROM node:14.16.0 AS base
+FROM node:14.16.1 AS base
 
 CMD ["node", "--expose-gc", "app.js"]
 
@@ -28,13 +28,7 @@ VOLUME /app/data
 
 USER node
 
-FROM dev as webpack
+FROM dev as dist
 USER root
 
-# generate the translations modules -- used by backend and frontend
-RUN /docker_cleanup.sh make build_lngs_full
-
-RUN /docker_cleanup.sh npm run webpack:production
-
-# precompile views
-RUN /docker_cleanup.sh make build_views_full
+RUN /docker_cleanup.sh make dist

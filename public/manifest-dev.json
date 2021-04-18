@@ -1,64 +1,39 @@
 {
-  "MathJaxBundle.js": "/js/MathJaxBundle.js",
   "entrypoints": {
-    "main": {
-      "js": [
-        "/js/libraries.js",
-        "/js/main.js"
-      ]
-    },
-    "ide": {
-      "js": [
-        "/js/libraries.js",
-        "/js/ideLibraries.js",
-        "/js/ide.js"
-      ]
-    },
-    "style": {
-      "css": [
-        "/stylesheets/style.css"
-      ],
-      "js": [
-        "/js/style.js"
-      ]
-    },
-    "light-style": {
-      "css": [
-        "/stylesheets/light-style.css"
-      ],
-      "js": [
-        "/js/light-style.js"
-      ]
-    }
+    "frontend/js/ide.js": [
+      "/js/libraries.js",
+      "/js/ideLibraries.js",
+      "/js/ide.js"
+    ],
+    "frontend/js/main.js": [
+      "/js/libraries.js",
+      "/js/main.js"
+    ]
   },
-  "libraries.js": "/js/libraries.js",
-  "ide.js": "/js/ide.js",
-  "ideLibraries.js": "/js/ideLibraries.js",
-  "ieee-style.css": "/stylesheets/iee-style.css",
-  "light-style.css": "/stylesheets/light-style.css",
-  "main.js": "/js/main.js",
-  "rich-text.js": "/js/rich-text.js",
-  "style.css": "/stylesheets/style.css",
-  "t/cs.js": "/js/t/cs.js",
-  "t/da.js": "/js/t/da.js",
-  "t/de.js": "/js/t/de.js",
-  "t/en.js": "/js/t/en.js",
-  "t/es.js": "/js/t/es.js",
-  "t/fi.js": "/js/t/fi.js",
-  "t/fr.js": "/js/t/fr.js",
-  "t/it.js": "/js/t/it.js",
-  "t/ja.js": "/js/t/ja.js",
-  "t/ko.js": "/js/t/ko.js",
-  "t/nl.js": "/js/t/nl.js",
-  "t/no.js": "/js/t/no.js",
-  "t/pl.js": "/js/t/pl.js",
-  "t/pt.js": "/js/t/pt.js",
-  "t/ru.js": "/js/t/ru.js",
-  "t/sv.js": "/js/t/sv.js",
-  "t/tr.js": "/js/t/tr.js",
-  "t/zh-CN.js": "/js/t/zh-CN.js",
-  "vendors~rich-text.js": "/js/vendors~rich-text.js",
-  "vendors~sentry.js": "/js/vendors~sentry.js",
-  "vendor/pdfjs-dist/build/pdf.worker.min.js": "/vendor/pdfjs-dist/build/pdf.worker.min.js",
-  "vendor/stylesheets/highlight-github.css": "/vendor/stylesheets/highlight-github.css"
+  "frontend/js/ide.js": "/js/ide.js",
+  "frontend/js/ide.js.css": "/js/ide.css",
+  "frontend/js/main.js": "/js/main.js",
+  "frontend/js/main.js.css": "/js/main.css",
+  "frontend/js/MathJaxBundle.js": "/js/MathJaxBundle.js",
+  "frontend/stylesheets/ieee-style.less": "/stylesheets/ieee-style.css",
+  "frontend/stylesheets/light-style.less": "/stylesheets/light-style.css",
+  "frontend/stylesheets/style.less": "/stylesheets/style.css",
+  "generated/lng/cs.js": "/js/t/cs.js",
+  "generated/lng/da.js": "/js/t/da.js",
+  "generated/lng/de.js": "/js/t/de.js",
+  "generated/lng/en.js": "/js/t/en.js",
+  "generated/lng/es.js": "/js/t/es.js",
+  "generated/lng/fi.js": "/js/t/fi.js",
+  "generated/lng/fr.js": "/js/t/fr.js",
+  "generated/lng/it.js": "/js/t/it.js",
+  "generated/lng/ja.js": "/js/t/ja.js",
+  "generated/lng/ko.js": "/js/t/ko.js",
+  "generated/lng/nl.js": "/js/t/nl.js",
+  "generated/lng/no.js": "/js/t/no.js",
+  "generated/lng/pl.js": "/js/t/pl.js",
+  "generated/lng/pt.js": "/js/t/pt.js",
+  "generated/lng/ru.js": "/js/t/ru.js",
+  "generated/lng/sv.js": "/js/t/sv.js",
+  "generated/lng/tr.js": "/js/t/tr.js",
+  "generated/lng/zh-CN.js": "/js/t/zh-CN.js"
 }

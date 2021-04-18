@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "ace/*": ["node_modules/ace-builds/src-noconflict/*"],
+      "libs/*": ["frontend/js/vendor/libs/*"]
+    }
+  }
+}

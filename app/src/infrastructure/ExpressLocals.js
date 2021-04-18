@@ -10,7 +10,8 @@ const {
   buildCssPath,
   buildImgPath,
   buildJsPath,
-  entrypointSources,
+  buildTPath,
+  getEntrypointChunks,
   staticPath
 } = require('./WebpackAssets')
 
@@ -27,8 +28,11 @@ module.exports = function(app, webRouter) {
   app.locals.buildCssPath = buildCssPath
   app.locals.buildImgPath = buildImgPath
   app.locals.buildJsPath = buildJsPath
-  app.locals.entrypointSources = entrypointSources
+  app.locals.buildTPath = buildTPath
+  app.locals.getEntrypointChunks = getEntrypointChunks
   app.locals.staticPath = staticPath
+
+  app.locals.buildMathJaxEntrypoint = () => buildJsPath('MathJaxBundle.js')
 
   webRouter.use(function(req, res, next) {
     const actualRender = res.render

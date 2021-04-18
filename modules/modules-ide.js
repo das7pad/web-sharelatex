@@ -1,8 +1,3 @@
-module.exports = function() {
-  return {
-    code: require('glob')
-      .sync('./*/frontend/js/ide/index.js', { cwd: __dirname })
-      .map(file => `import '${file}'`)
-      .join('\n')
-  }
-}
+const genLoaderTarget = require('./modules-factory')
+
+module.exports = genLoaderTarget('./*/frontend/js/ide/index.js')

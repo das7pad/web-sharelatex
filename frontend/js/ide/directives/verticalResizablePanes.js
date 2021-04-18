@@ -1,4 +1,5 @@
 import App from '../../base'
+import { localStorage } from '../../modules/storage'
 
 const layoutOptions = {
   center: {
@@ -21,7 +22,7 @@ const layoutOptions = {
   }
 }
 
-export default App.directive('verticalResizablePanes', localStorage => ({
+export default App.directive('verticalResizablePanes', () => ({
   restrict: 'A',
   link(scope, element, attrs) {
     const name = attrs.verticalResizablePanes

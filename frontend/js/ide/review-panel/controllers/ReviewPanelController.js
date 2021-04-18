@@ -18,6 +18,7 @@ import App from '../../../base'
 import EventEmitter from '../../../utils/EventEmitter'
 import ColorManager from '../../colors/ColorManager'
 import RangesTracker from '../RangesTracker'
+import { localStorage } from '../../../modules/storage'
 
 export default App.controller('ReviewPanelController', function(
   $scope,
@@ -26,8 +27,7 @@ export default App.controller('ReviewPanelController', function(
   $timeout,
   $http,
   $modal,
-  eventTracking,
-  localStorage
+  eventTracking
 ) {
   let UserTCSyncState
   const $reviewPanelEl = $element.find('#review-panel')
