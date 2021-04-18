@@ -5,26 +5,42 @@ const { handleRequest } = require('./inMemory')
 const { logWithTimestamp } = require('./utils')
 const { manifest } = require('./writeManifest')
 
-function watchAndServe({ host, port, proxyForInMemoryRequests, autoReload }) {
+function watchAndServe(options) {
+  const initialBuild = buildAndWatch(options)
+  const address = startServer(initialBuild, options)
+
+  return { manifest, address, initialBuild }
+}
+
+function startServer(initialBuild, { host, port, proxyForInMemoryRequests }) {
+  // Assume that the proxy sets all the CORS headers.
+  const setCORSHeader = !proxyForInMemoryRequests
+
   const server = http
-    .createServer((request, response) => {
+    .createServer(async (request, response) => {
       if (setCORSHeader) {
         response.setHeader(
           'Access-Control-Allow-Origin',
           request.headers.origin || '*'
         )
       }
+
+      // Wait for the initial build to finish before processing requests.
+      await initialBuild
+
       if (request.url.endsWith('/event-source')) {
-        return handleEventSourceRequest(request, response)
+        await handleEventSourceRequest(request, response)
+      } else {
+        await handleRequest(request, response)
       }
-      return handleRequest(request, response)
     })
     .listen(port, host)
-  const address = server.address()
-  // Assume that the proxy sets all the CORS headers.
-  const setCORSHeader = !proxyForInMemoryRequests
 
-  const initialBuild = buildAllConfigs({
+  return server.address()
+}
+
+function buildAndWatch({ autoReload }) {
+  return buildAllConfigs({
     isWatchMode: true,
     inMemory: true,
     autoReload
@@ -39,8 +55,6 @@ function watchAndServe({ host, port, proxyForInMemoryRequests, autoReload }) {
       )
       process.exit(1)
     })
-
-  return { manifest, address, initialBuild }
 }
 
 module.exports = { watchAndServe }
