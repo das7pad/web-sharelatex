@@ -6,6 +6,7 @@ import AccessibleModal from '../../../shared/components/accessible-modal'
 import PropTypes from 'prop-types'
 import { ReadOnlyTokenLink } from './link-sharing'
 import { Trans } from '../../../components/trans'
+import t from '../../../misc/t'
 import BetaBadge from '../../../shared/components/beta-badge'
 
 export default function ShareProjectModalContent({
