@@ -10,9 +10,12 @@
       "/js/main.js"
     ]
   },
-  "frontend/js/ide.js": "/js/main.js",
+  "frontend/js/ide.js": "/js/ide.js",
+  "frontend/js/ide.js.css": "/js/ide.css",
   "frontend/js/main.js": "/js/main.js",
-  "frontend/stylesheets/ieee-style.less": "/stylesheets/iee-style.css",
+  "frontend/js/main.js.css": "/js/main.css",
+  "frontend/js/MathJaxBundle.js": "/js/MathJaxBundle.js",
+  "frontend/stylesheets/ieee-style.less": "/stylesheets/ieee-style.css",
   "frontend/stylesheets/light-style.less": "/stylesheets/light-style.css",
   "frontend/stylesheets/style.less": "/stylesheets/style.css",
   "generated/lng/cs.js": "/js/t/cs.js",

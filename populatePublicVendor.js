@@ -29,7 +29,7 @@ const PATTERNS = []
       return {
         context: 'node_modules/mathjax',
         from,
-        to: `${VENDOR_PATH}/mathjax`
+        to: `${VENDOR_PATH}/mathjax-2-7-9`
       }
     })
   )

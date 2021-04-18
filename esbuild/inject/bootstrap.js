@@ -1,13 +1,14 @@
 /**
- * ES6 imports are not strictly sorted. Use require statements instead.
+ * Provide $/jQuery/angular as globals and use full jQuery in angular.
  */
 const jQuery = require('jquery')
 
-// provide `jQuery` and `$` globally w/o import
+// Provide `jQuery` and `$` globally w/o explicit import.
 export { jQuery, jQuery as $ }
 
+// angular will read jQuery from window.
 window.jQuery = jQuery
 require('angular')
 
-// provide `angular` globally w/o import
+// Provide `angular` globally w/o explicit import.
 export const angular = window.angular
