@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import App from '../../../base'
 import getMeta from '../../../utils/meta'
-App.controller('ShareProjectModalController', function(
+App.controller('ShareProjectModalController', function (
   $scope,
   $modalInstance,
   $timeout,
@@ -34,7 +34,7 @@ App.controller('ShareProjectModalController', function(
 
   const INFINITE_COLLABORATORS = -1
 
-  $scope.refreshCanAddCollaborators = function() {
+  $scope.refreshCanAddCollaborators = function () {
     const allowedNoOfMembers = $scope.project.features.collaborators
     $scope.canAddCollaborators =
       $scope.project.members.length + $scope.project.invites.length <
@@ -42,7 +42,7 @@ App.controller('ShareProjectModalController', function(
   }
   $scope.refreshCanAddCollaborators()
 
-  $scope.$watch('canAddCollaborators', function() {
+  $scope.$watch('canAddCollaborators', function () {
     if (!$scope.canAddCollaborators) {
       eventTracking.send(
         'subscription-funnel',
@@ -95,9 +95,9 @@ App.controller('ShareProjectModalController', function(
   const getCurrentInviteEmails = () =>
     ($scope.project.invites || []).map(u => u.email)
 
-  $scope.filterAutocompleteUsers = function($query) {
+  $scope.filterAutocompleteUsers = function ($query) {
     const currentMemberEmails = getCurrentMemberEmails()
-    return $scope.autocompleteContacts.filter(function(contact) {
+    return $scope.autocompleteContacts.filter(function (contact) {
       if (
         contact.email != null &&
         currentMemberEmails.includes(contact.email)
@@ -116,8 +116,8 @@ App.controller('ShareProjectModalController', function(
     })
   }
 
-  $scope.addMembers = function() {
-    const addMembers = function() {
+  $scope.addMembers = function () {
+    const addMembers = function () {
       if ($scope.inputs.contacts.length === 0) {
         return
       }
@@ -160,7 +160,7 @@ App.controller('ShareProjectModalController', function(
         validateCaptchaV3('invite')
         // do v2 captcha
         validateCaptcha(
-          function(response) {
+          function (response) {
             $scope.grecaptchaResponse = response
             const invites = $scope.project.invites || []
             const invite = _.find(invites, invite => invite.email === email)
@@ -176,7 +176,7 @@ App.controller('ShareProjectModalController', function(
             }
 
             request
-              .then(function(response) {
+              .then(function (response) {
                 const { data } = response
                 if (data.error) {
                   $scope.setError(data.error)
@@ -205,7 +205,7 @@ App.controller('ShareProjectModalController', function(
                   0
                 )
               })
-              .catch(function(httpResponse) {
+              .catch(function (httpResponse) {
                 const { data } = httpResponse
                 $scope.state.inflight = false
                 $scope.setError(data.errorReason)
@@ -221,9 +221,9 @@ App.controller('ShareProjectModalController', function(
     $timeout(addMembers, 50) // Give email list a chance to update
   }
 
-  $scope.removeMember = function(member) {
+  $scope.removeMember = function (member) {
     $scope.monitorRequest(
-      projectMembers.removeMember(member).then(function() {
+      projectMembers.removeMember(member).then(function () {
         const index = $scope.project.members.indexOf(member)
         if (index === -1) {
           return
@@ -233,9 +233,9 @@ App.controller('ShareProjectModalController', function(
     )
   }
 
-  $scope.revokeInvite = function(invite) {
+  $scope.revokeInvite = function (invite) {
     $scope.monitorRequest(
-      projectInvites.revokeInvite(invite._id).then(function() {
+      projectInvites.revokeInvite(invite._id).then(function () {
         const index = $scope.project.invites.indexOf(invite)
         if (index === -1) {
           return
@@ -245,31 +245,31 @@ App.controller('ShareProjectModalController', function(
     )
   }
 
-  $scope.resendInvite = function(invite, event) {
+  $scope.resendInvite = function (invite, event) {
     $scope.monitorRequest(
       projectInvites
         .resendInvite(invite._id)
-        .then(function() {
+        .then(function () {
           event.target.blur()
         })
-        .catch(function() {
+        .catch(function () {
           event.target.blur()
         })
     )
   }
 
-  $scope.makeTokenBased = function() {
+  $scope.makeTokenBased = function () {
     $scope.project.publicAccesLevel = 'tokenBased'
     settings.saveProjectAdminSettings({ publicAccessLevel: 'tokenBased' })
     eventTracking.sendMB('project-make-token-based')
   }
 
-  $scope.makePrivate = function() {
+  $scope.makePrivate = function () {
     $scope.project.publicAccesLevel = 'private'
     settings.saveProjectAdminSettings({ publicAccessLevel: 'private' })
   }
 
-  $scope.$watch('project.tokens.readAndWrite', function(token) {
+  $scope.$watch('project.tokens.readAndWrite', function (token) {
     if (token != null) {
       $scope.readAndWriteTokenLink = `${location.origin}/${token}`
     } else {
@@ -277,7 +277,7 @@ App.controller('ShareProjectModalController', function(
     }
   })
 
-  $scope.$watch('project.tokens.readOnly', function(token) {
+  $scope.$watch('project.tokens.readOnly', function (token) {
     if (token != null) {
       $scope.readOnlyTokenLink = `${location.origin}/read/${token}`
     } else {

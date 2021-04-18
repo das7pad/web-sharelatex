@@ -157,7 +157,7 @@ passport.use(
 passport.serializeUser(AuthenticationController.serializeUser)
 passport.deserializeUser(AuthenticationController.deserializeUser)
 
-Modules.hooks.fire('passportSetup', passport, function(err) {
+Modules.hooks.fire('passportSetup', passport, function (err) {
   if (err != null) {
     logger.err({ err }, 'error setting up passport in modules')
   }
@@ -170,7 +170,7 @@ webRouter.use(webRouter.csrf.middleware)
 webRouter.use(translations.middleware)
 
 // Measure expiry from last top-level request, not last login or ajax request
-webRouter.use(function(req, res, next) {
+webRouter.use(function (req, res, next) {
   // skip stub sessions
   if (!req.session || req.session.noSessionCallback) return next()
 
@@ -208,7 +208,7 @@ ResourceHints(app, webRouter)
 
 webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)
 
-webRouter.use(function(req, res, next) {
+webRouter.use(function (req, res, next) {
   if (Settings.siteIsOpen) {
     next()
   } else if (
@@ -221,7 +221,7 @@ webRouter.use(function(req, res, next) {
   }
 })
 
-webRouter.use(function(req, res, next) {
+webRouter.use(function (req, res, next) {
   if (Settings.editorIsOpen) {
     next()
   } else if (req.url.indexOf('/admin') === 0) {
@@ -235,7 +235,7 @@ webRouter.use(AuthenticationController.validateAdmin)
 
 // add security headers using Helmet
 const noCacheMiddleware = require('nocache')()
-webRouter.use(function(req, res, next) {
+webRouter.use(function (req, res, next) {
   const isLoggedIn = AuthenticationController.isUserLoggedIn(req)
   const isProjectPage = !!req.path.match('^/project/[a-f0-9]{24}$')
   if (isLoggedIn || isProjectPage) {

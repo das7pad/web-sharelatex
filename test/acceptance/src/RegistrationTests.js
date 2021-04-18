@@ -13,10 +13,10 @@ const Features = require('../../../app/src/infrastructure/Features')
 // whereas in production we're using the 'overleaf-integration' module.
 
 // Expectations
-const expectProjectAccess = function(user, projectId, callback) {
+const expectProjectAccess = function (user, projectId, callback) {
   // should have access to project
   if (callback == null) {
-    callback = function(err, result) {}
+    callback = function (err, result) {}
   }
   user.openProject(projectId, err => {
     expect(err).to.be.oneOf([null, undefined])
@@ -24,10 +24,10 @@ const expectProjectAccess = function(user, projectId, callback) {
   })
 }
 
-const expectNoProjectAccess = function(user, projectId, callback) {
+const expectNoProjectAccess = function (user, projectId, callback) {
   // should not have access to project page
   if (callback == null) {
-    callback = function(err, result) {}
+    callback = function (err, result) {}
   }
   user.openProject(projectId, err => {
     expect(err).to.be.instanceof(Error)
@@ -36,14 +36,14 @@ const expectNoProjectAccess = function(user, projectId, callback) {
 }
 
 // Actions
-const tryLoginThroughRegistrationForm = function(
+const tryLoginThroughRegistrationForm = function (
   user,
   email,
   password,
   callback
 ) {
   if (callback == null) {
-    callback = function(err, response, body) {}
+    callback = function (err, response, body) {}
   }
   user.getCsrfToken(err => {
     if (err != null) {
@@ -62,17 +62,17 @@ const tryLoginThroughRegistrationForm = function(
   })
 }
 
-describe('Registration', function() {
+describe('Registration', function () {
   this.timeout(5000)
 
-  describe('LoginRateLimit', function() {
-    beforeEach(function() {
+  describe('LoginRateLimit', function () {
+    beforeEach(function () {
       this.user = new User()
       this.badEmail = `bademail+${Math.random()}@example.com`
       this.badPassword = 'badpassword'
     })
 
-    it('should rate limit login attempts after 10 within two minutes', function(done) {
+    it('should rate limit login attempts after 10 within two minutes', function (done) {
       this.user.request.get('/login', (err, res, body) => {
         async.timesSeries(
           15,
@@ -119,26 +119,26 @@ describe('Registration', function() {
     })
   })
 
-  describe('CSRF protection', function() {
+  describe('CSRF protection', function () {
     this.timeout(5000)
 
-    before(function() {
+    before(function () {
       if (!Features.hasFeature('public-registration')) {
         this.skip()
       }
     })
 
-    beforeEach(function() {
+    beforeEach(function () {
       this.user = new User()
       this.email = `test+${Math.random()}@example.com`
       this.password = 'password11'
     })
 
-    afterEach(function(done) {
+    afterEach(function (done) {
       this.user.fullDeleteUser(this.email, done)
     })
 
-    it('should register with the csrf token', function(done) {
+    it('should register with the csrf token', function (done) {
       this.user.request.get('/login', (err, res, body) => {
         this.user.getCsrfToken(error => {
           this.user.request.post(
@@ -162,7 +162,7 @@ describe('Registration', function() {
       })
     })
 
-    it('should fail with no csrf token', function(done) {
+    it('should fail with no csrf token', function (done) {
       this.user.request.get('/login', (err, res, body) => {
         this.user.getCsrfToken(error => {
           this.user.request.post(
@@ -185,7 +185,7 @@ describe('Registration', function() {
       })
     })
 
-    it('should fail with a stale csrf token', function(done) {
+    it('should fail with a stale csrf token', function (done) {
       this.user.request.get('/login', (err, res, body) => {
         this.user.getCsrfToken(error => {
           const oldCsrfToken = this.user.csrfToken
@@ -212,18 +212,18 @@ describe('Registration', function() {
     })
   })
 
-  describe('Register', function() {
-    before(function() {
+  describe('Register', function () {
+    before(function () {
       if (!Features.hasFeature('public-registration')) {
         this.skip()
       }
     })
 
-    beforeEach(function() {
+    beforeEach(function () {
       this.user = new User()
     })
 
-    it('Set emails attribute', function(done) {
+    it('Set emails attribute', function (done) {
       this.user.register((error, user) => {
         expect(error).to.not.exist
         expect(user.email).to.equal(this.user.email)
@@ -236,14 +236,14 @@ describe('Registration', function() {
     })
   })
 
-  describe('Register with bonus referal id', function() {
-    before(function() {
+  describe('Register with bonus referal id', function () {
+    before(function () {
       if (!Features.hasFeature('public-registration')) {
         this.skip()
       }
     })
 
-    beforeEach(function(done) {
+    beforeEach(function (done) {
       this.user1 = new User()
       this.user2 = new User()
       async.series(
@@ -259,7 +259,7 @@ describe('Registration', function() {
       )
     })
 
-    it('Adds a referal when an id is supplied and the referal source is "bonus"', function(done) {
+    it('Adds a referal when an id is supplied and the referal source is "bonus"', function (done) {
       this.user1.get((error, user) => {
         expect(error).to.not.exist
         expect(user.refered_user_count).to.equal(1)
@@ -269,10 +269,10 @@ describe('Registration', function() {
     })
   })
 
-  describe('LoginViaRegistration', function() {
+  describe('LoginViaRegistration', function () {
     this.timeout(60000)
 
-    beforeEach(function(done) {
+    beforeEach(function (done) {
       this.timeout(60000)
       this.user1 = new User()
       this.user2 = new User()
@@ -290,14 +290,14 @@ describe('Registration', function() {
       this.project_id = null
     })
 
-    describe('[Security] Trying to register/login as another user', function() {
-      before(function() {
+    describe('[Security] Trying to register/login as another user', function () {
+      before(function () {
         if (!Features.hasFeature('public-registration')) {
           this.skip()
         }
       })
 
-      it('should not allow sign in with secondary email', function(done) {
+      it('should not allow sign in with secondary email', function (done) {
         const secondaryEmail = 'acceptance-test-secondary@example.com'
         this.user1.addEmail(secondaryEmail, err => {
           this.user1.loginWith(secondaryEmail, err => {
@@ -310,7 +310,7 @@ describe('Registration', function() {
         })
       })
 
-      it('should have user1 login and create a project, which user2 cannot access', function(done) {
+      it('should have user1 login and create a project, which user2 cannot access', function (done) {
         let projectId
         async.series(
           [

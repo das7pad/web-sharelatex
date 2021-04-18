@@ -14,7 +14,7 @@ module.exports = {
     const userAgent = req.get('User-Agent')
     ProjectLocator.findElement(
       { project_id: projectId, element_id: fileId, type: 'file' },
-      function(err, file) {
+      function (err, file) {
         if (err) {
           logger.err(
             { err, projectId, fileId, queryString },
@@ -22,18 +22,19 @@ module.exports = {
           )
           return res.sendStatus(500)
         }
-        FileStoreHandler.getFileStream(projectId, fileId, queryString, function(
-          err,
-          readReq
-        ) {
-          if (err) {
-            logger.err(
-              { err, projectId, fileId, queryString },
-              'error getting file stream for downloading file'
-            )
-            return res.sendStatus(500)
-          }
-          readReq.on('error', () => {
+        FileStoreHandler.getFileStream(
+          projectId,
+          fileId,
+          queryString,
+          function (err, readReq) {
+            if (err) {
+              logger.err(
+                { err, projectId, fileId, queryString },
+                'error getting file stream for downloading file'
+              )
+              return res.sendStatus(500)
+            }
+            readReq.on('error', () => {
             // The error is logged in FileStoreHandler.
             res.sendStatus(500)
           })
@@ -65,7 +66,8 @@ module.exports = {
               }
             })
           })
-        })
+          }
+        )
       }
     )
   },

@@ -327,9 +327,7 @@ class UserHelper {
   }
 
   async backdateConfirmation(userId, email, days) {
-    const confirmedDate = moment()
-      .subtract(days, 'days')
-      .toDate()
+    const confirmedDate = moment().subtract(days, 'days').toDate()
     const query = {
       _id: userId,
       'emails.email': email

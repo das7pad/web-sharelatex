@@ -23,7 +23,7 @@ import EditorWatchdogManager from '../connection/EditorWatchdogManager'
 let ShareJsDoc
 const SINGLE_USER_FLUSH_DELAY = 1000 // ms
 
-export default ShareJsDoc = (function() {
+export default ShareJsDoc = (function () {
   ShareJsDoc = class ShareJsDoc extends EventEmitter {
     static initClass() {
       this.prototype.INFLIGHT_OP_TIMEOUT = 5000 // Retry sending ops after 5 seconds without an ack
@@ -170,7 +170,7 @@ export default ShareJsDoc = (function() {
       }
       this.queuedMessages.push(message)
       // keep the queue in order, lowest version first
-      this.queuedMessages.sort(function(a, b) {
+      this.queuedMessages.sort(function (a, b) {
         return a.v - b.v
       })
     }

@@ -22,31 +22,33 @@ module.exports = ProjectDownloadsController = {
   downloadProject(req, res, next) {
     const project_id = req.params.Project_id
     Metrics.inc('zip-downloads')
-    return DocumentUpdaterHandler.flushProjectToMongo(project_id, function(
-      error
-    ) {
-      if (error != null) {
-        return next(error)
-      }
-      return ProjectGetter.getProject(project_id, { name: true }, function(
-        error,
-        project
-      ) {
+    return DocumentUpdaterHandler.flushProjectToMongo(
+      project_id,
+      function (error) {
         if (error != null) {
           return next(error)
         }
-        return ProjectZipStreamManager.createZipStreamForProject(
+        return ProjectGetter.getProject(
           project_id,
-          function(error, stream) {
+          { name: true },
+          function (error, project) {
             if (error != null) {
               return next(error)
             }
-            res.attachment(`${project.name}.zip`)
-            return stream.pipe(res)
+            return ProjectZipStreamManager.createZipStreamForProject(
+              project_id,
+              function (error, stream) {
+                if (error != null) {
+                  return next(error)
+                }
+                res.attachment(`${project.name}.zip`)
+                return stream.pipe(res)
+              }
+            )
           }
         )
-      })
-    })
+      }
+    )
   },
 
   downloadMultipleProjects(req, res, next) {
@@ -54,13 +56,13 @@ module.exports = ProjectDownloadsController = {
     Metrics.inc('zip-downloads-multiple')
     return DocumentUpdaterHandler.flushMultipleProjectsToMongo(
       project_ids,
-      function(error) {
+      function (error) {
         if (error != null) {
           return next(error)
         }
         return ProjectZipStreamManager.createZipStreamForMultipleProjects(
           project_ids,
-          function(error, stream) {
+          function (error, stream) {
             if (error != null) {
               return next(error)
             }

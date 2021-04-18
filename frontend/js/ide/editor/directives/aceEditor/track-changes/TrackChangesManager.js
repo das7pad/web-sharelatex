@@ -646,10 +646,7 @@ class TrackChangesManager {
   }
 
   _rangeToShareJs(range) {
-    const lines = this.editor
-      .getSession()
-      .getDocument()
-      .getLines(0, range.row)
+    const lines = this.editor.getSession().getDocument().getLines(0, range.row)
     return EditorShareJsCodec.rangeToShareJs(range, lines)
   }
 

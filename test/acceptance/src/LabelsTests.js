@@ -21,14 +21,14 @@ const MockProjectHistoryApiClass = require('./mocks/MockProjectHistoryApi')
 
 let MockProjectHistoryApi
 
-before(function() {
+before(function () {
   MockProjectHistoryApi = MockProjectHistoryApiClass.instance()
 })
 
-describe('Labels', function() {
+describe('Labels', function () {
   this.timeout(5000)
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     this.owner = new User()
     return this.owner.login(error => {
       if (error != null) {
@@ -48,7 +48,7 @@ describe('Labels', function() {
     })
   })
 
-  it('getting labels', function(done) {
+  it('getting labels', function (done) {
     const label_id = new ObjectId().toString()
     const comment = 'a label comment'
     const version = 3
@@ -75,7 +75,7 @@ describe('Labels', function() {
     )
   })
 
-  it('creating a label', function(done) {
+  it('creating a label', function (done) {
     const comment = 'a label comment'
     const version = 3
 
@@ -99,7 +99,7 @@ describe('Labels', function() {
     )
   })
 
-  it('deleting a label', function(done) {
+  it('deleting a label', function (done) {
     const label_id = new ObjectId().toString()
     const comment = 'a label comment'
     const version = 3

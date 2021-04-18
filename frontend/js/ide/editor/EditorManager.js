@@ -22,7 +22,7 @@ import './controllers/SavingNotificationController'
 import { captureException } from '../../infrastructure/error-reporter'
 let EditorManager
 
-export default EditorManager = (function() {
+export default EditorManager = (function () {
   EditorManager = class EditorManager {
     static initClass() {
       this.prototype._syncTimeout = null
@@ -260,7 +260,7 @@ export default EditorManager = (function() {
 
     _doOpenNewDocument(doc, callback) {
       if (callback == null) {
-        callback = function(error, sharejs_doc) {}
+        callback = function (error, sharejs_doc) {}
       }
       sl_console.log('[_doOpenNewDocument] Opening...')
       const new_sharejs_doc = Document.getDocument(this.ide, doc.id)

@@ -5,11 +5,11 @@ module.exports = {
   initialize() {
     before('waitForDb', waitForDb)
 
-    before('migrate', function(done) {
+    before('migrate', function (done) {
       exec('bin/east migrate', done)
     })
 
-    afterEach('clearDb', async function() {
+    afterEach('clearDb', async function () {
       return Promise.all(
         Object.values(db).map(collection => collection.deleteMany({}))
       )

@@ -77,7 +77,7 @@ function fileTreeMutableReducer({ fileTreeData }, action) {
   }
 }
 
-export const FileTreeMutableProvider = function({ rootFolder, children }) {
+export const FileTreeMutableProvider = function ({ rootFolder, children }) {
   const [{ fileTreeData, fileCount }, dispatch] = useReducer(
     fileTreeMutableReducer,
     {

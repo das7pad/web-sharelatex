@@ -15,7 +15,7 @@
 import App from '../../../base'
 import PDFJS from '../../../pdfjsBundle'
 
-export default App.factory('pdfHighlights', function() {
+export default App.factory('pdfHighlights', function () {
   let pdfHighlights
   return (pdfHighlights = class pdfHighlights {
     constructor(options) {

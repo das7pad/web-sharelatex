@@ -30,7 +30,7 @@ module.exports = CollaboratorsEmailHandler = {
     return Project.findOne({ _id: project_id })
       .select('name owner_ref')
       .populate('owner_ref')
-      .exec(function(err, project) {
+      .exec(function (err, project) {
         if (err) {
           return callback(err)
         }

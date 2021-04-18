@@ -7,7 +7,7 @@ if (getMeta('ol-preLoadMathJax')) {
   // eslint-disable-next-line no-unused-expressions
   loadMathJax().catch(() => {})
 }
-export default App.directive('mathjax', function($compile, $parse) {
+export default App.directive('mathjax', function ($compile, $parse) {
   return {
     link(scope, element) {
       loadMathJax()

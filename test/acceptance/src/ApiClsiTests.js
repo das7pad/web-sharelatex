@@ -22,9 +22,9 @@ const authed_request = request.defaults({
   }
 })
 
-describe('ApiClsiTests', function() {
-  describe('compile', function() {
-    beforeEach(function(done) {
+describe('ApiClsiTests', function () {
+  describe('compile', function () {
+    beforeEach(function (done) {
       this.compileSpec = {
         compile: {
           options: {
@@ -49,8 +49,8 @@ describe('ApiClsiTests', function() {
       return done()
     })
 
-    describe('valid request', function() {
-      it('returns success and a list of output files', function(done) {
+    describe('valid request', function () {
+      it('returns success and a list of output files', function (done) {
         return authed_request.post(
           {
             uri: '/api/clsi/compile/abcd',
@@ -84,8 +84,8 @@ describe('ApiClsiTests', function() {
       })
     })
 
-    describe('unauthorized', function() {
-      it('returns 401', function(done) {
+    describe('unauthorized', function () {
+      it('returns 401', function (done) {
         return request.post(
           {
             uri: '/api/clsi/compile/abcd',
@@ -104,9 +104,9 @@ describe('ApiClsiTests', function() {
     })
   })
 
-  describe('get output', function() {
-    describe('valid file', function() {
-      it('returns the file', function(done) {
+  describe('get output', function () {
+    describe('valid file', function () {
+      it('returns the file', function (done) {
         return authed_request.get(
           '/api/clsi/compile/abcd/build/1234/output/project.pdf',
           (error, response, body) => {
@@ -121,8 +121,8 @@ describe('ApiClsiTests', function() {
       })
     })
 
-    describe('invalid file', function() {
-      it('returns 404', function(done) {
+    describe('invalid file', function () {
+      it('returns 404', function (done) {
         return authed_request.get(
           '/api/clsi/compile/abcd/build/1234/output/project.aux',
           (error, response, body) => {
@@ -137,8 +137,8 @@ describe('ApiClsiTests', function() {
       })
     })
 
-    describe('unauthorized', function() {
-      it('returns 401', function(done) {
+    describe('unauthorized', function () {
+      it('returns 401', function (done) {
         return request.get(
           '/api/clsi/compile/abcd/build/1234/output/project.pdf',
           (error, response, body) => {

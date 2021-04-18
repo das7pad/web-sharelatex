@@ -43,7 +43,7 @@ module.exports = RedirectManager = {
   },
 
   createRedirect(target) {
-    return function(req, res, next) {
+    return function (req, res, next) {
       let url
       if (
         (req.headers != null ? req.headers['x-skip-redirects'] : undefined) !=

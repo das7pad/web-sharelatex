@@ -23,10 +23,10 @@ const assertResponse = (path, expectedStatusCode, expectedBody, cb) =>
     return cb()
   })
 
-describe('ProxyUrls', function() {
+describe('ProxyUrls', function () {
   this.timeout(1000)
 
-  it('proxy static URLs', function(done) {
+  it('proxy static URLs', function (done) {
     return async.series(
       [
         cb => assertResponse('/institutions/list', 200, [], cb),
@@ -36,7 +36,7 @@ describe('ProxyUrls', function() {
     )
   })
 
-  it('proxy dynamic URLs', function(done) {
+  it('proxy dynamic URLs', function (done) {
     return async.series(
       [
         cb =>
@@ -58,14 +58,14 @@ describe('ProxyUrls', function() {
     )
   })
 
-  it('return 404 if proxy is not set', function(done) {
+  it('return 404 if proxy is not set', function (done) {
     return async.series(
       [cb => assertResponse('/institutions/foobar', 404, null, cb)],
       done
     )
   })
 
-  it('handle missing baseUrl', function(done) {
+  it('handle missing baseUrl', function (done) {
     return async.series(
       [cb => assertResponse('/proxy/missing/baseUrl', 500, null, cb)],
       done

@@ -20,23 +20,23 @@ const MockV1HistoryApiClass = require('./mocks/MockV1HistoryApi')
 
 let MockV1HistoryApi
 
-before(function() {
+before(function () {
   MockV1HistoryApi = MockV1HistoryApiClass.instance()
 })
 
 const initialPollDelay = Settings.historyZipDownloadRetryDelay || 2000
 const generalRequestLatency = 100
 
-describe('History', function() {
+describe('History', function () {
   this.timeout(10000)
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     this.owner = new User()
     return this.owner.login(done)
   })
 
-  describe('zip download of version', function() {
-    it('should stream the zip file of a version', function(done) {
+  describe('zip download of version', function () {
+    it('should stream the zip file of a version', function (done) {
       return this.owner.createProject(
         'example-project',
         (error, project_id) => {
@@ -83,7 +83,7 @@ describe('History', function() {
       )
     })
 
-    describe('request abort', function() {
+    describe('request abort', function () {
       // Optional manual verification: add unique logging statements into
       //   HistoryController._pipeHistoryZipToResponse
       // in each of the `req.aborted` branches and confirm that each branch
@@ -107,7 +107,7 @@ describe('History', function() {
         })
       })
 
-      it('should abort the upstream request', function(done) {
+      it('should abort the upstream request', function (done) {
         const request = this.owner.request(
           `/project/${this.project_id}/version/100/zip`
         )
@@ -147,7 +147,7 @@ describe('History', function() {
         })
       })
 
-      it('should skip the v1-history request', function(done) {
+      it('should skip the v1-history request', function (done) {
         const request = this.owner.request(
           `/project/${this.project_id}/version/100/zip`
         )
@@ -165,7 +165,7 @@ describe('History', function() {
         }, generalRequestLatency)
       })
 
-      it('should skip the async-polling', function(done) {
+      it('should skip the async-polling', function (done) {
         const request = this.owner.request(
           `/project/${this.project_id}/version/100/zip`
         )
@@ -179,7 +179,7 @@ describe('History', function() {
         }, initialPollDelay + generalRequestLatency)
       })
 
-      it('should skip the upstream request', function(done) {
+      it('should skip the upstream request', function (done) {
         const request = this.owner.request(
           `/project/${this.project_id}/version/100/zip`
         )
@@ -196,7 +196,7 @@ describe('History', function() {
       })
     })
 
-    it('should return 402 for non-v2-history project', function(done) {
+    it('should return 402 for non-v2-history project', function (done) {
       return this.owner.createProject('non-v2-project', (error, project_id) => {
         this.project_id = project_id
         if (error != null) {

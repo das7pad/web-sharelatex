@@ -4,13 +4,13 @@ const SandboxedModule = require('sandboxed-module')
 
 const MODULE_PATH = '../../../../app/src/infrastructure/Translations.js'
 
-describe('Translations', function() {
+describe('Translations', function () {
   let req, res, translations
   function runMiddlewares(cb) {
     translations.middleware(req, res, cb)
   }
 
-  beforeEach(function() {
+  beforeEach(function () {
     translations = SandboxedModule.require(MODULE_PATH, {
       requires: {
         '@overleaf/settings': {
@@ -44,26 +44,26 @@ describe('Translations', function() {
     }
   })
 
-  describe('translate', function() {
-    beforeEach(function(done) {
+  describe('translate', function () {
+    beforeEach(function (done) {
       runMiddlewares(done)
     })
 
-    it('works', function() {
+    it('works', function () {
       expect(req.i18n.t('give_feedback')).to.equal('Give feedback')
     })
 
-    it('has translate alias', function() {
+    it('has translate alias', function () {
       expect(req.i18n.translate('give_feedback')).to.equal('Give feedback')
     })
   })
 
-  describe('interpolation', function() {
-    beforeEach(function(done) {
+  describe('interpolation', function () {
+    beforeEach(function (done) {
       runMiddlewares(done)
     })
 
-    it('works', function() {
+    it('works', function () {
       expect(
         req.i18n.t('please_confirm_email', {
           emailAddress: 'foo@example.com'
@@ -73,7 +73,7 @@ describe('Translations', function() {
       )
     })
 
-    it('handles dashes after interpolation', function() {
+    it('handles dashes after interpolation', function () {
       // This translation string has a problematic interpolation followed by a
       // dash: `__len__-day`
       expect(
@@ -86,7 +86,7 @@ describe('Translations', function() {
       )
     })
 
-    it('disables escaping', function() {
+    it('disables escaping', function () {
       expect(
         req.i18n.t('admin_user_created_message', {
           link: 'http://google.com'
@@ -97,8 +97,8 @@ describe('Translations', function() {
     })
   })
 
-  describe('setLangBasedOnDomainMiddleware', function() {
-    it('should set the lang to french if the domain is fr', function(done) {
+  describe('setLangBasedOnDomainMiddleware', function () {
+    it('should set the lang to french if the domain is fr', function (done) {
       req.headers.host = 'fr.sharelatex.com'
       runMiddlewares(() => {
         expect(req.lng).to.equal('fr')
@@ -106,8 +106,8 @@ describe('Translations', function() {
       })
     })
 
-    describe('suggestedLanguageSubdomainConfig', function() {
-      it('should set suggestedLanguageSubdomainConfig if the detected lang is different to subdomain lang', function(done) {
+    describe('suggestedLanguageSubdomainConfig', function () {
+      it('should set suggestedLanguageSubdomainConfig if the detected lang is different to subdomain lang', function (done) {
         req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
         req.headers.host = 'fr.sharelatex.com'
         runMiddlewares(() => {
@@ -119,7 +119,7 @@ describe('Translations', function() {
         })
       })
 
-      it('should not set suggestedLanguageSubdomainConfig if the detected lang is the same as subdomain lang', function(done) {
+      it('should not set suggestedLanguageSubdomainConfig if the detected lang is the same as subdomain lang', function (done) {
         req.headers['accept-language'] = 'da, en-gb;q=0.8, en;q=0.7'
         req.headers.host = 'da.sharelatex.com'
         runMiddlewares(() => {

@@ -11,11 +11,11 @@ const TIMEOUT = 1000 * 10
 const SPELLING_HOST = 'http://spelling.service.test'
 const SPELLING_URL = 'http://spelling.service.test'
 
-describe('SpellingHandler', function() {
+describe('SpellingHandler', function () {
   let userId, word, dictionary, dictionaryString, request, SpellingHandler
   let requestRetry
 
-  beforeEach(function() {
+  beforeEach(function () {
     userId = 'wombat'
     word = 'potato'
     dictionary = ['wombaat', 'woombat']
@@ -42,8 +42,8 @@ describe('SpellingHandler', function() {
     })
   })
 
-  describe('getUserDictionary', function() {
-    it('calls the spelling API', function(done) {
+  describe('getUserDictionary', function () {
+    it('calls the spelling API', function (done) {
       SpellingHandler.getUserDictionary(userId, () => {
         expect(requestRetry.get).to.have.been.calledWith({
           url: 'http://spelling.service.test/v20200714/user/wombat',
@@ -53,7 +53,7 @@ describe('SpellingHandler', function() {
       })
     })
 
-    it('returns the dictionary', function(done) {
+    it('returns the dictionary', function (done) {
       SpellingHandler.getUserDictionary(userId, (err, dictionary) => {
         expect(err).not.to.exist
         expect(dictionary).to.deep.equal(dictionary)
@@ -61,7 +61,7 @@ describe('SpellingHandler', function() {
       })
     })
 
-    it('returns an error when the request fails', function(done) {
+    it('returns an error when the request fails', function (done) {
       requestRetry.get = sinon.stub().yields(new Error('ugh'))
       SpellingHandler.getUserDictionary(userId, err => {
         expect(err).to.exist
@@ -70,8 +70,8 @@ describe('SpellingHandler', function() {
     })
   })
 
-  describe('deleteWordFromUserDictionary', function() {
-    it('calls the spelling API', function(done) {
+  describe('deleteWordFromUserDictionary', function () {
+    it('calls the spelling API', function (done) {
       SpellingHandler.deleteWordFromUserDictionary(userId, word, () => {
         expect(request.post).to.have.been.calledWith({
           url: 'http://spelling.service.test/v20200714/user/wombat/unlearn',
@@ -84,14 +84,14 @@ describe('SpellingHandler', function() {
       })
     })
 
-    it('does not return an error', function(done) {
+    it('does not return an error', function (done) {
       SpellingHandler.deleteWordFromUserDictionary(userId, word, err => {
         expect(err).not.to.exist
         done()
       })
     })
 
-    it('returns an error when the request fails', function(done) {
+    it('returns an error when the request fails', function (done) {
       request.post = sinon.stub().yields(new Error('ugh'))
       SpellingHandler.deleteWordFromUserDictionary(userId, word, err => {
         expect(err).to.exist
@@ -100,8 +100,8 @@ describe('SpellingHandler', function() {
     })
   })
 
-  describe('deleteUserDictionary', function() {
-    it('calls the spelling API', function(done) {
+  describe('deleteUserDictionary', function () {
+    it('calls the spelling API', function (done) {
       SpellingHandler.deleteUserDictionary(userId, () => {
         expect(request.delete).to.have.been.calledWith({
           url: 'http://spelling.service.test/v20200714/user/wombat',
@@ -111,14 +111,14 @@ describe('SpellingHandler', function() {
       })
     })
 
-    it('does not return an error', function(done) {
+    it('does not return an error', function (done) {
       SpellingHandler.deleteUserDictionary(userId, err => {
         expect(err).not.to.exist
         done()
       })
     })
 
-    it('returns an error when the request fails', function(done) {
+    it('returns an error when the request fails', function (done) {
       request.delete = sinon.stub().yields(new Error('ugh'))
       SpellingHandler.deleteUserDictionary(userId, err => {
         expect(err).to.exist

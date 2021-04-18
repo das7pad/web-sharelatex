@@ -46,7 +46,7 @@ const AdminController = {
     Object.assign(openSockets, serializeTracking(httpSockets, 'http://'))
     Object.assign(openSockets, serializeTracking(httpsSockets, 'https://'))
 
-    return SystemMessageManager.getMessagesFromDB(function(
+    return SystemMessageManager.getMessagesFromDB(function (
       error,
       systemMessages
     ) {
@@ -91,7 +91,7 @@ const AdminController = {
   writeAllToMongo(req, res) {
     logger.log('writing all docs to mongo')
     Settings.mongo.writeAll = true
-    return DocumentUpdaterHandler.flushAllDocsToMongo(function() {
+    return DocumentUpdaterHandler.flushAllDocsToMongo(function () {
       logger.log('all docs have been saved to mongo')
       return res.sendStatus(200)
     })
@@ -111,18 +111,19 @@ const AdminController = {
   },
 
   createMessage(req, res, next) {
-    return SystemMessageManager.createMessage(req.body.content, function(
-      error
-    ) {
-      if (error != null) {
-        return next(error)
+    return SystemMessageManager.createMessage(
+      req.body.content,
+      function (error) {
+        if (error != null) {
+          return next(error)
+        }
+        AsyncFormHelper.redirect(req, res, '/admin')
       }
-      AsyncFormHelper.redirect(req, res, '/admin')
-    })
+    )
   },
 
   clearMessages(req, res, next) {
-    return SystemMessageManager.clearMessages(function(error) {
+    return SystemMessageManager.clearMessages(function (error) {
       if (error != null) {
         return next(error)
       }

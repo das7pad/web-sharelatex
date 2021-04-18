@@ -1,7 +1,7 @@
 import App from '../base'
 import AlgoliaSearch from 'algoliasearch'
 
-export default App.factory('algoliaSearch', function() {
+export default App.factory('algoliaSearch', function () {
   let kbIdx, wikiIdx
   const algoliaConfig = window.sharelatex && window.sharelatex.algolia
   if (algoliaConfig && algoliaConfig.indexes && algoliaConfig.indexes.wiki) {

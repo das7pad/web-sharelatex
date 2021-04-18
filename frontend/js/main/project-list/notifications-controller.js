@@ -4,7 +4,7 @@ import { escapeForInnerHTML } from '../../misc/escape'
 import t from '../../misc/t'
 import { localStorage } from '../../modules/storage'
 
-App.controller('NotificationsController', function(
+App.controller('NotificationsController', function (
   $scope,
   $http,
   eventTracking
@@ -79,13 +79,14 @@ App.controller('DismissableNotificationsController', function($scope) {
   $scope.shouldShowNotification =
     localStorage('dismissed-covid-19-notification-extended') !== true
 
-  $scope.dismiss = () => {
-    localStorage('dismissed-covid-19-notification-extended', true)
-    $scope.shouldShowNotification = false
+    $scope.dismiss = () => {
+      localStorage('dismissed-covid-19-notification-extended', true)
+      $scope.shouldShowNotification = false
+    }
   }
-})
+)
 
-App.controller('ProjectInviteNotificationController', function($scope, $http) {
+App.controller('ProjectInviteNotificationController', function ($scope, $http) {
   const projectName = escapeForInnerHTML(
     $scope.notification.messageOpts.projectName
   )
@@ -100,7 +101,7 @@ App.controller('ProjectInviteNotificationController', function($scope, $http) {
     { userName, projectName }
   )
 
-  $scope.accept = function() {
+  $scope.accept = function () {
     $scope.notification.inflight = true
     return $http({
       url: `/project/${$scope.notification.messageOpts.projectId}/invite/token/${$scope.notification.messageOpts.token}/accept`,
@@ -128,52 +129,52 @@ App.controller('ProjectInviteNotificationController', function($scope, $http) {
   }
 })
 
-App.controller('EmailNotificationController', function(
-  $scope,
-  $http,
-  UserAffiliationsDataService
-) {
-  $scope.userEmails = window.data.userEmails
-  const _ssoAvailable = email => {
-    if (!getMeta('ol-hasSamlFeature')) return false
-    if (email.samlProviderId) return true
-    if (!email.affiliation || !email.affiliation.institution) return false
-    if (email.affiliation.institution.ssoEnabled) return true
-    if (getMeta('ol-hasSamlBeta') && email.affiliation.institution.ssoBeta) {
+App.controller(
+  'EmailNotificationController',
+  function ($scope, $http, UserAffiliationsDataService) {
+    $scope.userEmails = window.data.userEmails
+    const _ssoAvailable = email => {
+      if (!getMeta('ol-hasSamlFeature')) return false
+      if (email.samlProviderId) return true
+      if (!email.affiliation || !email.affiliation.institution) return false
+      if (email.affiliation.institution.ssoEnabled) return true
+      if (
+        getMeta('ol-hasSamlBeta') && email.affiliation.institution.ssoBeta) {
       return true
     }
     return false
   }
   $scope.showConfirmEmail = email => {
-    if (!email.confirmedAt && !email.hide) {
-      if (_ssoAvailable(email)) {
-        return false
+      if (!email.confirmedAt && !email.hide) {
+        if (_ssoAvailable(email)) {
+          return false
+        }
+        return true
       }
-      return true
+      return false
     }
-    return false
-  }
-  for (let userEmail of $scope.userEmails) {
-    userEmail.hide = false
-  }
+    for (let userEmail of $scope.userEmails) {
+      userEmail.hide = false
+    }
 
-  $scope.resendConfirmationEmail = function(userEmail) {
-    userEmail.confirmationInflight = true
-    userEmail.error = false
-    userEmail.errorMessage = null
-    UserAffiliationsDataService.resendConfirmationEmail(userEmail.email)
-      .then(() => {
-        userEmail.hide = true
-        $scope.$emit('project-list:notifications-received')
-      })
-      .catch(error => {
-        userEmail.error = true
-        userEmail.errorMessage = error.data.message
-        console.error(error)
-        $scope.$emit('project-list:notifications-received')
-      })
-      .finally(() => {
-        userEmail.confirmationInflight = false
-      })
+    $scope.resendConfirmationEmail = function (userEmail) {
+      userEmail.confirmationInflight = true
+      userEmail.error = false
+      userEmail.errorMessage = null
+      UserAffiliationsDataService.resendConfirmationEmail(userEmail.email)
+        .then(() => {
+          userEmail.hide = true
+          $scope.$emit('project-list:notifications-received')
+        })
+        .catch(error => {
+          userEmail.error = true
+          userEmail.errorMessage = error.data.message
+          console.error(error)
+          $scope.$emit('project-list:notifications-received')
+        })
+        .finally(() => {
+          userEmail.confirmationInflight = false
+        })
+    }
   }
-})
+)

@@ -17,7 +17,7 @@ const {
 
 const I18N_HTML_INJECTIONS = new Set()
 
-module.exports = function(app, webRouter) {
+module.exports = function (app, webRouter) {
   app.locals.EXTERNAL_AUTHENTICATION_SYSTEM_USED =
     Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
   app.locals.hasFeature = Features.hasFeature
@@ -34,7 +34,7 @@ module.exports = function(app, webRouter) {
 
   app.locals.buildMathJaxEntrypoint = () => buildJsPath('MathJaxBundle.js')
 
-  webRouter.use(function(req, res, next) {
+  webRouter.use(function (req, res, next) {
     const actualRender = res.render
     res.render = function() {
       res.locals.translate = function(key, vars, components) {

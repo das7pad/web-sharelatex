@@ -1,8 +1,8 @@
 import App from '../base'
 import getMeta from '../utils/meta'
 
-export default App.controller('PostGatewayController', function($scope) {
-  $scope.handleGateway = function() {
+export default App.controller('PostGatewayController', function ($scope) {
+  $scope.handleGateway = function () {
     const { params } = getMeta('ol-gateway-data')
     params.viaGateway = 'true'
     Object.keys(params).forEach(param => {

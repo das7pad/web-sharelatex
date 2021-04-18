@@ -7,3 +7,4 @@ public/js
 public/vendor
 frontend/js/vendor
 generated/
+frontend/stylesheets/components/nvd3.less

@@ -18,8 +18,8 @@ const SandboxedModule = require('sandboxed-module')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
 
-describe('ProjectDownloadsController', function() {
-  beforeEach(function() {
+describe('ProjectDownloadsController', function () {
+  beforeEach(function () {
     this.project_id = 'project-id-123'
     this.req = new MockRequest()
     this.res = new MockResponse()
@@ -39,8 +39,8 @@ describe('ProjectDownloadsController', function() {
     ))
   })
 
-  describe('downloadProject', function() {
-    beforeEach(function() {
+  describe('downloadProject', function () {
+    beforeEach(function () {
       this.stream = { pipe: sinon.stub() }
       this.ProjectZipStreamManager.createZipStreamForProject = sinon
         .stub()
@@ -63,13 +63,13 @@ describe('ProjectDownloadsController', function() {
       )
     })
 
-    it('should create a zip from the project', function() {
+    it('should create a zip from the project', function () {
       return this.ProjectZipStreamManager.createZipStreamForProject
         .calledWith(this.project_id)
         .should.equal(true)
     })
 
-    it('should stream the zip to the request', function() {
+    it('should stream the zip to the request', function () {
       return this.stream.pipe.calledWith(this.res).should.equal(true)
     })
 
@@ -79,25 +79,25 @@ describe('ProjectDownloadsController', function() {
         .should.equal(true)
     })
 
-    it("should look up the project's name", function() {
+    it("should look up the project's name", function () {
       return this.ProjectGetter.getProject
         .calledWith(this.project_id, { name: true })
         .should.equal(true)
     })
 
-    it('should name the downloaded file after the project', function() {
+    it('should name the downloaded file after the project', function () {
       return this.res.attachment
         .calledWith(`${this.project_name}.zip`)
         .should.equal(true)
     })
 
-    it('should record the action via Metrics', function() {
+    it('should record the action via Metrics', function () {
       return this.metrics.inc.calledWith('zip-downloads').should.equal(true)
     })
   })
 
-  describe('downloadMultipleProjects', function() {
-    beforeEach(function() {
+  describe('downloadMultipleProjects', function () {
+    beforeEach(function () {
       this.stream = { pipe: sinon.stub() }
       this.ProjectZipStreamManager.createZipStreamForMultipleProjects = sinon
         .stub()
@@ -117,13 +117,13 @@ describe('ProjectDownloadsController', function() {
       )
     })
 
-    it('should create a zip from the project', function() {
+    it('should create a zip from the project', function () {
       return this.ProjectZipStreamManager.createZipStreamForMultipleProjects
         .calledWith(this.project_ids)
         .should.equal(true)
     })
 
-    it('should stream the zip to the request', function() {
+    it('should stream the zip to the request', function () {
       return this.stream.pipe.calledWith(this.res).should.equal(true)
     })
 
@@ -133,13 +133,13 @@ describe('ProjectDownloadsController', function() {
         .should.equal(true)
     })
 
-    it('should name the downloaded file after the project', function() {
+    it('should name the downloaded file after the project', function () {
       return this.res.attachment
         .calledWith('Overleaf Projects (2 items).zip')
         .should.equal(true)
     })
 
-    it('should record the action via Metrics', function() {
+    it('should record the action via Metrics', function () {
       return this.metrics.inc
         .calledWith('zip-downloads-multiple')
         .should.equal(true)
