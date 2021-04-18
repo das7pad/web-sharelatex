@@ -21,16 +21,10 @@ describe('EmailHandler', function() {
       }
     }
     this.EmailHandler = SandboxedModule.require(MODULE_PATH, {
-      globals: {
-        console: console
-      },
       requires: {
         './EmailBuilder': this.EmailBuilder,
         './EmailSender': this.EmailSender,
-        '@overleaf/settings': this.Settings,
-        'logger-sharelatex': {
-          log() {}
-        }
+        '@overleaf/settings': this.Settings
       }
     })
   })

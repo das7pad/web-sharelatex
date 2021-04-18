@@ -23,9 +23,6 @@ const SandboxedModule = require('sandboxed-module')
 describe('LockManager - releasing the lock', function() {
   const deleteStub = sinon.stub().callsArgWith(4)
   const mocks = {
-    'logger-sharelatex': {
-      log() {}
-    },
     '@overleaf/settings': {
       redis: {},
       lockManager: {

@@ -11,10 +11,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const sinon = require('sinon')
-const chai = require('chai')
-const { assert } = require('chai')
-const should = chai.should()
-const { expect } = chai
+const { assert, expect } = require('chai')
 const modulePath = '../../../../app/src/Features/User/UserInfoController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
@@ -29,17 +26,11 @@ describe('UserInfoController', function() {
     this.UserGetter = {}
 
     this.UserInfoController = SandboxedModule.require(modulePath, {
-      globals: {
-        console: console
-      },
       requires: {
         mongodb: { ObjectId },
         './UserGetter': this.UserGetter,
         './UserUpdater': this.UserUpdater,
         './UserDeleter': this.UserDeleter,
-        'logger-sharelatex': {
-          log() {}
-        },
         '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub()
         })

@@ -14,8 +14,6 @@
  */
 const SandboxedModule = require('sandboxed-module')
 const sinon = require('sinon')
-require('chai').should()
-const Errors = require('../../../../app/src/Features/Errors/Errors')
 const modulePath = require('path').join(
   __dirname,
   '../../../../app/src/Features/Subscription/LimitationsManager'
@@ -50,9 +48,6 @@ describe('LimitationsManager', function() {
     }
 
     return (this.LimitationsManager = SandboxedModule.require(modulePath, {
-      globals: {
-        console: console
-      },
       requires: {
         '../Project/ProjectGetter': this.ProjectGetter,
         '../User/UserGetter': this.UserGetter,
@@ -60,10 +55,7 @@ describe('LimitationsManager', function() {
         '@overleaf/settings': (this.Settings = {}),
         '../Collaborators/CollaboratorsGetter': (this.CollaboratorsGetter = {}),
         '../Collaborators/CollaboratorsInviteHandler': (this.CollaboratorsInviteHandler = {}),
-        './V1SubscriptionManager': (this.V1SubscriptionManager = {}),
-        'logger-sharelatex': {
-          log() {}
-        }
+        './V1SubscriptionManager': (this.V1SubscriptionManager = {})
       }
     }))
   })

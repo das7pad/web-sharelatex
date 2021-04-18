@@ -22,16 +22,9 @@ describe('FileStoreController', function() {
       }
     }
     this.controller = SandboxedModule.require(MODULE_PATH, {
-      globals: {
-        console: console
-      },
       requires: {
         stream: { pipeline: this.pipeline },
         '@overleaf/settings': this.settings,
-        'logger-sharelatex': (this.logger = {
-          log: sinon.stub(),
-          err: sinon.stub()
-        }),
         '../Project/ProjectLocator': this.ProjectLocator,
         './FileStoreHandler': this.FileStoreHandler
       }

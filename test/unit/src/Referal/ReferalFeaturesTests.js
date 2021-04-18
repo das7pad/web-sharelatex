@@ -1,5 +1,4 @@
 const SandboxedModule = require('sandboxed-module')
-require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
@@ -9,18 +8,11 @@ const modulePath = require('path').join(
 describe('ReferalFeatures', function() {
   beforeEach(function() {
     this.ReferalFeatures = SandboxedModule.require(modulePath, {
-      globals: {
-        console: console
-      },
       requires: {
         '../../models/User': {
           User: (this.User = {})
         },
-        '@overleaf/settings': (this.Settings = {}),
-        'logger-sharelatex': {
-          log() {},
-          err() {}
-        }
+        '@overleaf/settings': (this.Settings = {})
       }
     })
     this.callback = sinon.stub()

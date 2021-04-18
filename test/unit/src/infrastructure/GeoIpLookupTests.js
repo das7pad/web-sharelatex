@@ -11,7 +11,6 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const should = require('chai').should()
 const SandboxedModule = require('sandboxed-module')
 const assert = require('assert')
 const path = require('path')
@@ -34,16 +33,9 @@ describe('GeoIpLookup', function() {
     }
     this.request = { get: sinon.stub() }
     this.GeoIpLookup = SandboxedModule.require(modulePath, {
-      globals: {
-        console: console
-      },
       requires: {
         request: this.request,
-        '@overleaf/settings': this.settings,
-        'logger-sharelatex': {
-          log() {},
-          err() {}
-        }
+        '@overleaf/settings': this.settings
       }
     })
     this.ipAddress = '123.456.789.123'

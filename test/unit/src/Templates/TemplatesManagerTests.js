@@ -12,11 +12,8 @@
  */
 const SandboxedModule = require('sandboxed-module')
 const assert = require('assert')
-const chai = require('chai')
 const sinon = require('sinon')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
-
-const should = require('chai').should()
 
 const modulePath = '../../../../app/src/Features/Templates/TemplatesManager'
 
@@ -66,9 +63,6 @@ describe('TemplatesManager', function() {
     this.Project = { updateOne: sinon.stub().callsArgWith(3, null) }
     this.FileWriter = { ensureDumpFolderExists: sinon.stub().callsArg(0) }
     this.TemplatesManager = SandboxedModule.require(modulePath, {
-      globals: {
-        console: console
-      },
       requires: {
         'request-promise-native': sinon.stub(),
         '../Uploads/ProjectUploadManager': this.ProjectUploadManager,
@@ -79,10 +73,6 @@ describe('TemplatesManager', function() {
           getLoggedInUserId: sinon.stub()
         }),
         '../../infrastructure/FileWriter': this.FileWriter,
-        'logger-sharelatex': {
-          log() {},
-          err() {}
-        },
         '@overleaf/settings': {
           path: {
             dumpFolder: this.dumpFolder

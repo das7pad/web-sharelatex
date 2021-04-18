@@ -35,11 +35,6 @@ describe('SpellingHandler', function() {
         jsonwebtoken: {},
         request: request,
         requestretry: { defaults: () => requestRetry },
-        'logger-sharelatex': {
-          warn() {},
-          error() {},
-          info() {}
-        },
         '@overleaf/settings': {
           apis: { spelling: { host: SPELLING_HOST, url: SPELLING_URL } }
         }

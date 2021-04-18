@@ -14,7 +14,6 @@
  */
 const SandboxedModule = require('sandboxed-module')
 const { assert } = require('chai')
-require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
@@ -31,19 +30,12 @@ describe('NotificationsHandler', function() {
     this.request = sinon.stub().callsArgWith(1)
     this.requestRetry = sinon.stub().callsArgWith(1)
     return (this.handler = SandboxedModule.require(modulePath, {
-      globals: {
-        console: console
-      },
       requires: {
         '@overleaf/settings': {
           apis: { notifications: { url: notificationUrl } }
         },
         request: this.request,
-        requestretry: { defaults: () => this.requestRetry },
-        'logger-sharelatex': {
-          log() {},
-          err() {}
-        }
+        requestretry: { defaults: () => this.requestRetry }
       }
     }))
   })

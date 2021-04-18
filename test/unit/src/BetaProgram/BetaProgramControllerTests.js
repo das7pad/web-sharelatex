@@ -1,4 +1,3 @@
-require('chai').should()
 const SandboxedModule = require('sandboxed-module')
 const path = require('path')
 const sinon = require('sinon')
@@ -24,9 +23,6 @@ describe('BetaProgramController', function() {
       }
     }
     this.BetaProgramController = SandboxedModule.require(modulePath, {
-      globals: {
-        console: console
-      },
       requires: {
         './BetaProgramHandler': (this.BetaProgramHandler = {
           optIn: sinon.stub(),
@@ -37,12 +33,6 @@ describe('BetaProgramController', function() {
         }),
         '@overleaf/settings': (this.settings = {
           languages: {}
-        }),
-        'logger-sharelatex': (this.logger = {
-          log: sinon.stub(),
-          warn: sinon.stub(),
-          err: sinon.stub(),
-          error: sinon.stub()
         }),
         '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub().returns(this.user._id)
