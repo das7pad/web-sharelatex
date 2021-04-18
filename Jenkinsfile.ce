@@ -210,15 +210,15 @@ pipeline {
           }
         }
 
-        stage('Webpack and Production build') {
+        stage('Dist and Production build') {
           agent {
             label 'sharelatex && docker_builder'
           }
           stages {
-            stage('Build webpack') {
+            stage('Build dist') {
               steps {
                 sh 'make prepare_ci_stage'
-                sh 'make build_webpack'
+                sh 'make build_dist'
               }
               post {
                 cleanup {

@@ -61,7 +61,7 @@ clean_docker_images:
 		$(IMAGE_CI)-dev-deps \
 		$(IMAGE_CI)-dev \
 		$(IMAGE_CI)-prod \
-		$(IMAGE_CI)-webpack \
+		$(IMAGE_CI)-dist \
 		$(IMAGE_CI)-dev-deps-cache \
 		$(IMAGE_CI)-prod-cache \
 		--force
@@ -157,11 +157,11 @@ format_fix_full:
 	$(RUN_FORMAT) '$(PWD)/**/*.{js,less}' --write
 
 format_partial:
-ifneq (,$(FILES_FOR_LINT))
+ifneq (,$(FILES_FOR_FORMAT))
 	$(RUN_FORMAT) $(FILES_FOR_FORMAT) --list-different
 endif
 format_fix_partial:
-ifneq (,$(FILES_FOR_LINT))
+ifneq (,$(FILES_FOR_FORMAT))
 	$(RUN_FORMAT) $(FILES_FOR_FORMAT) --write
 endif
 
@@ -247,6 +247,7 @@ VIEW_FILES:=$(shell \
 	| sed 's|^|generated/views/|;s/.pug/.js/' \
 )
 
+dist: build_views_full
 build_views_full:
 	node build/views
 
@@ -255,6 +256,7 @@ build_views: $(VIEW_FILES)
 $(VIEW_FILES): generated/views/%.js:
 	node build/views $*
 
+dist: build_lngs_full
 build_lngs_full:
 	node build/translations
 
@@ -265,8 +267,16 @@ $(LNGS): locales/en.json
 $(LNGS): generated/lng/%.js: locales/%.json
 	node build/translations $*
 
-webpack_production:
-	$(MAKE) --no-print-directory -j build_lng
+dist: esbuild_build
+esbuild_build:
+	node esbuild.js build
+
+esbuild_watch:
+	node esbuild.js watch
+
+dist: populatePublicVendor
+populatePublicVendor:
+	node populatePublicVendor.js
 
 build_dev_deps: clean_build_artifacts
 	docker build \
@@ -292,18 +302,18 @@ build_dev: clean_build_artifacts
 		--target dev \
 		.
 
-build_webpack: clean_build_artifacts
+build_dist: clean_build_artifacts
 	docker build \
 		--force-rm=true \
 		--cache-from $(IMAGE_CI)-dev \
-		--tag $(IMAGE_CI)-webpack \
-		--target webpack \
+		--tag $(IMAGE_CI)-dist \
+		--target dist \
 		.
 
 build_prod: clean_build_artifacts
 	docker build \
 		--force-rm=true \
-		--cache-from $(IMAGE_CI)-webpack \
+		--cache-from $(IMAGE_CI)-dist \
 		--tag $(IMAGE_CI)-base \
 		--target base \
 		.
@@ -320,7 +330,7 @@ build_prod: clean_build_artifacts
 
 	docker run \
 		--rm \
-		$(IMAGE_CI)-webpack \
+		$(IMAGE_CI)-dist \
 		$(TAR_CREATE_REPRODUCIBLE) \
 			app.js \
 			app/src \
@@ -446,7 +456,7 @@ public.tar.gz:
 		--volume $(PWD)/compress.sh:/compress.sh \
 		--workdir /app/public \
 		--entrypoint sh \
-		$(IMAGE_CI)-webpack \
+		$(IMAGE_CI)-dist \
 		-c '/compress.sh && $(TAR_CREATE_REPRODUCIBLE) .' \
 	| gzip -6 \
 	> public.tar.gz

@@ -46,8 +46,6 @@
 !/esbuild
 !/esbuild.js
 
-!/Gruntfile.js
-
 !/karma.conf.js
 
 !/populatePublicVendor.js

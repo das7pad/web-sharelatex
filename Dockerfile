@@ -28,14 +28,7 @@ VOLUME /app/data
 
 USER node
 
-FROM dev as webpack
+FROM dev as dist
 USER root
 
-# generate the translations modules -- used by backend and frontend
-RUN /docker_cleanup.sh make build_lngs_full
-
-RUN /docker_cleanup.sh node esbuild build
-RUN /docker_cleanup.sh node populatePublicVendor
-
-# precompile views
-RUN /docker_cleanup.sh make build_views_full
+RUN /docker_cleanup.sh make dist
