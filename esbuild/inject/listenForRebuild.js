@@ -12,28 +12,43 @@ function formatMessage(prefix, message) {
   )
   console.groupEnd()
 }
-new EventSource(import.meta.url + '/event-source').addEventListener(
-  'rebuild',
-  ({ data: blob }) => {
-    const { name, error, warnings } = JSON.parse(blob)
-    if (error) {
-      console.group('esbuild rebuild failed:', name)
-      for (const message of error.errors) {
-        formatMessage('error', message)
-      }
-      for (const message of error.warnings) {
+
+const clientEpoch = Date.now()
+
+function onEpoch({ data }) {
+  const serverEpoch = parseInt(data, 10)
+  if (clientEpoch < serverEpoch) {
+    window.location.reload()
+  }
+}
+
+function onRebuild({ data }) {
+  const { name, error, warnings } = JSON.parse(data)
+
+  if (error) {
+    console.group('esbuild rebuild failed:', name)
+    for (const message of error.errors) {
+      formatMessage('error', message)
+    }
+    for (const message of error.warnings) {
+      formatMessage('warning', message)
+    }
+    console.groupEnd()
+  } else {
+    if (warnings.length) {
+      console.group('esbuild rebuild produced warnings:', name)
+      for (const message of warnings) {
         formatMessage('warning', message)
       }
       console.groupEnd()
-    } else {
-      if (warnings.length) {
-        console.group('esbuild rebuild produced warnings:', name)
-        for (const message of warnings) {
-          formatMessage('warning', message)
-        }
-        console.groupEnd()
-      }
-      window.location.reload()
     }
+    window.location.reload()
   }
-)
+}
+
+const bus = new EventSource(import.meta.url + '/event-source')
+bus.addEventListener('epoch', onEpoch)
+bus.addEventListener('rebuild', onRebuild)
+
+// Use a dummy export map for marking this file as ES6.
+export {}
