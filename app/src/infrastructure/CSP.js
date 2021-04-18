@@ -7,11 +7,7 @@ const { STATIC_FILES_BASE } = require('./WebpackAssets')
 
 const staticFilesBase = STATIC_FILES_BASE
 
-const NG_CLOAK =
-  '@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}'
-
 module.exports = function(app, webRouter) {
-  app.locals.NG_CLOAK = NG_CLOAK
   if (
     Settings.security &&
     Settings.security.csp &&
@@ -73,7 +69,6 @@ function getCspMiddleware() {
     hash.update(blob)
     return `'sha512-${hash.digest('base64')}'`
   }
-  const ngCloakDigest = getDigest(NG_CLOAK)
   const angularSanitizeProbeDigest = getDigest('<img src="')
 
   const UNSAFE_INLINE = "'unsafe-inline'"
@@ -103,7 +98,7 @@ function getCspMiddleware() {
     const workerSrc = []
 
     if (csp.blockInlineStyle && !cfg.hasUnsafeInlineStyle) {
-      styleSrc.push(ngCloakDigest, angularSanitizeProbeDigest)
+      styleSrc.push(angularSanitizeProbeDigest)
     } else {
       styleSrc.push(UNSAFE_INLINE)
     }
