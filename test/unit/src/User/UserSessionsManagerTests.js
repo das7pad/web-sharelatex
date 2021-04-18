@@ -29,6 +29,7 @@ describe('UserSessionsManager', function() {
     this.rclient = {
       multi: sinon.stub(),
       exec: sinon.stub(),
+      exists: sinon.stub(),
       get: sinon.stub(),
       del: sinon.stub(),
       sadd: sinon.stub(),
@@ -719,7 +720,7 @@ describe('UserSessionsManager', function() {
       }
       this.sessionKeys = ['one', 'two']
       this.rclient.smembers.callsArgWith(1, null, this.sessionKeys)
-      this.rclient.get.callsArgWith(1, null, 'some-value')
+      this.rclient.exists.yields(null, 1)
       return this.rclient.srem.callsArgWith(2, null, {})
     })
 
@@ -734,7 +735,7 @@ describe('UserSessionsManager', function() {
     it('should call the appropriate redis methods', function(done) {
       return this.call(err => {
         this.rclient.smembers.callCount.should.equal(1)
-        this.rclient.get.callCount.should.equal(2)
+        this.rclient.exists.callCount.should.equal(2)
         this.rclient.srem.callCount.should.equal(0)
         return done()
       })
@@ -742,8 +743,8 @@ describe('UserSessionsManager', function() {
 
     describe('when one of the keys is not present in redis', function() {
       beforeEach(function() {
-        this.rclient.get.onCall(0).callsArgWith(1, null, 'some-val')
-        return this.rclient.get.onCall(1).callsArgWith(1, null, null)
+        this.rclient.exists.onCall(0).yields(null, 1) // one
+        this.rclient.exists.onCall(1).yields(null, 0) // two
       })
 
       it('should not produce an error', function(done) {
@@ -757,7 +758,7 @@ describe('UserSessionsManager', function() {
       it('should remove that key from the set', function(done) {
         return this.call(err => {
           this.rclient.smembers.callCount.should.equal(1)
-          this.rclient.get.callCount.should.equal(2)
+          this.rclient.exists.callCount.should.equal(2)
           this.rclient.srem.callCount.should.equal(1)
           this.rclient.srem.firstCall.args[1].should.equal('two')
           return done()
@@ -783,16 +784,16 @@ describe('UserSessionsManager', function() {
       it('should not call redis methods', function(done) {
         return this.call(err => {
           this.rclient.smembers.callCount.should.equal(0)
-          this.rclient.get.callCount.should.equal(0)
+          this.rclient.exists.callCount.should.equal(0)
           return done()
         })
       })
     })
 
-    describe('when one of the get operations produces an error', function() {
+    describe('when one of the exists operations produces an error', function() {
       beforeEach(function() {
-        this.rclient.get.onCall(0).callsArgWith(1, new Error('woops'), null)
-        return this.rclient.get.onCall(1).callsArgWith(1, null, null)
+        this.rclient.exists.onCall(0).yields(new Error('woops')) // one
+        this.rclient.exists.onCall(1).yields(null, 1) // two
       })
 
       it('should produce an error', function(done) {
@@ -805,7 +806,7 @@ describe('UserSessionsManager', function() {
       it('should call the right redis methods, bailing out early', function(done) {
         return this.call(err => {
           this.rclient.smembers.callCount.should.equal(1)
-          this.rclient.get.callCount.should.equal(1)
+          this.rclient.exists.callCount.should.equal(1)
           this.rclient.srem.callCount.should.equal(0)
           return done()
         })

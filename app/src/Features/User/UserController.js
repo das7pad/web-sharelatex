@@ -18,6 +18,7 @@ const HttpErrorHandler = require('../Errors/HttpErrorHandler')
 const OError = require('@overleaf/o-error')
 const EmailHandler = require('../Email/EmailHandler')
 const UrlHelper = require('../Helpers/UrlHelper')
+const Csrf = require('../../infrastructure/Csrf')
 const { promisify } = require('util')
 const { expressify } = require('../../util/promises')
 
@@ -410,6 +411,7 @@ const UserController = {
     if (typeof req.logout === 'function') {
       req.logout()
     } // passport logout
+    Csrf.invalidateState(req.res)
     req.session.destroy(err => {
       if (err) {
         OError.tag(err, 'error destroying session')

@@ -27,6 +27,9 @@ describe('AuthenticationController', function() {
         '../../infrastructure/RedirectManager': {
           getQueryString: sinon.stub().returns('?extra_query=foo')
         },
+        '../../infrastructure/Csrf': {
+          invalidateState: sinon.stub()
+        },
         '../Helpers/AsyncFormHelper': (this.AsyncFormHelper = {
           redirect: sinon.stub()
         }),
@@ -103,6 +106,7 @@ describe('AuthenticationController', function() {
     this.password = 'banana'
     this.req = new MockRequest()
     this.res = new MockResponse()
+    this.req.res = this.res
     this.callback = sinon.stub()
     this.next = sinon.stub()
   })
@@ -1283,10 +1287,6 @@ describe('AuthenticationController', function() {
 
       it('should setup the user data in the background', function() {
         this.UserHandler.setupLoginData.calledWith(this.user).should.equal(true)
-      })
-
-      it('should set res.session.justLoggedIn', function() {
-        this.req.session.justLoggedIn.should.equal(true)
       })
 
       it('should record the successful login', function() {

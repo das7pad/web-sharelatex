@@ -37,7 +37,36 @@ const UserSessionsManager = require('../Features/User/UserSessionsManager')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
 
 // Init the session store
-const sessionStore = new RedisStore({ client: sessionsRedisClient })
+const sessionStore = new RedisStore({
+  client: sessionsRedisClient,
+  ttl: Math.floor(Settings.cookieSessionLength / 1000),
+  serializer: {
+    stringify(session) {
+      // Omit the cookie config from the session blob in redis
+      return JSON.stringify(Object.assign({}, session, { cookie: undefined }))
+    },
+    parse(blob) {
+      const session = JSON.parse(blob)
+      // rebuild the cookie config as we do not persist it into redis
+      session.cookie = {
+        domain: Settings.cookieDomain,
+        expires: new Date(
+          Date.now() + Settings.cookieSessionLength / 1000
+        ).toISOString(),
+        httpOnly: true,
+        originalMaxAge: Settings.cookieSessionLength,
+        path: '/',
+        sameSite: Settings.sameSiteCookie,
+        secure: Settings.secureCookie
+      }
+      return session
+    }
+  }
+})
+// Preserve touch
+const touchSession = sessionStore.touch.bind(sessionStore)
+// Do not bump the expiry in redis on every request
+sessionStore.touch = false
 
 const app = express()
 
@@ -140,11 +169,16 @@ webRouter.csrf = new Csrf()
 webRouter.use(webRouter.csrf.middleware)
 webRouter.use(translations.middleware)
 
-// Measure expiry from last request, not last login
+// Measure expiry from last top-level request, not last login or ajax request
 webRouter.use(function(req, res, next) {
-  if (!req.session.noSessionCallback) {
+  // skip stub sessions
+  if (!req.session || req.session.noSessionCallback) return next()
+
+  const originalRender = res.render
+  res.render = (...args) => {
     req.session.touch()
     if (AuthenticationController.isUserLoggedIn(req)) {
+      // Extend the life time of the collection of users session ids
       UserSessionsManager.touch(
         AuthenticationController.getSessionUser(req),
         err => {
@@ -154,6 +188,16 @@ webRouter.use(function(req, res, next) {
         }
       )
     }
+
+    // An empty session has a 'cookie' and 'validationToken' field.
+    const [key1, key2, key3] = Object.keys(req.session)
+    const sessionIsEmpty =
+      key1 === 'cookie' && key2 === 'validationToken' && key3 === undefined
+    if (!sessionIsEmpty) {
+      // Extend the lifetime of this very session
+      touchSession(req.sessionID, req.session, () => {})
+    }
+    originalRender.apply(res, args)
   }
   next()
 })

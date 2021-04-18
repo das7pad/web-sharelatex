@@ -219,11 +219,11 @@ UserSessionsManager = {
       }
       Async.series(
         sessionKeys.map(key => next =>
-          rclient.get(key, function(err, val) {
+          rclient.exists(key, function(err, exists) {
             if (err) {
               return next(err)
             }
-            if (!val) {
+            if (!exists) {
               rclient.srem(sessionSetKey, key, function(err, result) {
                 return next(err)
               })

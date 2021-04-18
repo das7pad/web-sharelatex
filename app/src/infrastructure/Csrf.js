@@ -13,7 +13,18 @@
  */
 
 const csurf = require('csurf')
-const csrf = csurf()
+const Settings = require('@overleaf/settings')
+const csrf = csurf({
+  cookie: {
+    httpOnly: true,
+    path: '/',
+    sameSite: Settings.sameSiteCookie,
+    secure: Settings.secureCookie,
+    domain: Settings.cookieDomain,
+    maxAge: Settings.cookieSessionLength / 1000,
+    signed: true
+  }
+})
 const { promisify } = require('util')
 
 // Wrapper for `csurf` middleware that provides a list of routes that can be excluded from csrf checks.
@@ -64,6 +75,12 @@ class Csrf {
     } else {
       return csrf(req, res, next)
     }
+  }
+
+  static invalidateState(res) {
+    // omit request cookies in order to get a new cookie in the response
+    const req = { method: 'GET', signedCookies: {}, secret: res.req.secret }
+    csrf(req, res, () => {})
   }
 
   static validateRequest(req, cb) {

@@ -96,6 +96,9 @@ describe('UserController', function() {
         console: console
       },
       requires: {
+        '../../infrastructure/Csrf': {
+          invalidateState: sinon.stub()
+        },
         '../Helpers/UrlHelper': this.UrlHelper,
         './UserGetter': this.UserGetter,
         './UserDeleter': this.UserDeleter,
@@ -145,6 +148,7 @@ describe('UserController', function() {
       json: sinon.stub()
     }
     this.res.status.returns(this.res)
+    this.req.res = this.res
     this.next = sinon.stub()
     this.callback = sinon.stub()
   })

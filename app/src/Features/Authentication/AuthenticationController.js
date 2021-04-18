@@ -16,6 +16,7 @@ const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
 const UrlHelper = require('../Helpers/UrlHelper')
 const RedirectManager = require('../../infrastructure/RedirectManager')
 const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
+const Csrf = require('../../infrastructure/Csrf')
 const {
   acceptsJson
 } = require('../../infrastructure/RequestContentTypeDetection')
@@ -35,7 +36,13 @@ const AuthenticationController = {
     let staffAccess
     if (user.staffAccess) {
       const enabledStaffAccess = Object.entries(user.staffAccess).filter(
-        entry => entry[1]
+        ([key, value]) => {
+          if (key === '$init' && value === true) {
+            // mongoose internal
+            return false
+          }
+          return value
+        }
       )
       if (enabledStaffAccess.length) {
         staffAccess = Object.fromEntries(enabledStaffAccess)
@@ -470,6 +477,7 @@ function _afterLoginSessionSetup(req, user, callback) {
     // Regenerate the session to get a new sessionID (cookie value) to
     // protect against session fixation attacks
     const oldSession = req.session
+    Csrf.invalidateState(req.res)
     req.session.destroy(function(err) {
       if (err) {
         OError.tag(err, 'error when trying to destroy old session', {
@@ -514,7 +522,6 @@ function _loginAsyncHandlers(req, user) {
     { email: user.email, user_id: user._id.toString() },
     'successful log in'
   )
-  req.session.justLoggedIn = true
   // capture the request ip for use when creating the session
   return (user._login_req_ip = req.ip)
 }

@@ -79,13 +79,18 @@ const revokeInvite = (sendingUser, projectId, inviteId, callback) => {
 
 // Actions
 const tryFollowInviteLink = (user, link, callback) => {
-  user.request.get(
-    {
-      uri: link,
-      baseUrl: null
-    },
-    callback
-  )
+  user.getCsrfToken(err => {
+    if (err) {
+      return callback(err)
+    }
+    user.request.get(
+      {
+        uri: link,
+        baseUrl: null
+      },
+      callback
+    )
+  })
 }
 
 const tryAcceptInvite = (user, invite, callback) => {

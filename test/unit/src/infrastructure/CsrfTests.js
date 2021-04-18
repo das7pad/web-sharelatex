@@ -28,6 +28,7 @@ describe('Csrf', function() {
         console: console
       },
       requires: {
+        'settings-sharelatex': {},
         csurf: sinon.stub().returns(this.csurf_csrf)
       }
     })
