@@ -123,9 +123,6 @@ class UserHelper {
    * Requests csrf token unless already cached in internal state
    */
   async getCsrfToken() {
-    if (this._csrfToken) {
-      return
-    }
     // get csrf token from api and store
     const response = await this.request.get('/dev/csrf')
     this._csrfToken = response.body
@@ -257,6 +254,7 @@ class UserHelper {
     if (!userHelper.user) {
       throw new Error(`user not found for email: ${userData.email}`)
     }
+    await userHelper.getCsrfToken()
 
     return userHelper
   }
@@ -300,6 +298,7 @@ class UserHelper {
     if (!userHelper.user) {
       throw new Error(`user not found for email: ${userData.email}`)
     }
+    await userHelper.getCsrfToken()
 
     return userHelper
   }

@@ -497,7 +497,7 @@ function _afterLoginSessionSetup(req, user, callback) {
       // transferred to the new session below.
       for (let key in oldSession) {
         const value = oldSession[key]
-        if (key !== '__tmp') {
+        if (key !== '__tmp' && key !== 'csrfSecret') {
           req.session[key] = value
         }
       }
