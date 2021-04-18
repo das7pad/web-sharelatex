@@ -2,12 +2,12 @@ import { expect } from 'chai'
 import sinon from 'sinon'
 import React from 'react'
 import {
-  act,
   cleanup,
   render,
   screen,
   fireEvent,
-  waitFor
+  waitFor,
+  waitForElementToBeRemoved
 } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import ShareProjectModal from '../../../../../frontend/js/features/share-project-modal/components/share-project-modal'
@@ -68,12 +68,21 @@ describe('<ShareProjectModal/>', function() {
     }
   ]
 
+  const ideWithProject = project => {
+    return {
+      $scope: {
+        $watch: () => () => {},
+        $applyAsync: () => {},
+        project
+      }
+    }
+  }
+
   const modalProps = {
+    ide: ideWithProject(project),
     show: true,
     isAdmin: true,
-    project,
-    handleHide: sinon.stub(),
-    updateProject: sinon.stub()
+    handleHide: sinon.stub()
   }
 
   beforeEach(function() {
@@ -111,7 +120,7 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, publicAccesLevel: 'private' }}
+        ide={ideWithProject({ ...project, publicAccesLevel: 'private' })}
       />
     )
 
@@ -130,7 +139,7 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, publicAccesLevel: 'tokenBased' }}
+        ide={ideWithProject({ ...project, publicAccesLevel: 'tokenBased' })}
       />
     )
 
@@ -147,7 +156,7 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, publicAccesLevel: 'readAndWrite' }}
+        ide={ideWithProject({ ...project, publicAccesLevel: 'readAndWrite' })}
       />
     )
 
@@ -161,7 +170,7 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, publicAccesLevel: 'readOnly' }}
+        ide={ideWithProject({ ...project, publicAccesLevel: 'readOnly' })}
       />
     )
 
@@ -184,7 +193,11 @@ describe('<ShareProjectModal/>', function() {
     const { rerender } = render(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, invites, publicAccesLevel: 'tokenBased' }}
+        ide={ideWithProject({
+          ...project,
+          invites,
+          publicAccesLevel: 'tokenBased'
+        })}
         isAdmin
       />
     )
@@ -196,7 +209,11 @@ describe('<ShareProjectModal/>', function() {
     rerender(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, invites, publicAccesLevel: 'tokenBased' }}
+        ide={ideWithProject({
+          ...project,
+          invites,
+          publicAccesLevel: 'tokenBased'
+        })}
         isAdmin={false}
       />
     )
@@ -211,17 +228,21 @@ describe('<ShareProjectModal/>', function() {
       .null
     expect(screen.queryByRole('button', { name: 'Resend' })).to.be.null
 
-    // render as non-admin, link sharing off: actions should be missing and message should be present
+    // render as non-admin (non-owner), link sharing off: actions should be missing and message should be present
     rerender(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, invites, publicAccesLevel: 'private' }}
+        ide={ideWithProject({
+          ...project,
+          invites,
+          publicAccesLevel: 'private'
+        })}
         isAdmin={false}
       />
     )
 
     await screen.findByText(
-      'To add more collaborators or turn on link sharing, please ask the project owner'
+      'To change access permissions, please ask the project owner'
     )
 
     expect(screen.queryByRole('button', { name: 'Turn off link sharing' })).to
@@ -237,7 +258,7 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{ ...project, publicAccesLevel: 'tokenBased' }}
+        ide={ideWithProject({ ...project, publicAccesLevel: 'tokenBased' })}
       />
     )
 
@@ -285,12 +306,12 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           members,
           invites,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -329,11 +350,11 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           invites,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -342,11 +363,9 @@ describe('<ShareProjectModal/>', function() {
     })
 
     const resendButton = screen.getByRole('button', { name: 'Resend' })
+    fireEvent.click(resendButton)
 
-    await act(async () => {
-      await fireEvent.click(resendButton)
-      expect(closeButton.disabled).to.be.true
-    })
+    await waitFor(() => expect(closeButton.disabled).to.be.true)
 
     expect(fetchMock.done()).to.be.true
     expect(closeButton.disabled).to.be.false
@@ -366,11 +385,11 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           invites,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -379,11 +398,8 @@ describe('<ShareProjectModal/>', function() {
     })
 
     const revokeButton = screen.getByRole('button', { name: 'Revoke' })
-
-    await act(async () => {
-      await fireEvent.click(revokeButton)
-      expect(closeButton.disabled).to.be.true
-    })
+    fireEvent.click(revokeButton)
+    await waitFor(() => expect(closeButton.disabled).to.be.true)
 
     expect(fetchMock.done()).to.be.true
     expect(closeButton.disabled).to.be.false
@@ -403,11 +419,11 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           members,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -422,13 +438,11 @@ describe('<ShareProjectModal/>', function() {
 
     const changeButton = screen.getByRole('button', { name: 'Change' })
 
-    await act(async () => {
-      await fireEvent.click(changeButton)
-      expect(closeButton.disabled).to.be.true
+    fireEvent.click(changeButton)
+    await waitFor(() => expect(closeButton.disabled).to.be.true)
 
-      const { body } = fetchMock.lastOptions()
-      expect(JSON.parse(body)).to.deep.equal({ privilegeLevel: 'readAndWrite' })
-    })
+    const { body } = fetchMock.lastOptions()
+    expect(JSON.parse(body)).to.deep.equal({ privilegeLevel: 'readAndWrite' })
 
     expect(fetchMock.done()).to.be.true
     expect(closeButton.disabled).to.be.false
@@ -448,11 +462,11 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           members,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -462,13 +476,16 @@ describe('<ShareProjectModal/>', function() {
       name: 'Remove from project'
     })
 
-    act(() => {
-      removeButton.click()
-    })
+    fireEvent.click(removeButton)
+
+    const url = fetchMock.lastUrl()
+    expect(url).to.equal('/project/test-project/users/member-viewer')
 
     expect(fetchMock.done()).to.be.true
 
-    // TODO: once the project data is updated, assert that the member has been removed
+    await waitForElementToBeRemoved(() =>
+      screen.queryByText('member-viewer@example.com')
+    )
   })
 
   it('changes member privileges to owner with confirmation', async function() {
@@ -485,11 +502,11 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           members,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -508,11 +525,6 @@ describe('<ShareProjectModal/>', function() {
       )
     })
 
-    const confirmButton = screen.getByRole('button', {
-      name: 'Change owner',
-      hidden: true
-    })
-
     // Monkey patch window.location.reload()
     // jsdom does not implement the underlying `navigation` constructs.
     const oldLocation = window.location
@@ -520,13 +532,15 @@ describe('<ShareProjectModal/>', function() {
     const reloadStub = sinon.stub()
     window.location = { reload: reloadStub }
 
-    await act(async () => {
-      await fireEvent.click(confirmButton)
-      expect(confirmButton.disabled).to.be.true
-
-      const { body } = fetchMock.lastOptions()
-      expect(JSON.parse(body)).to.deep.equal({ user_id: 'member-viewer' })
+    const confirmButton = screen.getByRole('button', {
+      name: 'Change owner'
     })
+
+    fireEvent.click(confirmButton)
+    await waitFor(() => expect(confirmButton.disabled).to.be.true)
+
+    const { body } = fetchMock.lastOptions()
+    expect(JSON.parse(body)).to.deep.equal({ user_id: 'member-viewer' })
 
     expect(fetchMock.done()).to.be.true
     expect(reloadStub.calledOnce).to.be.true
@@ -536,39 +550,13 @@ describe('<ShareProjectModal/>', function() {
   })
 
   it('sends invites to input email addresses', async function() {
-    // TODO: can't use this as the value of useProjectContext doesn't get updated
-    // let mergedProject = {
-    //   ...project,
-    //   publicAccesLevel: 'tokenBased'
-    // }
-    //
-    // const updateProject = value => {
-    //   mergedProject = { ...mergedProject, ...value }
-    //
-    //   rerender(
-    //     <ShareProjectModal
-    //       {...modalProps}
-    //       project={mergedProject}
-    //       updateProject={updateProject}
-    //     />
-    //   )
-    // }
-    //
-    // const { rerender } = render(
-    //   <ShareProjectModal
-    //     {...modalProps}
-    //     project={mergedProject}
-    //     updateProject={updateProject}
-    //   />
-    // )
-
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -657,13 +645,13 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           publicAccesLevel: 'tokenBased',
           features: {
             collaborators: 0
           }
-        }}
+        })}
       />
     )
 
@@ -680,10 +668,10 @@ describe('<ShareProjectModal/>', function() {
     render(
       <ShareProjectModal
         {...modalProps}
-        project={{
+        ide={ideWithProject({
           ...project,
           publicAccesLevel: 'tokenBased'
-        }}
+        })}
       />
     )
 
@@ -699,13 +687,11 @@ describe('<ShareProjectModal/>', function() {
     const submitButton = screen.getByRole('button', { name: 'Share' })
 
     const respondWithError = async function(errorReason) {
-      await act(async () => {
-        inputElement.focus()
-        await fireEvent.change(inputElement, {
-          target: { value: 'invited-author-1@example.com' }
-        })
-        inputElement.blur()
+      inputElement.focus()
+      fireEvent.change(inputElement, {
+        target: { value: 'invited-author-1@example.com' }
       })
+      inputElement.blur()
 
       fetchMock.postOnce(
         'express:/project/:projectId/invite',
@@ -744,5 +730,99 @@ describe('<ShareProjectModal/>', function() {
     )
   })
 
-  // TODO: add test for switching between token-access and private, once project data is in React context
+  it('handles switching between access levels', async function() {
+    fetchMock.post('express:/project/:projectId/settings/admin', 204)
+
+    render(
+      <ShareProjectModal
+        {...modalProps}
+        ide={ideWithProject({ ...project, publicAccesLevel: 'private' })}
+      />
+    )
+
+    await screen.findByText(
+      'Link sharing is off, only invited users can view this project.'
+    )
+
+    const enableButton = await screen.findByRole('button', {
+      name: 'Turn on link sharing'
+    })
+    fireEvent.click(enableButton)
+    await waitFor(() => expect(enableButton.disabled).to.be.true)
+
+    const { body: tokenBody } = fetchMock.lastOptions()
+    expect(JSON.parse(tokenBody)).to.deep.equal({
+      publicAccessLevel: 'tokenBased'
+    })
+
+    await screen.findByText('Link sharing is on')
+    const disableButton = await screen.findByRole('button', {
+      name: 'Turn off link sharing'
+    })
+    fireEvent.click(disableButton)
+    await waitFor(() => expect(disableButton.disabled).to.be.true)
+
+    const { body: privateBody } = fetchMock.lastOptions()
+    expect(JSON.parse(privateBody)).to.deep.equal({
+      publicAccessLevel: 'private'
+    })
+
+    await screen.findByText(
+      'Link sharing is off, only invited users can view this project.'
+    )
+  })
+
+  it('avoids selecting unmatched contact', async function() {
+    render(<ShareProjectModal {...modalProps} />)
+
+    const [inputElement] = await screen.findAllByLabelText(
+      'Share with your collaborators'
+    )
+
+    // Wait for contacts to load
+    await waitFor(() => {
+      expect(fetchMock.called('express:/user/contacts')).to.be.true
+    })
+
+    // Enter a prefix that matches a contact
+    inputElement.focus()
+    fireEvent.change(inputElement, { target: { value: 'ptolemy' } })
+
+    // The matching contact should now be present and selected
+    await screen.findByRole('option', {
+      name: `Claudius Ptolemy <ptolemy@example.com>`,
+      selected: true
+    })
+
+    // Keep entering text so the contact no longer matches
+    fireEvent.change(inputElement, {
+      target: { value: 'ptolemy.new@example.com' }
+    })
+
+    // The matching contact should no longer be present
+    expect(
+      screen.queryByRole('option', {
+        name: `Claudius Ptolemy <ptolemy@example.com>`
+      })
+    ).to.be.null
+
+    // No items should be added yet
+    expect(screen.queryByRole('button', { name: 'Remove' })).to.be.null
+
+    // Pressing Tab should add the entered item
+    fireEvent.keyDown(inputElement, { key: 'Tab', code: 'Tab' })
+    await waitFor(() => {
+      expect(screen.getAllByRole('button', { name: 'Remove' })).to.have.length(
+        1
+      )
+    })
+
+    // Blurring the input should not add another contact
+    fireEvent.blur(inputElement)
+    await waitFor(() => {
+      expect(screen.getAllByRole('button', { name: 'Remove' })).to.have.length(
+        1
+      )
+    })
+  })
 })
