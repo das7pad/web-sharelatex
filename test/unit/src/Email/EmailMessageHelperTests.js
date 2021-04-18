@@ -1,7 +1,6 @@
 const SandboxedModule = require('sandboxed-module')
 const path = require('path')
 const { expect } = require('chai')
-const sanitizeHtml = require('sanitize-html')
 
 const MODULE_PATH = path.join(
   __dirname,
