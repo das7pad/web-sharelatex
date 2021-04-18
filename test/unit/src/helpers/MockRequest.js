@@ -9,6 +9,7 @@ class MockRequest {
   static initClass() {
     this.prototype.session = { destroy() {} }
 
+    this.prototype.ip = '42.42.42.42'
     this.prototype.headers = {
       host: 'www.overleaf.com'
     }

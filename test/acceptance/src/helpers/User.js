@@ -44,6 +44,20 @@ class User {
     db.users.findOne({ _id: ObjectId(this._id) }, callback)
   }
 
+  getAuditLogWithoutNoise(callback) {
+    this.get((error, user) => {
+      if (error) return callback(error)
+      if (!user) return callback(new Error('User not found'))
+
+      callback(
+        null,
+        (user.auditLog || []).filter(entry => {
+          return entry.operation !== 'login'
+        })
+      )
+    })
+  }
+
   mongoUpdate(updateOp, callback) {
     db.users.updateOne({ _id: ObjectId(this._id) }, updateOp, callback)
   }
@@ -354,6 +368,27 @@ class User {
       (error, response, body) => {
         if (error != null) {
           return callback(error)
+        }
+        callback(null)
+      }
+    )
+  }
+
+  undeleteProject(projectId, callback) {
+    this.request.post(
+      {
+        url: `/admin/project/${projectId}/undelete`
+      },
+      (error, response) => {
+        if (error) {
+          return callback(error)
+        }
+        if (response.statusCode !== 204) {
+          return callback(
+            new Error(
+              `Non-success response when undeleting project: ${response.statusCode}`
+            )
+          )
         }
         callback(null)
       }
