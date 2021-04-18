@@ -761,6 +761,8 @@ const ProjectController = {
           req.query && req.query.new_share_modal_ui === 'false'
         const wantsOldAddFilesModalUI =
           req.query && req.query.new_add_files_modal_ui === 'false'
+        const wantsOldGithubSyncUI =
+          req.query && req.query.new_github_sync_ui === 'false'
 
         if (projectId) {
           if (project) {
@@ -871,7 +873,6 @@ const ProjectController = {
                 lineHeight: user.ace.lineHeight || 'normal',
                 overallTheme: user.ace.overallTheme
               },
-              trackChangesState: project.track_changes,
               privilegeLevel,
               chatUrl: Settings.apis.chat.url,
               anonymous,
@@ -905,7 +906,8 @@ const ProjectController = {
               showReactFileTree: !wantsOldFileTreeUI,
               showReactShareModal: user.betaProgram && !wantsOldShareModalUI,
               showReactAddFilesModal:
-                user.betaProgram && !wantsOldAddFilesModalUI
+                user.betaProgram && !wantsOldAddFilesModalUI,
+              showReactGithubSync: !wantsOldGithubSyncUI && user.alphaProgram
             })
             timer.done()
           }

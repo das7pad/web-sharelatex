@@ -22,16 +22,14 @@ const { promisifyAll } = require('../../util/promises')
 const TIMEOUT = 30 * 1000 // request timeout
 
 const DocstoreManager = {
-  deleteDoc(project_id, doc_id, callback) {
+  deleteDoc(project_id, doc_id, name, deletedAt, callback) {
     if (callback == null) {
       callback = function(error) {}
     }
     const url = `${settings.apis.docstore.url}/project/${project_id}/doc/${doc_id}`
-    return request.del({ url: url, timeout: TIMEOUT }, function(
-      error,
-      res,
-      body
-    ) {
+    const docMetaData = { deleted: true, deletedAt, name }
+    const options = { url, json: docMetaData, timeout: TIMEOUT }
+    request.patch(options, function(error, res) {
       if (error != null) {
         return callback(error)
       }
@@ -85,6 +83,28 @@ const DocstoreManager = {
         }
       }
     )
+  },
+
+  getAllDeletedDocs(project_id, callback) {
+    const url = `${settings.apis.docstore.url}/project/${project_id}/doc-deleted`
+    request.get({ url, timeout: TIMEOUT, json: true }, function(
+      error,
+      res,
+      docs
+    ) {
+      if (error) {
+        callback(OError.tag(error, 'could not get deleted docs from docstore'))
+      } else if (res.statusCode === 200) {
+        callback(null, docs)
+      } else {
+        callback(
+          new OError(
+            `docstore api responded with non-success code: ${res.statusCode}`,
+            { project_id }
+          )
+        )
+      }
+    })
   },
 
   getAllRanges(project_id, callback) {

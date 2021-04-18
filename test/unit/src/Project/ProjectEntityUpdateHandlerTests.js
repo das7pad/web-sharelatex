@@ -114,7 +114,6 @@ describe('ProjectEntityUpdateHandler', function() {
       _confirmFolder: sinon.stub(),
       _putElement: sinon.stub(),
       _insertDeletedFileReference: sinon.stub(),
-      _insertDeletedDocReference: sinon.stub(),
       replaceFileWithNew: sinon.stub(),
       mkdirp: sinon.stub(),
       moveEntity: sinon.stub(),
@@ -2157,7 +2156,6 @@ describe('ProjectEntityUpdateHandler', function() {
       }
       this.path = '/path/to/doc'
       this.ProjectEntityUpdateHandler.unsetRootDoc = sinon.stub().yields()
-      this.ProjectEntityMongoUpdateHandler._insertDeletedDocReference.yields()
       this.DocstoreManager.deleteDoc.yields()
     })
 
@@ -2180,21 +2178,14 @@ describe('ProjectEntityUpdateHandler', function() {
       })
 
       it('should delete the doc in the doc updater', function() {
-        this.DocumentUpdaterHandler.deleteDoc.calledWith(
-          projectId,
-          this.doc._id.toString()
-        )
-      })
-
-      it('should insert the doc into the deletedDocs array', function() {
-        this.ProjectEntityMongoUpdateHandler._insertDeletedDocReference
-          .calledWith(this.project._id, this.doc)
+        this.DocumentUpdaterHandler.deleteDoc
+          .calledWith(projectId, this.doc._id.toString())
           .should.equal(true)
       })
 
       it('should delete the doc in the doc store', function() {
         this.DocstoreManager.deleteDoc
-          .calledWith(projectId, this.doc._id.toString())
+          .calledWith(projectId, this.doc._id.toString(), 'test.tex')
           .should.equal(true)
       })
 

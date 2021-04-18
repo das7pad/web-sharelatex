@@ -5,6 +5,26 @@ class MockDocstoreApi extends AbstractMockApi {
     this.docs = {}
   }
 
+  createLegacyDeletedDoc(projectId, docId) {
+    if (!this.docs[projectId]) {
+      this.docs[projectId] = {}
+    }
+    this.docs[projectId][docId] = {
+      lines: [],
+      version: 1,
+      ranges: {},
+      deleted: true
+    }
+  }
+
+  getDeletedDocs(projectId) {
+    return Object.entries(this.docs[projectId] || {})
+      .filter(([_, doc]) => doc.deleted)
+      .map(([docId, doc]) => {
+        return { _id: docId, name: doc.name }
+      })
+  }
+
   applyRoutes() {
     this.app.post('/project/:projectId/doc/:docId', (req, res) => {
       const { projectId, docId } = req.params
@@ -32,6 +52,10 @@ class MockDocstoreApi extends AbstractMockApi {
       res.json(Object.values(this.docs[req.params.projectId] || {}))
     })
 
+    this.app.get('/project/:projectId/doc-deleted', (req, res) => {
+      res.json(this.getDeletedDocs(req.params.projectId))
+    })
+
     this.app.get('/project/:projectId/doc/:docId', (req, res) => {
       const { projectId, docId } = req.params
       const doc = this.docs[projectId][docId]
@@ -51,14 +75,14 @@ class MockDocstoreApi extends AbstractMockApi {
       }
     })
 
-    this.app.delete('/project/:projectId/doc/:docId', (req, res) => {
+    this.app.patch('/project/:projectId/doc/:docId', (req, res) => {
       const { projectId, docId } = req.params
       if (!this.docs[projectId]) {
         res.sendStatus(404)
       } else if (!this.docs[projectId][docId]) {
         res.sendStatus(404)
       } else {
-        this.docs[projectId][docId].deleted = true
+        Object.assign(this.docs[projectId][docId], req.body)
         res.sendStatus(204)
       }
     })

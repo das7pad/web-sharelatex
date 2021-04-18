@@ -106,6 +106,9 @@ describe('ProjectEditorHandler', function() {
         token: 'my-secret-token2'
       }
     ]
+    this.deletedDocsFromDocstore = [
+      { _id: 'deleted-doc-id-from-docstore', name: 'docstore.tex' }
+    ]
     return (this.handler = SandboxedModule.require(modulePath))
   })
 
@@ -115,7 +118,8 @@ describe('ProjectEditorHandler', function() {
         return (this.result = this.handler.buildProjectModelView(
           this.project,
           this.members,
-          this.invites
+          this.invites,
+          this.deletedDocsFromDocstore
         ))
       })
 
@@ -155,7 +159,8 @@ describe('ProjectEditorHandler', function() {
             // omit deletedAt field
             _id: this.project.deletedDocs[0]._id,
             name: this.project.deletedDocs[0].name
-          }
+          },
+          this.deletedDocsFromDocstore[0]
         ])
       })
 
@@ -235,6 +240,26 @@ describe('ProjectEditorHandler', function() {
       })
     })
 
+    describe('when docstore sends a deleted doc that is also present in the project', function() {
+      beforeEach(function() {
+        this.deletedDocsFromDocstore.push(this.project.deletedDocs[0])
+        this.result = this.handler.buildProjectModelView(
+          this.project,
+          this.members,
+          this.invites,
+          this.deletedDocsFromDocstore
+        )
+      })
+
+      it('should not send any duplicate', function() {
+        expect(this.result.deletedDocs).to.exist
+        this.result.deletedDocs.should.deep.equal([
+          this.project.deletedDocs[0],
+          this.deletedDocsFromDocstore[0]
+        ])
+      })
+    })
+
     describe('deletedByExternalDataSource', function() {
       it('should set the deletedByExternalDataSource flag to false when it is not there', function() {
         delete this.project.deletedByExternalDataSource
@@ -298,6 +323,60 @@ describe('ProjectEditorHandler', function() {
         return this.result.features.compileTimeout.should.equal(
           this.owner.features.compileTimeout
         )
+      })
+    })
+
+    describe('trackChangesState', function() {
+      describe('when the owner does not have the trackChanges feature', function() {
+        beforeEach(function() {
+          this.owner.features = {
+            trackChanges: false
+          }
+          this.result = this.handler.buildProjectModelView(
+            this.project,
+            this.members,
+            [],
+            []
+          )
+        })
+        it('should not emit trackChangesState', function() {
+          expect(this.result.trackChangesState).to.not.exist
+        })
+      })
+
+      describe('when the owner has got the trackChanges feature', function() {
+        beforeEach(function() {
+          this.owner.features = {
+            trackChanges: true
+          }
+        })
+
+        function genCase([dbEntry, expected]) {
+          describe(`when track_changes is ${JSON.stringify(
+            dbEntry
+          )}`, function() {
+            beforeEach(function() {
+              this.project.track_changes = dbEntry
+              this.result = this.handler.buildProjectModelView(
+                this.project,
+                this.members,
+                [],
+                []
+              )
+            })
+            it(`should set trackChangesState=${expected}`, function() {
+              expect(this.result.trackChangesState).to.deep.equal(expected)
+            })
+          })
+        }
+
+        const CASES = [
+          [null, false],
+          [false, false],
+          [true, true],
+          [{ someId: true }, { someId: true }]
+        ]
+        CASES.map(genCase)
       })
     })
   })
