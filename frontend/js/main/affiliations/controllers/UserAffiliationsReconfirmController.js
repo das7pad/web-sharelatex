@@ -7,7 +7,7 @@ export default App.controller('UserAffiliationsReconfirmController', function(
   UserAffiliationsDataService,
   $window
 ) {
-  const samlInitPath = ExposedSettings.samlInitPath
+  const samlInitPath = getMeta('ol-samlInitPath')
   $scope.reconfirm = {}
   $scope.ui = $scope.ui || {} // $scope.ui inherited on settings page
   $scope.userEmails = getMeta('ol-userEmails')
