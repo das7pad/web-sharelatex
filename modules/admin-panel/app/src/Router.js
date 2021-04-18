@@ -62,6 +62,10 @@ module.exports = {
 
     adminRouter.get('/user/graph/:user_id', GraphController.userGraph)
     adminRouter.delete('/project/:Project_id', ProjectController.deleteProject)
+    adminRouter.post(
+      '/project/:Project_id/undelete',
+      ProjectAdminController.undeleteProject
+    )
 
     adminRouter.get('/project/:Project_id', ProjectAdminController.show)
     return adminRouter.post(
