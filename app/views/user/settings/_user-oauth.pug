@@ -1,8 +1,3 @@
-block head-scripts
-	meta(name="ol-oauthProviders" data-type="json" content=oauthProviders)
-	meta(name="ol-thirdPartyIds" data-type="json" content=thirdPartyIds)
-	meta(name="ol-isOverleaf" data-type="boolean" content=!!settings.overleaf)
-
 mixin providerList()
 	ul.list-like-table
 		li(ng-repeat="(key, provider) in providers" ng-if="!provider.hideWhenNotLinked || (provider.hideWhenNotLinked && thirdPartyIds[key])")

@@ -1,5 +1,13 @@
 extends ../_layout
 
+block append meta
+	meta(name="ol-reconfirmationRemoveEmail", content=reconfirmationRemoveEmail)
+	meta(name="ol-reconfirmedViaSAML", content=reconfirmedViaSAML)
+	meta(name="ol-passwordStrengthOptions", data-type="json", content=settings.passwordStrengthOptions || {})
+	meta(name="ol-oauthProviders", data-type="json", content=oauthProviders)
+	meta(name="ol-thirdPartyIds", data-type="json", content=thirdPartyIds)
+	meta(name="ol-isOverleaf" data-type="boolean" content=!!settings.overleaf)
+
 block content
 	main.content.content-alt
 		.container
@@ -278,8 +286,3 @@ block content
 			)
 				span(ng-hide="state.inflight") {{translate("delete")}}
 				span(ng-show="state.inflight") {{translate("deleting")}}…
-	
-	meta(name="ol-reconfirmationRemoveEmail" content=reconfirmationRemoveEmail)
-	meta(name="ol-reconfirmedViaSAML" content=reconfirmedViaSAML)
-	meta(name="ol-passwordStrengthOptions" data-type="json" content=(settings.passwordStrengthOptions || {}))
-	meta(name="ol-usersEmail", content=user.email)
