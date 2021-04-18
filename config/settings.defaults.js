@@ -78,7 +78,8 @@ const defaultTextExtensions = [
   'ldf',
   'rmd',
   'lua',
-  'gv'
+  'gv',
+  'mf'
 ]
 
 function parseTextExtensions(extensions) {
