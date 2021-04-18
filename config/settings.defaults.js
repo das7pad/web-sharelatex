@@ -50,6 +50,43 @@ const intFromEnv = function(name, defaultValue) {
   return parseInt(process.env[name], 10) || defaultValue
 }
 
+const defaultTextExtensions = [
+  'tex',
+  'latex',
+  'sty',
+  'cls',
+  'bst',
+  'bib',
+  'bibtex',
+  'txt',
+  'tikz',
+  'mtx',
+  'rtex',
+  'md',
+  'asy',
+  'latexmkrc',
+  'lbx',
+  'bbx',
+  'cbx',
+  'm',
+  'lco',
+  'dtx',
+  'ins',
+  'ist',
+  'def',
+  'clo',
+  'ldf',
+  'rmd',
+  'lua',
+  'gv'
+]
+
+function parseTextExtensions(extensions) {
+  if (!extensions) return []
+
+  return extensions.split(',').map(ext => ext.trim())
+}
+
 module.exports = {
   enableLegacyRegistration: true,
 
@@ -967,6 +1004,10 @@ module.exports = {
   // imageRoot: "<DOCKER REPOSITORY ROOT>" # without any trailing slash
 
   compileBodySizeLimitMb: process.env.COMPILE_BODY_SIZE_LIMIT_MB || 5,
+
+  textExtensions: defaultTextExtensions.concat(
+    parseTextExtensions(process.env.ADDITIONAL_TEXT_EXTENSIONS)
+  ),
 
   validRootDocExtensions: ['tex', 'Rtex', 'ltx'],
 

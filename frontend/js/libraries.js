@@ -11,4 +11,9 @@ import 'libs/passfield'
 import 'libs/ng-tags-input'
 import 'libs/select/select'
 import './misc/ga'
+
+// CSS
+import 'angular/angular-csp.css'
+
+// Rewrite meta elements
 import './utils/meta'

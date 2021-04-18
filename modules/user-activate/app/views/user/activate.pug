@@ -1,5 +1,8 @@
 extends ../../../../../app/views/_layout
 
+block append meta
+	meta(name="ol-passwordStrengthOptions" data-type="json" content=settings.passwordStrengthOptions)
+
 block content
 	main.content.content-alt
 		.container
@@ -57,5 +60,3 @@ block content
 								)
 									span(ng-show="!activationForm.inflight") {{translate("activate")}}
 									span(ng-show="activationForm.inflight") {{translate("activating")}}…
-
-	meta(name="ol-passwordStrengthOptions" data-type="json" content=(settings.passwordStrengthOptions || {}))
