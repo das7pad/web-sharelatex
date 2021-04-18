@@ -7,7 +7,7 @@ block vars
 	- metadata = { viewport: true }
 
 block head-scripts
-	script(type="text/javascript", nonce=scriptNonce).
+	script(type='text/javascript').
 		window.recomendedCurrency = '#{recomendedCurrency}';
 		window.abCurrencyFlag = '#{abCurrencyFlag}';
 		window.groupPlans = !{StringHelper.stringifyJsonForScript(groupPlans)};
