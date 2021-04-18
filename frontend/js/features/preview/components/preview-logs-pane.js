@@ -18,6 +18,7 @@ function PreviewLogsPane({
   isClearingCache,
   isCompiling = false,
   autoCompileHasLintingError = false,
+  variantWithFirstErrorPopup,
   onLogEntryLocationClick,
   onClearCache
 }) {
@@ -112,7 +113,9 @@ function PreviewLogsPane({
   return (
     <div className="logs-pane">
       <div className="logs-pane-content">
-        <LogsPaneBetaNotice />
+        <LogsPaneInfoNotice
+          variantWithFirstErrorPopup={variantWithFirstErrorPopup}
+        />
         {autoCompileHasLintingError ? <AutoCompileLintingErrorEntry /> : null}
         {errors ? errorsUI : null}
         {validationIssues ? validationIssuesUI : null}
@@ -139,27 +142,30 @@ function AutoCompileLintingErrorEntry() {
   )
 }
 
-function LogsPaneBetaNotice() {
-  const [dismissedBetaNotice, setDismissedBetaNotice] = usePersistedState(
-    `logs_pane.dismissed_beta_notice`,
+function LogsPaneInfoNotice({ variantWithFirstErrorPopup }) {
+  const [dismissedInfoNotice, setDismissedInfoNotice] = usePersistedState(
+    `logs_pane.dismissed_info_notice`,
     false
   )
 
+  const surveyLink = variantWithFirstErrorPopup
+    ? 'https://forms.gle/AUbDDRvroQ7KFwHR9'
+    : 'https://forms.gle/bRxevtGzBHRk8BKw8'
   function handleDismissButtonClick() {
-    setDismissedBetaNotice(true)
+    setDismissedInfoNotice(true)
   }
 
-  return dismissedBetaNotice ? null : (
+  return dismissedInfoNotice ? null : (
     <div className="log-entry">
       <div className="log-entry-header log-entry-header-raw">
         <div className="log-entry-header-icon-container">
-          <span className="beta-badge" />
+          <span className="info-badge" />
         </div>
         <h3 className="log-entry-header-title">
-          {t('logs_pane_beta_message')}
+          {t('logs_pane_info_message')}
         </h3>
         <a
-          href="/beta/participate"
+          href={surveyLink}
           target="_blank"
           rel="noopener noreferrer"
           className="log-entry-header-link log-entry-header-link-raw"
@@ -181,6 +187,10 @@ function LogsPaneBetaNotice() {
   )
 }
 
+LogsPaneInfoNotice.propTypes = {
+  variantWithFirstErrorPopup: PropTypes.bool
+}
+
 PreviewLogsPane.propTypes = {
   logEntries: PropTypes.shape({
     all: PropTypes.array,
@@ -193,6 +203,7 @@ PreviewLogsPane.propTypes = {
   outputFiles: PropTypes.array,
   isClearingCache: PropTypes.bool,
   isCompiling: PropTypes.bool,
+  variantWithFirstErrorPopup: PropTypes.bool,
   onLogEntryLocationClick: PropTypes.func.isRequired,
   onClearCache: PropTypes.func.isRequired,
   validationIssues: PropTypes.object,

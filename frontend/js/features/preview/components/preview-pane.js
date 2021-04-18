@@ -131,6 +131,7 @@ function PreviewPane({
           onLogEntryLocationClick={onLogEntryLocationClick}
           isClearingCache={compilerState.isClearingCache}
           isCompiling={compilerState.isCompiling}
+          variantWithFirstErrorPopup={variantWithFirstErrorPopup}
           onClearCache={onClearCache}
         />
       ) : null}
