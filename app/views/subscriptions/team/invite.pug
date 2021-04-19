@@ -1,9 +1,8 @@
 extends ../../_layout
 
-block head-scripts
-	meta(id="ol-teamId" content=teamId)
-	meta(id="ol-hasIndividualRecurlySubscription" data-json content=hasIndividualRecurlySubscription)
-	meta(id="ol-inviteToken" content=inviteToken)
+block append meta
+	meta(name="ol-hasIndividualRecurlySubscription" data-type="boolean" content=hasIndividualRecurlySubscription)
+	meta(name="ol-inviteToken" content=inviteToken)
 
 block content
 	main.content.content-alt.team-invite

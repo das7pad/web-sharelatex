@@ -6,10 +6,9 @@ include _plans_page_tables
 block vars
 	- metadata = { viewport: true }
 
-block head-scripts
-	meta(id="ol-recomendedCurrency" content=recomendedCurrency)
-	meta(id="ol-abCurrencyFlag" content=abCurrencyFlag)
-	meta(id="ol-groupPlans" data-json content=groupPlans)
+block append meta
+	meta(name="ol-recomendedCurrency" content=recomendedCurrency)
+	meta(name="ol-groupPlans" data-type="json" content=groupPlans)
 
 block content
 	.content.content-alt

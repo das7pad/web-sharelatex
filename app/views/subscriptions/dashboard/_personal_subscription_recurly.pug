@@ -1,7 +1,3 @@
-meta(id="ol-recurlyApiKey" content=settings.apis.recurly.publicKey)
-meta(id="ol-subscription" data-json content=personalSubscription)
-meta(id="ol-recomendedCurrency" content=personalSubscription.recurly.currency)
-
 div(ng-controller="RecurlySubscriptionController")
 	div(ng-show="!showCancellation")
 		if (personalSubscription.recurly.account.has_past_due_invoice && personalSubscription.recurly.account.has_past_due_invoice._ == 'true')
