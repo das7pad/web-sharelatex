@@ -498,21 +498,24 @@ describe('Deleting a project', function () {
       })
 
       it('should insert unique entries into the deletedFiles collection', async function () {
-        const docs = await db.deletedFiles
-          .find({}, { sort: { _id: 1 } })
-          .toArray()
-        expect(docs).to.deep.equal([
-          {
-            _id: fileId1,
-            projectId: ObjectId(this.projectId),
-            ...otherFileDetails
-          },
-          {
-            _id: fileId2,
-            projectId: ObjectId(this.projectId),
-            ...otherFileDetails
-          }
-        ])
+        const docs = await db.deletedFiles.find({}).toArray()
+        function compareFn(a, b) {
+          return a._id.toString() > b._id.toString() ? 1 : -1
+        }
+        expect(docs.sort(compareFn)).to.deep.equal(
+          [
+            {
+              _id: fileId1,
+              projectId: ObjectId(this.projectId),
+              ...otherFileDetails
+            },
+            {
+              _id: fileId2,
+              projectId: ObjectId(this.projectId),
+              ...otherFileDetails
+            }
+          ].sort(compareFn)
+        )
       })
     })
   })
