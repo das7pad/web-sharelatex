@@ -1,6 +1,4 @@
 const { exec } = require('child_process')
-const fs = require('fs')
-const Path = require('path')
 const { promisify } = require('util')
 const { expect } = require('chai')
 const logger = require('logger-sharelatex')
@@ -24,18 +22,6 @@ async function unsetDeletedFiles(projectId) {
 
 describe('BackFillDeletedFiles', function () {
   let user, projectId1, projectId2, projectId3, projectId4, projectId5
-
-  before('skip unless the script exists', async function () {
-    const scriptPath = Path.join(
-      __dirname,
-      '../../../scripts/back_fill_deleted_files.js'
-    )
-    try {
-      await fs.promises.stat(scriptPath)
-    } catch (e) {
-      this.skip()
-    }
-  })
 
   beforeEach('create projects', async function () {
     user = new User()
