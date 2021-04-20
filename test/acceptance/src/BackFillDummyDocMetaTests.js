@@ -1,5 +1,3 @@
-const fs = require('fs')
-const Path = require('path')
 const { exec } = require('child_process')
 const { promisify } = require('util')
 const { expect } = require('chai')
@@ -21,18 +19,6 @@ function getObjectIdFromDate(date) {
 }
 
 describe('BackFillDummyDocMeta', function () {
-  before('skip unless the script exists', async function () {
-    const scriptPath = Path.join(
-      __dirname,
-      '../../../scripts/back_fill_dummy_doc_meta.js'
-    )
-    try {
-      await fs.promises.stat(scriptPath)
-    } catch (e) {
-      this.skip()
-    }
-  })
-
   let docIds
   let projectIds
   let stopAtSeconds
