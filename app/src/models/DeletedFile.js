@@ -17,5 +17,10 @@ const DeletedFileSchema = new Schema(
   { collection: 'deletedFiles' }
 )
 
+DeletedFileSchema.index(
+  { projectId: 1 },
+  { name: 'projectId_1', background: 1 }
+)
+
 exports.DeletedFile = mongoose.model('DeletedFile', DeletedFileSchema)
 exports.DeletedFileSchema = DeletedFileSchema
