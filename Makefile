@@ -342,6 +342,7 @@ build_prod: clean_build_artifacts
 			modules/*/app/ \
 			modules/*/index.js \
 			public/manifest.json \
+			scripts/ \
 			test/smoke/src \
 	| gzip \
 	> build_artifacts.tar.gz
