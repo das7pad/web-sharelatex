@@ -308,10 +308,6 @@ describe('Deleting a project', function () {
       })
 
       it('should cleanup the deleteFiles', async function () {
-        if (!(await db.deletedFiles.indexExists('projectId_1'))) {
-          this.skip()
-          return
-        }
         const files = await db.deletedFiles
           .find({}, { sort: { _id: 1 } })
           .toArray()
