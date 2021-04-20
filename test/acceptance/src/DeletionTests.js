@@ -279,9 +279,7 @@ describe('Deleting a project', function () {
         .find({}, { sort: { _id: 1 } })
         .toArray()
       expect(files).to.have.length(2)
-      expect(files.map(file => file._id.toString()).sort()).to.deep.equal(
-        allFileIds.sort()
-      )
+      expect(files.map(file => file._id.toString())).to.deep.equal(allFileIds)
     })
 
     describe('When the deleted project is expired', function () {
