@@ -10,10 +10,8 @@ import TrackChangesToggleButton from './track-changes-toggle-button'
 import HistoryToggleButton from './history-toggle-button'
 import ShareProjectButton from './share-project-button'
 import PdfToggleButton from './pdf-toggle-button'
-import importOverleafModules from '../../../../macros/import-overleaf-module.macro'
 
-const [publishModalModules] = importOverleafModules('publishModal')
-const PublishButton = publishModalModules?.import.default
+const PublishButton = undefined
 
 function ToolbarHeader({
   cobranding,
