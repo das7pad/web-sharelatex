@@ -93,6 +93,9 @@ describe('RegenerateDuplicateReferralIds', function () {
           // disable verbose logging from logger-sharelatex
           'LOG_LEVEL=ERROR',
 
+          // Silence DeprecationWarnings
+          'NODE_OPTIONS="--no-deprecation"',
+
           // actual command
           'node',
           'scripts/regenerate_duplicate_referral_ids'
