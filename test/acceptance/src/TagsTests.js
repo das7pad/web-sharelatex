@@ -185,7 +185,7 @@ describe('Tags', function () {
         { url: `/tag/lol/rename`, json: { name: 'five' } },
         (err, response) => {
           expect(err).to.not.exist
-          expect(response.statusCode).to.equal(500)
+          expect(response.statusCode).to.equal(400)
           done()
         }
       )
@@ -253,7 +253,7 @@ describe('Tags', function () {
         { url: `/tag/lol`, json: { name: 'five' } },
         (err, response) => {
           expect(err).to.not.exist
-          expect(response.statusCode).to.equal(500)
+          expect(response.statusCode).to.equal(400)
           done()
         }
       )
@@ -298,7 +298,7 @@ describe('Tags', function () {
         { url: `/tag/lol/project/bad` },
         (err, response) => {
           expect(err).to.not.exist
-          expect(response.statusCode).to.equal(500)
+          expect(response.statusCode).to.equal(400)
           done()
         }
       )

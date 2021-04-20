@@ -11,19 +11,17 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
+const { ObjectId } = require('mongodb')
 const SandboxedModule = require('sandboxed-module')
-const assert = require('assert')
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
   '../../../../app/src/Features/Tags/TagsController'
 )
-const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('TagsController', function () {
-  const userId = '123nd3ijdks'
-  const projectId = '123njdskj9jlk'
-  const tag = 'some_class101'
+  const userId = ObjectId().toString()
+  const projectId = ObjectId().toString()
 
   beforeEach(function () {
     this.handler = {
@@ -79,7 +77,7 @@ describe('TagsController', function () {
   describe('createTag', function () {
     beforeEach(function () {
       this.handler.createTag.callsArgWith(2, null, (this.tag = { mock: 'tag' }))
-      this.req.session.user._id = this.userId = 'user-id-123'
+      this.req.session.user._id = this.userId = ObjectId().toString()
       this.req.body = { name: (this.name = 'tag-name') }
       return this.controller.createTag(this.req, this.res)
     })
@@ -97,8 +95,8 @@ describe('TagsController', function () {
 
   describe('deleteTag', function () {
     beforeEach(function () {
-      this.req.params.tagId = this.tagId = 'tag-id-123'
-      this.req.session.user._id = this.userId = 'user-id-123'
+      this.req.params.tagId = this.tagId = ObjectId().toString()
+      this.req.session.user._id = this.userId = ObjectId().toString()
       return this.controller.deleteTag(this.req, this.res)
     })
 
@@ -116,8 +114,8 @@ describe('TagsController', function () {
 
   describe('renameTag', function () {
     beforeEach(function () {
-      this.req.params.tagId = this.tagId = 'tag-id-123'
-      return (this.req.session.user._id = this.userId = 'user-id-123')
+      this.req.params.tagId = this.tagId = ObjectId().toString()
+      this.req.session.user._id = this.userId = ObjectId().toString()
     })
 
     describe('with a name', function () {
@@ -156,9 +154,9 @@ describe('TagsController', function () {
 
   describe('addProjectToTag', function () {
     beforeEach(function () {
-      this.req.params.tagId = this.tagId = 'tag-id-123'
-      this.req.params.projectId = this.projectId = 'project-id-123'
-      this.req.session.user._id = this.userId = 'user-id-123'
+      this.req.params.tagId = this.tagId = ObjectId().toString()
+      this.req.params.projectId = this.projectId = ObjectId().toString()
+      this.req.session.user._id = this.userId = ObjectId().toString()
       return this.controller.addProjectToTag(this.req, this.res)
     })
 
@@ -176,9 +174,9 @@ describe('TagsController', function () {
 
   describe('removeProjectFromTag', function () {
     beforeEach(function () {
-      this.req.params.tagId = this.tagId = 'tag-id-123'
-      this.req.params.projectId = this.projectId = 'project-id-123'
-      this.req.session.user._id = this.userId = 'user-id-123'
+      this.req.params.tagId = this.tagId = ObjectId().toString()
+      this.req.params.projectId = this.projectId = ObjectId().toString()
+      this.req.session.user._id = this.userId = ObjectId().toString()
       return this.controller.removeProjectFromTag(this.req, this.res)
     })
 

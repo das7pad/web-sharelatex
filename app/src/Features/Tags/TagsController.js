@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb')
 const TagsHandler = require('./TagsHandler')
 const AuthenticationController = require('../Authentication/AuthenticationController')
 const Errors = require('../Errors/Errors')
@@ -17,6 +18,9 @@ const TagsController = {
 
   apiGetAllTags(req, res, next) {
     const { userId } = req.params
+    if (!ObjectId.isValid(userId)) {
+      return res.status(400).end()
+    }
     TagsController._getTags(userId, req, res, next)
   },
 
@@ -39,6 +43,9 @@ const TagsController = {
   addProjectToTag(req, res, next) {
     const userId = AuthenticationController.getLoggedInUserId(req)
     const { tagId, projectId } = req.params
+    if (!ObjectId.isValid(tagId) || !ObjectId.isValid(projectId)) {
+      return res.status(400).end()
+    }
     TagsHandler.addProjectToTag(userId, tagId, projectId, function (error) {
       if (error) {
         return next(error)
@@ -50,6 +57,9 @@ const TagsController = {
   removeProjectFromTag(req, res, next) {
     const userId = AuthenticationController.getLoggedInUserId(req)
     const { tagId, projectId } = req.params
+    if (!ObjectId.isValid(tagId) || !ObjectId.isValid(projectId)) {
+      return res.status(400).end()
+    }
     TagsHandler.removeProjectFromTag(
       userId,
       tagId,
@@ -66,6 +76,9 @@ const TagsController = {
   deleteTag(req, res, next) {
     const userId = AuthenticationController.getLoggedInUserId(req)
     const { tagId } = req.params
+    if (!ObjectId.isValid(tagId)) {
+      return res.status(400).end()
+    }
     TagsHandler.deleteTag(userId, tagId, function (error) {
       if (error) {
         return next(error)
@@ -78,7 +91,7 @@ const TagsController = {
     const userId = AuthenticationController.getLoggedInUserId(req)
     const { tagId } = req.params
     const name = req.body != null ? req.body.name : undefined
-    if (!name) {
+    if (!name || !ObjectId.isValid(tagId)) {
       return res.status(400).end()
     }
     TagsHandler.renameTag(userId, tagId, name, function (error) {
