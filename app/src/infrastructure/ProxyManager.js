@@ -39,6 +39,13 @@ module.exports = ProxyManager = {
   },
 
   createProxy(target) {
+    if (typeof target !== 'string' && !target.baseUrl) {
+      logger.error({ target }, 'cannot make proxy without baseUrl')
+      return function (req, res) {
+        return res.sendStatus(500)
+      }
+    }
+
     return function (req, res, next) {
       const targetUrl = makeTargetUrl(target, req)
       logger.log({ targetUrl, reqUrl: req.url }, 'proxying url')
