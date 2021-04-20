@@ -2,6 +2,9 @@ const { exec } = require('child_process')
 const { promisify } = require('util')
 const { expect } = require('chai')
 const logger = require('logger-sharelatex')
+const {
+  skipWithBrokenObjectIdCounter
+} = require('./helpers/skipWithBrokenObjectIdCounter')
 const { db } = require('../../../app/src/infrastructure/mongodb')
 
 const BATCH_SIZE = 100
@@ -34,6 +37,8 @@ async function getBatch(batchCounter) {
 }
 
 describe('RegenerateDuplicateReferralIds', function () {
+  skipWithBrokenObjectIdCounter()
+
   let firstBatch, secondBatch, thirdBatch, forthBatch, duplicateAcrossBatch
   beforeEach('insert duplicates', async function () {
     // full batch of duplicates

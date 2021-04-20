@@ -2,6 +2,9 @@ const { exec } = require('child_process')
 const { promisify } = require('util')
 const { expect } = require('chai')
 const logger = require('logger-sharelatex')
+const {
+  skipWithBrokenObjectIdCounter
+} = require('./helpers/skipWithBrokenObjectIdCounter')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongodb')
 
 const DUMMY_NAME = 'unknown.tex'
@@ -19,6 +22,8 @@ function getObjectIdFromDate(date) {
 }
 
 describe('BackFillDummyDocMeta', function () {
+  skipWithBrokenObjectIdCounter()
+
   let docIds
   let projectIds
   let stopAtSeconds

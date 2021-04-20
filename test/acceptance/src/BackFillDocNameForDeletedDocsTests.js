@@ -2,6 +2,9 @@ const { exec } = require('child_process')
 const { promisify } = require('util')
 const { expect } = require('chai')
 const logger = require('logger-sharelatex')
+const {
+  skipWithBrokenObjectIdCounter
+} = require('./helpers/skipWithBrokenObjectIdCounter')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongodb')
 const User = require('./helpers/User').promises
 
@@ -14,6 +17,8 @@ async function setDeletedDocs(projectId, deletedDocs) {
 }
 
 describe('BackFillDocNameForDeletedDocs', function () {
+  skipWithBrokenObjectIdCounter()
+
   let user, projectId1, projectId2, docId1, docId2, docId3
   beforeEach('create projects', async function () {
     user = new User()

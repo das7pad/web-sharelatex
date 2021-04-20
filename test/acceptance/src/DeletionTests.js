@@ -275,11 +275,11 @@ describe('Deleting a project', function () {
     }
 
     it('should have two deleteFiles entries', async function () {
-      const files = await db.deletedFiles
-        .find({}, { sort: { _id: 1 } })
-        .toArray()
+      const files = await db.deletedFiles.find({}).toArray()
       expect(files).to.have.length(2)
-      expect(files.map(file => file._id.toString())).to.deep.equal(allFileIds)
+      const actualIds = files.map(file => file._id.toString())
+      expect(actualIds).to.include(allFileIds[0])
+      expect(actualIds).to.include(allFileIds[1])
     })
 
     describe('When the deleted project is expired', function () {
@@ -492,21 +492,18 @@ describe('Deleting a project', function () {
       })
 
       it('should insert unique entries into the deletedFiles collection', async function () {
-        const docs = await db.deletedFiles
-          .find({}, { sort: { _id: 1 } })
-          .toArray()
-        expect(docs).to.deep.equal([
-          {
-            _id: fileId1,
-            projectId: ObjectId(this.projectId),
-            ...otherFileDetails
-          },
-          {
-            _id: fileId2,
-            projectId: ObjectId(this.projectId),
-            ...otherFileDetails
-          }
-        ])
+        const docs = await db.deletedFiles.find({}).toArray()
+        expect(docs).to.have.length(2)
+        expect(docs).to.deep.include({
+          _id: fileId1,
+          projectId: ObjectId(this.projectId),
+          ...otherFileDetails
+        })
+        expect(docs).to.deep.include({
+          _id: fileId2,
+          projectId: ObjectId(this.projectId),
+          ...otherFileDetails
+        })
       })
     })
   })
