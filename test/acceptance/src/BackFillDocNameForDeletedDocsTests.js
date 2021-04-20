@@ -1,5 +1,3 @@
-const fs = require('fs')
-const Path = require('path')
 const { exec } = require('child_process')
 const { promisify } = require('util')
 const { expect } = require('chai')
@@ -16,17 +14,6 @@ async function setDeletedDocs(projectId, deletedDocs) {
 }
 
 describe('BackFillDocNameForDeletedDocs', function () {
-  before('skip unless the script exists', async function () {
-    const scriptPath = Path.join(
-      __dirname,
-      '../../../scripts/back_fill_doc_name_for_deleted_docs.js'
-    )
-    try {
-      await fs.promises.stat(scriptPath)
-    } catch (e) {
-      this.skip()
-    }
-  })
   let user, projectId1, projectId2, docId1, docId2, docId3
   beforeEach('create projects', async function () {
     user = new User()
