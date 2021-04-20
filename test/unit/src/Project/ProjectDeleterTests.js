@@ -628,6 +628,9 @@ describe('ProjectDeleter', function () {
 
   describe('undeleteProject', function () {
     beforeEach(function () {
+      this.unknownProjectId = ObjectId()
+      this.purgedProjectId = ObjectId()
+
       this.deletedProject = {
         _id: 'deleted',
         project: this.project,
@@ -639,7 +642,7 @@ describe('ProjectDeleter', function () {
       this.purgedProject = {
         _id: 'purged',
         deleterData: {
-          deletedProjectId: 'purgedProject',
+          deletedProjectId: this.purgedProjectId,
           deletedProjectOwnerId: 'potato'
         }
       }
@@ -649,11 +652,11 @@ describe('ProjectDeleter', function () {
         .chain('exec')
         .resolves(this.deletedProject)
       this.DeletedProjectMock.expects('findOne')
-        .withArgs({ 'deleterData.deletedProjectId': 'purgedProject' })
+        .withArgs({ 'deleterData.deletedProjectId': this.purgedProjectId })
         .chain('exec')
         .resolves(this.purgedProject)
       this.DeletedProjectMock.expects('findOne')
-        .withArgs({ 'deleterData.deletedProjectId': 'wombat' })
+        .withArgs({ 'deleterData.deletedProjectId': this.unknownProjectId })
         .chain('exec')
         .resolves(null)
       this.DeletedProjectMock.expects('deleteOne').chain('exec').resolves()
@@ -661,13 +664,17 @@ describe('ProjectDeleter', function () {
 
     it('should return not found if the project does not exist', async function () {
       await expect(
-        this.ProjectDeleter.promises.undeleteProject('wombat')
+        this.ProjectDeleter.promises.undeleteProject(
+          this.unknownProjectId.toString()
+        )
       ).to.be.rejectedWith(Errors.NotFoundError, 'project_not_found')
     })
 
     it('should return not found if the project has been expired', async function () {
       await expect(
-        this.ProjectDeleter.promises.undeleteProject('purgedProject')
+        this.ProjectDeleter.promises.undeleteProject(
+          this.purgedProjectId.toString()
+        )
       ).to.be.rejectedWith(Errors.NotFoundError, 'project_too_old_to_restore')
     })
 

@@ -1109,6 +1109,7 @@ module.exports = {
           img: ['alt', 'class', 'src', 'style'],
           source: ['src', 'type'],
           span: ['class', 'id', 'style'],
+          strong: ['style'],
           table: ['border', 'class', 'id', 'style'],
           td: ['colspan', 'rowspan', 'headers', 'style'],
           th: [
@@ -1130,6 +1131,7 @@ module.exports = {
   overleafModuleImports: {
     // modules to import (an empty array for each set of modules)
     createFileModes: [],
-    gitBridge: []
+    gitBridge: [],
+    publishModal: []
   }
 }

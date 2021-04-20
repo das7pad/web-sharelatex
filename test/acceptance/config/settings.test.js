@@ -256,5 +256,9 @@ module.exports = {
   // property (check Features.js)
   overleaf: true,
 
-  reconfirmNotificationDays: 14
+  reconfirmNotificationDays: 14,
+
+  unsupportedBrowsers: {
+    ie: '<=11'
+  }
 }
