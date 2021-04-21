@@ -66,6 +66,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "logger-sharelatex": "https://github.com/das7pad/logger-sharelatex/archive/1cb0c1714a91000f996d3aa49abfa6b5e7e0be58.tar.gz",
+    "lru-cache": "^6.0.0",
     "marked": "^0.7.0",
     "mmmagic": "^0.5.3",
     "moment": "^2.24.0",
