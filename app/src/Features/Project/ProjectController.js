@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const OError = require('@overleaf/o-error')
 const crypto = require('crypto')
 const async = require('async')
@@ -853,7 +854,7 @@ const ProjectController = {
                 allowedFreeTrial: allowedFreeTrial,
                 featureSwitches: user.featureSwitches,
                 features: user.features,
-                refProviders: user.refProviders,
+                refProviders: _.mapValues(user.refProviders, Boolean),
                 alphaProgram: user.alphaProgram,
                 betaProgram: user.betaProgram,
                 isAdmin: user.isAdmin
