@@ -313,23 +313,6 @@ If the project has been renamed please look in your project list for a new proje
       ide.safariScrollPatcher = new SafariScrollPatcher($scope)
     }
 
-    // Fix Chrome 61 and 62 text-shadow rendering
-    let browserIsChrome61or62 = false
-    try {
-      const chromeVersion =
-        parseFloat(navigator.userAgent.split(' Chrome/')[1]) || null
-      browserIsChrome61or62 = chromeVersion != null
-      if (browserIsChrome61or62) {
-        document.styleSheets[0].insertRule(
-          '.ace_editor.ace_autocomplete .ace_completion-highlight { text-shadow: none !important; font-weight: bold; }',
-          1
-        )
-      }
-    } catch (error1) {
-      err = error1
-      console.error(err)
-    }
-
     // User can append ?ft=somefeature to url to activate a feature toggle
     ide.featureToggle = __guard__(
       __guard__(
