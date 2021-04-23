@@ -902,9 +902,8 @@ const ProjectController = {
               showNewNavigationUI:
                 req.query && req.query.new_navigation_ui === 'true',
               showReactFileTree: !wantsOldFileTreeUI,
-              showReactShareModal: user.betaProgram && !wantsOldShareModalUI,
-              showReactAddFilesModal:
-                user.betaProgram && !wantsOldAddFilesModalUI,
+              showReactShareModal: !wantsOldShareModalUI,
+              showReactAddFilesModal: !wantsOldAddFilesModalUI,
               showReactGithubSync: !wantsOldGithubSyncUI && user.alphaProgram
             })
             timer.done()

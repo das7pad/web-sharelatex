@@ -62,6 +62,9 @@ config/*.js
 config/*.coffee
 !config/settings.defaults.coffee
 !config/settings.webpack.coffee
+config/*.js
+!config/settings.defaults.js
+!config/settings.webpack.js
 
 modules/**/Makefile
 
