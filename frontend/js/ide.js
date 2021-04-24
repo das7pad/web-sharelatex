@@ -218,13 +218,12 @@ If the project has been renamed please look in your project list for a new proje
 `
         )
       }
-      return $timeout(function () {
+      // NOTE: $scope.permissions.write is not immediately available.
+      $timeout(function () {
         if ($scope.permissions.write) {
-          let _labelsInitialLoadDone
           ide.metadataManager.loadProjectMetaFromServer()
-          return (_labelsInitialLoadDone = true)
         }
-      }, 200)
+      }, 1)
     })
 
     // Count the first 'doc:opened' as a sign that the ide is loaded
