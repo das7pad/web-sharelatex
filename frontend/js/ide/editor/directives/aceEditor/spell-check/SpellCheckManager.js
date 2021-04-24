@@ -45,6 +45,7 @@ class SpellCheckManager {
     this.inProgressRequest = null
     this.changedLines = []
     this.firstCheck = true
+    this.isFirstRequest = true
 
     // allow overwriting in tests
     this.userDictFetched = USER_DICT_FETCHED
@@ -238,7 +239,11 @@ class SpellCheckManager {
     }
     this.prefetchUserDict()
 
+    if (this.isFirstRequest) {
+      delay = 0
+    }
     const run = () => {
+      this.isFirstRequest = false
       delete this.timeoutId
       // blocking fetch, potentially resolved already
       this.fetchUserDict(error => {
