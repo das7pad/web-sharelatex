@@ -6,6 +6,7 @@ import { react2angular } from 'react2angular'
 import { rootContext } from '../../../shared/context/root-context'
 import 'ace/ace'
 import { localStorage } from '../../../modules/storage'
+import getMeta from '../../../utils/meta'
 
 const AUTO_COMPILE_MAX_WAIT = 5000
 // We add a 1 second debounce to sending user changes to server if they aren't
@@ -19,7 +20,7 @@ App.filter('trusted', $sce => url => $sce.trustAsResourceUrl(url))
 App.controller(
   'PdfController',
   function ($scope, $http, ide, $modal, synctex, eventTracking, $q) {
-    let autoCompile = true
+    let autoCompileOnJoinProject = true
 
     // pdf.view = uncompiled | pdf | errors
     $scope.pdf.view = $scope.pdf.url ? 'pdf' : 'uncompiled'
@@ -87,14 +88,19 @@ App.controller(
       }
     }
 
-    $scope.$on('project:joined', () => {
-      if (!autoCompile) {
-        return
-      }
-      autoCompile = false
-      $scope.recompile({ isAutoCompileOnLoad: true })
+    // Wait for joinDoc to complete.
+    // We may need to read the doc contents for a rootDoc override.
+    $scope.$on('doc:after-opened', () => {
       $scope.hasPremiumCompile =
         $scope.project.features.compileGroup === 'priority'
+      if (!autoCompileOnJoinProject) {
+        return
+      }
+      autoCompileOnJoinProject = false
+      // Apparently the scope is not ready in the same event loop cycle.
+      setTimeout(() => {
+        $scope.recompile({ isAutoCompileOnLoad: true })
+      })
     })
 
     $scope.$on('pdf:error:display', function () {
@@ -725,9 +731,11 @@ App.controller(
       }
       for (let line of doc.split('\n')) {
         if (/^[^%]*\\documentclass/.test(line)) {
+          localStorage(`doc.isValidRootDoc.${currentDocId}`, true)
           return ide.editorManager.getCurrentDocId()
         }
       }
+      localStorage(`doc.isValidRootDoc.${currentDocId}`, false)
       return null
     }
 
@@ -775,7 +783,9 @@ App.controller(
 
       ide.$scope.$broadcast('flush-changes')
 
-      options.rootDocOverride_id = getRootDocOverrideId()
+      if (options.rootDocOverride_id === undefined) {
+        options.rootDocOverride_id = getRootDocOverrideId()
+      }
 
       sendCompileRequest(options)
         .then(function (response) {
@@ -950,6 +960,32 @@ App.controller(
         gotoLine: line,
         gotoColumn: column
       })
+    }
+
+    const initialRootDocId = getMeta('ol-projectRootDoc_id')
+    const lastOpenedDoc = localStorage(`doc.open_id.${$scope.project_id}`)
+    let lastOpenedDocIsValidRootDoc
+    if (lastOpenedDoc) {
+      lastOpenedDocIsValidRootDoc = localStorage(
+        `doc.isValidRootDoc.${lastOpenedDoc}`
+      )
+    }
+    if (
+      // This project has not been opened yet.
+      !lastOpenedDoc ||
+      // The last time this project was open, the rootDoc was open.
+      lastOpenedDoc === initialRootDocId ||
+      // A manual compile request with this doc opened was triggered before.
+      typeof lastOpenedDocIsValidRootDoc === 'boolean'
+    ) {
+      // Fast path: Trigger compile request before joinProject yields.
+      $scope.recompile({
+        rootDocOverride_id:
+          // Set the custom rootDoc when valid, else use null for default.
+          (lastOpenedDocIsValidRootDoc && lastOpenedDoc) || null,
+        isAutoCompileOnLoad: true
+      })
+      autoCompileOnJoinProject = false
     }
   }
 )

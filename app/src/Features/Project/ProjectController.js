@@ -646,6 +646,7 @@ const ProjectController = {
             projectId,
             {
               name: 1,
+              rootDoc_id: 1,
               lastUpdated: 1,
               track_changes: 1,
               owner_ref: 1,
@@ -844,6 +845,7 @@ const ProjectController = {
               priority_title: true,
               bodyClasses: ['editor'],
               project_id: project._id,
+              projectRootDoc_id: project.rootDoc_id,
               user: {
                 id: userId,
                 email: user.email,
