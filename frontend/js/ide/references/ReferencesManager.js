@@ -14,6 +14,8 @@ import _ from 'lodash'
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import CryptoJSSHA1 from 'crypto-js/sha1'
+import getMeta from '../../utils/meta'
+const hasReferencesFeature = getMeta('ol-hasReferencesFeature')
 let ReferencesManager
 
 export default ReferencesManager = class ReferencesManager {
@@ -23,6 +25,7 @@ export default ReferencesManager = class ReferencesManager {
     this.$scope.$root._references = this.state = { keys: [] }
     this.existingIndexHash = {}
 
+    if (!hasReferencesFeature) return
     this.$scope.$on('document:closed', (e, doc) => {
       let entity
       if (doc.doc_id) {
@@ -65,6 +68,7 @@ export default ReferencesManager = class ReferencesManager {
   }
 
   indexReferencesIfDocModified(doc, shouldBroadcast) {
+    if (!hasReferencesFeature) return
     // avoid reindexing references if the bib file has not changed since the
     // last time they were indexed
     const docId = doc.doc_id
@@ -86,6 +90,7 @@ export default ReferencesManager = class ReferencesManager {
   }
 
   indexReferences(docIds, shouldBroadcast) {
+    if (!hasReferencesFeature) return
     const opts = {
       docIds,
       shouldBroadcast,
@@ -99,6 +104,7 @@ export default ReferencesManager = class ReferencesManager {
   }
 
   indexAllReferences(shouldBroadcast) {
+    if (!hasReferencesFeature) return
     const opts = {
       shouldBroadcast,
       _csrf: window.csrfToken
