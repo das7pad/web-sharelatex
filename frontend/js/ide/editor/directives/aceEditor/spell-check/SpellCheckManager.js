@@ -101,7 +101,7 @@ class SpellCheckManager {
     this.changedLines = Array(this.adapter.getLineCount()).fill(true)
     this.firstCheck = true
     if (this.isSpellCheckEnabled()) {
-      this.runSpellCheckSoon(DEBOUNCE_DELAY)
+      this.runSpellCheckSoon(0)
     }
   }
 
