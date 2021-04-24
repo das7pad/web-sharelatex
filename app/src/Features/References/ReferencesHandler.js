@@ -101,6 +101,9 @@ module.exports = ReferencesHandler = {
     if (callback == null) {
       callback = function (err, data) {}
     }
+    if (!Features.hasFeature('references')) {
+      return callback()
+    }
     return ProjectGetter.getProject(
       projectId,
       { rootFolder: true, owner_ref: 1 },
@@ -129,6 +132,9 @@ module.exports = ReferencesHandler = {
     if (callback == null) {
       callback = function (err, data) {}
     }
+    if (!Features.hasFeature('references')) {
+      return callback()
+    }
     return ProjectGetter.getProject(
       projectId,
       { rootFolder: true, owner_ref: 1 },
@@ -151,9 +157,6 @@ module.exports = ReferencesHandler = {
   },
 
   _doIndexOperation(projectId, project, docIds, fileIds, callback) {
-    if (!Features.hasFeature('references')) {
-      return callback()
-    }
     return ReferencesHandler._isFullIndex(project, function (err, isFullIndex) {
       if (err) {
         OError.tag(err, 'error checking whether to do full index', {
