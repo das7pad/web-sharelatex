@@ -26,7 +26,7 @@ let USER_DICT_FETCHED = false
 const USER_DICT = new Set()
 
 class SpellCheckManager {
-  constructor($scope, $cacheFactory, $http, $q, adapter) {
+  constructor($scope, $cacheFactory, $http, $q, adapter, prefetchUserDict) {
     this.onChange = this.onChange.bind(this)
     this.onSessionChange = this.onSessionChange.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
@@ -95,6 +95,10 @@ class SpellCheckManager {
       }
       return true
     })
+
+    if (prefetchUserDict !== false) {
+      this.prefetchUserDict()
+    }
   }
 
   init() {
@@ -232,8 +236,7 @@ class SpellCheckManager {
     if (delay == null) {
       delay = 1000
     }
-    // pre-fetch
-    this.fetchUserDict(() => {})
+    this.prefetchUserDict()
 
     const run = () => {
       delete this.timeoutId
@@ -345,6 +348,10 @@ class SpellCheckManager {
         }
       )
     }
+  }
+
+  prefetchUserDict() {
+    this.fetchUserDict(() => {})
   }
 
   fetchUserDict(cb) {

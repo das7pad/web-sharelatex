@@ -42,7 +42,8 @@ export default describe('SpellCheckManager', function () {
         $cacheFactory,
         $http,
         $q,
-        this.adapter
+        this.adapter,
+        false
       )
       return done()
     })
