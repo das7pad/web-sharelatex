@@ -15,7 +15,9 @@
 import moment from 'moment'
 import App from '../base'
 import { localStorage } from '../modules/storage'
+import getMeta from '../utils/meta'
 const CACHE_KEY = 'mbEvents'
+const isSAAS = getMeta('ol-isSAAS')
 
 // keep track of how many heartbeats we've sent so we can calculate how
 // long wait until the next one
@@ -23,6 +25,18 @@ let heartbeatsSent = 0
 let nextHeartbeat = new Date()
 
 App.factory('eventTracking', function ($http) {
+  if (!isSAAS) {
+    return {
+      enabled: false,
+      send(category, action, label, value) {},
+      sendGAOnce(category, action, label, value) {},
+      editingSessionHeartbeat() {},
+      sendMB(key, segmentation) {},
+      sendMBSampled(key, segmentation, rate) {},
+      sendMBOnce(key, segmentation) {},
+      eventInCache(key) {}
+    }
+  }
   const _getEventCache = function () {
     let eventCache = localStorage(CACHE_KEY)
 
@@ -57,6 +71,8 @@ App.factory('eventTracking', function ($http) {
     })
 
   return {
+    enabled: true,
+
     send(category, action, label, value) {
       return ga('send', 'event', category, action, label, value)
     },
@@ -122,9 +138,11 @@ App.factory('eventTracking', function ($http) {
   }
 })
 
-export default $('.navbar a').on('click', function (e) {
-  const href = $(e.target).attr('href')
-  if (href != null) {
-    return ga('send', 'event', 'navigation', 'top menu bar', href)
-  }
-})
+if (isSAAS) {
+  $('.navbar a').on('click', function (e) {
+    const href = $(e.target).attr('href')
+    if (href != null) {
+      return ga('send', 'event', 'navigation', 'top menu bar', href)
+    }
+  })
+}

@@ -67,6 +67,10 @@ export default App.directive('eventTracking', eventTracking => ({
     eventSegmentation: '=?'
   },
   link(scope, element, attrs) {
+    if (!eventTracking.enabled) {
+      return
+    }
+
     const sendGA = attrs.eventTrackingGa || false
     const sendMB = attrs.eventTrackingMb || false
     const sendMBFunction = attrs.eventTrackingSendOnce ? 'sendMBOnce' : 'sendMB'

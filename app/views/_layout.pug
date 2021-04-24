@@ -32,6 +32,7 @@ html(
 					siteUrl: settings.siteUrl,
 				})
 			meta(name="ol-user_id" content=getLoggedInUserId())
+			meta(name="ol-isSAAS" data-type="boolean" content=hasFeature('saas'))
 
 			if (typeof(settings.algolia) != "undefined")
 				meta(name="ol-sharelatex.algolia" data-type="json" content={
