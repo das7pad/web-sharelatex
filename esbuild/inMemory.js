@@ -46,6 +46,7 @@ async function getBody(path) {
   try {
     const buffer = await fs.promises.readFile(path)
     PUBLIC_CONTENT.set(path, buffer)
+    return buffer
   } catch (e) {}
 }
 
@@ -72,6 +73,7 @@ async function handleRequest(request, response) {
     return
   }
   if (!body) {
+    console.error('esbuild cannot find static file for %s', path)
     response.writeHead(404)
     response.end()
     return
