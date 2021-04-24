@@ -14,9 +14,80 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let MetaHandler
+const { callbackify, promisify } = require('util')
 const ProjectEntityHandler = require('../Project/ProjectEntityHandler')
+const ProjectGetter = require('../Project/ProjectGetter')
 const DocumentUpdaterHandler = require('../DocumentUpdater/DocumentUpdaterHandler')
 const packageMapping = require('./packageMapping')
+
+const RedisWrapper = require('../../infrastructure/RedisWrapper')
+const rclient = RedisWrapper.client('meta_cache')
+const ONE_DAY_IN_S = 60 * 60 * 24
+const CACHE_EXPIRY_IN_S = ONE_DAY_IN_S
+
+function getCacheKey(projectId) {
+  return `metadata:${projectId}`
+}
+async function getProjectCache(projectId) {
+  const cacheKey = getCacheKey(projectId)
+  const contentsRaw = await rclient.get(cacheKey)
+  if (!contentsRaw) return null
+  return JSON.parse(contentsRaw)
+}
+async function setProjectCache(projectId, contents) {
+  const cacheKey = getCacheKey(projectId)
+  await rclient.set(cacheKey, JSON.stringify(contents), 'EX', CACHE_EXPIRY_IN_S)
+}
+async function getProjectVersion(projectId) {
+  const { lastUpdated } = await ProjectGetter.promises.getProject(projectId, {
+    lastUpdated: 1
+  })
+  if (!lastUpdated) return null
+  return lastUpdated.toISOString()
+}
+function crunchProjectMeta(projectMeta) {
+  return Object.fromEntries(
+    Object.entries(projectMeta).map(([docId, docMeta]) => {
+      const { labels, packages } = docMeta
+      const packageNames = Object.keys(packages)
+      return [docId, { labels, packageNames }]
+    })
+  )
+}
+function inflateProjectMeta(projectMeta) {
+  return Object.fromEntries(
+    Object.entries(projectMeta).map(([docId, docMeta]) => {
+      const { labels, packageNames } = docMeta
+      const packages = packageNames.reduce((packages, pkg) => {
+        if (packageMapping[pkg]) {
+          packages[pkg] = packageMapping[pkg]
+        }
+        return packages
+      }, {})
+      return [docId, { labels, packages }]
+    })
+  )
+}
+
+async function getAllMetaForProjectWithCache(projectId) {
+  let [projectCache, projectVersion] = await Promise.all([
+    getProjectCache(projectId),
+    getProjectVersion(projectId)
+  ])
+  if (projectCache && projectCache.projectVersion === projectVersion) {
+    return inflateProjectMeta(projectCache.projectMeta)
+  }
+  const projectMeta = await MetaHandler.promises.getAllMetaForProject(projectId)
+  // Emit the projectVersion from before fetching docs for proper
+  //  cache-invalidation on updates.
+  projectCache = {
+    projectVersion,
+    projectMeta: crunchProjectMeta(projectMeta)
+  }
+  // Populate the cache in the background.
+  setProjectCache(projectId, projectCache).catch(() => {})
+  return projectMeta
+}
 
 module.exports = MetaHandler = {
   labelRegex() {
@@ -31,6 +102,7 @@ module.exports = MetaHandler = {
     return /^\\RequirePackage(?:\[.{0,80}?])?{(.{0,80}?)}/g
   },
 
+  getAllMetaForProjectWithCache: callbackify(getAllMetaForProjectWithCache),
   getAllMetaForProject(projectId, callback) {
     if (callback == null) {
       callback = function (err, projectMeta) {}
@@ -129,4 +201,9 @@ module.exports = MetaHandler = {
     }
     return projectMeta
   }
+}
+
+MetaHandler.promises = {
+  getAllMetaForProjectWithCache,
+  getAllMetaForProject: promisify(MetaHandler.getAllMetaForProject)
 }

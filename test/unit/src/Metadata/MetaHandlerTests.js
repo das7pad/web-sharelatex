@@ -50,10 +50,15 @@ describe('MetaHandler', function () {
         }
       ]
     }
+    this.RedisWrapper = {
+      client() {}
+    }
 
     return (this.MetaHandler = SandboxedModule.require(modulePath, {
       requires: {
         '../Project/ProjectEntityHandler': this.ProjectEntityHandler,
+        '../Project/ProjectGetter': this.ProjectGetter,
+        '../../infrastructure/RedisWrapper': this.RedisWrapper,
         '../DocumentUpdater/DocumentUpdaterHandler': this
           .DocumentUpdaterHandler,
         './packageMapping': this.packageMapping

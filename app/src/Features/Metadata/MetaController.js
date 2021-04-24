@@ -21,7 +21,7 @@ module.exports = MetaController = {
   getMetadata(req, res, next) {
     const { project_id } = req.params
     logger.log({ project_id }, 'getting all labels for project')
-    return MetaHandler.getAllMetaForProject(
+    MetaHandler.getAllMetaForProjectWithCache(
       project_id,
       function (err, projectMeta) {
         if (err != null) {

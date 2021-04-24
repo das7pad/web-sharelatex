@@ -21,7 +21,7 @@ describe('MetaController', function () {
       emitToRoom: sinon.stub()
     }
     this.MetaHandler = {
-      getAllMetaForProject: sinon.stub(),
+      getAllMetaForProjectWithCache: sinon.stub(),
       getMetaForDoc: sinon.stub()
     }
     return (this.MetadataController = SandboxedModule.require(modulePath, {
@@ -35,7 +35,7 @@ describe('MetaController', function () {
   describe('getMetadata', function () {
     beforeEach(function () {
       this.fakeLabels = { somedoc: ['a_label'] }
-      this.MetaHandler.getAllMetaForProject = sinon
+      this.MetaHandler.getAllMetaForProjectWithCache = sinon
         .stub()
         .callsArgWith(1, null, this.fakeLabels)
       this.req = { params: { project_id: this.projectId } }
@@ -43,10 +43,10 @@ describe('MetaController', function () {
       return (this.next = sinon.stub())
     })
 
-    it('should call MetaHandler.getAllMetaForProject', function () {
+    it('should call MetaHandler.getAllMetaForProjectWithCache', function () {
       this.MetadataController.getMetadata(this.req, this.res, this.next)
-      this.MetaHandler.getAllMetaForProject.callCount.should.equal(1)
-      return this.MetaHandler.getAllMetaForProject
+      this.MetaHandler.getAllMetaForProjectWithCache.callCount.should.equal(1)
+      return this.MetaHandler.getAllMetaForProjectWithCache
         .calledWith(this.projectId)
         .should.equal(true)
     })
@@ -65,9 +65,9 @@ describe('MetaController', function () {
       ])
     })
 
-    describe('when MetaHandler.getAllMetaForProject produces an error', function () {
+    describe('when MetaHandler.getAllMetaForProjectWithCache produces an error', function () {
       beforeEach(function () {
-        this.MetaHandler.getAllMetaForProject = sinon
+        this.MetaHandler.getAllMetaForProjectWithCache = sinon
           .stub()
           .callsArgWith(1, new Error('woops'))
         this.req = { params: { project_id: this.projectId } }
@@ -75,10 +75,10 @@ describe('MetaController', function () {
         return (this.next = sinon.stub())
       })
 
-      it('should call MetaHandler.getAllMetaForProject', function () {
+      it('should call MetaHandler.getAllMetaForProjectWithCache', function () {
         this.MetadataController.getMetadata(this.req, this.res, this.next)
-        this.MetaHandler.getAllMetaForProject.callCount.should.equal(1)
-        return this.MetaHandler.getAllMetaForProject
+        this.MetaHandler.getAllMetaForProjectWithCache.callCount.should.equal(1)
+        return this.MetaHandler.getAllMetaForProjectWithCache
           .calledWith(this.projectId)
           .should.equal(true)
       })
