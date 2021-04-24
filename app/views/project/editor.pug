@@ -195,7 +195,7 @@ block content
 	meta(name="ol-textExtensions" data-type="json" content=settings.textExtensions)
 
 block foot-scripts
-	script(type='text/javascript', defer, src=wsAssetUrl)
-	script(type='text/javascript' defer src=buildTPath(currentLngCode))
+	script(type='text/javascript' src=wsAssetUrl)
+	script(type='text/javascript' src=buildTPath(currentLngCode))
 	each chunk in getEntrypointChunks('frontend/js/ide.js')
-		script(type="module" defer src=chunk)
+		script(type="module" src=chunk)
