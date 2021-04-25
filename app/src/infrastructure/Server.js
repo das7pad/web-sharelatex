@@ -96,6 +96,40 @@ if (Settings.behindProxy) {
     next()
   })
 }
+
+// `req.ip` is a getter on the underlying socket.
+// The socket details are freed as the connection is dropped -- aka aborted.
+// Hence `req.ip` may read `undefined` upon connection drop.
+// A couple of places require a valid IP at all times. Cache it!
+const CACHED_IP_FIELD = Symbol('cached ip')
+const ORIGINAL_REQ_IP = Object.getOwnPropertyDescriptor(
+  Object.getPrototypeOf(app.request),
+  'ip'
+).get
+Object.defineProperty(app.request, 'ip', {
+  configurable: true,
+  enumerable: true,
+  get: function ipWithCache() {
+    const cachedIP = this[CACHED_IP_FIELD]
+    if (cachedIP) return cachedIP
+    const resolvedIp = ORIGINAL_REQ_IP.call(this)
+    this[CACHED_IP_FIELD] = resolvedIp
+    return resolvedIp
+  }
+})
+app.use(function (req, res, next) {
+  if (req.aborted) {
+    // Request has been aborted already.
+    return
+  }
+  // Implicitly cache the ip, see above.
+  if (!req.ip) {
+    // Critical connection details are missing.
+    return
+  }
+  next()
+})
+
 if (Settings.exposeHostname) {
   const HOSTNAME = require('os').hostname()
   app.use((req, res, next) => {
