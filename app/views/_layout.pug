@@ -1,4 +1,4 @@
-
+include ./_mixins/mainBundleFor
 doctype html
 html(
 	lang=(currentLngCode || 'en')
@@ -69,5 +69,5 @@ html(
 
 		block foot-scripts
 			script(type='text/javascript' src=buildTPath(currentLngCode))
-			each chunk in getEntrypointChunks('frontend/js/main.js')
-				script(type="module" src=chunk)
+			block main-bundle
+				+mainBundleFor('frontend/js/main.js')

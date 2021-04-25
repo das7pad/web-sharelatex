@@ -196,8 +196,6 @@ block content
 	meta(name="ol-overallThemes" data-type="json" content=overallThemes)
 	meta(name="ol-textExtensions" data-type="json" content=settings.textExtensions)
 
-block foot-scripts
+block main-bundle
 	script(type='text/javascript' src=wsAssetUrl)
-	script(type='text/javascript' src=buildTPath(currentLngCode))
-	each chunk in getEntrypointChunks('frontend/js/ide.js')
-		script(type="module" src=chunk)
+	+mainBundleFor('frontend/js/ide.js')

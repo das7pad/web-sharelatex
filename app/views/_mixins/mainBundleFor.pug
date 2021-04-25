@@ -1,0 +1,3 @@
+mixin mainBundleFor(entrypoint)
+	each chunk in getEntrypointChunks(entrypoint)
+		script(type="module" src=chunk)
