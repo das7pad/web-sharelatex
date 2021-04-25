@@ -1,4 +1,5 @@
 const Path = require('path')
+const glob = require('glob')
 const BROWSER_TARGETS = require('./getBrowserTargets')
 const lessLoader = require('./plugins/lessLoader')
 const valLoader = require('./plugins/valLoader')
@@ -38,7 +39,8 @@ const CONFIGS = [
     format: 'esm',
     entryPoints: [
       Path.join(FRONTEND_PATH, 'js/ide.js'),
-      Path.join(FRONTEND_PATH, 'js/main.js')
+      Path.join(FRONTEND_PATH, 'js/main.js'),
+      ...glob.sync(Path.join(FRONTEND_PATH, 'js/pages/**/*.js'))
     ],
     outbase: Path.join(FRONTEND_PATH, 'js'),
     outdir: Path.join(PUBLIC_PATH, 'js'),
