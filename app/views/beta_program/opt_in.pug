@@ -1,6 +1,8 @@
 extends ../_layout
 
+block append meta
+	meta(name="ol-participatesBetaProgram" data-type="boolean" content=user.betaProgram)
+
 block content
 	main.content.content-alt
-		meta(name="ol-participatesBetaProgram" data-type="boolean" content=user.betaProgram)
 		beta-program-participate
