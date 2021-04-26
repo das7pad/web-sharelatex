@@ -33,6 +33,9 @@ describe('ResourceHints', function () {
         buildImgPath(path) {
           return '/img/' + path
         },
+        buildJsPath(path) {
+          return '/js/' + path
+        },
         staticPath(path) {
           return path
         }

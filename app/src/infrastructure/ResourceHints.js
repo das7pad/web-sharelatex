@@ -1,6 +1,11 @@
 const Settings =
   require('@overleaf/settings') || require('../../../config/settings.defaults')
-const { buildCssPath, buildFontPath, buildImgPath } = require('./WebpackAssets')
+const {
+  buildCssPath,
+  buildFontPath,
+  buildImgPath,
+  buildJsPath
+} = require('./WebpackAssets')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 
@@ -37,6 +42,7 @@ function getPreloadMiddleware() {
 
     if (cfg.isEditor) {
       preloadCss(cfg.themeModifier)
+      preload(buildJsPath('ide.js.css'), 'style')
       preloadFont('merriweather-v21-latin-regular')
       ;['ol-brand/overleaf-o.svg', 'ol-brand/overleaf-o-grey.svg'].forEach(
         preloadImg
