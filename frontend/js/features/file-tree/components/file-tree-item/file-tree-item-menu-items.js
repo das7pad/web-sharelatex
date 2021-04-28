@@ -13,7 +13,7 @@ function FileTreeItemMenuItems() {
     startDeleting,
     startCreatingFolder,
     startCreatingDocOrFile,
-    startUploadingDocOrFile
+    startUploadingDocOrFile,
   } = useFileTreeActionable()
 
   return (

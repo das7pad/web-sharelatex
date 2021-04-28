@@ -7,7 +7,7 @@ import {
   screen,
   fireEvent,
   waitFor,
-  waitForElementToBeRemoved
+  waitForElementToBeRemoved,
 } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import ShareProjectModal from '../../../../../frontend/js/features/share-project-modal/components/share-project-modal'
@@ -17,13 +17,13 @@ describe('<ShareProjectModal/>', function () {
     _id: 'test-project',
     name: 'Test Project',
     features: {
-      collaborators: 10
+      collaborators: 10,
     },
     owner: {
-      email: 'project-owner@example.com'
+      email: 'project-owner@example.com',
     },
     members: [],
-    invites: []
+    invites: [],
   }
 
   const contacts = [
@@ -33,39 +33,39 @@ describe('<ShareProjectModal/>', function () {
       email: 'test-user@example.com',
       first_name: 'Test',
       last_name: 'User',
-      name: 'Test User'
+      name: 'Test User',
     },
     // user with default name (email prefix)
     {
       type: 'user',
       email: 'test@example.com',
-      first_name: 'test'
+      first_name: 'test',
     },
     // no last name
     {
       type: 'user',
       first_name: 'Eratosthenes',
-      email: 'eratosthenes@example.com'
+      email: 'eratosthenes@example.com',
     },
     // more users
     {
       type: 'user',
       first_name: 'Claudius',
       last_name: 'Ptolemy',
-      email: 'ptolemy@example.com'
+      email: 'ptolemy@example.com',
     },
     {
       type: 'user',
       first_name: 'Abd al-Rahman',
       last_name: 'Al-Sufi',
-      email: 'al-sufi@example.com'
+      email: 'al-sufi@example.com',
     },
     {
       type: 'user',
       first_name: 'Nicolaus',
       last_name: 'Copernicus',
-      email: 'copernicus@example.com'
-    }
+      email: 'copernicus@example.com',
+    },
   ]
 
   const ideWithProject = project => {
@@ -73,8 +73,8 @@ describe('<ShareProjectModal/>', function () {
       $scope: {
         $watch: () => () => {},
         $applyAsync: () => {},
-        project
-      }
+        project,
+      },
     }
   }
 
@@ -82,7 +82,7 @@ describe('<ShareProjectModal/>', function () {
     ide: ideWithProject(project),
     show: true,
     isAdmin: true,
-    handleHide: sinon.stub()
+    handleHide: sinon.stub(),
   }
 
   beforeEach(function () {
@@ -107,7 +107,7 @@ describe('<ShareProjectModal/>', function () {
 
     const [
       headerCloseButton,
-      footerCloseButton
+      footerCloseButton,
     ] = await screen.findAllByRole('button', { name: 'Close' })
 
     fireEvent.click(headerCloseButton)
@@ -185,8 +185,8 @@ describe('<ShareProjectModal/>', function () {
       {
         _id: 'invited-author',
         email: 'invited-author@example.com',
-        privileges: 'readAndWrite'
-      }
+        privileges: 'readAndWrite',
+      },
     ]
 
     // render as admin: actions should be present
@@ -196,7 +196,7 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           invites,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
         isAdmin
       />
@@ -212,7 +212,7 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           invites,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
         isAdmin={false}
       />
@@ -235,7 +235,7 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           invites,
-          publicAccesLevel: 'private'
+          publicAccesLevel: 'private',
         })}
         isAdmin={false}
       />
@@ -281,26 +281,26 @@ describe('<ShareProjectModal/>', function () {
       {
         _id: 'member-author',
         email: 'member-author@example.com',
-        privileges: 'readAndWrite'
+        privileges: 'readAndWrite',
       },
       {
         _id: 'member-viewer',
         email: 'member-viewer@example.com',
-        privileges: 'readOnly'
-      }
+        privileges: 'readOnly',
+      },
     ]
 
     const invites = [
       {
         _id: 'invited-author',
         email: 'invited-author@example.com',
-        privileges: 'readAndWrite'
+        privileges: 'readAndWrite',
       },
       {
         _id: 'invited-viewer',
         email: 'invited-viewer@example.com',
-        privileges: 'readOnly'
-      }
+        privileges: 'readOnly',
+      },
     ]
 
     render(
@@ -310,7 +310,7 @@ describe('<ShareProjectModal/>', function () {
           ...project,
           members,
           invites,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
@@ -343,8 +343,8 @@ describe('<ShareProjectModal/>', function () {
       {
         _id: 'invited-author',
         email: 'invited-author@example.com',
-        privileges: 'readAndWrite'
-      }
+        privileges: 'readAndWrite',
+      },
     ]
 
     render(
@@ -353,13 +353,13 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           invites,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
 
     const [, closeButton] = screen.getAllByRole('button', {
-      name: 'Close'
+      name: 'Close',
     })
 
     const resendButton = screen.getByRole('button', { name: 'Resend' })
@@ -378,8 +378,8 @@ describe('<ShareProjectModal/>', function () {
       {
         _id: 'invited-author',
         email: 'invited-author@example.com',
-        privileges: 'readAndWrite'
-      }
+        privileges: 'readAndWrite',
+      },
     ]
 
     render(
@@ -388,13 +388,13 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           invites,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
 
     const [, closeButton] = screen.getAllByRole('button', {
-      name: 'Close'
+      name: 'Close',
     })
 
     const revokeButton = screen.getByRole('button', { name: 'Revoke' })
@@ -412,8 +412,8 @@ describe('<ShareProjectModal/>', function () {
       {
         _id: 'member-viewer',
         email: 'member-viewer@example.com',
-        privileges: 'readOnly'
-      }
+        privileges: 'readOnly',
+      },
     ]
 
     render(
@@ -422,13 +422,13 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           members,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
 
     const [, closeButton] = await screen.getAllByRole('button', {
-      name: 'Close'
+      name: 'Close',
     })
 
     expect(screen.queryAllByText('member-viewer@example.com')).to.have.length(1)
@@ -455,8 +455,8 @@ describe('<ShareProjectModal/>', function () {
       {
         _id: 'member-viewer',
         email: 'member-viewer@example.com',
-        privileges: 'readOnly'
-      }
+        privileges: 'readOnly',
+      },
     ]
 
     render(
@@ -465,7 +465,7 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           members,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
@@ -473,7 +473,7 @@ describe('<ShareProjectModal/>', function () {
     expect(screen.queryAllByText('member-viewer@example.com')).to.have.length(1)
 
     const removeButton = screen.getByRole('button', {
-      name: 'Remove from project'
+      name: 'Remove from project',
     })
 
     fireEvent.click(removeButton)
@@ -495,8 +495,8 @@ describe('<ShareProjectModal/>', function () {
       {
         _id: 'member-viewer',
         email: 'member-viewer@example.com',
-        privileges: 'readOnly'
-      }
+        privileges: 'readOnly',
+      },
     ]
 
     render(
@@ -505,7 +505,7 @@ describe('<ShareProjectModal/>', function () {
         ide={ideWithProject({
           ...project,
           members,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
@@ -533,7 +533,7 @@ describe('<ShareProjectModal/>', function () {
     window.location = { reload: reloadStub }
 
     const confirmButton = screen.getByRole('button', {
-      name: 'Change owner'
+      name: 'Change owner',
     })
 
     fireEvent.click(confirmButton)
@@ -555,7 +555,7 @@ describe('<ShareProjectModal/>', function () {
         {...modalProps}
         ide={ideWithProject({
           ...project,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
@@ -583,7 +583,7 @@ describe('<ShareProjectModal/>', function () {
       if (data.email === 'a@b.c') {
         return {
           status: 400,
-          body: { errorReason: 'invalid_email' }
+          body: { errorReason: 'invalid_email' },
         }
       }
 
@@ -592,17 +592,17 @@ describe('<ShareProjectModal/>', function () {
         body: {
           invite: {
             ...data,
-            _id: data.email
-          }
-        }
+            _id: data.email,
+          },
+        },
       }
     })
 
     fireEvent.paste(inputElement, {
       clipboardData: {
         getData: () =>
-          'test@example.com, foo@example.com, bar@example.com, a@b.c'
-      }
+          'test@example.com, foo@example.com, bar@example.com, a@b.c',
+      },
     })
 
     const privilegesElement = screen.getByDisplayValue('Can Edit')
@@ -649,8 +649,8 @@ describe('<ShareProjectModal/>', function () {
           ...project,
           publicAccesLevel: 'tokenBased',
           features: {
-            collaborators: 0
-          }
+            collaborators: 0,
+          },
         })}
       />
     )
@@ -670,7 +670,7 @@ describe('<ShareProjectModal/>', function () {
         {...modalProps}
         ide={ideWithProject({
           ...project,
-          publicAccesLevel: 'tokenBased'
+          publicAccesLevel: 'tokenBased',
         })}
       />
     )
@@ -689,7 +689,7 @@ describe('<ShareProjectModal/>', function () {
     const respondWithError = async function (errorReason) {
       inputElement.focus()
       fireEvent.change(inputElement, {
-        target: { value: 'invited-author-1@example.com' }
+        target: { value: 'invited-author-1@example.com' },
       })
       inputElement.blur()
 
@@ -697,7 +697,7 @@ describe('<ShareProjectModal/>', function () {
         'express:/project/:projectId/invite',
         {
           status: 400,
-          body: { errorReason }
+          body: { errorReason },
         },
         { overwriteRoutes: true }
       )
@@ -743,8 +743,8 @@ describe('<ShareProjectModal/>', function () {
             return () => {}
           },
           $applyAsync: () => {},
-          project
-        }
+          project,
+        },
       }
     }
 
@@ -760,14 +760,14 @@ describe('<ShareProjectModal/>', function () {
     )
 
     const enableButton = await screen.findByRole('button', {
-      name: 'Turn on link sharing'
+      name: 'Turn on link sharing',
     })
     fireEvent.click(enableButton)
     await waitFor(() => expect(enableButton.disabled).to.be.true)
 
     const { body: tokenBody } = fetchMock.lastOptions()
     expect(JSON.parse(tokenBody)).to.deep.equal({
-      publicAccessLevel: 'tokenBased'
+      publicAccessLevel: 'tokenBased',
     })
 
     // NOTE: updating the scoped project data manually,
@@ -776,14 +776,14 @@ describe('<ShareProjectModal/>', function () {
 
     await screen.findByText('Link sharing is on')
     const disableButton = await screen.findByRole('button', {
-      name: 'Turn off link sharing'
+      name: 'Turn off link sharing',
     })
     fireEvent.click(disableButton)
     await waitFor(() => expect(disableButton.disabled).to.be.true)
 
     const { body: privateBody } = fetchMock.lastOptions()
     expect(JSON.parse(privateBody)).to.deep.equal({
-      publicAccessLevel: 'private'
+      publicAccessLevel: 'private',
     })
 
     // NOTE: updating the scoped project data manually,
@@ -814,18 +814,18 @@ describe('<ShareProjectModal/>', function () {
     // The matching contact should now be present and selected
     await screen.findByRole('option', {
       name: `Claudius Ptolemy <ptolemy@example.com>`,
-      selected: true
+      selected: true,
     })
 
     // Keep entering text so the contact no longer matches
     fireEvent.change(inputElement, {
-      target: { value: 'ptolemy.new@example.com' }
+      target: { value: 'ptolemy.new@example.com' },
     })
 
     // The matching contact should no longer be present
     expect(
       screen.queryByRole('option', {
-        name: `Claudius Ptolemy <ptolemy@example.com>`
+        name: `Claudius Ptolemy <ptolemy@example.com>`,
       })
     ).to.be.null
 

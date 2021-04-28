@@ -29,13 +29,13 @@ export default App.controller(
     $scope.statusChecks = {
       ideJs: { status: 'inflight', error: null },
       websocket: { status: 'inflight', error: null },
-      healthCheck: { status: 'inflight', error: null }
+      healthCheck: { status: 'inflight', error: null },
     }
 
     $scope.testEmail = {
       emailAddress: '',
       inflight: false,
-      status: null // | 'ok' | 'success'
+      status: null, // | 'ok' | 'success'
     }
 
     $scope.shouldShowAdminForm = () => !$scope.adminUserExists
@@ -55,7 +55,7 @@ export default App.controller(
       return $http
         .post('/launchpad/send_test_email', {
           email: $scope.testEmail.emailAddress,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         })
         .then(function (response) {
           const { status } = response
@@ -117,7 +117,7 @@ export default App.controller(
           resource: parsedURL.pathname.slice(1),
           reconnect: false,
           'connect timeout': 30 * 1000,
-          'force new connection': true
+          'force new connection': true,
         })
 
         socket.on('connectionAccepted', function () {

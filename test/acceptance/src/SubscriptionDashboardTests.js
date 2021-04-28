@@ -83,13 +83,13 @@ describe('Subscriptions', function () {
           trial_ends_at: new Date(2018, 6, 7),
           account: {
             hosted_login_token: 'mock-login-token',
-            email: 'mock@email.com'
-          }
+            email: 'mock@email.com',
+          },
         })
         MockRecurlyApi.coupons = this.coupons = {
           'test-coupon-1': { description: 'Test Coupon 1' },
           'test-coupon-2': { description: 'Test Coupon 2' },
-          'test-coupon-3': { name: 'TestCoupon3' }
+          'test-coupon-3': { name: 'TestCoupon3' },
         }
         this.recurlySubscription.ensureExists(error => {
           if (error) {
@@ -114,7 +114,7 @@ describe('Subscriptions', function () {
         MockRecurlyApi.redemptions = {}
         Subscription.deleteOne(
           {
-            admin_id: this.user._id
+            admin_id: this.user._id,
           },
           done
         )
@@ -142,10 +142,10 @@ describe('Subscriptions', function () {
           account: {
             account_code: this.user._id.toString(),
             email: 'mock@email.com',
-            hosted_login_token: 'mock-login-token'
+            hosted_login_token: 'mock-login-token',
           },
           additionalLicenses: 0,
-          totalLicenses: 0
+          totalLicenses: 0,
         })
       })
 
@@ -157,7 +157,7 @@ describe('Subscriptions', function () {
         MockRecurlyApi.redemptions[this.user._id] = [
           { state: 'active', coupon_code: 'test-coupon-1' },
           { state: 'inactive', coupon_code: 'test-coupon-2' },
-          { state: 'active', coupon_code: 'test-coupon-3' }
+          { state: 'active', coupon_code: 'test-coupon-3' },
         ]
 
         // rebuild the view model with the redemptions
@@ -171,13 +171,13 @@ describe('Subscriptions', function () {
               {
                 coupon_code: 'test-coupon-1',
                 name: '',
-                description: 'Test Coupon 1'
+                description: 'Test Coupon 1',
               },
               {
                 coupon_code: 'test-coupon-3',
                 name: 'TestCoupon3',
-                description: ''
-              }
+                description: '',
+              },
             ])
             done()
           }
@@ -197,7 +197,7 @@ describe('Subscriptions', function () {
           {
             admin_id: this.user._id,
             manager_ids: [this.user._id],
-            planCode: 'collaborator'
+            planCode: 'collaborator',
           },
           error => {
             if (error) {
@@ -220,7 +220,7 @@ describe('Subscriptions', function () {
       after(function (done) {
         Subscription.deleteOne(
           {
-            admin_id: this.user._id
+            admin_id: this.user._id,
           },
           done
         )
@@ -250,14 +250,14 @@ describe('Subscriptions', function () {
           manager_ids: [this.owner1._id],
           planCode: 'collaborator',
           groupPlan: true,
-          member_ids: [this.user._id]
+          member_ids: [this.user._id],
         })
         await Subscription.create({
           admin_id: this.owner2._id,
           manager_ids: [this.owner2._id],
           planCode: 'collaborator',
           groupPlan: true,
-          member_ids: [this.user._id]
+          member_ids: [this.user._id],
         })
         this.data = await buildUsersSubscriptionViewModelPromise(this.user._id)
       })
@@ -265,7 +265,7 @@ describe('Subscriptions', function () {
       after(function (done) {
         Subscription.deleteOne(
           {
-            admin_id: this.owner1._id
+            admin_id: this.owner1._id,
           },
           error => {
             if (error) {
@@ -273,7 +273,7 @@ describe('Subscriptions', function () {
             }
             Subscription.deleteOne(
               {
-                admin_id: this.owner2._id
+                admin_id: this.owner2._id,
               },
               done
             )
@@ -308,7 +308,7 @@ describe('Subscriptions', function () {
           admin_id: this.owner1._id,
           manager_ids: [this.owner1._id, this.user._id],
           planCode: 'collaborator',
-          groupPlan: true
+          groupPlan: true,
         })
         this.data = await buildUsersSubscriptionViewModelPromise(this.user._id)
       })
@@ -316,7 +316,7 @@ describe('Subscriptions', function () {
       after(function (done) {
         Subscription.deleteOne(
           {
-            admin_id: this.owner1._id
+            admin_id: this.owner1._id,
           },
           done
         )
@@ -346,11 +346,11 @@ describe('Subscriptions', function () {
               Institution.create(
                 {
                   v1Id: this.v1Id,
-                  managerIds: [this.user._id]
+                  managerIds: [this.user._id],
                 },
                 cb
               )
-            }
+            },
           ],
           error => {
             if (error) {
@@ -373,7 +373,7 @@ describe('Subscriptions', function () {
       after(function (done) {
         Institution.deleteOne(
           {
-            v1Id: this.v1Id
+            v1Id: this.v1Id,
           },
           done
         )
@@ -392,10 +392,10 @@ describe('Subscriptions', function () {
         const v1Id = MockV1Api.nextV1Id()
         MockV1Api.setUser(v1Id, {
           subscription: {},
-          subscription_status: {}
+          subscription_status: {},
         })
         await UserHelper.updateUser(this.user._id, {
-          $set: { overleaf: { id: v1Id } }
+          $set: { overleaf: { id: v1Id } },
         })
 
         const harvardDomain = 'harvard.example.edu'
@@ -403,24 +403,24 @@ describe('Subscriptions', function () {
         const stanfordDomain = 'stanford.example.edu'
         const harvardId = MockV1Api.createInstitution({
           name: 'Harvard',
-          hostname: harvardDomain
+          hostname: harvardDomain,
         })
         const mitId = MockV1Api.createInstitution({
           name: 'MIT',
-          hostname: mitDomain
+          hostname: mitDomain,
         })
         const stanfordId = MockV1Api.createInstitution({
           name: 'Stanford',
-          hostname: stanfordDomain
+          hostname: stanfordDomain,
         })
         MockV1Api.updateInstitutionDomain(harvardId, harvardDomain, {
-          confirmed: true
+          confirmed: true,
         })
         MockV1Api.updateInstitutionDomain(mitId, mitDomain, {
-          confirmed: false
+          confirmed: false,
         })
         MockV1Api.updateInstitutionDomain(stanfordId, stanfordDomain, {
-          confirmed: true
+          confirmed: true,
         })
         this.harvardEmail = `unconfirmed-affiliation-email@${harvardDomain}`
         this.stanfordEmail = `confirmed-affiliation-email@${stanfordDomain}`
@@ -452,21 +452,21 @@ describe('Subscriptions', function () {
             teams: [
               {
                 id: 56,
-                name: 'Test team'
-              }
-            ]
+                name: 'Test team',
+              },
+            ],
           }),
           subscription_status: (this.subscription_status = {
             product: { mock: 'product' },
-            team: null
-          })
+            team: null,
+          }),
         })
         await UserHelper.updateUser(this.user._id, {
           $set: {
             overleaf: {
-              id: v1Id
-            }
-          }
+              id: v1Id,
+            },
+          },
         })
         this.data = await buildUsersSubscriptionViewModelPromise(this.user._id)
       })
@@ -501,7 +501,7 @@ describe('Subscriptions', function () {
       this.response = await userHelper.request.post(
         '/user/subscription/v1/cancel',
         {
-          simple: false
+          simple: false,
         }
       )
     })

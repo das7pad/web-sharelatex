@@ -54,8 +54,8 @@ PreviewValidationIssue.propTypes = {
   details: PropTypes.oneOfType([
     PropTypes.object,
     PropTypes.array,
-    PropTypes.bool
-  ])
+    PropTypes.bool,
+  ]),
 }
 
 export default PreviewValidationIssue

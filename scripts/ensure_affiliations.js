@@ -8,7 +8,7 @@ const success = []
 console.log('Starting ensure affiliations')
 
 const query = {
-  'emails.affiliationUnchecked': true
+  'emails.affiliationUnchecked': true,
 }
 
 async function _handleEnsureAffiliation(user) {

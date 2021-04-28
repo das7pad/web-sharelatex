@@ -10,7 +10,7 @@ export default App.controller('PostGatewayController', function ($scope) {
         .attr({
           type: 'hidden',
           name: param,
-          value: params[param]
+          value: params[param],
         })
         .appendTo('#gateway')
     })

@@ -42,7 +42,7 @@ function FileTreeItemMenu({ id }) {
 }
 
 FileTreeItemMenu.propTypes = {
-  id: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired,
 }
 
 export default FileTreeItemMenu

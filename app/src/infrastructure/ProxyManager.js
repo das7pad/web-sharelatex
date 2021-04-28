@@ -69,7 +69,7 @@ module.exports = ProxyManager = {
       // see https://github.com/overleaf/write_latex/wiki/Streams-and-pipes-in-Node.js
       return upstream.pipe(res)
     }
-  }
+  },
 }
 
 // make a URL from a proxy target.

@@ -22,7 +22,7 @@ const Settings = require('@overleaf/settings')
 const {
   InvalidZipFileError,
   EmptyZipFileError,
-  ZipContentsTooLargeError
+  ZipContentsTooLargeError,
 } = require('./ArchiveErrors')
 const _ = require('underscore')
 const { promisifyAll } = require('../../util/promises')
@@ -170,7 +170,7 @@ const ArchiveManager = {
                   if (err != null) {
                     OError.tag(err, 'error unzipping file entry', {
                       source,
-                      destFile
+                      destFile,
                     })
                     zipfile.close() // bail out, stop reading file entries
                     return callback(err)
@@ -228,7 +228,7 @@ const ArchiveManager = {
           if (err != null) {
             OError.tag(err, 'unzip failed', {
               source,
-              destination
+              destination,
             })
             return callback(err)
           } else {
@@ -263,7 +263,7 @@ const ArchiveManager = {
         return callback(null, directory)
       }
     })
-  }
+  },
 }
 
 ArchiveManager.promises = promisifyAll(ArchiveManager)

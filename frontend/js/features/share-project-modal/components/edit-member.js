@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import {
   useProjectContext,
-  useShareProjectContext
+  useShareProjectContext,
 } from './share-project-modal'
 import Icon from '../../../shared/components/icon'
 import TransferOwnershipModal from './transfer-ownership-modal'
@@ -13,7 +13,7 @@ import {
   FormControl,
   FormGroup,
   OverlayTrigger,
-  Tooltip
+  Tooltip,
 } from 'react-bootstrap'
 import { removeMemberFromProject, updateMember } from '../utils/api'
 import t from '../../../misc/t'
@@ -23,7 +23,7 @@ export default function EditMember({ member }) {
   const [privileges, setPrivileges] = useState(member.privileges)
   const [
     confirmingOwnershipTransfer,
-    setConfirmingOwnershipTransfer
+    setConfirmingOwnershipTransfer,
   ] = useState(false)
 
   // update the local state if the member's privileges change externally
@@ -42,13 +42,13 @@ export default function EditMember({ member }) {
     } else {
       monitorRequest(() =>
         updateMember(project, member, {
-          privilegeLevel: privileges
+          privilegeLevel: privileges,
         })
       ).then(() => {
         updateProject({
           members: project.members.map(item =>
             item._id === member._id ? { ...item, privileges } : item
-          )
+          ),
         })
       })
     }
@@ -94,8 +94,8 @@ EditMember.propTypes = {
   member: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
-    privileges: PropTypes.string.isRequired
-  })
+    privileges: PropTypes.string.isRequired,
+  }),
 }
 
 function SelectPrivilege({ value, handleChange }) {
@@ -115,7 +115,7 @@ function SelectPrivilege({ value, handleChange }) {
 }
 SelectPrivilege.propTypes = {
   value: PropTypes.string.isRequired,
-  handleChange: PropTypes.func.isRequired
+  handleChange: PropTypes.func.isRequired,
 }
 
 function RemoveMemberAction({ member }) {
@@ -127,7 +127,7 @@ function RemoveMemberAction({ member }) {
 
     monitorRequest(() => removeMemberFromProject(project, member)).then(() => {
       updateProject({
-        members: project.members.filter(existing => existing !== member)
+        members: project.members.filter(existing => existing !== member),
       })
     })
   }
@@ -159,8 +159,8 @@ RemoveMemberAction.propTypes = {
   member: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     email: PropTypes.string.isRequired,
-    privileges: PropTypes.string.isRequired
-  })
+    privileges: PropTypes.string.isRequired,
+  }),
 }
 
 function ChangePrivilegesActions({ handleReset }) {
@@ -180,5 +180,5 @@ function ChangePrivilegesActions({ handleReset }) {
   )
 }
 ChangePrivilegesActions.propTypes = {
-  handleReset: PropTypes.func.isRequired
+  handleReset: PropTypes.func.isRequired,
 }

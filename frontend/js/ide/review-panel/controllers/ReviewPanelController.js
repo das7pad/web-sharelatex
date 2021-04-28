@@ -29,7 +29,7 @@ export default App.controller(
     const UserTypes = {
       MEMBER: 'member', // Invited, listed in project.members
       GUEST: 'guest', // Not invited, but logged in so has a user_id
-      ANONYMOUS: 'anonymous' // No user_id
+      ANONYMOUS: 'anonymous', // No user_id
     }
 
     const currentUserType = function () {
@@ -54,12 +54,12 @@ export default App.controller(
 
     $scope.SubViews = {
       CUR_FILE: 'cur_file',
-      OVERVIEW: 'overview'
+      OVERVIEW: 'overview',
     }
 
     $scope.UserTCSyncState = UserTCSyncState = {
       SYNCED: 'synced',
-      PENDING: 'pending'
+      PENDING: 'pending',
     }
 
     $scope.reviewPanel = {
@@ -77,10 +77,10 @@ export default App.controller(
         docsCollapsedState:
           JSON.parse(
             localStorage(`docs_collapsed_state:${$scope.project_id}`)
-          ) || {}
+          ) || {},
       },
       dropdown: {
-        loading: false
+        loading: false,
       },
       commentThreads: {},
       resolvedThreadIds: {},
@@ -93,7 +93,7 @@ export default App.controller(
       selectedEntryIds: [],
       // A count of user-facing selected changes. An aggregated change (insertion + deletion) will count
       // as only one.
-      nVisibleSelectedChanges: 0
+      nVisibleSelectedChanges: 0,
     }
 
     window.addEventListener('beforeunload', function () {
@@ -177,7 +177,7 @@ export default App.controller(
 
     $scope.commentState = {
       adding: false,
-      content: ''
+      content: '',
     }
 
     $scope.users = {}
@@ -452,7 +452,7 @@ export default App.controller(
             entry_ids: [change.id],
             content: change.op.i || change.op.d,
             offset: change.op.p,
-            metadata: change.metadata
+            metadata: change.metadata,
           }
           for (key in new_entry) {
             value = new_entry[key]
@@ -499,7 +499,7 @@ export default App.controller(
           thread_id: comment.op.t,
           entry_ids: [comment.id],
           content: comment.op.c,
-          offset: comment.op.p
+          offset: comment.op.p,
         }
         for (key in new_entry) {
           value = new_entry[key]
@@ -550,12 +550,12 @@ export default App.controller(
           entries['add-comment'] = {
             type: 'add-comment',
             offset: selection_offset_start,
-            length: selection_offset_end - selection_offset_start
+            length: selection_offset_end - selection_offset_start,
           }
           entries['bulk-actions'] = {
             type: 'bulk-actions',
             offset: selection_offset_start,
-            length: selection_offset_end - selection_offset_start
+            length: selection_offset_end - selection_offset_start,
           }
         }
 
@@ -611,14 +611,14 @@ export default App.controller(
     $scope.acceptChanges = function (change_ids) {
       _doAcceptChanges(change_ids)
       return eventTracking.sendMB('rp-changes-accepted', {
-        view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
+        view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
       })
     }
 
     $scope.rejectChanges = function (change_ids) {
       _doRejectChanges(change_ids)
       return eventTracking.sendMB('rp-changes-rejected', {
-        view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
+        view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
       })
     }
 
@@ -637,7 +637,7 @@ export default App.controller(
       _doAcceptChanges($scope.reviewPanel.selectedEntryIds.slice())
       return eventTracking.sendMB('rp-bulk-accept', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
-        nEntries: $scope.reviewPanel.nVisibleSelectedChanges
+        nEntries: $scope.reviewPanel.nVisibleSelectedChanges,
       })
     }
 
@@ -645,7 +645,7 @@ export default App.controller(
       _doRejectChanges($scope.reviewPanel.selectedEntryIds.slice())
       return eventTracking.sendMB('rp-bulk-reject', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
-        nEntries: $scope.reviewPanel.nVisibleSelectedChanges
+        nEntries: $scope.reviewPanel.nVisibleSelectedChanges,
       })
     }
 
@@ -664,9 +664,9 @@ export default App.controller(
             },
             nChanges() {
               return $scope.reviewPanel.nVisibleSelectedChanges
-            }
+            },
           },
-          scope: $scope.$new()
+          scope: $scope.$new(),
         })
         .result.then(function (isAccept) {
           if (isAccept) {
@@ -722,7 +722,7 @@ export default App.controller(
       $http
         .post(`/project/${$scope.project_id}/thread/${thread_id}/messages`, {
           content,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         })
         .catch(() =>
           ide.showGenericMessageModal(
@@ -749,7 +749,7 @@ export default App.controller(
       $http
         .post(`/project/${$scope.project_id}/thread/${thread_id}/messages`, {
           content,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         })
         .catch(() =>
           ide.showGenericMessageModal(
@@ -761,7 +761,7 @@ export default App.controller(
       const trackingMetadata = {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
         size: entry.replyContent.length,
-        thread: thread_id
+        thread: thread_id,
       }
 
       const thread = getThread(thread_id)
@@ -786,14 +786,14 @@ export default App.controller(
       )
       _onCommentResolved(entry.thread_id, ide.$scope.user)
       return eventTracking.sendMB('rp-comment-resolve', {
-        view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
+        view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
       })
     }
 
     $scope.unresolveComment = function (thread_id) {
       _onCommentReopened(thread_id)
       $http.post(`/project/${$scope.project_id}/thread/${thread_id}/reopen`, {
-        _csrf: window.csrfToken
+        _csrf: window.csrfToken,
       })
       return eventTracking.sendMB('rp-comment-reopen')
     }
@@ -856,8 +856,8 @@ export default App.controller(
         method: 'DELETE',
         url: `/project/${$scope.project_id}/doc/${doc_id}/thread/${thread_id}`,
         headers: {
-          'X-CSRF-Token': window.csrfToken
-        }
+          'X-CSRF-Token': window.csrfToken,
+        },
       })
       return eventTracking.sendMB('rp-comment-delete')
     }
@@ -867,7 +867,7 @@ export default App.controller(
         `/project/${$scope.project_id}/thread/${thread_id}/messages/${comment.id}/edit`,
         {
           content: comment.content,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         }
       )
       return $timeout(() => $scope.$broadcast('review-panel:layout'))
@@ -879,8 +879,8 @@ export default App.controller(
         method: 'DELETE',
         url: `/project/${$scope.project_id}/thread/${thread_id}/messages/${comment.id}`,
         headers: {
-          'X-CSRF-Token': window.csrfToken
-        }
+          'X-CSRF-Token': window.csrfToken,
+        },
       })
       return $timeout(() => $scope.$broadcast('review-panel:layout'))
     }
@@ -1186,7 +1186,7 @@ export default App.controller(
           name: 'Anonymous',
           isSelf: false,
           hue: ColorManager.ANONYMOUS_HUE,
-          avatar_text: 'A'
+          avatar_text: 'A',
         }
       }
       if (id === window.user_id) {
@@ -1212,7 +1212,7 @@ export default App.controller(
         avatar_text: [user.first_name, user.last_name]
           .filter(n => n != null)
           .map(n => n[0])
-          .join('')
+          .join(''),
       }
     }
 
@@ -1220,7 +1220,7 @@ export default App.controller(
       $modal.open({
         templateUrl: 'trackChangesUpgradeModalTemplate',
         controller: 'TrackChangesUpgradeModalController',
-        scope: $scope.$new()
+        scope: $scope.$new(),
       }))
   }
 )

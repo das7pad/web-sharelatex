@@ -47,16 +47,16 @@ module.exports = {
       {
         url: url,
         json: {
-          word
+          word,
         },
-        timeout: TIMEOUT
+        timeout: TIMEOUT,
       },
       (error, response) => {
         if (error) {
           return callback(
             OError.tag(error, 'error deleting word from user dictionary', {
               userId,
-              word
+              word,
             })
           )
         }
@@ -95,5 +95,5 @@ module.exports = {
 
       callback()
     })
-  }
+  },
 }

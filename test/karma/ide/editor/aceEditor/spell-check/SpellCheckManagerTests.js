@@ -19,19 +19,19 @@ export default describe('SpellCheckManager', function () {
     this.scope = {
       $watch: sinon.stub(),
       spellCheck: true,
-      spellCheckLanguage: 'en'
+      spellCheckLanguage: 'en',
     }
     this.highlightedWordManager = {
       reset: sinon.stub(),
       clearRow: sinon.stub(),
-      addHighlight: sinon.stub()
+      addHighlight: sinon.stub(),
     }
     this.adapter = {
       getLineCount: sinon.stub(),
       getFirstVisibleRowNum: sinon.stub(),
       getLastVisibleRowNum: sinon.stub(),
       getLinesByRows: sinon.stub(),
-      highlightedWordManager: this.highlightedWordManager
+      highlightedWordManager: this.highlightedWordManager,
     }
     return inject(($q, $http, $httpBackend, $cacheFactory) => {
       this.$http = $http
@@ -65,9 +65,9 @@ export default describe('SpellCheckManager', function () {
       misspellings: [
         {
           index: 0,
-          suggestions: ['opposition']
-        }
-      ]
+          suggestions: ['opposition'],
+        },
+      ],
     })
     this.adapter.getLinesByRows.returns(['oppozition'])
     this.timelord.tick(500)
@@ -83,15 +83,15 @@ export default describe('SpellCheckManager', function () {
       this.adapter.getLinesByRows.returns([
         'Lorem ipsum dolor sit amet',
         'consectetur adipisicing elit',
-        'sed do eiusmod'
+        'sed do eiusmod',
       ])
       this.$httpBackend.when('POST', '/spelling/v20200714/check').respond({
         misspellings: [
           {
             index: 0,
-            suggestions: ['opposition']
-          }
-        ]
+            suggestions: ['opposition'],
+          },
+        ],
       })
     })
     describe('when doing the first check', function () {
@@ -117,7 +117,7 @@ export default describe('SpellCheckManager', function () {
           6,
           7,
           8,
-          9
+          9,
         ])
       })
     })
@@ -181,9 +181,9 @@ export default describe('SpellCheckManager', function () {
         misspellings: [
           {
             index: 0,
-            suggestions: ['foobarbaz']
-          }
-        ]
+            suggestions: ['foobarbaz'],
+          },
+        ],
       })
 
       this.spellCheckManager.init()
@@ -236,15 +236,15 @@ export default describe('SpellCheckManager', function () {
           language: this.scope.spellCheckLanguage,
           words: ['Lorem', 'ipsum', 'dolor'],
           token: window.user.id,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         })
         .respond({
           misspellings: [
             {
               index: 0,
-              suggestions: ['foobarbaz']
-            }
-          ]
+              suggestions: ['foobarbaz'],
+            },
+          ],
         })
       this.timelord.tick(500)
       this.$httpBackend.flush()
@@ -256,15 +256,15 @@ export default describe('SpellCheckManager', function () {
           language: this.scope.spellCheckLanguage,
           words: ['Lorem', 'ipsum', 'dolor'],
           token: window.user.id,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         })
         .respond({
           misspellings: [
             {
               index: 0,
-              suggestions: ['foobarbaz']
-            }
-          ]
+              suggestions: ['foobarbaz'],
+            },
+          ],
         })
       this.timelord.tick(500)
       this.$httpBackend.flush()
@@ -278,15 +278,15 @@ export default describe('SpellCheckManager', function () {
           language: this.scope.spellCheckLanguage,
           words: ['Lorem', 'ipsum', 'dolor'],
           token: window.user.id,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         })
         .respond({
           misspellings: [
             {
               index: 0,
-              suggestions: ['foobarbaz']
-            }
-          ]
+              suggestions: ['foobarbaz'],
+            },
+          ],
         })
       this.timelord.tick(500)
       this.$httpBackend.flush()
@@ -297,15 +297,15 @@ export default describe('SpellCheckManager', function () {
           language: this.scope.spellCheckLanguage,
           words: ['sit', 'amet'],
           token: window.user.id,
-          _csrf: window.csrfToken
+          _csrf: window.csrfToken,
         })
         .respond({
           misspellings: [
             {
               index: 0,
-              suggestions: ['bazbarfoo']
-            }
-          ]
+              suggestions: ['bazbarfoo'],
+            },
+          ],
         })
       this.spellCheckManager.init()
       this.timelord.tick(500)

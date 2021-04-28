@@ -20,7 +20,7 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
   const isHighlightedRef = useRef(false)
 
   const mainItemClasses = classNames('outline-item', {
-    'outline-item-no-children': !outlineItem.children
+    'outline-item-no-children': !outlineItem.children,
   })
 
   const hasHighlightedChild =
@@ -31,7 +31,7 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
     highlightedLine === outlineItem.line || hasHighlightedChild
 
   const itemLinkClasses = classNames('outline-item-link', {
-    'outline-item-link-highlight': isHighlighted
+    'outline-item-link-highlight': isHighlighted,
   })
 
   function handleExpandCollapseClick() {
@@ -53,7 +53,7 @@ function OutlineItem({ outlineItem, jumpToLine, highlightedLine }) {
     if (!wasHighlighted && isHighlighted) {
       scrollIntoViewIfNeeded(titleElementRef.current, {
         scrollMode: 'if-needed',
-        block: 'center'
+        block: 'center',
       })
     }
   }, [isHighlighted, titleElementRef, isHighlightedRef])
@@ -108,10 +108,10 @@ OutlineItem.propTypes = {
     line: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
     level: PropTypes.number,
-    children: PropTypes.array
+    children: PropTypes.array,
   }).isRequired,
   jumpToLine: PropTypes.func.isRequired,
-  highlightedLine: PropTypes.number
+  highlightedLine: PropTypes.number,
 }
 
 export default OutlineItem

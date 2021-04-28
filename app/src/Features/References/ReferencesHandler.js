@@ -110,7 +110,7 @@ module.exports = ReferencesHandler = {
       function (err, project) {
         if (err) {
           OError.tag(err, 'error finding project', {
-            projectId
+            projectId,
           })
           return callback(err)
         }
@@ -141,7 +141,7 @@ module.exports = ReferencesHandler = {
       function (err, project) {
         if (err) {
           OError.tag(err, 'error finding project', {
-            projectId
+            projectId,
           })
           return callback(err)
         }
@@ -160,7 +160,7 @@ module.exports = ReferencesHandler = {
     return ReferencesHandler._isFullIndex(project, function (err, isFullIndex) {
       if (err) {
         OError.tag(err, 'error checking whether to do full index', {
-          projectId
+          projectId,
         })
         return callback(err)
       }
@@ -177,7 +177,7 @@ module.exports = ReferencesHandler = {
           if (err) {
             OError.tag(err, 'error flushing docs to mongo', {
               projectId,
-              docIds
+              docIds,
             })
             return callback(err)
           }
@@ -193,13 +193,13 @@ module.exports = ReferencesHandler = {
               url: `${settings.apis.references.url}/project/${projectId}/index`,
               json: {
                 docUrls: allUrls,
-                fullIndex: isFullIndex
-              }
+                fullIndex: isFullIndex,
+              },
             },
             function (err, res, data) {
               if (err) {
                 OError.tag(err, 'error communicating with references api', {
-                  projectId
+                  projectId,
                 })
                 return callback(err)
               }
@@ -217,7 +217,7 @@ module.exports = ReferencesHandler = {
         }
       )
     })
-  }
+  },
 }
 
 function __guard__(value, transform) {

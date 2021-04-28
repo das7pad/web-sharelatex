@@ -12,7 +12,7 @@ describe('BodyParserErrors', function () {
           {
             url: '/login',
             body: { password: wayTooLongString },
-            json: true
+            json: true,
           },
           (error, response, body) => {
             if (error) {
@@ -32,7 +32,7 @@ describe('BodyParserErrors', function () {
         request.post(
           {
             url: '/login',
-            form: { password: wayTooLongString }
+            form: { password: wayTooLongString },
           },
           (error, response, body) => {
             if (error) {
@@ -54,7 +54,7 @@ describe('BodyParserErrors', function () {
           {
             url: '/login',
             body: { password: 'foo' },
-            json: true
+            json: true,
           },
           (error, response, body) => {
             if (error) {
@@ -72,7 +72,7 @@ describe('BodyParserErrors', function () {
         request.post(
           {
             url: '/login',
-            form: { password: 'foo' }
+            form: { password: 'foo' },
           },
           (error, response, body) => {
             if (error) {

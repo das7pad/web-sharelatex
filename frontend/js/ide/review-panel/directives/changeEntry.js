@@ -22,7 +22,7 @@ export default App.directive('changeEntry', $timeout => ({
     onAccept: '&',
     onReject: '&',
     onIndicatorClick: '&',
-    onBodyClick: '&'
+    onBodyClick: '&',
   },
   link(scope, element, attrs) {
     scope.translate = t
@@ -50,5 +50,5 @@ export default App.directive('changeEntry', $timeout => ({
       contentLength =>
         (scope.needsCollapsing = contentLength > scope.contentLimit)
     )
-  }
+  },
 }))

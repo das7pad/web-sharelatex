@@ -46,7 +46,7 @@ export default function FileTreeUploadDoc() {
         allowMultipleUploads: false,
         restrictions: {
           maxNumberOfFiles,
-          maxFileSize: maxFileSize || null
+          maxFileSize: maxFileSize || null,
         },
         onBeforeUpload: files => {
           let result = true
@@ -67,17 +67,17 @@ export default function FileTreeUploadDoc() {
 
           return result
         },
-        autoProceed: true
+        autoProceed: true,
       })
         // use the basic XHR uploader
         .use(XHRUpload, {
           endpoint,
           headers: {
-            'X-CSRF-TOKEN': window.csrfToken
+            'X-CSRF-TOKEN': window.csrfToken,
           },
           // limit: maxConnections || 1,
           limit: 1,
-          fieldName: 'qqfile' // "qqfile" field inherited from FineUploader
+          fieldName: 'qqfile', // "qqfile" field inherited from FineUploader
         })
         // close the modal when all the uploads completed successfully
         .on('complete', result => {
@@ -154,8 +154,8 @@ export default function FileTreeUploadDoc() {
               dropPasteFiles: `Drag here or %{browseFiles}`,
               // Used as the label for the link that opens the system file selection dialog.
               // browseFiles: t('select_from_your_computer')
-              browseFiles: 'select from your computer'
-            }
+              browseFiles: 'select from your computer',
+            },
           }}
         />
       )}
@@ -179,7 +179,7 @@ function UploadErrorMessage({ error, maxNumberOfFiles }) {
 }
 UploadErrorMessage.propTypes = {
   error: PropTypes.string.isRequired,
-  maxNumberOfFiles: PropTypes.number.isRequired
+  maxNumberOfFiles: PropTypes.number.isRequired,
 }
 
 function UploadConflicts({ cancel, conflicts, handleOverwrite }) {
@@ -216,5 +216,5 @@ function UploadConflicts({ cancel, conflicts, handleOverwrite }) {
 UploadConflicts.propTypes = {
   cancel: PropTypes.func.isRequired,
   conflicts: PropTypes.array.isRequired,
-  handleOverwrite: PropTypes.func.isRequired
+  handleOverwrite: PropTypes.func.isRequired,
 }

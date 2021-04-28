@@ -50,7 +50,7 @@ function FileTreeDoc({ name, id, isLinkedFile }) {
 FileTreeDoc.propTypes = {
   name: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
-  isLinkedFile: PropTypes.bool
+  isLinkedFile: PropTypes.bool,
 }
 
 export default FileTreeDoc

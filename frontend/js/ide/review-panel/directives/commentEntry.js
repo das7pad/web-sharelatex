@@ -24,7 +24,7 @@ export default App.directive('commentEntry', $timeout => ({
     onIndicatorClick: '&',
     onSaveEdit: '&',
     onDelete: '&',
-    onBodyClick: '&'
+    onBodyClick: '&',
   },
   link(scope, element, attrs) {
     scope.translate = t
@@ -88,5 +88,5 @@ export default App.directive('commentEntry', $timeout => ({
         return scope.saveEdit(comment)
       }
     })
-  }
+  },
 }))

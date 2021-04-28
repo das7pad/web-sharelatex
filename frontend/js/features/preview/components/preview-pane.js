@@ -23,7 +23,7 @@ function PreviewPane({
   onLogEntryLocationClick,
   showLogs,
   variantWithFirstErrorPopup = true,
-  splitLayout
+  splitLayout,
 }) {
   const [lastCompileTimestamp, setLastCompileTimestamp] = useState(
     compilerState.lastCompileTimestamp
@@ -152,7 +152,7 @@ PreviewPane.propTypes = {
     validationIssues: PropTypes.object,
     errors: PropTypes.object,
     rawLog: PropTypes.string,
-    compileFailed: PropTypes.bool
+    compileFailed: PropTypes.bool,
   }),
   onClearCache: PropTypes.func.isRequired,
   onLogEntryLocationClick: PropTypes.func.isRequired,
@@ -170,7 +170,7 @@ PreviewPane.propTypes = {
   pdfDownloadUrl: PropTypes.string,
   showLogs: PropTypes.bool.isRequired,
   variantWithFirstErrorPopup: PropTypes.bool,
-  splitLayout: PropTypes.bool.isRequired
+  splitLayout: PropTypes.bool.isRequired,
 }
 
 export default PreviewPane

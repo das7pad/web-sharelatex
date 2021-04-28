@@ -20,7 +20,7 @@ class MockRequest {
     this.prototype.i18n = {
       translate(str) {
         return str
-      }
+      },
     }
     this.prototype.route = { path: '' }
     this.prototype.accepts = () => {}

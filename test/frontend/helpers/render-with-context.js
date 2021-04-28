@@ -14,9 +14,9 @@ export function EditorProviders({
   projectId = 'project123',
   socket = {
     on: sinon.stub(),
-    removeListener: sinon.stub()
+    removeListener: sinon.stub(),
   },
-  children
+  children,
 }) {
   window.user = user || window.user
   window.project_id = projectId != null ? projectId : window.project_id
@@ -25,16 +25,16 @@ export function EditorProviders({
     $scope: {
       project: {
         owner: {
-          _id: '124abd'
-        }
+          _id: '124abd',
+        },
       },
       ui: {
         chatOpen: true,
-        pdfLayout: 'flat'
+        pdfLayout: 'flat',
       },
-      $watch: () => {}
+      $watch: () => {},
     },
-    socket
+    socket,
   }
   return (
     <ApplicationProvider>

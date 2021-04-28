@@ -32,17 +32,17 @@ describe('V1SubscriptionManager', function () {
           apis: {
             v1: {
               host: (this.host = 'http://overleaf.example.com'),
-              url: 'v1.url'
-            }
+              url: 'v1.url',
+            },
           },
           v1GrandfatheredFeaturesUidCutoff: 10,
           v1GrandfatheredFeatures: {
             github: true,
-            mendeley: true
-          }
+            mendeley: true,
+          },
         }),
-        request: (this.request = sinon.stub())
-      }
+        request: (this.request = sinon.stub()),
+      },
     })
     this.userId = 'abcd'
     this.v1UserId = 42
@@ -50,8 +50,8 @@ describe('V1SubscriptionManager', function () {
       _id: this.userId,
       email: 'user@example.com',
       overleaf: {
-        id: this.v1UserId
-      }
+        id: this.v1UserId,
+      },
     })
   })
 
@@ -59,7 +59,7 @@ describe('V1SubscriptionManager', function () {
     beforeEach(function () {
       this.responseBody = {
         id: 32,
-        plan_name: 'pro'
+        plan_name: 'pro',
       }
       this.V1SubscriptionManager._v1Request = sinon
         .stub()
@@ -127,7 +127,7 @@ describe('V1SubscriptionManager', function () {
           this.V1SubscriptionManager.getGrandfatheredFeaturesForV1User(1)
         ).to.eql({
           github: true,
-          mendeley: true
+          mendeley: true,
         })
         return done()
       })
@@ -150,7 +150,7 @@ describe('V1SubscriptionManager', function () {
             {
               url() {
                 return '/foo'
-              }
+              },
             },
             cb
           )
@@ -181,7 +181,7 @@ describe('V1SubscriptionManager', function () {
             {
               url() {
                 return '/foo'
-              }
+              },
             },
             cb
           )
@@ -212,7 +212,7 @@ describe('V1SubscriptionManager', function () {
             {
               url() {
                 return '/foo'
-              }
+              },
             },
             cb
           )
@@ -239,7 +239,7 @@ describe('V1SubscriptionManager', function () {
             {
               url() {
                 return '/foo'
-              }
+              },
             },
             cb
           )
@@ -280,7 +280,7 @@ describe('V1SubscriptionManager', function () {
             {
               url() {
                 return '/foo'
-              }
+              },
             },
             cb
           )
@@ -307,7 +307,7 @@ describe('V1SubscriptionManager', function () {
             {
               url() {
                 return '/foo'
-              }
+              },
             },
             cb
           )

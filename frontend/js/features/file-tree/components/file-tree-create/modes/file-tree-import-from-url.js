@@ -38,7 +38,7 @@ export default function FileTreeImportFromUrl() {
     finishCreatingLinkedFile({
       name,
       provider: 'url',
-      data: { url }
+      data: { url },
     })
   }
 

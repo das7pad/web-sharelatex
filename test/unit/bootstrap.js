@@ -34,8 +34,8 @@ const globalStubs = {
     warn: globalStubsSandbox.stub(),
     err: globalStubsSandbox.stub(),
     error: globalStubsSandbox.stub(),
-    fatal: globalStubsSandbox.stub()
-  }
+    fatal: globalStubsSandbox.stub(),
+  },
 }
 
 /*
@@ -60,13 +60,13 @@ SandboxedModule.configure({
         return compiled
       }
       return source
-    }
-  }
+    },
+  },
 })
 
 function getSandboxedModuleRequires() {
   const requires = {
-    'logger-sharelatex': globalStubs.logger
+    'logger-sharelatex': globalStubs.logger,
   }
 
   const internalModules = [
@@ -75,7 +75,7 @@ function getSandboxedModuleRequires() {
 
     '../../app/src/util/promises',
     '../../app/src/Features/Errors/Errors',
-    '../../app/src/Features/Helpers/Mongo'
+    '../../app/src/Features/Helpers/Mongo',
   ]
   const externalLibs = [
     'async',
@@ -87,7 +87,7 @@ function getSandboxedModuleRequires() {
     'sanitize-html',
     'sshpk',
     'underscore',
-    'xml2js'
+    'xml2js',
   ]
   for (const modulePath of internalModules) {
     requires[Path.resolve(__dirname, modulePath)] = require(modulePath)
@@ -128,7 +128,7 @@ exports.mochaHooks = {
 
     // Restore other stubs
     sinon.restore()
-  }
+  },
 }
 
 // used by -> app/src/infrastructure/Mongoose.js

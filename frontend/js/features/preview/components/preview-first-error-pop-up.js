@@ -9,7 +9,7 @@ function PreviewFirstErrorPopUp({
   logEntry,
   onGoToErrorLocation,
   onViewLogs,
-  onClose
+  onClose,
 }) {
   function handleGoToErrorLocation() {
     const { file, line, column } = logEntry
@@ -82,7 +82,7 @@ PreviewFirstErrorPopUp.propTypes = {
   logEntry: PropTypes.object.isRequired,
   onGoToErrorLocation: PropTypes.func.isRequired,
   onViewLogs: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
 }
 
 export default PreviewFirstErrorPopUp

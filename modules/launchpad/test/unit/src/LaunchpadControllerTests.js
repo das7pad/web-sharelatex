@@ -25,7 +25,7 @@ describe('LaunchpadController', function () {
       _id: '323123',
       first_name: 'fn',
       last_name: 'ln',
-      save: sinon.stub().callsArgWith(0)
+      save: sinon.stub().callsArgWith(0),
     }
 
     this.User = {}
@@ -42,8 +42,8 @@ describe('LaunchpadController', function () {
         '../../../../app/src/Features/Email/EmailHandler': (this.EmailHandler = {}),
         '../../../../app/src/Features/User/UserGetter': (this.UserGetter = {}),
         '../../../../app/src/models/User': { User: this.User },
-        '../../../../app/src/Features/Authentication/AuthenticationController': (this.AuthenticationController = {})
-      }
+        '../../../../app/src/Features/Authentication/AuthenticationController': (this.AuthenticationController = {}),
+      },
     })
 
     this.email = 'bob@smith.com'
@@ -51,14 +51,14 @@ describe('LaunchpadController', function () {
     this.req = {
       query: {},
       body: {},
-      session: {}
+      session: {},
     }
 
     this.res = {
       render: sinon.stub(),
       redirect: sinon.stub(),
       send: sinon.stub(),
-      sendStatus: sinon.stub()
+      sendStatus: sinon.stub(),
     }
 
     return (this.next = sinon.stub())
@@ -106,7 +106,7 @@ describe('LaunchpadController', function () {
               wsAssetUrl: '/socket.io/socket.io.js',
               wsUrl: '/socket.io',
               adminUserExists: false,
-              authMethod: 'local'
+              authMethod: 'local',
             })
             .should.equal(true)
         })
@@ -139,7 +139,7 @@ describe('LaunchpadController', function () {
       beforeEach(function () {
         this.user = {
           _id: 'abcd',
-          email: 'abcd@example.com'
+          email: 'abcd@example.com',
         }
         this.AuthenticationController.getSessionUser = sinon
           .stub()
@@ -172,7 +172,7 @@ describe('LaunchpadController', function () {
               wsAssetUrl: '/socket.io/socket.io.js',
               wsUrl: '/socket.io',
               adminUserExists: true,
-              authMethod: 'local'
+              authMethod: 'local',
             })
             .should.equal(true)
         })
@@ -330,7 +330,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon
           .stub()
@@ -370,8 +370,8 @@ describe('LaunchpadController', function () {
             {
               $set: {
                 isAdmin: true,
-                emails: [{ email: this.user.email }]
-              }
+                emails: [{ email: this.user.email }],
+              },
             }
           )
           .should.equal(true)
@@ -396,7 +396,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -435,7 +435,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -474,7 +474,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -509,7 +509,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -548,7 +548,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon
           .stub()
@@ -594,7 +594,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon
           .stub()
@@ -638,7 +638,7 @@ describe('LaunchpadController', function () {
         this.req.body.password = this.password
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon
           .stub()
@@ -680,8 +680,8 @@ describe('LaunchpadController', function () {
             {
               $set: {
                 isAdmin: true,
-                emails: [{ email: this.user.email }]
-              }
+                emails: [{ email: this.user.email }],
+              },
             }
           )
           .should.equal(true)
@@ -718,7 +718,7 @@ describe('LaunchpadController', function () {
         this.req.body.email = this.email
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon
           .stub()
@@ -750,7 +750,7 @@ describe('LaunchpadController', function () {
             email: this.email,
             password: 'password_here',
             first_name: this.email,
-            last_name: ''
+            last_name: '',
           })
           .should.equal(true)
       })
@@ -762,7 +762,7 @@ describe('LaunchpadController', function () {
             { _id: this.user._id },
             {
               $set: { isAdmin: true },
-              emails: [{ email: this.user.email }]
+              emails: [{ email: this.user.email }],
             }
           )
           .should.equal(true)
@@ -785,7 +785,7 @@ describe('LaunchpadController', function () {
         this.req.body.email = this.email
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -820,7 +820,7 @@ describe('LaunchpadController', function () {
         this.req.body.email = this.email
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -857,7 +857,7 @@ describe('LaunchpadController', function () {
         this.req.body.email = this.email
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -890,7 +890,7 @@ describe('LaunchpadController', function () {
         this.req.body.email = this.email
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon.stub()
         this.User.updateOne = sinon.stub()
@@ -927,7 +927,7 @@ describe('LaunchpadController', function () {
         this.req.body.email = this.email
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon
           .stub()
@@ -959,7 +959,7 @@ describe('LaunchpadController', function () {
             email: this.email,
             password: 'password_here',
             first_name: this.email,
-            last_name: ''
+            last_name: '',
           })
           .should.equal(true)
       })
@@ -976,7 +976,7 @@ describe('LaunchpadController', function () {
         this.req.body.email = this.email
         this.user = {
           _id: 'abcdef',
-          email: this.email
+          email: this.email,
         }
         this.UserRegistrationHandler.registerNewUser = sinon
           .stub()
@@ -1008,7 +1008,7 @@ describe('LaunchpadController', function () {
             email: this.email,
             password: 'password_here',
             first_name: this.email,
-            last_name: ''
+            last_name: '',
           })
           .should.equal(true)
       })

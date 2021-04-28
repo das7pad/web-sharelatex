@@ -21,7 +21,7 @@ export default App.directive('pdfng', $timeout => ({
     pdfSrc: '=',
     highlights: '=',
     position: '=',
-    dblClickCallback: '='
+    dblClickCallback: '=',
   },
   link(scope, element, attrs) {
     scope.loading = false
@@ -46,8 +46,8 @@ export default App.directive('pdfng', $timeout => ({
           page: +position.page,
           offset: {
             top: +position.offset.top,
-            left: +position.offset.left
-          }
+            left: +position.offset.left,
+          },
         }
       }
 
@@ -72,7 +72,7 @@ export default App.directive('pdfng', $timeout => ({
       typeof scope.dblClickCallback === 'function'
         ? scope.dblClickCallback({
             page: e.page - 1,
-            offset: { top: e.y, left: e.x }
+            offset: { top: e.y, left: e.x },
           })
         : undefined
     )
@@ -195,5 +195,5 @@ export default App.directive('pdfng', $timeout => ({
 <div class="progress-thin" ng-show="loading">
   <div class="progress-bar" ng-style="{ 'width': progress + '%' }"></div>
 </div>\
-`
+`,
 }))

@@ -5,6 +5,6 @@ App.directive('autoSubmitForm', function () {
     link(scope, element) {
       showFakeProgress()
       element.submit() // Runs on load
-    }
+    },
   }
 })

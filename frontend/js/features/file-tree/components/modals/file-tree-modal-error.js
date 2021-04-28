@@ -8,7 +8,7 @@ import {
   InvalidFilenameError,
   BlockedFilenameError,
   DuplicateFilenameError,
-  DuplicateFilenameMoveError
+  DuplicateFilenameMoveError,
 } from '../../errors'
 import t from '../../../../misc/t'
 import { Trans } from '../../../../components/trans'

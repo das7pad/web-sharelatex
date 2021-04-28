@@ -64,7 +64,7 @@ const isInViewport = function (element) {
 export default App.directive('eventTracking', eventTracking => ({
   scope: {
     eventTracking: '@',
-    eventSegmentation: '=?'
+    eventSegmentation: '=?',
   },
   link(scope, element, attrs) {
     if (!eventTracking.enabled) {
@@ -125,5 +125,5 @@ export default App.directive('eventTracking', eventTracking => ({
         }, 500)
       )
     }
-  }
+  },
 }))

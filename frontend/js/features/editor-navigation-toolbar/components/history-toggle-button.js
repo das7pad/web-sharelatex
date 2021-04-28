@@ -6,7 +6,7 @@ import t from '../../../misc/t'
 
 function HistoryToggleButton({ historyIsOpen, onClick }) {
   const classes = classNames('btn', 'btn-full-height', {
-    active: historyIsOpen
+    active: historyIsOpen,
   })
 
   return (
@@ -20,7 +20,7 @@ function HistoryToggleButton({ historyIsOpen, onClick }) {
 
 HistoryToggleButton.propTypes = {
   historyIsOpen: PropTypes.bool,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 
 export default HistoryToggleButton

@@ -15,10 +15,10 @@ function OutlinePane({
   jumpToLine,
   onToggle,
   eventTracking,
-  highlightedLine
+  highlightedLine,
 }) {
   const { projectId } = useEditorContext({
-    projectId: PropTypes.string.isRequired
+    projectId: PropTypes.string.isRequired,
   })
 
   const storageKey = `file_outline.expanded.${projectId}`
@@ -33,7 +33,7 @@ function OutlinePane({
   }, [isOpen, onToggle])
 
   const headerClasses = classNames('outline-pane', {
-    'outline-pane-disabled': !isTexFile
+    'outline-pane-disabled': !isTexFile,
   })
 
   function handleExpandCollapseClick() {
@@ -79,7 +79,7 @@ OutlinePane.propTypes = {
   jumpToLine: PropTypes.func.isRequired,
   onToggle: PropTypes.func.isRequired,
   eventTracking: PropTypes.object.isRequired,
-  highlightedLine: PropTypes.number
+  highlightedLine: PropTypes.number,
 }
 
 export default withErrorBoundary(OutlinePane)

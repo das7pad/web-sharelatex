@@ -22,7 +22,7 @@ export default App.directive('aggregateChangeEntry', $timeout => ({
     onAccept: '&',
     onReject: '&',
     onIndicatorClick: '&',
-    onBodyClick: '&'
+    onBodyClick: '&',
   },
   link(scope, element, attrs) {
     scope.translate = t
@@ -65,5 +65,5 @@ export default App.directive('aggregateChangeEntry', $timeout => ({
         (scope.insertionNeedsCollapsing =
           insertionContentLength > scope.contentLimit)
     )
-  }
+  },
 }))

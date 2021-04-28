@@ -22,7 +22,7 @@ function FileTreeModalCreateFolder() {
     inFlight,
     finishCreatingFolder,
     cancel,
-    error
+    error,
   } = useFileTreeActionable()
 
   if (!isCreatingFolder) return null // the modal will not be rendered; return early
@@ -105,7 +105,7 @@ function InputName({
   setName,
   validName,
   setValidName,
-  handleCreateFolder
+  handleCreateFolder,
 }) {
   const { autoFocusedRef } = useRefWithAutoFocus()
 
@@ -142,7 +142,7 @@ InputName.propTypes = {
   setName: PropTypes.func.isRequired,
   validName: PropTypes.bool.isRequired,
   setValidName: PropTypes.func.isRequired,
-  handleCreateFolder: PropTypes.func.isRequired
+  handleCreateFolder: PropTypes.func.isRequired,
 }
 
 export default FileTreeModalCreateFolder

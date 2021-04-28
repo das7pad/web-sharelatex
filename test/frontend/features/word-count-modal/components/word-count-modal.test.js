@@ -15,7 +15,7 @@ describe('<WordCountModal />', function () {
     projectId: 'project-1',
     clsiServerId: 'clsi-server-1',
     show: true,
-    handleHide: sinon.stub()
+    handleHide: sinon.stub(),
   }
 
   it('renders the translated modal title', async function () {
@@ -53,9 +53,9 @@ describe('<WordCountModal />', function () {
         status: 200,
         body: {
           texcount: {
-            messages: 'This is a test'
-          }
-        }
+            messages: 'This is a test',
+          },
+        },
       }
     })
 
@@ -73,9 +73,9 @@ describe('<WordCountModal />', function () {
             textWords: 100,
             mathDisplay: 200,
             mathInline: 300,
-            headers: 400
-          }
-        }
+            headers: 400,
+          },
+        },
       }
     })
 

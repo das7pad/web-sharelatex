@@ -64,7 +64,7 @@ module.exports = LaunchpadController = {
             wsUrl,
             wsAssetUrl,
             adminUserExists,
-            authMethod
+            authMethod,
           })
         } else {
           AuthenticationController.setRedirectInSession(req)
@@ -83,7 +83,7 @@ module.exports = LaunchpadController = {
                 wsUrl,
                 wsAssetUrl,
                 adminUserExists,
-                authMethod
+                authMethod,
               })
             } else {
               return res.redirect('/restricted')
@@ -121,7 +121,7 @@ module.exports = LaunchpadController = {
     return EmailHandler.sendEmail('testEmail', emailOptions, function (err) {
       if (err != null) {
         OError.tag(err, 'error sending test email', {
-          email
+          email,
         })
         return next(err)
       }
@@ -163,7 +163,7 @@ module.exports = LaunchpadController = {
           email,
           password: 'password_here',
           first_name: email,
-          last_name: ''
+          last_name: '',
         }
         logger.log(
           { body, authMethod },
@@ -176,7 +176,7 @@ module.exports = LaunchpadController = {
             if (err != null) {
               OError.tag(err, 'error with registerNewUser', {
                 email,
-                authMethod
+                authMethod,
               })
               return next(err)
             }
@@ -185,12 +185,12 @@ module.exports = LaunchpadController = {
               { _id: user._id },
               {
                 $set: { isAdmin: true },
-                emails: [{ email }]
+                emails: [{ email }],
               },
               function (err) {
                 if (err != null) {
                   OError.tag(err, 'error setting user to admin', {
-                    user_id: user._id
+                    user_id: user._id,
                   })
                   return next(err)
                 }
@@ -246,13 +246,13 @@ module.exports = LaunchpadController = {
             {
               $set: {
                 isAdmin: true,
-                emails: [{ email }]
-              }
+                emails: [{ email }],
+              },
             },
             function (err) {
               if (err != null) {
                 OError.tag(err, 'error setting user to admin', {
-                  user_id: user._id
+                  user_id: user._id,
                 })
                 return next(err)
               }
@@ -268,12 +268,12 @@ module.exports = LaunchpadController = {
                 first_name: user.first_name,
                 last_name: user.last_name,
                 email: user.email,
-                created: Date.now()
+                created: Date.now(),
               })
             }
           )
         }
       )
     })
-  }
+  },
 }

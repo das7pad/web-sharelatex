@@ -25,7 +25,7 @@ function FileTreeToolbarLeft() {
     canCreate,
     startCreatingFolder,
     startCreatingDocOrFile,
-    startUploadingDocOrFile
+    startUploadingDocOrFile,
   } = useFileTreeActionable()
 
   if (!canCreate) return null
@@ -66,7 +66,7 @@ function FileTreeToolbarRight() {
     canRename,
     canDelete,
     startRenaming,
-    startDeleting
+    startDeleting,
   } = useFileTreeActionable()
 
   if (!canRename && !canDelete) {

@@ -19,7 +19,7 @@ export default App.directive('resolvedCommentEntry', () => ({
     thread: '=',
     permissions: '=',
     onUnresolve: '&',
-    onDelete: '&'
+    onDelete: '&',
   },
   link(scope, element, attrs) {
     scope.translate = t
@@ -34,5 +34,5 @@ export default App.directive('resolvedCommentEntry', () => ({
       contentLength =>
         (scope.needsCollapsing = contentLength > scope.contentLimit)
     )
-  }
+  },
 }))

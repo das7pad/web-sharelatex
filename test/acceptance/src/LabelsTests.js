@@ -55,14 +55,14 @@ describe('Labels', function () {
     MockProjectHistoryApi.addLabel(this.project_id, {
       id: label_id,
       comment,
-      version
+      version,
     })
 
     return this.owner.request(
       {
         method: 'GET',
         url: `/project/${this.project_id}/labels`,
-        json: true
+        json: true,
       },
       (error, response, body) => {
         if (error != null) {
@@ -83,7 +83,7 @@ describe('Labels', function () {
       {
         method: 'POST',
         url: `/project/${this.project_id}/labels`,
-        json: { comment, version }
+        json: { comment, version },
       },
       (error, response, body) => {
         if (error != null) {
@@ -92,7 +92,7 @@ describe('Labels', function () {
         expect(response.statusCode).to.equal(200)
         const { label_id } = body
         expect(MockProjectHistoryApi.getLabels(this.project_id)).to.deep.equal([
-          { id: label_id, comment, version }
+          { id: label_id, comment, version },
         ])
         return done()
       }
@@ -106,14 +106,14 @@ describe('Labels', function () {
     MockProjectHistoryApi.addLabel(this.project_id, {
       id: label_id,
       comment,
-      version
+      version,
     })
 
     return this.owner.request(
       {
         method: 'DELETE',
         url: `/project/${this.project_id}/labels/${label_id}`,
-        json: true
+        json: true,
       },
       (error, response, body) => {
         if (error != null) {

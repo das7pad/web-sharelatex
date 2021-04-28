@@ -55,7 +55,7 @@ describe('FeatureUpdater.refreshFeatures', function () {
         admin_id: user._id,
         manager_ids: [user._id],
         planCode: 'collaborator',
-        customAccount: true
+        customAccount: true,
       })
     }) // returns a promise
 
@@ -82,7 +82,7 @@ describe('FeatureUpdater.refreshFeatures', function () {
         member_ids: [user._id],
         groupAccount: true,
         planCode: 'collaborator',
-        customAccount: true
+        customAccount: true,
       })
     }) // returns a promise
 
@@ -104,10 +104,10 @@ describe('FeatureUpdater.refreshFeatures', function () {
     beforeEach(function () {
       return User.updateOne(
         {
-          _id: user._id
+          _id: user._id,
         },
         {
-          refered_user_count: 10
+          refered_user_count: 10,
         }
       )
     }) // returns a promise
@@ -135,7 +135,7 @@ describe('FeatureUpdater.refreshFeatures', function () {
       institutionId = MockV1Api.createInstitution({ commonsAccount: true })
       hostname = 'institution.edu'
       MockV1Api.addInstitutionDomain(institutionId, hostname, {
-        confirmed: true
+        confirmed: true,
       })
       email2 = `${user._id}@${hostname}`
       userHelper = await UserHelper.loginUser(
@@ -169,7 +169,7 @@ describe('FeatureUpdater.refreshFeatures', function () {
       describe('when domain is not confirmed as part of institution', function () {
         beforeEach(function () {
           MockV1Api.updateInstitutionDomain(institutionId, hostname, {
-            confirmed: false
+            confirmed: false,
           })
         })
         it('should not set their features', function (done) {
@@ -186,11 +186,11 @@ describe('FeatureUpdater.refreshFeatures', function () {
     beforeEach(function () {
       return User.updateOne(
         {
-          _id: user._id
+          _id: user._id,
         },
         {
           refered_user_count: 10,
-          'features.github': true
+          'features.github': true,
         }
       )
     }) // returns a promise
@@ -217,12 +217,12 @@ describe('FeatureUpdater.refreshFeatures', function () {
       MockV1Api.setUser(42, { plan_name: 'free' })
       return User.updateOne(
         {
-          _id: user._id
+          _id: user._id,
         },
         {
           overleaf: {
-            id: 42
-          }
+            id: 42,
+          },
         }
       )
     }) // returns a promise
@@ -244,13 +244,13 @@ describe('FeatureUpdater.refreshFeatures', function () {
       MockV1Api.setUser(42, { plan_name: 'free' })
       return User.updateOne(
         {
-          _id: user._id
+          _id: user._id,
         },
         {
           overleaf: {
-            id: 42
+            id: 42,
           },
-          refered_user_count: 10
+          refered_user_count: 10,
         }
       )
     }) // returns a promise
@@ -281,7 +281,7 @@ describe('FeatureUpdater.refreshFeatures', function () {
           admin_id: user._id,
           manager_ids: [user._id],
           planCode: 'professional',
-          customAccount: true
+          customAccount: true,
         },
         error => {
           if (error) {
@@ -294,7 +294,7 @@ describe('FeatureUpdater.refreshFeatures', function () {
               member_ids: [user._id],
               groupAccount: true,
               planCode: 'collaborator',
-              customAccount: true
+              customAccount: true,
             },
             done
           )
@@ -320,12 +320,12 @@ describe('FeatureUpdater.refreshFeatures', function () {
     beforeEach(function () {
       User.updateOne(
         {
-          _id: user._id
+          _id: user._id,
         },
         {
           overleaf: {
-            id: 42
-          }
+            id: 42,
+          },
         }
       )
     }) // returns a promise
@@ -337,28 +337,28 @@ describe('FeatureUpdater.refreshFeatures', function () {
       futureDate.setDate(futureDate.getDate() + 1)
       return User.updateOne(
         {
-          _id: user._id
+          _id: user._id,
         },
         {
           featuresOverrides: [
             {
               features: {
-                github: true
-              }
+                github: true,
+              },
             },
             {
               features: {
-                dropbox: true
+                dropbox: true,
               },
-              expiresAt: new Date(1990, 12, 25)
+              expiresAt: new Date(1990, 12, 25),
             },
             {
               features: {
-                trackChanges: true
+                trackChanges: true,
               },
-              expiresAt: futureDate
-            }
-          ]
+              expiresAt: futureDate,
+            },
+          ],
         }
       )
     }) // returns a promise
@@ -370,7 +370,7 @@ describe('FeatureUpdater.refreshFeatures', function () {
         }
         let expectedFeatures = Object.assign(settings.defaultFeatures, {
           github: true,
-          trackChanges: true
+          trackChanges: true,
         })
         expect(features).to.deep.equal(expectedFeatures)
         done()

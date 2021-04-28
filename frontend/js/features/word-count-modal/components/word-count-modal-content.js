@@ -11,7 +11,7 @@ export default function WordCountModalContent({
   data,
   error,
   handleHide,
-  loading
+  loading,
 }) {
   return (
     <AccessibleModal
@@ -96,6 +96,6 @@ WordCountModalContent.propTypes = {
     headers: PropTypes.number,
     mathDisplay: PropTypes.number,
     mathInline: PropTypes.number,
-    textWords: PropTypes.number
-  })
+    textWords: PropTypes.number,
+  }),
 }

@@ -265,5 +265,5 @@ module.exports = AuthorizationMiddleware = {
       AuthenticationController.setRedirectInSession(req, from)
     }
     res.redirect('/login')
-  }
+  },
 }

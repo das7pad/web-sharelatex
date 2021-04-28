@@ -30,7 +30,7 @@ describe('ProxyUrls', function () {
     return async.series(
       [
         cb => assertResponse('/institutions/list', 200, [], cb),
-        cb => assertResponse('/institutions/domains', 200, [], cb)
+        cb => assertResponse('/institutions/domains', 200, [], cb),
       ],
       done
     )
@@ -52,7 +52,7 @@ describe('ProxyUrls', function () {
             200,
             { id: 456, name: 'Institution 456' },
             cb
-          )
+          ),
       ],
       done
     )

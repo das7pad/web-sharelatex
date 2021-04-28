@@ -31,7 +31,7 @@ function buildHostedLink(recurlySubscription, type) {
       recurlySubdomain,
       '.recurly.com/account/',
       path,
-      hostedLoginToken
+      hostedLoginToken,
     ].join('')
   }
 }
@@ -58,7 +58,7 @@ module.exports = {
               { includeAccount: true },
               cb
             )
-          }
+          },
         ],
         recurlyCoupons: [
           'recurlySubscription',
@@ -68,7 +68,7 @@ module.exports = {
             }
             const accountId = recurlySubscription.account.account_code
             RecurlyWrapper.getAccountActiveCoupons(accountId, cb)
-          }
+          },
         ],
         plan: [
           'personalSubscription',
@@ -87,7 +87,7 @@ module.exports = {
               )
             }
             cb(null, plan)
-          }
+          },
         ],
         memberGroupSubscriptions(cb) {
           SubscriptionLocator.getMemberSubscriptions(user, cb)
@@ -118,7 +118,7 @@ module.exports = {
               cb(null, status)
             }
           )
-        }
+        },
       },
       (err, results) => {
         if (err) {
@@ -134,7 +134,7 @@ module.exports = {
           v1SubscriptionStatus,
           recurlySubscription,
           recurlyCoupons,
-          plan
+          plan,
         } = results
         if (memberGroupSubscriptions == null) {
           memberGroupSubscriptions = []
@@ -212,7 +212,7 @@ module.exports = {
             ),
             trial_ends_at: recurlySubscription.trial_ends_at,
             activeCoupons: recurlyCoupons,
-            account: recurlySubscription.account
+            account: recurlySubscription.account,
           }
         }
 
@@ -223,7 +223,7 @@ module.exports = {
           confirmedMemberAffiliations,
           managedInstitutions,
           managedPublishers,
-          v1SubscriptionStatus
+          v1SubscriptionStatus,
         })
       }
     )
@@ -270,5 +270,5 @@ module.exports = {
     )
 
     return result
-  }
+  },
 }

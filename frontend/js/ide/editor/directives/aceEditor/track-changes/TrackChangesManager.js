@@ -410,7 +410,7 @@ class TrackChangesManager {
     return (this._cutState = {
       text: null,
       comments: [],
-      docId: null
+      docId: null,
     })
   }
 
@@ -431,7 +431,7 @@ class TrackChangesManager {
             this._cutState.comments.push({
               offset: comment.op.p - selection_start,
               text: comment.op.c,
-              comment
+              comment,
             })
           )
         } else {
@@ -494,7 +494,7 @@ class TrackChangesManager {
         ;({ op } = change)
         ;({
           background_marker_id,
-          callout_marker_id
+          callout_marker_id,
         } = this.adapter.changeIdToMarkerIdMap[change.id])
         start = this.adapter.shareJsOffsetToRowColumn(op.p)
         if (op.i != null) {
@@ -505,12 +505,12 @@ class TrackChangesManager {
         expected_markers.push({
           marker_id: background_marker_id,
           start,
-          end
+          end,
         })
         expected_markers.push({
           marker_id: callout_marker_id,
           start,
-          end: start
+          end: start,
         })
       }
     }
@@ -519,7 +519,7 @@ class TrackChangesManager {
       if (this.adapter.changeIdToMarkerIdMap[comment.id] != null) {
         ;({
           background_marker_id,
-          callout_marker_id
+          callout_marker_id,
         } = this.adapter.changeIdToMarkerIdMap[comment.id])
         start = this.adapter.shareJsOffsetToRowColumn(comment.op.p)
         end = this.adapter.shareJsOffsetToRowColumn(
@@ -528,12 +528,12 @@ class TrackChangesManager {
         expected_markers.push({
           marker_id: background_marker_id,
           start,
-          end
+          end,
         })
         expected_markers.push({
           marker_id: callout_marker_id,
           start,
-          end: start
+          end: start,
         })
       }
     }
@@ -551,7 +551,7 @@ class TrackChangesManager {
           change,
           marker,
           start,
-          end
+          end,
         })
       }
     }

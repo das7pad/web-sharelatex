@@ -5,7 +5,7 @@ import RedirectToLogin from './redirect-to-login'
 import {
   BlockedFilenameError,
   DuplicateFilenameError,
-  InvalidFilenameError
+  InvalidFilenameError,
 } from '../../errors'
 import DangerMessage from './danger-message'
 import t from '../../../../misc/t'
@@ -103,5 +103,5 @@ export default function ErrorMessage({ error }) {
   }
 }
 ErrorMessage.propTypes = {
-  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired
+  error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
 }

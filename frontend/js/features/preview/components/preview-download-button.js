@@ -9,13 +9,13 @@ function PreviewDownloadButton({
   isCompiling,
   outputFiles,
   pdfDownloadUrl,
-  showText
+  showText,
 }) {
   let textStyle = {}
   if (!showText) {
     textStyle = {
       position: 'absolute',
-      right: '-100vw'
+      right: '-100vw',
     }
   }
 
@@ -75,7 +75,7 @@ PreviewDownloadButton.propTypes = {
   isCompiling: PropTypes.bool.isRequired,
   outputFiles: PropTypes.array,
   pdfDownloadUrl: PropTypes.string,
-  showText: PropTypes.bool.isRequired
+  showText: PropTypes.bool.isRequired,
 }
 
 export default PreviewDownloadButton

@@ -6,7 +6,7 @@ import t from '../../../misc/t'
 function TrackChangesToggleButton({ trackChangesIsOpen, disabled, onClick }) {
   const classes = classNames('btn', 'btn-full-height', {
     active: trackChangesIsOpen && !disabled,
-    disabled: disabled
+    disabled: disabled,
   })
 
   return (
@@ -27,7 +27,7 @@ function TrackChangesToggleButton({ trackChangesIsOpen, disabled, onClick }) {
 TrackChangesToggleButton.propTypes = {
   trackChangesIsOpen: PropTypes.bool,
   disabled: PropTypes.bool,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 
 export default TrackChangesToggleButton

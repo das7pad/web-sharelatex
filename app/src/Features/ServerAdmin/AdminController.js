@@ -56,7 +56,7 @@ const AdminController = {
       return res.render('admin/index', {
         title: 'System Admin',
         openSockets,
-        systemMessages
+        systemMessages,
       })
     })
   },
@@ -129,7 +129,7 @@ const AdminController = {
       }
       AsyncFormHelper.redirect(req, res, '/admin')
     })
-  }
+  },
 }
 
 module.exports = AdminController

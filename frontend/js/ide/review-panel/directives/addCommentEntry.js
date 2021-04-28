@@ -7,13 +7,13 @@ App.directive('addCommentEntry', () => ({
   scope: {
     onStartNew: '&',
     onSubmit: '&',
-    onCancel: '&'
+    onCancel: '&',
   },
   link(scope, element, attrs) {
     scope.translate = t
     scope.state = {
       isAdding: false,
-      content: content
+      content: content,
     }
 
     scope.$on('comment:start_adding', () => scope.startNewComment())
@@ -48,5 +48,5 @@ App.directive('addCommentEntry', () => ({
       scope.state.isAdding = false
       scope.state.content = ''
     }
-  }
+  },
 }))

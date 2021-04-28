@@ -72,8 +72,8 @@ describe('ProjectDuplicateNames', function () {
                 uri: `/project/${this.example_project_id}/folder`,
                 json: {
                   name: 'testfolder',
-                  parent_folder_id: this.rootFolderId
-                }
+                  parent_folder_id: this.rootFolderId,
+                },
               },
               (err, res, body) => {
                 this.testFolderId = body._id
@@ -108,8 +108,8 @@ describe('ProjectDuplicateNames', function () {
               uri: `/project/${this.example_project_id}/doc`,
               json: {
                 name: 'main.tex',
-                parent_folder_id: this.rootFolderId
-              }
+                parent_folder_id: this.rootFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -130,8 +130,8 @@ describe('ProjectDuplicateNames', function () {
               uri: `/project/${this.example_project_id}/folder`,
               json: {
                 name: 'main.tex',
-                parent_folder_id: this.rootFolderId
-              }
+                parent_folder_id: this.rootFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -152,8 +152,8 @@ describe('ProjectDuplicateNames', function () {
               uri: `/project/${this.example_project_id}/folder`,
               json: {
                 name: 'main.tex',
-                parent_folder_id: this.rootFolderId
-              }
+                parent_folder_id: this.rootFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -176,8 +176,8 @@ describe('ProjectDuplicateNames', function () {
               uri: `/project/${this.example_project_id}/doc`,
               json: {
                 name: 'universe.jpg',
-                parent_folder_id: this.rootFolderId
-              }
+                parent_folder_id: this.rootFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -198,8 +198,8 @@ describe('ProjectDuplicateNames', function () {
               uri: `/project/${this.example_project_id}/folder`,
               json: {
                 name: 'universe.jpg',
-                parent_folder_id: this.rootFolderId
-              }
+                parent_folder_id: this.rootFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -221,7 +221,7 @@ describe('ProjectDuplicateNames', function () {
               json: true,
               qs: {
                 folder_id: this.rootFolderId,
-                qqfilename: 'universe.jpg'
+                qqfilename: 'universe.jpg',
               },
               formData: {
                 qqfile: {
@@ -230,10 +230,10 @@ describe('ProjectDuplicateNames', function () {
                   ),
                   options: {
                     filename: 'universe.jpg',
-                    contentType: 'image/jpeg'
-                  }
-                }
-              }
+                    contentType: 'image/jpeg',
+                  },
+                },
+              },
             },
             (err, res, body) => {
               this.body = body
@@ -259,8 +259,8 @@ describe('ProjectDuplicateNames', function () {
               uri: `/project/${this.example_project_id}/doc`,
               json: {
                 name: 'testfolder',
-                parent_folder_id: this.rootFolderId
-              }
+                parent_folder_id: this.rootFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -281,8 +281,8 @@ describe('ProjectDuplicateNames', function () {
               uri: `/project/${this.example_project_id}/folder`,
               json: {
                 name: 'testfolder',
-                parent_folder_id: this.rootFolderId
-              }
+                parent_folder_id: this.rootFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -304,7 +304,7 @@ describe('ProjectDuplicateNames', function () {
               json: true,
               qs: {
                 folder_id: this.rootFolderId,
-                qqfilename: 'universe.jpg'
+                qqfilename: 'universe.jpg',
               },
               formData: {
                 qqfile: {
@@ -313,10 +313,10 @@ describe('ProjectDuplicateNames', function () {
                   ),
                   options: {
                     filename: 'testfolder',
-                    contentType: 'image/jpeg'
-                  }
-                }
-              }
+                    contentType: 'image/jpeg',
+                  },
+                },
+              },
             },
             (err, res, body) => {
               this.body = body
@@ -338,8 +338,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/doc/${this.refBibDoc._id}/rename`,
               json: {
-                name: 'main.tex'
-              }
+                name: 'main.tex',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -359,8 +359,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/rename`,
               json: {
-                name: 'main.tex'
-              }
+                name: 'main.tex',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -380,8 +380,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/rename`,
               json: {
-                name: 'main.tex'
-              }
+                name: 'main.tex',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -403,8 +403,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/doc/${this.refBibDoc._id}/rename`,
               json: {
-                name: 'universe.jpg'
-              }
+                name: 'universe.jpg',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -424,8 +424,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/rename`,
               json: {
-                name: 'universe.jpg'
-              }
+                name: 'universe.jpg',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -445,8 +445,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/rename`,
               json: {
-                name: 'universe.jpg'
-              }
+                name: 'universe.jpg',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -468,8 +468,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/doc/${this.refBibDoc._id}/rename`,
               json: {
-                name: 'testfolder'
-              }
+                name: 'testfolder',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -489,8 +489,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/rename`,
               json: {
-                name: 'testfolder'
-              }
+                name: 'testfolder',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -510,8 +510,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/rename`,
               json: {
-                name: 'testfolder'
-              }
+                name: 'testfolder',
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -533,8 +533,8 @@ describe('ProjectDuplicateNames', function () {
             uri: `/project/${this.example_project_id}/doc`,
             json: {
               name: 'main.tex',
-              parent_folder_id: this.testFolderId
-            }
+              parent_folder_id: this.testFolderId,
+            },
           },
           (err, res, body) => {
             return this.owner.request.post(
@@ -542,8 +542,8 @@ describe('ProjectDuplicateNames', function () {
                 uri: `/project/${this.example_project_id}/doc`,
                 json: {
                   name: 'universe.jpg',
-                  parent_folder_id: this.testFolderId
-                }
+                  parent_folder_id: this.testFolderId,
+                },
               },
               (err, res, body) => {
                 return this.owner.request.post(
@@ -551,8 +551,8 @@ describe('ProjectDuplicateNames', function () {
                     uri: `/project/${this.example_project_id}/folder`,
                     json: {
                       name: 'otherFolder',
-                      parent_folder_id: this.testFolderId
-                    }
+                      parent_folder_id: this.testFolderId,
+                    },
                   },
                   (err, res, body) => {
                     this.subFolderId = body._id
@@ -561,8 +561,8 @@ describe('ProjectDuplicateNames', function () {
                         uri: `/project/${this.example_project_id}/folder`,
                         json: {
                           name: 'otherFolder',
-                          parent_folder_id: this.rootFolderId
-                        }
+                          parent_folder_id: this.rootFolderId,
+                        },
                       },
                       (err, res, body) => {
                         this.otherFolderId = body._id
@@ -583,8 +583,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/doc/${this.mainTexDoc._id}/move`,
               json: {
-                folder_id: this.testFolderId
-              }
+                folder_id: this.testFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -604,8 +604,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/move`,
               json: {
-                folder_id: this.testFolderId
-              }
+                folder_id: this.testFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -625,8 +625,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/folder/${this.otherFolderId}/move`,
               json: {
-                folder_id: this.testFolderId
-              }
+                folder_id: this.testFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res
@@ -646,8 +646,8 @@ describe('ProjectDuplicateNames', function () {
             {
               uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/move`,
               json: {
-                folder_id: this.subFolderId
-              }
+                folder_id: this.subFolderId,
+              },
             },
             (err, res, body) => {
               this.res = res

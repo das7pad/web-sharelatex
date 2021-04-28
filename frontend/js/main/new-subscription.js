@@ -22,7 +22,7 @@ export default App.controller(
     }
 
     $scope.ui = {
-      addCompanyDetails: false
+      addCompanyDetails: false,
     }
 
     $scope.recurlyLoadError = false
@@ -37,7 +37,7 @@ export default App.controller(
       const currentPlanCode = window.plan_code
       const planCode = currentPlanCode.replace('collaborator', 'student')
       eventTracking.sendMB('subscription-form-switch-to-student', {
-        plan: window.plan_code
+        plan: window.plan_code,
       })
       eventTracking.send(
         'subscription-funnel',
@@ -67,7 +67,7 @@ export default App.controller(
       company: '',
       vat_number: '',
       country: getMeta('ol-countryCode'),
-      coupon: window.couponCode
+      coupon: window.couponCode,
     }
 
     $scope.validation = {}
@@ -88,18 +88,18 @@ export default App.controller(
         all: {
           fontFamily: '"Open Sans", sans-serif',
           fontSize: '16px',
-          fontColor: '#7a7a7a'
+          fontColor: '#7a7a7a',
         },
         month: {
-          placeholder: 'MM'
+          placeholder: 'MM',
         },
         year: {
-          placeholder: 'YY'
+          placeholder: 'YY',
         },
         cvv: {
-          placeholder: 'CVV'
-        }
-      }
+          placeholder: 'CVV',
+        },
+      },
     })
 
     const pricing = recurly.Pricing()
@@ -107,7 +107,7 @@ export default App.controller(
     pricing
       .plan(window.plan_code, { quantity: 1 })
       .address({
-        country: $scope.data.country
+        country: $scope.data.country,
       })
       .tax({ tax_code: 'digital', vat_number: '' })
       .currency($scope.currencyCode)
@@ -142,7 +142,7 @@ export default App.controller(
         const basePrice = parseInt(pricing.price.base.plan.unit, 10)
         $scope.coupon = {
           singleUse: pricing.items.coupon.single_use,
-          normalPrice: basePrice
+          normalPrice: basePrice,
         }
         if (
           pricing.items.coupon.applies_for_months > 0 &&
@@ -242,11 +242,11 @@ export default App.controller(
               address2: $scope.data.address2,
               country: $scope.data.country,
               state: $scope.data.state,
-              zip: $scope.data.postal_code
+              zip: $scope.data.postal_code,
             },
             ITMCampaign: window.ITMCampaign,
-            ITMContent: window.ITMContent
-          }
+            ITMContent: window.ITMContent,
+          },
         }
 
         if (
@@ -268,7 +268,7 @@ export default App.controller(
           currencyCode: postData.subscriptionDetails.currencyCode,
           plan_code: postData.subscriptionDetails.plan_code,
           coupon_code: postData.subscriptionDetails.coupon_code,
-          isPaypal: postData.subscriptionDetails.isPaypal
+          isPaypal: postData.subscriptionDetails.isPaypal,
         })
         eventTracking.send(
           'subscription-funnel',
@@ -319,7 +319,7 @@ export default App.controller(
       // instanciate and configure Recurly 3DSecure flow
       const risk = recurly.Risk()
       const threeDSecure = risk.ThreeDSecure({
-        actionTokenId: threeDSecureActionTokenId
+        actionTokenId: threeDSecureActionTokenId,
       })
 
       // on SCA verification error: show payment UI with the error message
@@ -628,7 +628,7 @@ export default App.controller(
       { code: 'EH', name: 'Western Sahara' },
       { code: 'YE', name: 'Yemen' },
       { code: 'ZM', name: 'Zambia' },
-      { code: 'ZW', name: 'Zimbabwe' }
+      { code: 'ZW', name: 'Zimbabwe' },
     ]
   }
 )

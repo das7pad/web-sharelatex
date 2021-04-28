@@ -22,7 +22,7 @@ export default App.controller(
 
     $scope.state = {
       renaming: false,
-      overflowed: false
+      overflowed: false,
     }
 
     $scope.inputs = {}

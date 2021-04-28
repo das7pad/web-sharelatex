@@ -56,7 +56,7 @@ module.exports = {
       }/user/${user_id}`,
       json: true,
       timeout: oneSecond,
-      method: 'GET'
+      method: 'GET',
     }
     return makeRequest(opts, function (err, res, unreadNotifications) {
       const statusCode = res != null ? res.statusCode : 500
@@ -96,7 +96,7 @@ module.exports = {
       key,
       messageOpts,
       templateKey,
-      forceCreate
+      forceCreate,
     }
     if (expiryDateTime != null) {
       payload.expires = expiryDateTime
@@ -109,7 +109,7 @@ module.exports = {
       }/user/${user_id}`,
       timeout: oneSecond,
       method: 'POST',
-      json: payload
+      json: payload,
     }
     return makeRequest(opts, callback)
   },
@@ -124,8 +124,8 @@ module.exports = {
       method: 'DELETE',
       timeout: oneSecond,
       json: {
-        key
-      }
+        key,
+      },
     }
     return makeRequest(opts, callback)
   },
@@ -138,7 +138,7 @@ module.exports = {
           ? settings.apis.notifications.url
           : undefined
       }/user/${user_id}/notification/${notification_id}`,
-      timeout: oneSecond
+      timeout: oneSecond,
     }
     return makeRequest(opts, callback)
   },
@@ -153,8 +153,8 @@ module.exports = {
           : undefined
       }/key/${key}`,
       method: 'DELETE',
-      timeout: oneSecond
+      timeout: oneSecond,
     }
     return makeRequest(opts, callback)
-  }
+  },
 }

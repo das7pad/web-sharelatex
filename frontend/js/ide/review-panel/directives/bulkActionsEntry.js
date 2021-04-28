@@ -17,11 +17,11 @@ export default App.directive('bulkActionsEntry', () => ({
   scope: {
     onBulkAccept: '&',
     onBulkReject: '&',
-    nEntries: '='
+    nEntries: '=',
   },
   link(scope, element, attrs) {
     scope.translate = t
     scope.bulkAccept = () => scope.onBulkAccept()
     return (scope.bulkReject = () => scope.onBulkReject())
-  }
+  },
 }))
