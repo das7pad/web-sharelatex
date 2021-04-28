@@ -95,6 +95,7 @@
     "@sentry/browser": "^5.27.6",
     "@testing-library/dom": "^7.29.4",
     "@testing-library/react": "^11.2.3",
+    "@testing-library/react-hooks": "^5.1.0",
     "@uppy/core": "^1.15.0",
     "@uppy/react": "^1.11.0",
     "@uppy/xhr-upload": "^1.6.8",
