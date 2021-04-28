@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
 import classNames from 'classnames'
 import Icon from '../../../shared/components/icon'
+import t from '../../../misc/t'
 
 function ProjectNameEditableLabel({
   projectName,
@@ -11,8 +11,6 @@ function ProjectNameEditableLabel({
   onChange,
   className,
 }) {
-  const { t } = useTranslation()
-
   const [isRenaming, setIsRenaming] = useState(false)
 
   const canRename = userIsAdmin && !isRenaming
