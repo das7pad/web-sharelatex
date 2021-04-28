@@ -1136,4 +1136,8 @@ module.exports = {
     gitBridge: [],
     publishModal: [],
   },
+
+  unsupportedBrowsers: {
+    ie: '<=11',
+  },
 }
