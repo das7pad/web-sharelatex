@@ -6,9 +6,10 @@ const UserGetter = require('../User/UserGetter')
 const recurlySettings = Settings.apis.recurly
 const recurlyApiKey = recurlySettings ? recurlySettings.apiKey : undefined
 
-let client, recurly
+let client, recurly, errors
 if (recurlyApiKey) {
   recurly = require('recurly')
+  errors = recurly.errors
   client = new recurly.Client(recurlyApiKey)
 }
 
@@ -71,7 +72,7 @@ async function removeSubscriptionChangeByUuid(subscriptionUuid) {
 }
 
 module.exports = {
-  errors: recurly.errors,
+  errors,
 
   getAccountForUserId: callbackify(getAccountForUserId),
   createAccountForUserId: callbackify(createAccountForUserId),
