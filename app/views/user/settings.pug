@@ -8,17 +8,20 @@ block append meta
 	meta(name="ol-thirdPartyIds", data-type="json", content=thirdPartyIds)
 	meta(name="ol-isOverleaf" data-type="boolean" content=!!settings.overleaf)
 
+	if ssoError
+		meta(name="ol-ssoError" content=ssoError)
+
 block content
 	main.content.content-alt
 		.container
 			.row
 				.col-md-12.col-lg-10.col-lg-offset-1
 					if ssoError
-						.alert.alert-danger
-							| {{translate('sso_link_error')}}: {{translate("#{ssoError}")}}
+						.alert.alert-danger(ng-cloak)
+							| {{translate('sso_link_error')}}: {{translate(getMeta('ol-ssoError'))}}
 					.card
 						.page-header
-							h1  {{translate("account_settings")}}
+							h1(ng-cloak) {{translate("account_settings")}}
 						.account-settings(ng-controller="AccountSettingsController", ng-cloak)
 
 							if hasFeature('affiliations')
