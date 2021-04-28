@@ -51,7 +51,7 @@ describe('MetaHandler', function () {
       ],
     }
     this.RedisWrapper = {
-      client() {}
+      client() {},
     }
 
     return (this.MetaHandler = SandboxedModule.require(modulePath, {

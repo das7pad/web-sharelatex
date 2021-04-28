@@ -75,5 +75,5 @@ function generateModuleInMemory(lng) {
 
 module.exports = {
   generateModule,
-  generateModuleInMemory
+  generateModuleInMemory,
 }

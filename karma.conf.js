@@ -16,18 +16,18 @@ module.exports = function (config) {
         // We must disable the Chrome sandbox when running Chrome inside Docker
         // (Chrome's sandbox needs more permissions than Docker allows by
         // default)
-        flags: ['--no-sandbox']
-      }
+        flags: ['--no-sandbox'],
+      },
     },
     browsers: ['ChromeCustom'],
     files: [
       // Import all tests (see comment in the file for why this is necessary)
-      'test/karma/entrypoint.js'
+      'test/karma/entrypoint.js',
     ],
     middleware: ['fake-img'],
     preprocessors: {
       // Run files through esbuild
-      'test/karma/entrypoint.js': ['esbuild']
+      'test/karma/entrypoint.js': ['esbuild'],
     },
     frameworks: ['mocha', 'chai-sinon'],
     // Configure the webpack dev server used to serve test files
@@ -38,12 +38,12 @@ module.exports = function (config) {
       require('karma-mocha-reporter'),
       require('karma-junit-reporter'),
       { 'middleware:fake-img': ['factory', fakeImgMiddlewareFactory] },
-      { 'preprocessor:esbuild': ['factory', esBuildPreprocessorFactory] }
+      { 'preprocessor:esbuild': ['factory', esBuildPreprocessorFactory] },
     ],
     reporters: reporters,
     junitReporter: {
-      outputFile: junitDest
-    }
+      outputFile: junitDest,
+    },
   })
 }
 

@@ -3,7 +3,7 @@ const { promisify } = require('util')
 const { expect } = require('chai')
 const logger = require('logger-sharelatex')
 const {
-  skipWithBrokenObjectIdCounter
+  skipWithBrokenObjectIdCounter,
 } = require('./helpers/skipWithBrokenObjectIdCounter')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongodb')
 

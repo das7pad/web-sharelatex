@@ -28,7 +28,7 @@ function generateTemplate(path) {
   //  templates --, but just 'pug-runtime' which can render templates.
   return require('../../../build/views/generator').generateModuleInMemory({
     path,
-    debug: DEBUG_VIEWS
+    debug: DEBUG_VIEWS,
   })
 }
 
@@ -85,5 +85,5 @@ function setup(app) {
 module.exports = {
   CACHE_VIEWS,
   getTemplate,
-  setup
+  setup,
 }

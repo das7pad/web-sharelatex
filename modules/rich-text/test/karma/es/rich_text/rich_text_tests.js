@@ -7,7 +7,7 @@ import { Editor } from '../../../../frontend/js/rich_text_editor'
 const FIXTURE_HTML = '<div></div>'
 
 const autocompleteAdapterStub = {
-  getBeginCommandArguments: () => ['environmentName']
+  getBeginCommandArguments: () => ['environmentName'],
 }
 
 describe('RichText', function () {
@@ -321,7 +321,7 @@ describe('RichText', function () {
     beforeEach(function () {
       this.rtAdapter.getEntityForPath = sinon.stub().returns({
         id: 'entity_id',
-        name: 'watermelon-1600x1200.jpg'
+        name: 'watermelon-1600x1200.jpg',
       })
       this.rtAdapter.isPreviewableEntity = sinon.stub().returns(true)
       this.rtAdapter.getPreviewUrlForEntity = sinon

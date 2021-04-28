@@ -22,7 +22,7 @@ export default App.directive('formattingButtons', () => ({
   scope: {
     buttons: '=',
     opening: '=',
-    isFullscreenEditor: '='
+    isFullscreenEditor: '=',
   },
 
   link(scope, element, attrs) {
@@ -87,5 +87,5 @@ export default App.directive('formattingButtons', () => ({
     })
   },
 
-  templateUrl: 'formattingButtonsTpl'
+  templateUrl: 'formattingButtonsTpl',
 }))

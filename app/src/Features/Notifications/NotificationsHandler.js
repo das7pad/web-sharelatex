@@ -17,7 +17,7 @@ const settings = require('@overleaf/settings')
 const request = require('request')
 const requestRetry = require('requestretry').defaults({
   maxAttempts: 3,
-  retryDelay: 10
+  retryDelay: 10,
 })
 const logger = require('logger-sharelatex')
 
@@ -64,7 +64,7 @@ module.exports = {
         OError.tag(err, 'something went wrong getting notifications')
       } else if (statusCode !== 200) {
         err = new OError('non success statusCode from notifications', {
-          statusCode
+          statusCode,
         })
       }
       if (err) {

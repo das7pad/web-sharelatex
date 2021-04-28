@@ -13,21 +13,21 @@ const AbstractMarker = {
     const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
       inclusiveLeft: true,
       inclusiveRight: true,
-      replacedWith: makeDiv('Abstract', 'wl-abstract-open')
+      replacedWith: makeDiv('Abstract', 'wl-abstract-open'),
     })
     const innerMark = makeSingleMark(cm, sourceMark, 'inner', true, {
       inclusiveLeft: true,
       inclusiveRight: true,
-      className: 'wl-abstract'
+      className: 'wl-abstract',
     })
     const postMark = makeSingleMark(cm, sourceMark, 'post', true, {
       inclusiveLeft: true,
       inclusiveRight: true,
-      replacedWith: makeDiv(' ', 'wl-abstract-close')
+      replacedWith: makeDiv(' ', 'wl-abstract-close'),
     })
 
     makeGroup([preMark, innerMark, postMark])
-  }
+  },
 }
 
 function makeDiv(text, className) {

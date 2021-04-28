@@ -17,6 +17,6 @@ export default App.directive('mathjax', function ($compile, $parse) {
           }, 0)
         })
         .catch(() => {})
-    }
+    },
   }
 })

@@ -138,7 +138,7 @@ module.exports = OpenInOverleafController = {
           } else {
             return cb(null, project)
           }
-        }
+        },
       ],
       callback
     )
@@ -185,7 +185,7 @@ module.exports = OpenInOverleafController = {
           } else {
             return cb(null, project)
           }
-        }
+        },
       ],
       callback
     )
@@ -240,7 +240,7 @@ module.exports = OpenInOverleafController = {
           } else {
             return cb(null, project)
           }
-        }
+        },
       ],
       callback
     )
@@ -381,5 +381,5 @@ module.exports = OpenInOverleafController = {
     }
 
     return req.i18n.translate('new_snippet_project')
-  }
+  },
 }

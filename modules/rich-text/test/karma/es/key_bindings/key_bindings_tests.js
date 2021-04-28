@@ -13,7 +13,7 @@ const FIXTURE_HTML = `<div class="rich-text">
 `
 
 const autocompleteAdapterStub = {
-  getBeginCommandArguments: () => ['environmentName']
+  getBeginCommandArguments: () => ['environmentName'],
 }
 
 describe('Key bindings', function () {
@@ -73,7 +73,7 @@ describe('Key bindings', function () {
       shiftKey: shift,
       altKey: alt,
       preventDefault: function () {},
-      stopPropagation: function () {}
+      stopPropagation: function () {},
     })
   }
 
@@ -197,7 +197,7 @@ describe('Key bindings', function () {
         this.cm.setValue('\n' + '')
         this.cm.setSelections([
           { anchor: CodeMirror.Pos(0, 0), head: CodeMirror.Pos(0, 0) },
-          { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) }
+          { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) },
         ])
 
         // Press opening char key
@@ -210,7 +210,7 @@ describe('Key bindings', function () {
         // Cursor should be inbetween the opening & closing chars
         expectRangesMatch(this.cm.listSelections(), [
           { anchor: CodeMirror.Pos(0, 1), head: CodeMirror.Pos(0, 1) },
-          { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) }
+          { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) },
         ])
 
         // Press closing char key
@@ -219,13 +219,13 @@ describe('Key bindings', function () {
         // Cursor should be after the opening & closing chars
         expectRangesMatch(this.cm.listSelections(), [
           { anchor: CodeMirror.Pos(0, 2), head: CodeMirror.Pos(0, 2) },
-          { anchor: CodeMirror.Pos(1, 2), head: CodeMirror.Pos(1, 2) }
+          { anchor: CodeMirror.Pos(1, 2), head: CodeMirror.Pos(1, 2) },
         ])
 
         // Reset the cursors back inbetween the opening & closing chars
         this.cm.setSelections([
           { anchor: CodeMirror.Pos(0, 1), head: CodeMirror.Pos(0, 1) },
-          { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) }
+          { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) },
         ])
 
         // Press the Backspace key
@@ -236,7 +236,7 @@ describe('Key bindings', function () {
         // Cursor should be at the SOL
         expectRangesMatch(this.cm.listSelections(), [
           { anchor: CodeMirror.Pos(0, 0), head: CodeMirror.Pos(0, 0) },
-          { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) }
+          { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) },
         ])
       }
 

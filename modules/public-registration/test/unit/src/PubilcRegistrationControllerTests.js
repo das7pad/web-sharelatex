@@ -26,22 +26,22 @@ describe('PublicRegistrationController', function () {
     this.user = {
       _id: this.user_id,
       save: sinon.stub().callsArgWith(0),
-      ace: {}
+      ace: {},
     }
 
     this.UserRegistrationHandler = { registerNewUser: sinon.stub() }
     this.ReferalAllocator = { allocate: sinon.stub().yields() }
     this.UserUpdater = { changeEmailAddress: sinon.stub() }
     this.UserEmailsConfirmationHandler = {
-      sendConfirmationEmail: sinon.stub().yields()
+      sendConfirmationEmail: sinon.stub().yields(),
     }
     this.UserHandler = {
-      populateTeamInvites: sinon.stub().callsArgWith(1).yields()
+      populateTeamInvites: sinon.stub().callsArgWith(1).yields(),
     }
     this.AuthenticationController = {
       passportLogin: sinon.stub(),
       _getRedirectFromSession: sinon.stub().returns('/somewhere'),
-      _clearRedirectFromSession: sinon.stub()
+      _clearRedirectFromSession: sinon.stub(),
     }
     this.UserSessionsManager = { trackSession: sinon.stub().yields() }
     this.AnalyticsManager = { identifyUser: sinon.stub() }
@@ -53,7 +53,7 @@ describe('PublicRegistrationController', function () {
           .ReferalAllocator,
         '../../../../app/src/Features/Email/EmailBuilder': {
           templates: { welcome: {} },
-          ctaTemplate: sinon.stub()
+          ctaTemplate: sinon.stub(),
         },
         '../../../../app/src/Features/Email/EmailHandler': {},
         '../../../../app/src/Features/User/UserHandler': this.UserHandler,
@@ -67,19 +67,19 @@ describe('PublicRegistrationController', function () {
           .AnalyticsManager,
         'logger-sharelatex': { log() {} },
         '@overleaf/metrics': { inc() {} },
-        '@overleaf/settings': {}
-      }
+        '@overleaf/settings': {},
+      },
     })
 
     this.req = {
       session: {
         destroy() {},
         user: {
-          _id: this.user_id
-        }
+          _id: this.user_id,
+        },
       },
       body: {},
-      login: sinon.stub().callsArgWith(1, null) // passport
+      login: sinon.stub().callsArgWith(1, null), // passport
     }
     this.res = { json: sinon.stub() }
     return (this.next = sinon.stub())
@@ -190,7 +190,7 @@ describe('PublicRegistrationController', function () {
         referal_id: '23123',
         referal_source: 'email',
         referal_medium: 'bob',
-        passport: { user: { _id: this.user_id } }
+        passport: { user: { _id: this.user_id } },
       }
 
       this.UserRegistrationHandler.registerNewUser.callsArgWith(

@@ -3,7 +3,7 @@ import { focus } from '../utils/focus'
 import {
   markEntirelyWithinSelection,
   selectionStartsAtMarkContentStart,
-  selectionEndsAtMarkContentEnd
+  selectionEndsAtMarkContentEnd,
 } from '../utils/selection'
 import { updateMarkWithClosingPosition, removeMark } from '../latex_mode/mark'
 
@@ -13,7 +13,7 @@ const MARKS_DISALLOWED_WITHIN_HEADERS = [
   'subsection',
   'subsubsection',
   'itemize',
-  'enumerate'
+  'enumerate',
 ]
 
 const HEADER_MARKS = {
@@ -24,7 +24,7 @@ const HEADER_MARKS = {
   subsection: MARKS_DISALLOWED_WITHIN_HEADERS,
   'subsection\\*': MARKS_DISALLOWED_WITHIN_HEADERS,
   subsubsection: MARKS_DISALLOWED_WITHIN_HEADERS,
-  'subsubsection\\*': MARKS_DISALLOWED_WITHIN_HEADERS
+  'subsubsection\\*': MARKS_DISALLOWED_WITHIN_HEADERS,
 }
 
 const BOLD_OR_ITALIC_MARKS = ['textbf', 'textit']

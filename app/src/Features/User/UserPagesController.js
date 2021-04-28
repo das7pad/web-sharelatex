@@ -9,7 +9,7 @@ const UserPagesController = {
   registerPage(req, res) {
     const sharedProjectData = {
       projectname: req.query.project_name || ' ',
-      username: req.query.user_first_name
+      username: req.query.user_first_name,
     }
 
     const newTemplateData = {}
@@ -21,7 +21,7 @@ const UserPagesController = {
       title: 'register',
       sharedProjectData,
       newTemplateData,
-      samlBeta: req.session.samlBeta
+      samlBeta: req.session.samlBeta,
     })
   },
 
@@ -35,7 +35,7 @@ const UserPagesController = {
       AuthenticationController.setRedirectInSession(req, req.query.redir)
     }
     res.render('user/login', {
-      title: 'login'
+      title: 'login',
     })
   },
 
@@ -73,7 +73,7 @@ const UserPagesController = {
       // copy object if exists
       institutionLinked = Object.assign(
         {
-          hasEntitlement: saml.hasEntitlement
+          hasEntitlement: saml.hasEntitlement,
         },
         institutionLinked
       )
@@ -118,7 +118,7 @@ const UserPagesController = {
         reconfirmationRemoveEmail,
         samlBeta: req.session.samlBeta,
         ssoError: ssoError,
-        thirdPartyIds: UserPagesController._restructureThirdPartyIds(user)
+        thirdPartyIds: UserPagesController._restructureThirdPartyIds(user),
       })
     })
   },
@@ -132,13 +132,13 @@ const UserPagesController = {
       (err, sessions) => {
         if (err != null) {
           OError.tag(err, 'error getting all user sessions', {
-            userId: user._id
+            userId: user._id,
           })
           return next(err)
         }
         res.render('user/sessions', {
           title: 'sessions',
-          sessions
+          sessions,
         })
       }
     )
@@ -173,7 +173,7 @@ const UserPagesController = {
       }
     }
     return result
-  }
+  },
 }
 
 module.exports = UserPagesController

@@ -6,7 +6,7 @@ import {
   Col,
   Row,
   PageHeader,
-  Grid
+  Grid,
 } from 'react-bootstrap'
 import Card from '../../../shared/components/card'
 import t from '../../../misc/t'
@@ -29,7 +29,7 @@ export default function BetaProgramParticipate() {
     const url = action === OPT_IN ? '/beta/opt-in' : '/beta/opt-out'
     const headers = new Headers([
       ['Accept', 'application/json'],
-      ['X-CSRF-Token', getMeta('ol-csrfToken')]
+      ['X-CSRF-Token', getMeta('ol-csrfToken')],
     ])
     setRequestStatus(REQUEST_PENDING)
     fetch(url, { method: 'POST', headers })

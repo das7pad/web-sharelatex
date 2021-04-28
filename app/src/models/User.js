@@ -22,7 +22,7 @@ const UserSchema = new Schema({
     type: String,
     default: '',
     maxlength: MAX_EMAIL_LENGTH,
-    unique: true
+    unique: true,
   },
   emails: [
     {

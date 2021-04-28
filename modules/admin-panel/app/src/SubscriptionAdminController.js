@@ -75,7 +75,7 @@ module.exports = SubscriptionAdminController = {
     'planCode',
     'membersLimit',
     'groupPlan',
-    'customAccount'
+    'customAccount',
   ],
   BOOLEAN_ATTRIBUTES: ['groupPlan', 'customAccount'],
   update(req, res, next) {
@@ -113,7 +113,7 @@ module.exports = SubscriptionAdminController = {
 
   new(req, res, next) {
     return res.render(Path.resolve(__dirname, '../views/subscription/new'), {
-      admin_id: req.params.user_id
+      admin_id: req.params.user_id,
     })
   },
 
@@ -149,5 +149,5 @@ module.exports = SubscriptionAdminController = {
         return res.sendStatus(204)
       }
     )
-  }
+  },
 }

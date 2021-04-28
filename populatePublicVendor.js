@@ -13,7 +13,7 @@ const PATTERNS = []
       'pdfjs-dist/cmaps/',
 
       // lazy loaded ace files -- minified: keymaps, modes, themes, worker
-      'ace-builds/src-min-noconflict/'
+      'ace-builds/src-min-noconflict/',
     ].map(path => {
       return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
     })
@@ -24,34 +24,34 @@ const PATTERNS = []
       'extensions/a11y/',
       'extensions/HelpDialog.js',
       'fonts/HTML-CSS/TeX/woff/',
-      'jax/output/HTML-CSS/fonts/TeX/'
+      'jax/output/HTML-CSS/fonts/TeX/',
     ].map(from => {
       return {
         context: 'node_modules/mathjax',
         from,
-        to: `${VENDOR_PATH}/mathjax-2-7-9`
+        to: `${VENDOR_PATH}/mathjax-2-7-9`,
       }
     })
   )
   .concat(
     [
       // admin-panel
-      'sigma-master/'
+      'sigma-master/',
     ].map(path => {
       return {
         from: `frontend/js/vendor/libs/${path}`,
-        to: `${VENDOR_PATH}/${path}`
+        to: `${VENDOR_PATH}/${path}`,
       }
     })
   )
   .concat(
     [
       // open-in-overleaf
-      'highlight-github.css'
+      'highlight-github.css',
     ].map(path => {
       return {
         from: `frontend/stylesheets/vendor/${path}`,
-        to: `${VENDOR_PATH}/stylesheets/${path}`
+        to: `${VENDOR_PATH}/stylesheets/${path}`,
       }
     })
   )

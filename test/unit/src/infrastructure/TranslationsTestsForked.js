@@ -15,8 +15,8 @@ describe('TranslationsForked', function () {
           lang,
           {
             lngCode: lang,
-            url: `https://${lang}.sharelatex.com`
-          }
+            url: `https://${lang}.sharelatex.com`,
+          },
         ]
       })
       .concat([['www', { lngCode: 'en', url: 'https://www.sharelatex.com' }]])
@@ -27,11 +27,11 @@ describe('TranslationsForked', function () {
 
   beforeEach(function () {
     const options = {
-      subdomainLang
+      subdomainLang,
     }
     this.Translations = SandboxedModule.require(MODULE_PATH, {
       requires: { '@overleaf/settings': { i18n: options } },
-      globals: { process }
+      globals: { process },
     })
 
     this.req = {
@@ -40,17 +40,17 @@ describe('TranslationsForked', function () {
         return accept.languages.apply(accept, arguments)
       },
       headers: {
-        'accept-language': ''
+        'accept-language': '',
       },
       originalUrl: '/login',
       query: {},
       session: {},
-      url: '/login'
+      url: '/login',
     }
     this.res = {
       setHeader() {},
       locals: {},
-      redirect: sinon.stub()
+      redirect: sinon.stub(),
     }
     this.appName = `Overleaf Dev (${Math.random()})`
 
@@ -66,7 +66,7 @@ describe('TranslationsForked', function () {
     beforeEach(function () {
       this.Translations = SandboxedModule.require(MODULE_PATH, {
         requires: { '@overleaf/settings': { i18n: {} } },
-        globals: { process }
+        globals: { process },
       })
     })
 
@@ -94,7 +94,7 @@ describe('TranslationsForked', function () {
         .map(spec => spec.lngCode)
         .map(lang => [
           lang,
-          new Map(Object.entries(require(`../../../../locales/${lang}.json`)))
+          new Map(Object.entries(require(`../../../../locales/${lang}.json`))),
         ])
     )
     function getLocale(lang, key) {
@@ -118,22 +118,22 @@ describe('TranslationsForked', function () {
     ;[
       {
         desc: 'when the locale is plain text',
-        key: 'email'
+        key: 'email',
       },
       {
         desc: 'when there is html in the locale',
-        key: 'track_changes_is_on'
+        key: 'track_changes_is_on',
       },
       {
         desc: 'when there are additional variables',
         key: 'register_to_edit_template',
-        vars: { templateName: `[${Math.random()}]` }
+        vars: { templateName: `[${Math.random()}]` },
       },
       {
         desc: 'when there is html in the vars',
         key: 'click_here_to_view_sl_in_lng',
-        vars: { lngName: `<strong>${Math.random()}</strong>` }
-      }
+        vars: { lngName: `<strong>${Math.random()}</strong>` },
+      },
     ].forEach(testSpec => {
       describe(testSpec.desc, function () {
         Object.values(subdomainLang).forEach(langSpec => {
@@ -161,7 +161,7 @@ describe('TranslationsForked', function () {
       it('should handle 0 as var value', function () {
         expect(
           this.Translations.i18n.translate('reconnecting_in_x_secs', {
-            seconds: 0
+            seconds: 0,
           })
         ).to.equal('Reconnecting in 0 secs')
       })
@@ -187,21 +187,21 @@ describe('TranslationsForked', function () {
         it('should refuse translating zero case', function () {
           expect(
             this.Translations.i18n.translate('resend_confirmation_email', {
-              count: 0
+              count: 0,
             })
           ).to.equal('resend_confirmation_email')
         })
         it('should refuse translating singular case', function () {
           expect(
             this.Translations.i18n.translate('resend_confirmation_email', {
-              count: 1
+              count: 1,
             })
           ).to.equal('resend_confirmation_email')
         })
         it('should refuse translating plural case', function () {
           expect(
             this.Translations.i18n.translate('resend_confirmation_email', {
-              count: 2
+              count: 2,
             })
           ).to.equal('resend_confirmation_email')
         })
@@ -345,7 +345,7 @@ describe('TranslationsForked', function () {
           expect(
             this.res.locals.getTranslationUrl({
               lngCode: 'da',
-              url: 'https://da.sharelatex.com'
+              url: 'https://da.sharelatex.com',
             })
           ).to.equal('https://da.sharelatex.com/login')
         })
@@ -359,7 +359,7 @@ describe('TranslationsForked', function () {
           expect(
             this.res.locals.getTranslationUrl({
               lngCode: 'da',
-              url: 'https://da.sharelatex.com'
+              url: 'https://da.sharelatex.com',
             })
           ).to.equal('https://da.sharelatex.com/login?someKey=someValue')
         })
@@ -374,7 +374,7 @@ describe('TranslationsForked', function () {
           expect(
             this.res.locals.getTranslationUrl({
               lngCode: 'da',
-              url: 'https://da.sharelatex.com'
+              url: 'https://da.sharelatex.com',
             })
           ).to.equal('https://da.sharelatex.com//evil.com')
         })
@@ -387,12 +387,12 @@ describe('TranslationsForked', function () {
           subdomainLang: {
             www: { lngCode: 'en', url: 'https://www.sharelatex.com' },
             fr: { lngCode: 'fr', url: 'https://www.sharelatex.com' },
-            da: { lngCode: 'da', url: 'https://www.sharelatex.com' }
-          }
+            da: { lngCode: 'da', url: 'https://www.sharelatex.com' },
+          },
         }
         this.Translations = SandboxedModule.require(MODULE_PATH, {
           requires: { '@overleaf/settings': { i18n: options } },
-          globals: { process }
+          globals: { process },
         })
       })
 
@@ -526,7 +526,7 @@ describe('TranslationsForked', function () {
             expect(
               this.res.locals.getTranslationUrl({
                 lngCode: 'da',
-                url: 'https://www.sharelatex.com'
+                url: 'https://www.sharelatex.com',
               })
             ).to.equal('https://www.sharelatex.com/login?setGlobalLng=da')
           })
@@ -540,7 +540,7 @@ describe('TranslationsForked', function () {
             expect(
               this.res.locals.getTranslationUrl({
                 lngCode: 'da',
-                url: 'https://www.sharelatex.com'
+                url: 'https://www.sharelatex.com',
               })
             ).to.equal(
               'https://www.sharelatex.com/login?someKey=someValue&setGlobalLng=da'
@@ -557,7 +557,7 @@ describe('TranslationsForked', function () {
             expect(
               this.res.locals.getTranslationUrl({
                 lngCode: 'da',
-                url: 'https://da.sharelatex.com'
+                url: 'https://da.sharelatex.com',
               })
             ).to.equal('https://da.sharelatex.com//evil.com?setGlobalLng=da')
           })

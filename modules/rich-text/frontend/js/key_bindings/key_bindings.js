@@ -36,7 +36,7 @@ export function makeKeyBindings(getSetting, keyBindingsAdapter) {
       'Ctrl-Space': 'autocomplete',
       'Ctrl-,': keyBindingsAdapter.triggerSyncToPdf,
       'Ctrl-.': keyBindingsAdapter.triggerRecompile,
-      [`${modifierKey}-Enter`]: keyBindingsAdapter.triggerRecompile
+      [`${modifierKey}-Enter`]: keyBindingsAdapter.triggerRecompile,
     },
     makeAutoCloseCharHandlers(getSetting)
   )
@@ -49,7 +49,7 @@ function makeAutoCloseCharHandlers(getSetting) {
     "'}'": { openChar: '{', closeChar: '}', typedChar: '}' },
     "']'": { openChar: '[', closeChar: ']', typedChar: ']' },
     "'`'": { openChar: '`', closeChar: "'", typedChar: '`' },
-    "'''": { openChar: '`', closeChar: "'", typedChar: "'" }
+    "'''": { openChar: '`', closeChar: "'", typedChar: "'" },
   }
 
   return Object.keys(autoCloseChars).reduce((acc, key) => {
@@ -80,7 +80,7 @@ var COMMANDS_ON_SINGLE_LINE = {
   subsection: true,
   'subsection\\*': true,
   subsubsection: true,
-  'subsubsection\\*': true
+  'subsubsection\\*': true,
 }
 
 function handleBackspace(cm) {
@@ -232,13 +232,13 @@ function handleEnter(cm) {
           // the cursor
           cm.replaceRange('\n\\item ', {
             line: cursor.line,
-            ch: cursor.ch
+            ch: cursor.ch,
           })
           // Move the cursor to end of the line on which we just inserted the
           // \item
           cm.doc.setCursor({
             line: cursor.line + 1,
-            ch: lastOpenMark.contentFrom.ch
+            ch: lastOpenMark.contentFrom.ch,
           })
         }
       } else {
@@ -317,7 +317,7 @@ function handleEnter(cm) {
           // Insert a new blank \item on the line below the cursor
           cm.replaceRange('\n\\item ', {
             line: cursor.line,
-            ch: cursor.ch
+            ch: cursor.ch,
           })
           // If the line the cursor is on is an \item
           if (
@@ -327,7 +327,7 @@ function handleEnter(cm) {
             // Move the cursor to the start of the \item on the line below
             cm.doc.setCursor({
               line: cursor.line + 1,
-              ch: lastClosedMarkAfter.contentFrom.ch
+              ch: lastClosedMarkAfter.contentFrom.ch,
             })
           }
         }
@@ -482,7 +482,7 @@ function handleBackspaceListEnvs(cm) {
           // Get text from where cursor is to the end of the line
           var lineRange = cm.getRange(currentPos, {
             line: currentPos.line,
-            ch: line.length
+            ch: line.length,
           })
           // If the lineBefore the env is a closing env command
           if (lineBefore && lineBefore.match(/\\end{.*}/)) {
@@ -494,7 +494,7 @@ function handleBackspaceListEnvs(cm) {
             // and insert a newline after
             cm.replaceRange(lineRange + '\n', {
               line: currentPos.line - 1,
-              ch: 0
+              ch: 0,
             })
             // Remove the current \item (line + 1 because we just added a
             // newline)
@@ -533,7 +533,7 @@ function handleBackspaceListEnvs(cm) {
               // \begin{..}
               cm.replaceRange(lineRange, {
                 line: currentPos.line - 2,
-                ch: beforeLength
+                ch: beforeLength,
               })
 
               // Remove the current \item and it's text (now that we've moved
@@ -568,7 +568,7 @@ function handleBackspaceListEnvs(cm) {
               // \begin{..}
               cm.replaceRange(lineRange + '\n', {
                 line: currentPos.line - 1,
-                ch: 0
+                ch: 0,
               })
 
               // Delete the environment if it's empty
@@ -643,13 +643,13 @@ function handleBackspaceListEnvs(cm) {
             // (i.e.) after the \item
             var lineRange = cm.getRange(currentPos, {
               line: currentPos.line,
-              ch: line.length
+              ch: line.length,
             })
 
             // Append the text on the line above the \end{..}
             cm.replaceRange(lineRange, {
               line: currentPos.line - 2,
-              ch: lineBeforeLength
+              ch: lineBeforeLength,
             })
 
             // Remove everything on the current line (i.e. the \item), now
@@ -791,7 +791,7 @@ function handleBackspaceAbstract(cm) {
         // \begin{..} to the end of that line
         cm.setCursor({
           line: currentPos.line - 2,
-          ch: cm.getLine(currentPos.line - 2).length
+          ch: cm.getLine(currentPos.line - 2).length,
         })
         // We handled the text manipulation, so return true to prevent the
         // default backspace action
@@ -834,7 +834,7 @@ function handleDeleteAbstract(cm) {
     var token = cm.getTokenAt(
       {
         line: currentPos.line + 1,
-        ch: lineAfter.length
+        ch: lineAfter.length,
       },
       true
     )
@@ -931,7 +931,7 @@ function handleBackspaceCommandsSingleLine(cm) {
         { line: currentPos.line, ch: lastOpenMark.from.ch },
         {
           line: currentPos.line,
-          ch: lastOpenMark.from.ch + emptyMatch[0].length
+          ch: lastOpenMark.from.ch + emptyMatch[0].length,
         }
       )
       // We handled the text manipulation, so return true to prevent the
@@ -1040,7 +1040,7 @@ function handleDeleteCommandsSingleLine(cm) {
         { line: currentPos.line, ch: lastOpenMark.from.ch },
         {
           line: currentPos.line,
-          ch: lastOpenMark.from.ch + emptyMatch[2].length
+          ch: lastOpenMark.from.ch + emptyMatch[2].length,
         }
       )
       // We handled the text manipulation, so return true to prevent the
@@ -1188,7 +1188,7 @@ function handleKeyUp(cm, e) {
     const token = cm.getTokenAt(cursor)
     const tokenBeforeCursor = cm.getTokenAt({
       line: cursor.line,
-      ch: token.start - 1
+      ch: token.start - 1,
     })
 
     // If the token string starts with a backslash (i.e. it is a command)

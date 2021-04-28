@@ -19,7 +19,7 @@ App.controller(
       }
       apiRequest({
         url: `/notifications/${notification._id}`,
-        method: 'DELETE'
+        method: 'DELETE',
       }).then(() => (notification.hide = true))
     }
 
@@ -110,8 +110,8 @@ App.controller('ProjectInviteNotificationController', function ($scope, $http) {
       method: 'POST',
       headers: {
         'X-Csrf-Token': window.csrfToken,
-        'X-Requested-With': 'XMLHttpRequest'
-      }
+        'X-Requested-With': 'XMLHttpRequest',
+      },
     })
       .then(() => {
         $scope.notification.accepted = true

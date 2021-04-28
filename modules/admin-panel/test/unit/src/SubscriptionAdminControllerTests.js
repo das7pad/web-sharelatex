@@ -29,14 +29,14 @@ describe('SubscriptionAdminController', function () {
       requires: {
         'logger-sharelatex': {
           log() {},
-          err() {}
+          err() {},
         },
         './UserAdminController': (this.UserAdminController = {}),
         '../../../../app/src/Features/User/UserGetter': (this.UserGetter = {}),
         '../../../../app/src/Features/Subscription/SubscriptionLocator': (this.SubscriptionLocator = {}),
         '../../../../app/src/Features/Subscription/SubscriptionUpdater': (this.SubscriptionUpdater = {}),
         '../../../../app/src/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {
-          refreshFeatures: sinon.stub().yields()
+          refreshFeatures: sinon.stub().yields(),
         }),
         '../../../../app/src/models/Subscription': {
           Subscription: (this.Subscription = Subscription = (function () {
@@ -55,19 +55,19 @@ describe('SubscriptionAdminController', function () {
             }
             Subscription.initClass()
             return Subscription
-          })())
+          })()),
         },
         '../../../../app/src/Features/Errors/ErrorController': (this.ErrorController = {}),
         '@overleaf/metrics': {
-          gauge() {}
-        }
-      }
+          gauge() {},
+        },
+      },
     })
 
     this.res = {
       render: sinon.stub(),
       json: sinon.stub(),
-      sendStatus: sinon.stub()
+      sendStatus: sinon.stub(),
     }
 
     this.req = {}
@@ -84,7 +84,7 @@ describe('SubscriptionAdminController', function () {
       this.UserGetter.getUsers = sinon.stub()
       return (this.req.params = {
         subscription_id: this.subscription_id,
-        user_id: this.user_id
+        user_id: this.user_id,
       })
     })
 
@@ -92,12 +92,12 @@ describe('SubscriptionAdminController', function () {
       beforeEach(function () {
         this.subscription = {
           mock: 'subscription',
-          member_ids: [ObjectId(), ObjectId(), ObjectId()]
+          member_ids: [ObjectId(), ObjectId(), ObjectId()],
         }
         this.members = this.managers = [
           { mock: 'member2' },
           { mock: 'member2' },
-          { mock: 'member3' }
+          { mock: 'member3' },
         ]
         this.UserGetter.getUsers.yields(null, this.members)
         this.SubscriptionLocator.getSubscription.yields(null, this.subscription)
@@ -124,7 +124,7 @@ describe('SubscriptionAdminController', function () {
               subscription: this.subscription,
               user_id: this.user_id,
               members: this.members,
-              managers: this.managers
+              managers: this.managers,
             }
           )
           .should.equal(true)
@@ -149,7 +149,7 @@ describe('SubscriptionAdminController', function () {
     beforeEach(function () {
       this.req.params = { subscription_id: this.subscription_id }
       return (this.req.body = {
-        mock: 'data for subscription'
+        mock: 'data for subscription',
       })
     })
 
@@ -158,7 +158,7 @@ describe('SubscriptionAdminController', function () {
         this.subscription = {
           mock: 'subscription',
           admin_id: 'admin-id',
-          member_ids: ['member-id-1', 'member-id-2']
+          member_ids: ['member-id-1', 'member-id-2'],
         }
         this.Subscription.findAndModify.yields(null, this.subscription)
         this.UserAdminController._reqToMongoUpdate = sinon
@@ -211,7 +211,7 @@ describe('SubscriptionAdminController', function () {
     beforeEach(function () {
       this.req.body = {
         mock: 'data for subscription',
-        admin_id: (this.admin_id = 'mock-admin-id')
+        admin_id: (this.admin_id = 'mock-admin-id'),
       }
       return this.Subscription.prototype.save.yields(
         null,

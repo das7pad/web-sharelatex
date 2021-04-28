@@ -40,7 +40,7 @@ async function setProjectCache(projectId, contents) {
 }
 async function getProjectVersion(projectId) {
   const { lastUpdated } = await ProjectGetter.promises.getProject(projectId, {
-    lastUpdated: 1
+    lastUpdated: 1,
   })
   if (!lastUpdated) return null
   return lastUpdated.toISOString()
@@ -72,7 +72,7 @@ function inflateProjectMeta(projectMeta) {
 async function getAllMetaForProjectWithCache(projectId) {
   let [projectCache, projectVersion] = await Promise.all([
     getProjectCache(projectId),
-    getProjectVersion(projectId)
+    getProjectVersion(projectId),
   ])
   if (projectCache && projectCache.projectVersion === projectVersion) {
     return inflateProjectMeta(projectCache.projectMeta)
@@ -82,7 +82,7 @@ async function getAllMetaForProjectWithCache(projectId) {
   //  cache-invalidation on updates.
   projectCache = {
     projectVersion,
-    projectMeta: crunchProjectMeta(projectMeta)
+    projectMeta: crunchProjectMeta(projectMeta),
   }
   // Populate the cache in the background.
   setProjectCache(projectId, projectCache).catch(() => {})
@@ -205,5 +205,5 @@ module.exports = MetaHandler = {
 
 MetaHandler.promises = {
   getAllMetaForProjectWithCache,
-  getAllMetaForProject: promisify(MetaHandler.getAllMetaForProject)
+  getAllMetaForProject: promisify(MetaHandler.getAllMetaForProject),
 }

@@ -416,11 +416,11 @@ export default function LatexMode() {
     'citealt',
     'textcite',
     'cref',
-    'Cref'
+    'Cref',
   ].reduce((acc, command) => {
     acc[command] = {
       lookaheadPattern: new RegExp('^\\\\' + command + '\\s*[\\[{]'),
-      matchPattern: new RegExp('^\\\\' + command + '\\s*')
+      matchPattern: new RegExp('^\\\\' + command + '\\s*'),
     }
     return acc
   }, {})
@@ -442,11 +442,11 @@ export default function LatexMode() {
     'includegraphics',
     'ref',
     'input',
-    'include'
+    'include',
   ].reduce((acc, command) => {
     acc[command] = {
       lookaheadPattern: new RegExp('^\\\\' + command + '\\s*[\\[{]'),
-      matchPattern: new RegExp('^\\\\' + command + '\\s*')
+      matchPattern: new RegExp('^\\\\' + command + '\\s*'),
     }
     return acc
   }, {})
@@ -636,117 +636,117 @@ export default function LatexMode() {
   var _IGNORED_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
     verbatim: {
       tokenizer: _matchVerbatimEnvironment,
-      allowBlankLines: true
+      allowBlankLines: true,
     },
     Verbatim: {
       tokenizer: _matchVerbatimEnvironment,
-      allowBlankLines: true
+      allowBlankLines: true,
     },
     lstlisting: {
       tokenizer: _matchVerbatimEnvironment,
-      allowBlankLines: true
+      allowBlankLines: true,
     },
     minted: {
       tokenizer: _matchVerbatimEnvironment,
-      allowBlankLines: true
+      allowBlankLines: true,
     },
     comment: {
       tokenizer: _matchCommentEnvironment,
-      allowBlankLines: true
-    }
+      allowBlankLines: true,
+    },
   })
 
   var _MATH_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
     math: {
       tokenizer: _matchMath,
       kind: 'inline-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     displaymath: {
       tokenizer: _matchMath,
       kind: 'display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     // Standard LaTeX
     equation: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     'equation\\*': {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     eqnarray: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     'eqnarray\\*': {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     // AMS-LaTeX
     align: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     'align\\*': {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     gather: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     'gather\\*': {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     multline: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     'multline\\*': {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     alignat: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     'alignat\\*': {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     xalignat: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
+      allowBlankLines: false,
     },
     'xalignat\\*': {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
-      allowBlankLines: false
-    }
+      allowBlankLines: false,
+    },
   })
 
   var _TOP_LEVEL_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
     abstract: {
       tokenizer: _matchText,
       kind: 'abstract',
-      allowBlankLines: true
-    }
+      allowBlankLines: true,
+    },
   })
 
   var _LIST_ENVIROMENTS = _buildEnvironmentBeginAndEndPatterns({
@@ -754,29 +754,29 @@ export default function LatexMode() {
       tokenizer: _matchListContent,
       kind: 'itemize',
       allowBlankLines: true,
-      matchOnSingleLine: true
+      matchOnSingleLine: true,
     },
     enumerate: {
       tokenizer: _matchListContent,
       kind: 'enumerate',
       allowBlankLines: true,
-      matchOnSingleLine: true
-    }
+      matchOnSingleLine: true,
+    },
   })
 
   var _FIGURE_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
     figure: {
       tokenizer: _matchFigureContent,
       kind: 'figure',
-      allowBlankLines: true
-    }
+      allowBlankLines: true,
+    },
   })
 
   var _TIKZ_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
     tikzpicture: {
       tokenizer: _matchTikZ,
-      allowBlankLines: true
-    }
+      allowBlankLines: true,
+    },
   })
 
   function _lookaheadForBeginEnvironments(
@@ -1069,7 +1069,7 @@ export default function LatexMode() {
       stack: [_topLevel],
       line: -1,
       openMarks: [],
-      marks: []
+      marks: [],
     }
   }
   this.blankLine = function (state) {

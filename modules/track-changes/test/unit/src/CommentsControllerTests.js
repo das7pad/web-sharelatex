@@ -28,7 +28,7 @@ describe('TrackChanges CommentsController', function () {
     this.ChatApiHandler = {}
     this.EditorRealTimeController = { emitToRoom: sinon.stub() }
     this.AuthenticationController = {
-      getLoggedInUserId: sinon.stub().returns(this.user_id)
+      getLoggedInUserId: sinon.stub().returns(this.user_id),
     }
     this.CommentsController = SandboxedModule.require(modulePath, {
       requires: {
@@ -43,13 +43,13 @@ describe('TrackChanges CommentsController', function () {
         '../../../../../app/src/Features/User/UserInfoManager': (this.UserInfoManager = {}),
         '../../../../../app/src/Features/User/UserInfoController': (this.UserInfoController = {}),
         '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
-        '../../../../../app/src/Features/Chat/ChatController': (this.ChatController = {})
-      }
+        '../../../../../app/src/Features/Chat/ChatController': (this.ChatController = {}),
+      },
     })
     this.req = {}
     return (this.res = {
       json: sinon.stub(),
-      sendStatus: sinon.stub()
+      sendStatus: sinon.stub(),
     })
   })
 
@@ -57,7 +57,7 @@ describe('TrackChanges CommentsController', function () {
     beforeEach(function () {
       this.req.params = {
         project_id: (this.project_id = 'mock-project-id'),
-        thread_id: (this.thread_id = 'mock-thread-id')
+        thread_id: (this.thread_id = 'mock-thread-id'),
       }
       this.req.body = { content: (this.content = 'message-content') }
       this.UserInfoManager.getPersonalInfo = sinon
@@ -143,7 +143,7 @@ describe('TrackChanges CommentsController', function () {
     beforeEach(function () {
       this.req.params = {
         project_id: (this.project_id = 'mock-project-id'),
-        thread_id: (this.thread_id = 'mock-thread-id')
+        thread_id: (this.thread_id = 'mock-thread-id'),
       }
       this.ChatApiHandler.resolveThread = sinon.stub().yields()
       this.UserInfoManager.getPersonalInfo = sinon
@@ -187,7 +187,7 @@ describe('TrackChanges CommentsController', function () {
     beforeEach(function () {
       this.req.params = {
         project_id: (this.project_id = 'mock-project-id'),
-        thread_id: (this.thread_id = 'mock-thread-id')
+        thread_id: (this.thread_id = 'mock-thread-id'),
       }
       this.ChatApiHandler.reopenThread = sinon.stub().yields()
       return this.CommentsController.reopenThread(this.req, this.res)
@@ -215,7 +215,7 @@ describe('TrackChanges CommentsController', function () {
       this.req.params = {
         project_id: (this.project_id = 'mock-project-id'),
         doc_id: (this.doc_id = 'mock-doc-id'),
-        thread_id: (this.thread_id = 'mock-thread-id')
+        thread_id: (this.thread_id = 'mock-thread-id'),
       }
       this.DocumentUpdaterHandler.deleteThread = sinon.stub().yields()
       this.ChatApiHandler.deleteThread = sinon.stub().yields()
@@ -250,7 +250,7 @@ describe('TrackChanges CommentsController', function () {
       this.req.params = {
         project_id: (this.project_id = 'mock-project-id'),
         thread_id: (this.thread_id = 'mock-thread-id'),
-        message_id: (this.message_id = 'mock-thread-id')
+        message_id: (this.message_id = 'mock-thread-id'),
       }
       this.req.body = { content: (this.content = 'mock-content') }
       this.ChatApiHandler.editMessage = sinon.stub().yields()
@@ -290,7 +290,7 @@ describe('TrackChanges CommentsController', function () {
       this.req.params = {
         project_id: (this.project_id = 'mock-project-id'),
         thread_id: (this.thread_id = 'mock-thread-id'),
-        message_id: (this.message_id = 'mock-thread-id')
+        message_id: (this.message_id = 'mock-thread-id'),
       }
       this.ChatApiHandler.deleteMessage = sinon.stub().yields()
       return this.CommentsController.deleteMessage(this.req, this.res)

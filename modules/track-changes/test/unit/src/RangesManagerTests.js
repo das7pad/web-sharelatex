@@ -29,8 +29,8 @@ describe('TrackChanges RangesManager', function () {
       requires: {
         '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
         '../../../../../app/src/Features/Docstore/DocstoreManager': (this.DocstoreManager = {}),
-        '../../../../../app/src/Features/User/UserInfoManager': (this.UserInfoManager = {})
-      }
+        '../../../../../app/src/Features/User/UserInfoManager': (this.UserInfoManager = {}),
+      },
     }))
   })
 
@@ -46,17 +46,17 @@ describe('TrackChanges RangesManager', function () {
               {
                 op: { i: 'foo', p: 42 },
                 metadata: {
-                  user_id: this.user_id1
-                }
+                  user_id: this.user_id1,
+                },
               },
               {
                 op: { i: 'bar', p: 102 },
                 metadata: {
-                  user_id: this.user_id2
-                }
-              }
-            ]
-          }
+                  user_id: this.user_id2,
+                },
+              },
+            ],
+          },
         },
         {
           ranges: {
@@ -64,12 +64,12 @@ describe('TrackChanges RangesManager', function () {
               {
                 op: { i: 'baz', p: 3 },
                 metadata: {
-                  user_id: this.user_id1
-                }
-              }
-            ]
-          }
-        }
+                  user_id: this.user_id1,
+                },
+              },
+            ],
+          },
+        },
       ]
       this.users = {}
       this.users[this.user_id1] = { mock: 'user-1' }

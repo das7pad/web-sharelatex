@@ -42,5 +42,5 @@ module.exports = TrackChangesManager = {
         return callback(null, project.track_changes || {})
       }
     )
-  }
+  },
 }

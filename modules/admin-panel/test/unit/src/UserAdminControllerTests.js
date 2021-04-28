@@ -33,10 +33,10 @@ describe('UserAdminController', function () {
     this.projects = {
       owned: [
         { lastUpdated: 1, _id: 1, owner_ref: 'user-1' },
-        { lastUpdated: 2, _id: 2, owner_ref: 'user-2' }
+        { lastUpdated: 2, _id: 2, owner_ref: 'user-2' },
       ],
       readAndWrite: [],
-      readOnly: []
+      readOnly: [],
     }
     this.user_count = user_count = 35043
 
@@ -61,14 +61,14 @@ describe('UserAdminController', function () {
     this.AuthenticationController = {}
 
     this.ProjectGetter = {
-      findAllUsersProjects: sinon.stub().yields(null, this.projects)
+      findAllUsersProjects: sinon.stub().yields(null, this.projects),
     }
 
     this.UserAdminController = SandboxedModule.require(modulePath, {
       requires: {
         'logger-sharelatex': {
           log() {},
-          err() {}
+          err() {},
         },
         '../../../../app/src/Features/User/UserGetter': this.UserGetter,
         '../../../../app/src/Features/User/UserDeleter': this.UserDeleter,
@@ -79,8 +79,8 @@ describe('UserAdminController', function () {
         '../../../../app/src/Features/Project/ProjectGetter': this
           .ProjectGetter,
         '../../../../app/src/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
-        '@overleaf/settings': (this.settings = {})
-      }
+        '@overleaf/settings': (this.settings = {}),
+      },
     })
 
     this.perPage = this.UserAdminController.PER_PAGE
@@ -91,8 +91,8 @@ describe('UserAdminController', function () {
 
     this.req = {
       body: {
-        query: ''
-      }
+        query: '',
+      },
     }
 
     this.res = new MockResponse()
@@ -131,8 +131,8 @@ describe('UserAdminController', function () {
       return (this.req = {
         body: {
           query: '',
-          page: 1
-        }
+          page: 1,
+        },
       })
     })
 
@@ -165,8 +165,8 @@ describe('UserAdminController', function () {
         .returns(false)
       return (this.req = {
         params: {
-          user_id: 'user_id_here'
-        }
+          user_id: 'user_id_here',
+        },
       })
     })
 
@@ -221,8 +221,8 @@ describe('UserAdminController', function () {
     return it('should delete the user', function (done) {
       this.req = {
         params: {
-          user_id: 'user_id_here'
-        }
+          user_id: 'user_id_here',
+        },
       }
       this.res.sendStatus = code => {
         this.UserDeleter.deleteUser

@@ -34,7 +34,7 @@ describe('LaunchpadController', function () {
         '../../../../app/src/infrastructure/Features': {
           hasFeature() {
             return false
-          }
+          },
         },
         '@overleaf/settings': (this.Settings = {}),
         '@overleaf/metrics': (this.Metrics = {}),

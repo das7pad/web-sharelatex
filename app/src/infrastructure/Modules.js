@@ -148,13 +148,13 @@ module.exports = {
   moduleIncludesAvailable,
   hooks: {
     attach: attachHook,
-    fire: fireHook
+    fire: fireHook,
   },
   promises: {
     hooks: {
-      fire: promisify(fireHook)
-    }
-  }
+      fire: promisify(fireHook),
+    },
+  },
 }
 
 loadModules()

@@ -33,7 +33,7 @@ module.exports = {
           endpointName: 'wiki',
           params: [],
           maxRequests: 60,
-          timeInterval: 60
+          timeInterval: 60,
         }),
         WikiController.proxy
       )
@@ -45,7 +45,7 @@ module.exports = {
           endpointName: 'wiki',
           params: [],
           maxRequests: 60,
-          timeInterval: 60
+          timeInterval: 60,
         }),
         WikiController.getPage
       )
@@ -73,7 +73,7 @@ module.exports = {
               .replace(/learn\/kb/i, 'learn/how-to')
               .replace(/%20/g, '_')
               .replace(/\/Knowledge Base/i, ''),
-            query: req.query
+            query: req.query,
           })
         )
       )
@@ -85,7 +85,7 @@ module.exports = {
           endpointName: 'wiki',
           params: [],
           maxRequests: 60,
-          timeInterval: 60
+          timeInterval: 60,
         }),
         WikiController.getPage
       )
@@ -114,7 +114,7 @@ module.exports = {
         targetList.unshift({
           url: '/learn',
           text: 'documentation',
-          class: optionalClass
+          class: optionalClass,
         })
       if (settings.nav) {
         try {
@@ -139,7 +139,7 @@ module.exports = {
         }
       }
     }
-  }
+  },
 }
 
 function __guardMethod__(obj, methodName, transform) {

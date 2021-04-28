@@ -210,5 +210,5 @@ module.exports = CommentsController = {
         return res.sendStatus(204)
       }
     )
-  }
+  },
 }

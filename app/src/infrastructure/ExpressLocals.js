@@ -12,7 +12,7 @@ const {
   buildJsPath,
   buildTPath,
   getEntrypointChunks,
-  staticPath
+  staticPath,
 } = require('./WebpackAssets')
 
 const I18N_HTML_INJECTIONS = new Set()

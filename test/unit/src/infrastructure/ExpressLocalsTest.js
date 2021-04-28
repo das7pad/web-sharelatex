@@ -17,9 +17,9 @@ describe('ExpressLocalsTests', function () {
       i18n: {
         subdomainLang: {
           fr: { lngCode: 'fr', url: 'http://localhost:3000' },
-          www: { lngCode: 'en', url: 'http://localhost:3000' }
-        }
-      }
+          www: { lngCode: 'en', url: 'http://localhost:3000' },
+        },
+      },
     }
     this.user_id = '386010482601212345061012'
 
@@ -36,7 +36,7 @@ describe('ExpressLocalsTests', function () {
         buildJsPath(name) {
           return staticPath('/js/' + name + '.js')
         },
-        staticPath
+        staticPath,
       },
       'logger-sharelatex': { log: function () {} },
       '@overleaf/settings': this.settings,
@@ -44,18 +44,18 @@ describe('ExpressLocalsTests', function () {
       '../Features/SystemMessages/SystemMessageManager': {},
       '../Features/Authentication/AuthenticationController': {
         getLoggedInUserId: sinon.stub().returns(this.user_id),
-        getSessionUser: sinon.stub()
+        getSessionUser: sinon.stub(),
       },
       './Modules': {},
-      './Features': { hasFeature: sinon.stub().returns(false) }
+      './Features': { hasFeature: sinon.stub().returns(false) },
     }
 
     this.webRouter = {
-      use: sinon.stub()
+      use: sinon.stub(),
     }
 
     this.app = {
-      locals: {}
+      locals: {},
     }
     this.req = new MockRequest()
     this.res = new MockResponse()
@@ -67,9 +67,9 @@ describe('ExpressLocalsTests', function () {
       //  settings values - e.g. the availability of a cdn
       this.ExpressLocals = SandboxedModule.require(MODULE_PATH, {
         globals: {
-          console
+          console,
         },
-        requires: this.requires
+        requires: this.requires,
       })
       this.ExpressLocals(this.app, this.webRouter)
     }

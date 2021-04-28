@@ -12,5 +12,5 @@ function loadTemplate(name) {
 module.exports = {
   'main.tex': loadTemplate('main.tex'),
   'mainbasic.tex': loadTemplate('mainbasic.tex'),
-  'references.bib': loadTemplate('references.bib')
+  'references.bib': loadTemplate('references.bib'),
 }

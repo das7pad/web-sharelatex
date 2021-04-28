@@ -18,7 +18,7 @@ const ICON_COMMANDS = [
   'citealt',
   'textcite',
   'cref',
-  'Cref'
+  'Cref',
 ]
 
 const IconCommandMarker = {
@@ -28,14 +28,14 @@ const IconCommandMarker = {
 
   marker(cm, sourceMark) {
     const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
-      replacedWith: makeOpenSpan(sourceMark)
+      replacedWith: makeOpenSpan(sourceMark),
     })
     const postMark = makeSingleMark(cm, sourceMark, 'post', true, {
-      replacedWith: makeClosingSpan()
+      replacedWith: makeClosingSpan(),
     })
 
     makeGroup([preMark, postMark])
-  }
+  },
 }
 
 function makeOpenSpan(sourceMark) {

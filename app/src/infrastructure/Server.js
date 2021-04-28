@@ -57,11 +57,11 @@ const sessionStore = new RedisStore({
         originalMaxAge: Settings.cookieSessionLength,
         path: '/',
         sameSite: Settings.sameSiteCookie,
-        secure: Settings.secureCookie
+        secure: Settings.secureCookie,
       }
       return session
-    }
-  }
+    },
+  },
 })
 // Preserve touch
 const touchSession = sessionStore.touch.bind(sessionStore)
@@ -115,7 +115,7 @@ Object.defineProperty(app.request, 'ip', {
     const resolvedIp = ORIGINAL_REQ_IP.call(this)
     this[CACHED_IP_FIELD] = resolvedIp
     return resolvedIp
-  }
+  },
 })
 app.use(function (req, res, next) {
   if (req.aborted) {
@@ -161,11 +161,11 @@ webRouter.use(
       domain: Settings.cookieDomain,
       maxAge: Settings.cookieSessionLength, // in milliseconds, see https://github.com/expressjs/session#cookiemaxage
       secure: Settings.secureCookie,
-      sameSite: Settings.sameSiteCookie
+      sameSite: Settings.sameSiteCookie,
     },
     store: sessionStore,
     key: Settings.cookieName,
-    rolling: true
+    rolling: true,
   })
 )
 
@@ -183,7 +183,7 @@ passport.use(
     {
       passReqToCallback: true,
       usernameField: 'email',
-      passwordField: 'password'
+      passwordField: 'password',
     },
     AuthenticationController.doPassportLogin
   )
@@ -283,7 +283,7 @@ webRouter.use(
     // note that more headers are added by default
     dnsPrefetchControl: false,
     referrerPolicy: { policy: 'origin-when-cross-origin' },
-    hsts: false
+    hsts: false,
   })
 )
 
@@ -321,5 +321,5 @@ Router.initialize(webRouter, privateApiRouter, publicApiRouter)
 
 module.exports = {
   app,
-  server
+  server,
 }

@@ -123,7 +123,7 @@ export function updateMarkWithClosingPosition(cm, mark) {
   const { state } = cm.getTokenAt(
     {
       line: cm.lastLine() + 1,
-      ch: 0
+      ch: 0,
     },
     true
   )

@@ -34,7 +34,7 @@ module.exports = {
       )
       return AuthenticationController.addEndpointToLoginWhitelist('/register')
     }
-  }
+  },
 }
 
 var removeRoute = function (webRouter, method, path) {

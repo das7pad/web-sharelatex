@@ -34,32 +34,32 @@ describe('GraphController', function () {
       edges: [],
       addNode: sinon.stub(),
       addEdge: sinon.stub(),
-      new: sinon.stub()
+      new: sinon.stub(),
     }
 
     this.GraphController = SandboxedModule.require(modulePath, {
       requires: {
         'logger-sharelatex': {
           log() {},
-          err() {}
+          err() {},
         },
         '../../../../app/src/Features/User/UserGetter': this.UserGetter,
         '../../../../app/src/infrastructure/mongodb': {
           db: (this.db = {
             projects: {},
-            users: {}
+            users: {},
           }),
-          ObjectId
+          ObjectId,
         },
-        './SigmaJSGraph': this.SigmaJSGraph
-      }
+        './SigmaJSGraph': this.SigmaJSGraph,
+      },
     })
 
     this.users = [
       { _id: ObjectId(), first_name: 'James' },
       { _id: ObjectId(), first_name: 'Henry' },
       { _id: ObjectId(), first_name: 'Teddy' },
-      { _id: ObjectId(), first_name: 'Harry' }
+      { _id: ObjectId(), first_name: 'Harry' },
     ]
 
     this.projects = [
@@ -67,26 +67,26 @@ describe('GraphController', function () {
         _id: 1,
         owner_ref: this.users[0]._id,
         readOnly_refs: [],
-        collaberator_refs: []
+        collaberator_refs: [],
       },
       {
         _id: 2,
         owner_ref: this.users[0]._id,
         readOnly_refs: this.users[2]._id,
-        collaberator_refs: this.users[3]._id
+        collaberator_refs: this.users[3]._id,
       },
       {
         _id: 3,
         owner_ref: this.users[0]._id,
         readOnly_refs: this.users[1]._id,
-        collaberator_refs: []
+        collaberator_refs: [],
       },
       {
         _id: 4,
         owner_ref: this.users[1]._id,
         readOnly_refs: this.users[0]._id,
-        collaberator_refs: []
-      }
+        collaberator_refs: [],
+      },
     ]
 
     this.db.projects.find = sinon
@@ -101,22 +101,22 @@ describe('GraphController', function () {
 
     this.emptyGraph = {
       nodes: [],
-      edges: []
+      edges: [],
     }
 
     this.nodes = [
       { id: this.users[0]._id.toString(), label: '' },
       { id: this.users[1]._id.toString(), label: '' },
-      { id: this.users[2]._id.toString(), label: '' }
+      { id: this.users[2]._id.toString(), label: '' },
     ]
 
     this.req = {
       params: {
-        user_id: 'user_id_here'
+        user_id: 'user_id_here',
       },
       query: {
-        SecondLevel: false
-      }
+        SecondLevel: false,
+      },
     }
 
     this.res = {}
@@ -190,7 +190,7 @@ describe('GraphController', function () {
     beforeEach(function () {
       this.OneLevelGraph = {
         nodes: this.nodes,
-        edges: [1, 2, 3, 4]
+        edges: [1, 2, 3, 4],
       }
 
       this.GraphController._genGraph = sinon

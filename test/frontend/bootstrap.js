@@ -14,8 +14,8 @@ moment.updateLocale('en', {
     nextDay: '[Tomorrow]',
     lastWeek: 'ddd, Do MMM YY',
     nextWeek: 'ddd, Do MMM YY',
-    sameElse: 'ddd, Do MMM YY'
-  }
+    sameElse: 'ddd, Do MMM YY',
+  },
 })
 
 let inMemoryLocalStorage = {}
@@ -28,9 +28,9 @@ Object.defineProperty(global, 'localStorage', {
         : null,
     setItem: (key, value) => (inMemoryLocalStorage[key] = value),
     clear: () => (inMemoryLocalStorage = {}),
-    removeItem: key => delete inMemoryLocalStorage[key]
+    removeItem: key => delete inMemoryLocalStorage[key],
   },
-  writable: true
+  writable: true,
 })
 
 // node-fetch doesn't accept relative URL's: https://github.com/node-fetch/node-fetch/blob/master/docs/v2-LIMITS.md#known-differences

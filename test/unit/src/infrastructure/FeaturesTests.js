@@ -6,8 +6,8 @@ describe('Features', function () {
   beforeEach(function () {
     this.Features = SandboxedModule.require(modulePath, {
       requires: {
-        '@overleaf/settings': (this.settings = {})
-      }
+        '@overleaf/settings': (this.settings = {}),
+      },
     })
   })
   describe('externalAuthenticationSystemUsed', function () {
@@ -45,8 +45,8 @@ describe('Features', function () {
   describe('hasFeature', function () {
     const defaults = SandboxedModule.require('@overleaf/settings', {
       globals: {
-        process: { env: {}, cwd: () => process.cwd() }
-      }
+        process: { env: {}, cwd: () => process.cwd() },
+      },
     })
     beforeEach(function () {
       Object.assign(this.settings, defaults)
@@ -97,14 +97,14 @@ describe('Features', function () {
           beforeEach(function () {
             this.settings.apis = {
               linkedUrlProxy: {
-                url: 'https://www.overleaf.com'
+                url: 'https://www.overleaf.com',
               },
               references: {
-                url: 'https://www.overleaf.com'
+                url: 'https://www.overleaf.com',
               },
               v1: {
-                url: 'https://www.overleaf.com'
-              }
+                url: 'https://www.overleaf.com',
+              },
             }
           })
           it('should return true', function () {

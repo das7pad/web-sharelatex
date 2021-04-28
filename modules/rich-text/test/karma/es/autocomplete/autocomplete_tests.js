@@ -11,7 +11,7 @@ describe('Autocomplete', function () {
       getBeginCommandArguments: sinon.stub(),
       getCommandCompletions: sinon
         .stub()
-        .returns(makeCompletionsList(['\\foo', '\\bar']))
+        .returns(makeCompletionsList(['\\foo', '\\bar'])),
     }
 
     this.editor = makeEditor(this.adapter)
@@ -113,7 +113,7 @@ describe('Autocomplete', function () {
   it('shows \\cite reference argument completions', function () {
     const bibTexCompletions = ['ACitation', 'BCitation']
     this.adapter.getBibtexArguments = sinon.stub().returns({
-      keys: bibTexCompletions
+      keys: bibTexCompletions,
     })
     type(this.cm, '\\cite{}')
     // Move cursor into \cite argument
@@ -126,7 +126,7 @@ describe('Autocomplete', function () {
   it('shows \\cite reference argument completions after comma', function () {
     const bibTexCompletions = ['ACitation', 'BCitation']
     this.adapter.getBibtexArguments = sinon.stub().returns({
-      keys: bibTexCompletions
+      keys: bibTexCompletions,
     })
     type(this.cm, '\\cite{foo,}')
     // Move cursor into \cite argument, after comma
@@ -139,7 +139,7 @@ describe('Autocomplete', function () {
   it('shows \\cite reference argument completions before comma', function () {
     const bibTexCompletions = ['ACitation', 'BCitation']
     this.adapter.getBibtexArguments = sinon.stub().returns({
-      keys: bibTexCompletions
+      keys: bibTexCompletions,
     })
     type(this.cm, '\\cite{,foo}')
     // Move cursor into \cite argument, after comma
@@ -180,7 +180,7 @@ describe('Autocomplete', function () {
         return ['\\foo', '\\bar'].map(command => ({
           text: command,
           displayText: command,
-          hint: handleCommandCompletionPicked
+          hint: handleCommandCompletionPicked,
         }))
       }
       type(this.cm, '\\')
@@ -200,7 +200,7 @@ describe('Autocomplete', function () {
         return ['\\foo{}', '\\bar{}'].map(command => ({
           text: command,
           displayText: command,
-          hint: handleCommandCompletionPicked
+          hint: handleCommandCompletionPicked,
         }))
       }
       type(this.cm, '\\')
@@ -224,8 +224,8 @@ describe('Autocomplete', function () {
           {
             text: '\\begin{}',
             displayText: '\\begin{}',
-            hint: handleCommandCompletionPicked
-          }
+            hint: handleCommandCompletionPicked,
+          },
         ]
       }
       type(this.cm, '\\')
@@ -248,8 +248,8 @@ describe('Autocomplete', function () {
           {
             text: '\\begin{}',
             displayText: '\\begin{}',
-            hint: handleCommandCompletionPicked
-          }
+            hint: handleCommandCompletionPicked,
+          },
         ]
       }
       type(this.cm, '  \\')
@@ -344,7 +344,7 @@ function type(cm, string) {
 function makeCompletionsList(completions) {
   return completions.map(c => ({
     text: c,
-    displayText: c
+    displayText: c,
   }))
 }
 

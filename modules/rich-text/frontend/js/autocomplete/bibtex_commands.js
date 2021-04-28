@@ -10,5 +10,5 @@ export default [
   '\\citeyear',
   '\\parencite',
   '\\citealt',
-  '\\textcite'
+  '\\textcite',
 ]

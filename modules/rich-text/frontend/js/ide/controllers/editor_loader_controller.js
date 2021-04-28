@@ -7,7 +7,7 @@ App.controller('EditorLoaderController', function ($scope) {
   $scope.richText = {
     bundle: null,
     bundleLoading: null,
-    formattingEvents: new EventEmitter()
+    formattingEvents: new EventEmitter(),
   }
 
   $scope.$watch('editor.showRichText', function (val) {
@@ -23,7 +23,7 @@ App.controller('EditorLoaderController', function ($scope) {
       )
       $scope.richText.bundleLoading = Promise.all([
         richTextLoading,
-        MathJaxLoading
+        MathJaxLoading,
       ])
         .then(() =>
           richTextLoading.then(bundle =>

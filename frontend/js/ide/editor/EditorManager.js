@@ -323,7 +323,7 @@ export default EditorManager = (function () {
           this.ide.connectionManager.disconnect({ permanent: true })
           this.ide.reportError(error, meta)
           captureException(new Error(message), {
-            extra: { error: error, meta: meta }
+            extra: { error: error, meta: meta },
           })
 
           // Tell the user about the error state.

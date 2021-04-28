@@ -24,17 +24,17 @@ describe('OpenInOverleafMiddleware', function () {
     this.Csrf = { validateRequest: sinon.stub().callsArgWith(1, null) }
     this.AuthenticationController = {
       isUserLoggedIn: sinon.stub().returns(true),
-      setRedirectInSession: sinon.stub()
+      setRedirectInSession: sinon.stub(),
     }
     this.req = {
       method: 'POST',
       originalUrl: '/docs',
       body: {
-        type: 'body'
+        type: 'body',
       },
       query: {
-        type: 'query'
-      }
+        type: 'query',
+      },
     }
     this.res = {}
     this.next = sinon.stub()
@@ -45,12 +45,12 @@ describe('OpenInOverleafMiddleware', function () {
         requires: {
           'logger-sharelatex': {
             log() {},
-            err() {}
+            err() {},
           },
           '../../../../app/src/Features/Authentication/AuthenticationController': this
             .AuthenticationController,
-          '../../../../app/src/infrastructure/Csrf': this.Csrf
-        }
+          '../../../../app/src/infrastructure/Csrf': this.Csrf,
+        },
       }
     ))
   })

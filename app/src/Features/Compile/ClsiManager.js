@@ -66,13 +66,13 @@ const ClsiManager = {
       if (err != null) {
         if (err.message === 'no main file specified') {
           return callback(null, 'validation-problems', null, null, {
-            mainFile: err.message
+            mainFile: err.message,
           })
         } else {
           return callback(
             OError.tag(err, 'Could not build request to CLSI', {
               projectId,
-              options
+              options,
             })
           )
         }
@@ -110,7 +110,7 @@ const ClsiManager = {
             OError.tag(err, 'CLSI compile failed', {
               submissionId,
               clsiRequest,
-              options
+              options,
             })
           )
         }
@@ -131,7 +131,7 @@ const ClsiManager = {
     )
     const opts = {
       url: compilerUrl,
-      method: 'POST'
+      method: 'POST',
     }
     ClsiManager._makeRequest(projectId, opts, callback)
   },
@@ -147,7 +147,7 @@ const ClsiManager = {
     )
     const opts = {
       url: compilerUrl,
-      method: 'DELETE'
+      method: 'DELETE',
     }
     ClsiManager._makeRequestWithClsiServerId(
       projectId,
@@ -243,7 +243,7 @@ const ClsiManager = {
               return callback(
                 OError.tag(err, 'error sending request to clsi', {
                   projectId,
-                  userId
+                  userId,
                 })
               )
             }
@@ -296,7 +296,7 @@ const ClsiManager = {
             if (err != null) {
               return callback(
                 OError.tag(err, 'error getting cookie jar for CLSI request', {
-                  projectId
+                  projectId,
                 })
               )
             }
@@ -324,7 +324,7 @@ const ClsiManager = {
                 cb(err, {
                   response,
                   body,
-                  finishTime: new Date() - startTime
+                  finishTime: new Date() - startTime,
                 })
               })
             })
@@ -347,11 +347,11 @@ const ClsiManager = {
               cb(err, {
                 response,
                 body,
-                finishTime: new Date() - startTime
+                finishTime: new Date() - startTime,
               })
             }
           )
-        }
+        },
       },
       (err, results) => {
         if (err != null) {
@@ -371,7 +371,7 @@ const ClsiManager = {
               timeDifference,
               currentCompileTime,
               newBackendCompileTime,
-              projectId
+              projectId,
             },
             'both clsi requests returned'
           )
@@ -389,13 +389,13 @@ const ClsiManager = {
       url: baseOpts.url.replace(
         Settings.apis.clsi.url,
         Settings.apis.clsi_new.url
-      )
+      ),
     }
     NewBackendCloudClsiCookieManager.getCookieJar(projectId, (err, jar) => {
       if (err != null) {
         return callback(
           OError.tag(err, 'error getting cookie jar for CLSI request', {
-            projectId
+            projectId,
           })
         )
       }
@@ -407,7 +407,7 @@ const ClsiManager = {
           return callback(
             OError.tag(err, 'error making request to new CLSI', {
               projectId,
-              opts
+              opts,
             })
           )
         }
@@ -418,7 +418,7 @@ const ClsiManager = {
             if (err != null) {
               return callback(
                 OError.tag(err, 'error setting server id on new backend', {
-                  projectId
+                  projectId,
                 })
               )
             }
@@ -451,7 +451,7 @@ const ClsiManager = {
     const opts = {
       url: compileUrl,
       json: req,
-      method: 'POST'
+      method: 'POST',
     }
     ClsiManager._makeRequest(projectId, opts, (err, response, body) => {
       if (err != null) {
@@ -460,7 +460,7 @@ const ClsiManager = {
             projectId,
             userId,
             compileOptions: req.compile.options,
-            rootResourcePath: req.compile.rootResourcePath
+            rootResourcePath: req.compile.rootResourcePath,
           })
         )
       }
@@ -483,7 +483,7 @@ const ClsiManager = {
             rootResourcePath: req.compile.rootResourcePath,
             clsiResponse: body,
             headers: response.headers,
-            statusCode: response.statusCode
+            statusCode: response.statusCode,
           })
         )
       }
@@ -502,7 +502,7 @@ const ClsiManager = {
             ? new URL(file.url).pathname
             : file.url,
         type: file.type,
-        build: file.build
+        build: file.build,
       })
     }
     return outputFiles
@@ -582,7 +582,7 @@ const ClsiManager = {
             if (err != null) {
               return callback(
                 OError.tag(err, 'failed to get contents from Mongo', {
-                  projectId
+                  projectId,
                 })
               )
             }
@@ -615,7 +615,7 @@ const ClsiManager = {
             return callback(
               OError.tag(err, 'Failed to get project documents', {
                 projectId,
-                projectStateHash
+                projectStateHash,
               })
             )
           }
@@ -634,7 +634,7 @@ const ClsiManager = {
             projectId,
             userId,
             buildId,
-            outputFilePath
+            outputFilePath,
           })
         )
       }
@@ -701,14 +701,14 @@ const ClsiManager = {
       if (err != null) {
         return callback(
           OError.tag(err, 'failed to get project contents from Mongo', {
-            projectId
+            projectId,
           })
         )
       }
       options = {
         ...options,
         syncType: 'full',
-        syncState: projectStateHash
+        syncState: projectStateHash,
       }
       ClsiManager._finaliseRequest(
         projectId,
@@ -764,7 +764,7 @@ const ClsiManager = {
         // add doc to resources unless it is just a stub entry
         resources.push({
           path,
-          content: doc.lines.join('\n')
+          content: doc.lines.join('\n'),
         })
       }
       if (
@@ -807,7 +807,7 @@ const ClsiManager = {
       resources.push({
         path,
         url: `${Settings.apis.filestore.url}/project/${project._id}/file/${file._id}`,
-        modified: file.created != null ? file.created.getTime() : undefined
+        modified: file.created != null ? file.created.getTime() : undefined,
       })
     }
 
@@ -821,11 +821,11 @@ const ClsiManager = {
           check: options.check,
           syncType: options.syncType,
           syncState: options.syncState,
-          compileGroup: options.compileGroup
+          compileGroup: options.compileGroup,
         },
         rootResourcePath,
-        resources
-      }
+        resources,
+      },
     })
   },
 
@@ -835,7 +835,7 @@ const ClsiManager = {
         return callback(
           OError.tag(err, 'Failed to build CLSI request', {
             projectId,
-            options
+            options,
           })
         )
       }
@@ -850,9 +850,9 @@ const ClsiManager = {
         url: wordCountUrl,
         qs: {
           file: filename,
-          image: req.compile.options.imageName
+          image: req.compile.options.imageName,
         },
-        method: 'GET'
+        method: 'GET',
       }
       ClsiManager._makeRequestWithClsiServerId(
         projectId,
@@ -873,7 +873,7 @@ const ClsiManager = {
                 {
                   projectId,
                   clsiResponse: body,
-                  statusCode: response.statusCode
+                  statusCode: response.statusCode,
                 }
               )
             )
@@ -881,7 +881,7 @@ const ClsiManager = {
         }
       )
     })
-  }
+  },
 }
 
 module.exports = ClsiManager

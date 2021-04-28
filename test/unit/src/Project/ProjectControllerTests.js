@@ -20,23 +20,23 @@ describe('ProjectController', function () {
       email: 'test@overleaf.com',
       first_name: 'bjkdsjfk',
       features: {},
-      emails: [{ email: 'test@overleaf.com' }]
+      emails: [{ email: 'test@overleaf.com' }],
     }
     this.settings = {
       apis: {
         chat: {
-          url: 'chat.com'
+          url: 'chat.com',
         },
         notifications: {
-          publicUrl: undefined
+          publicUrl: undefined,
         },
         spelling: {
-          publicUrl: undefined
-        }
+          publicUrl: undefined,
+        },
       },
       hasThemes: true,
       siteUrl: 'mysite.com',
-      algolia: {}
+      algolia: {},
     }
     this.brandVariationDetails = {
       id: '12',
@@ -44,23 +44,23 @@ describe('ProjectController', function () {
       brand_id: 12,
       brand_name: 'The journal',
       home_url: 'http://www.thejournal.com/',
-      publish_menu_link_html: 'Submit your paper to the <em>The Journal</em>'
+      publish_menu_link_html: 'Submit your paper to the <em>The Journal</em>',
     }
     this.ieeeBrandVariationDetails = {
       id: '15',
       active: true,
       brand_id: 15,
       brand_name: 'IEEE',
-      home_url: 'https://www.ieee.org/'
+      home_url: 'https://www.ieee.org/',
     }
     this.token = 'some-token'
     this.ProjectDeleter = {
       deleteProject: sinon.stub().callsArg(2),
       restoreProject: sinon.stub().callsArg(1),
-      findArchivedProjects: sinon.stub()
+      findArchivedProjects: sinon.stub(),
     }
     this.ProjectDuplicator = {
-      duplicate: sinon.stub().callsArgWith(3, null, { _id: this.project_id })
+      duplicate: sinon.stub().callsArgWith(3, null, { _id: this.project_id }),
     }
     this.ProjectCreationHandler = {
       createExampleProject: sinon
@@ -68,64 +68,64 @@ describe('ProjectController', function () {
         .callsArgWith(2, null, { _id: this.project_id }),
       createBasicProject: sinon
         .stub()
-        .callsArgWith(2, null, { _id: this.project_id })
+        .callsArgWith(2, null, { _id: this.project_id }),
     }
     this.SubscriptionLocator = { getUsersSubscription: sinon.stub() }
     this.LimitationsManager = { hasPaidSubscription: sinon.stub() }
     this.TagsHandler = { getAllTags: sinon.stub() }
     this.NotificationsHandler = {
       getUserNotifications: sinon.stub(),
-      getJWT: sinon.stub().yields(null, 'some-jwt')
+      getJWT: sinon.stub().yields(null, 'some-jwt'),
     }
     this.UserModel = { findById: sinon.stub() }
     this.AuthorizationManager = {
       getPrivilegeLevelForProject: sinon.stub(),
-      isRestrictedUser: sinon.stub().returns(false)
+      isRestrictedUser: sinon.stub().returns(false),
     }
     this.EditorController = { renameProject: sinon.stub() }
     this.InactiveProjectManager = { reactivateProjectIfRequired: sinon.stub() }
     this.ProjectUpdateHandler = { markAsOpened: sinon.stub() }
     this.ProjectGetter = {
       findAllUsersProjects: sinon.stub(),
-      getProject: sinon.stub()
+      getProject: sinon.stub(),
     }
     this.ProjectHelper = {
       isArchived: sinon.stub(),
       isTrashed: sinon.stub(),
       isArchivedOrTrashed: sinon.stub(),
-      getAllowedImagesForUser: sinon.stub().returns([])
+      getAllowedImagesForUser: sinon.stub().returns([]),
     }
     this.AuthenticationController = {
       getLoggedInUser: sinon.stub().callsArgWith(1, null, this.user),
       getLoggedInUserId: sinon.stub().returns(this.user._id),
       getSessionUser: sinon.stub().returns(this.user),
-      isUserLoggedIn: sinon.stub().returns(true)
+      isUserLoggedIn: sinon.stub().returns(true),
     }
     this.UserController = {
-      logout: sinon.stub()
+      logout: sinon.stub(),
     }
     this.TokenAccessHandler = {
       getRequestToken: sinon.stub().returns(this.token),
-      protectTokens: sinon.stub()
+      protectTokens: sinon.stub(),
     }
     this.CollaboratorsGetter = {
-      userIsTokenMember: sinon.stub().callsArgWith(2, null, false)
+      userIsTokenMember: sinon.stub().callsArgWith(2, null, false),
     }
     this.ProjectEntityHandler = {}
     this.NotificationBuilder = {
-      ipMatcherAffiliation: sinon.stub().returns({ create: sinon.stub() })
+      ipMatcherAffiliation: sinon.stub().returns({ create: sinon.stub() }),
     }
     this.UserGetter = {
       getUserFullEmails: sinon.stub().yields(null, []),
       getUser: sinon
         .stub()
-        .callsArgWith(2, null, { lastLoginIp: '192.170.18.2' })
+        .callsArgWith(2, null, { lastLoginIp: '192.170.18.2' }),
     }
     this.Features = {
-      hasFeature: sinon.stub()
+      hasFeature: sinon.stub(),
     }
     this.BrandVariationsHandler = {
-      getBrandVariationById: sinon.stub()
+      getBrandVariationById: sinon.stub(),
     }
     this.BrandVariationsHandler.getBrandVariationById
       .withArgs('12')
@@ -134,22 +134,22 @@ describe('ProjectController', function () {
       .withArgs('15')
       .callsArgWith(1, null, this.ieeeBrandVariationDetails)
     this.TpdsProjectFlusher = {
-      flushProjectToTpdsIfNeeded: sinon.stub().yields()
+      flushProjectToTpdsIfNeeded: sinon.stub().yields(),
     }
     this.SpellingHandler = {
       getUserDictionary: sinon.stub().yields(null, ['word']),
-      getJWT: sinon.stub().yields(null, 'some-jwt')
+      getJWT: sinon.stub().yields(null, 'some-jwt'),
     }
     this.Metrics = {
       Timer: class {
         done() {}
       },
-      inc: sinon.stub()
+      inc: sinon.stub(),
     }
     this.NewLogsUIHelper = {
       getNewLogsUIVariantForUser: sinon
         .stub()
-        .returns({ newLogsUI: false, subvariant: null })
+        .returns({ newLogsUI: false, subvariant: null }),
     }
 
     this.ProjectController = SandboxedModule.require(MODULE_PATH, {
@@ -188,42 +188,42 @@ describe('ProjectController', function () {
         '../../models/Project': {},
         '../Analytics/AnalyticsManager': { recordEvent: () => {} },
         '../../infrastructure/Modules': {
-          hooks: { fire: sinon.stub().yields(null, []) }
+          hooks: { fire: sinon.stub().yields(null, []) },
         },
-        '../Helpers/NewLogsUI': this.NewLogsUIHelper
-      }
+        '../Helpers/NewLogsUI': this.NewLogsUIHelper,
+      },
     })
 
     this.projectName = '£12321jkj9ujkljds'
     this.req = {
       params: {
-        Project_id: this.project_id
+        Project_id: this.project_id,
       },
       headers: {},
       connection: {
-        remoteAddress: '192.170.18.1'
+        remoteAddress: '192.170.18.1',
       },
       session: {
-        user: this.user
+        user: this.user,
       },
       body: {
-        projectName: this.projectName
+        projectName: this.projectName,
       },
       i18n: {
-        translate() {}
+        translate() {},
       },
-      ip: '192.170.18.1'
+      ip: '192.170.18.1',
     }
     this.res = {
       app: {
         locals: {
           buildCssPath(themeModifier) {
             return `/stylesheets/${themeModifier}style.css`
-          }
-        }
+          },
+        },
       },
       locals: {},
-      setTimeout: sinon.stub()
+      setTimeout: sinon.stub(),
     }
   })
 
@@ -298,7 +298,7 @@ describe('ProjectController', function () {
     it('should update the public access level', function (done) {
       this.EditorController.setPublicAccessLevel = sinon.stub().callsArg(2)
       this.req.body = {
-        publicAccessLevel: (this.publicAccessLevel = 'readonly')
+        publicAccessLevel: (this.publicAccessLevel = 'readonly'),
       }
       this.res.sendStatus = code => {
         this.EditorController.setPublicAccessLevel
@@ -317,7 +317,7 @@ describe('ProjectController', function () {
         this.ProjectDeleter.deleteProject
           .calledWith(this.project_id, {
             deleterUser: this.user,
-            ipAddress: this.req.ip
+            ipAddress: this.req.ip,
           })
           .should.equal(true)
         code.should.equal(200)
@@ -388,14 +388,25 @@ describe('ProjectController', function () {
       this.tags = [
         { name: 1, project_ids: ['1', '2', '3'] },
         { name: 2, project_ids: ['a', '1'] },
-        { name: 3, project_ids: ['a', 'b', 'c', 'd'] }
+        { name: 3, project_ids: ['a', 'b', 'c', 'd'] },
       ]
       this.notifications = [
-        { _id: '1', user_id: '2', templateKey: '3', messageOpts: '4', key: '5' }
+        {
+          _id: '1',
+          user_id: '2',
+          templateKey: '3',
+          messageOpts: '4',
+          key: '5',
+        },
       ]
       this.projects = [
         { _id: 1, lastUpdated: 1, owner_ref: 'user-1' },
-        { _id: 2, lastUpdated: 2, owner_ref: 'user-2', lastUpdatedBy: 'user-1' }
+        {
+          _id: 2,
+          lastUpdated: 2,
+          owner_ref: 'user-2',
+          lastUpdatedBy: 'user-1',
+        },
       ]
       this.collabertions = [{ _id: 5, lastUpdated: 5, owner_ref: 'user-1' }]
       this.readOnly = [{ _id: 3, lastUpdated: 3, owner_ref: 'user-1' }]
@@ -406,16 +417,16 @@ describe('ProjectController', function () {
         readAndWrite: this.collabertions,
         readOnly: this.readOnly,
         tokenReadAndWrite: this.tokenReadAndWrite,
-        tokenReadOnly: this.tokenReadOnly
+        tokenReadOnly: this.tokenReadOnly,
       }
 
       this.users = {
         'user-1': {
-          first_name: 'James'
+          first_name: 'James',
         },
         'user-2': {
-          first_name: 'Henry'
-        }
+          first_name: 'Henry',
+        },
       }
       this.users[this.user._id] = this.user // Owner
       this.UserModel.findById = (id, fields, callback) => {
@@ -544,7 +555,7 @@ describe('ProjectController', function () {
     describe('front widget', function (done) {
       beforeEach(function () {
         this.settings.overleaf = {
-          front_chat_widget_room_id: 'chat-room-id'
+          front_chat_widget_room_id: 'chat-room-id',
         }
       })
 
@@ -600,17 +611,17 @@ describe('ProjectController', function () {
                 confirmed: true,
                 name: 'Overleaf',
                 ssoBeta: false,
-                ssoEnabled: true
-              }
-            }
-          }
+                ssoEnabled: true,
+              },
+            },
+          },
         ])
         this.res.render = (pageName, opts) => {
           expect(opts.notificationsInstitution).to.deep.include({
             email: this.institutionEmail,
             institutionId: 1,
             institutionName: this.institutionName,
-            templateKey: 'notification_institution_sso_available'
+            templateKey: 'notification_institution_sso_available',
           })
         }
         this.ProjectController.projectListPage(this.req, this.res)
@@ -620,14 +631,14 @@ describe('ProjectController', function () {
           institutionEmail: this.institutionEmail,
           linked: {
             hasEntitlement: false,
-            universityName: this.institutionName
-          }
+            universityName: this.institutionName,
+          },
         }
         this.res.render = (pageName, opts) => {
           expect(opts.notificationsInstitution).to.deep.include({
             email: this.institutionEmail,
             institutionName: this.institutionName,
-            templateKey: 'notification_institution_sso_linked'
+            templateKey: 'notification_institution_sso_linked',
           })
         }
         this.ProjectController.projectListPage(this.req, this.res)
@@ -639,7 +650,7 @@ describe('ProjectController', function () {
           expect(opts.notificationsInstitution).to.deep.include({
             institutionEmail: this.institutionEmail,
             requestedEmail: 'requested@overleaf.com',
-            templateKey: 'notification_institution_sso_non_canonical'
+            templateKey: 'notification_institution_sso_non_canonical',
           })
         }
         this.req.session.saml = {
@@ -648,8 +659,8 @@ describe('ProjectController', function () {
           requestedEmail: 'requested@overleaf.com',
           linked: {
             hasEntitlement: false,
-            universityName: this.institutionName
-          }
+            universityName: this.institutionName,
+          },
         }
         this.ProjectController.projectListPage(this.req, this.res)
       })
@@ -658,19 +669,19 @@ describe('ProjectController', function () {
         this.res.render = (pageName, opts) => {
           expect(opts.notificationsInstitution).to.deep.include({
             email: this.institutionEmail,
-            templateKey: 'notification_institution_sso_already_registered'
+            templateKey: 'notification_institution_sso_already_registered',
           })
         }
         this.req.session.saml = {
           institutionEmail: this.institutionEmail,
           linked: {
             hasEntitlement: false,
-            universityName: 'Overleaf'
+            universityName: 'Overleaf',
           },
           registerIntercept: {
             id: 1,
-            name: 'Example University'
-          }
+            name: 'Example University',
+          },
         }
         this.ProjectController.projectListPage(this.req, this.res)
       })
@@ -681,14 +692,14 @@ describe('ProjectController', function () {
         this.res.render = (pageName, opts) => {
           expect(opts.notificationsInstitution).to.deep.not.include({
             email: 'test@overleaf.com',
-            templateKey: 'notification_institution_sso_already_registered'
+            templateKey: 'notification_institution_sso_already_registered',
           })
         }
         this.req.session.saml = {
           registerIntercept: {
             id: 1,
-            name: 'Example University'
-          }
+            name: 'Example University',
+          },
         }
         this.ProjectController.projectListPage(this.req, this.res)
       })
@@ -705,7 +716,7 @@ describe('ProjectController', function () {
         }
         this.req.session.saml = {
           institutionEmail: this.institutionEmail,
-          error: new Errors.SAMLAlreadyLinkedError()
+          error: new Errors.SAMLAlreadyLinkedError(),
         }
         this.ProjectController.projectListPage(this.req, this.res)
       })
@@ -721,10 +732,10 @@ describe('ProjectController', function () {
                   confirmed: false,
                   name: 'Overleaf',
                   ssoBeta: false,
-                  ssoEnabled: true
-                }
-              }
-            }
+                  ssoEnabled: true,
+                },
+              },
+            },
           ])
           done()
         })
@@ -743,7 +754,7 @@ describe('ProjectController', function () {
             expect(opts.notificationsInstitution).to.not.deep.include({
               institutionEmail: this.institutionEmail,
               requestedEmail: undefined,
-              templateKey: 'notification_institution_sso_non_canonical'
+              templateKey: 'notification_institution_sso_non_canonical',
             })
           }
           this.req.session.saml = {
@@ -751,8 +762,8 @@ describe('ProjectController', function () {
             institutionEmail: this.institutionEmail,
             linked: {
               hasEntitlement: false,
-              universityName: this.institutionName
-            }
+              universityName: this.institutionName,
+            },
           }
           this.ProjectController.projectListPage(this.req, this.res)
         })
@@ -768,10 +779,10 @@ describe('ProjectController', function () {
                   confirmed: true,
                   name: 'Beta University',
                   ssoBeta: true,
-                  ssoEnabled: false
-                }
-              }
-            }
+                  ssoEnabled: false,
+                },
+              },
+            },
           ])
           done()
         })
@@ -782,7 +793,7 @@ describe('ProjectController', function () {
               email: 'beta@beta.com',
               institutionId: 2,
               institutionName: 'Beta University',
-              templateKey: 'notification_institution_sso_available'
+              templateKey: 'notification_institution_sso_available',
             })
           }
           this.ProjectController.projectListPage(this.req, this.res)
@@ -794,7 +805,7 @@ describe('ProjectController', function () {
               email: 'test@overleaf.com',
               institutionId: 1,
               institutionName: 'Overleaf',
-              templateKey: 'notification_institution_sso_available'
+              templateKey: 'notification_institution_sso_available',
             })
           }
           this.ProjectController.projectListPage(this.req, this.res)
@@ -813,7 +824,7 @@ describe('ProjectController', function () {
             email: 'test@overleaf.com',
             institutionId: 1,
             institutionName: 'Overleaf',
-            templateKey: 'notification_institution_sso_available'
+            templateKey: 'notification_institution_sso_available',
           })
         }
         this.ProjectController.projectListPage(this.req, this.res)
@@ -826,37 +837,43 @@ describe('ProjectController', function () {
       this.tags = [
         { name: 1, project_ids: ['1', '2', '3'] },
         { name: 2, project_ids: ['a', '1'] },
-        { name: 3, project_ids: ['a', 'b', 'c', 'd'] }
+        { name: 3, project_ids: ['a', 'b', 'c', 'd'] },
       ]
       this.notifications = [
-        { _id: '1', user_id: '2', templateKey: '3', messageOpts: '4', key: '5' }
+        {
+          _id: '1',
+          user_id: '2',
+          templateKey: '3',
+          messageOpts: '4',
+          key: '5',
+        },
       ]
       this.projects = [
         { _id: 1, lastUpdated: 1, owner_ref: 'user-1' },
-        { _id: 2, lastUpdated: 2, owner_ref: 'user-2' }
+        { _id: 2, lastUpdated: 2, owner_ref: 'user-2' },
       ]
       this.collabertions = [{ _id: 5, lastUpdated: 5, owner_ref: 'user-1' }]
       this.readOnly = [{ _id: 3, lastUpdated: 3, owner_ref: 'user-1' }]
       this.tokenReadAndWrite = [{ _id: 6, lastUpdated: 5, owner_ref: 'user-4' }]
       this.tokenReadOnly = [
         { _id: 6, lastUpdated: 5, owner_ref: 'user-4' }, // Also in tokenReadAndWrite
-        { _id: 7, lastUpdated: 4, owner_ref: 'user-5' }
+        { _id: 7, lastUpdated: 4, owner_ref: 'user-5' },
       ]
       this.allProjects = {
         owned: this.projects,
         readAndWrite: this.collabertions,
         readOnly: this.readOnly,
         tokenReadAndWrite: this.tokenReadAndWrite,
-        tokenReadOnly: this.tokenReadOnly
+        tokenReadOnly: this.tokenReadOnly,
       }
 
       this.users = {
         'user-1': {
-          first_name: 'James'
+          first_name: 'James',
         },
         'user-2': {
-          first_name: 'Henry'
-        }
+          first_name: 'Henry',
+        },
       }
       this.users[this.user._id] = this.user // Owner
       this.UserModel.findById = (id, fields, callback) => {
@@ -937,31 +954,31 @@ describe('ProjectController', function () {
       this.project = {
         name: 'my proj',
         _id: '213123kjlkj',
-        owner_ref: '59fc84d5fbea77482d436e1b'
+        owner_ref: '59fc84d5fbea77482d436e1b',
       }
       this.brandedProject = {
         name: 'my branded proj',
         _id: '3252332',
         owner_ref: '59fc84d5fbea77482d436e1b',
-        brandVariationId: '12'
+        brandVariationId: '12',
       }
       this.ieeeProject = {
         name: 'ieee branded proj',
         _id: '000000000000000000001337',
         owner_ref: '59fc84d5fbea77482d436e1b',
-        brandVariationId: '15'
+        brandVariationId: '15',
       }
       this.user = {
         _id: '588f3ddae8ebc1bac07c9fa4',
         ace: {
           fontSize: 'massive',
-          theme: 'sexy'
+          theme: 'sexy',
         },
         email: 'bob@bob.com',
         refProviders: {
           mendeley: { encrypted: 'aaaa' },
-          zotero: { encrypted: 'bbbb' }
-        }
+          zotero: { encrypted: 'bbbb' },
+        },
       }
       this.ProjectGetter.getProject.callsArgWith(2, null, this.project)
       this.UserModel.findById.callsArgWith(2, null, this.user)
@@ -996,7 +1013,7 @@ describe('ProjectController', function () {
       this.res.render = (_pageName, opts) => {
         expect(opts.user.refProviders).to.deep.equal({
           mendeley: true,
-          zotero: true
+          zotero: true,
         })
         done()
       }
@@ -1395,14 +1412,14 @@ describe('ProjectController', function () {
           id: 'a',
           name: 'A',
           accessLevel: 'a',
-          somethingElse: 1
+          somethingElse: 1,
         },
         {
           archived: false,
           id: 'b',
           name: 'B',
           accessLevel: 'b',
-          somethingElse: 1
+          somethingElse: 1,
         },
         {
           archived: false,
@@ -1410,7 +1427,7 @@ describe('ProjectController', function () {
           id: 'c',
           name: 'C',
           accessLevel: 'c',
-          somethingElse: 1
+          somethingElse: 1,
         },
         {
           archived: false,
@@ -1418,8 +1435,8 @@ describe('ProjectController', function () {
           id: 'd',
           name: 'D',
           accessLevel: 'd',
-          somethingElse: 1
-        }
+          somethingElse: 1,
+        },
       ]
 
       this.ProjectHelper.isArchivedOrTrashed
@@ -1450,8 +1467,8 @@ describe('ProjectController', function () {
         expect(data).to.deep.equal({
           projects: [
             { _id: 'b', name: 'B', accessLevel: 'b' },
-            { _id: 'd', name: 'D', accessLevel: 'd' }
-          ]
+            { _id: 'd', name: 'D', accessLevel: 'd' },
+          ],
         })
         done()
       }
@@ -1468,7 +1485,7 @@ describe('ProjectController', function () {
       this.project = { _id: 'abcd' }
       this.docs = [
         { path: '/things/b.txt', doc: true },
-        { path: '/main.tex', doc: true }
+        { path: '/main.tex', doc: true },
       ]
       this.files = [{ path: '/things/a.txt' }]
       this.ProjectGetter.getProject = sinon
@@ -1486,8 +1503,8 @@ describe('ProjectController', function () {
           entities: [
             { path: '/main.tex', type: 'doc' },
             { path: '/things/a.txt', type: 'file' },
-            { path: '/things/b.txt', type: 'doc' }
-          ]
+            { path: '/things/b.txt', type: 'doc' },
+          ],
         })
         expect(this.ProjectGetter.getProject.callCount).to.equal(1)
         expect(
@@ -1515,8 +1532,8 @@ describe('ProjectController', function () {
         tokens: {
           readAndWrite: '1abcd',
           readAndWritePrefix: '1',
-          readOnly: 'neiotsranteoia'
-        }
+          readOnly: 'neiotsranteoia',
+        },
       }
     })
 
@@ -1541,7 +1558,7 @@ describe('ProjectController', function () {
           archived: false,
           trashed: false,
           owner_ref: 'defg',
-          isV1Project: false
+          isV1Project: false,
         })
       })
     })
@@ -1572,7 +1589,7 @@ describe('ProjectController', function () {
           archived: true,
           trashed: false,
           owner_ref: 'defg',
-          isV1Project: false
+          isV1Project: false,
         })
       })
     })
@@ -1598,7 +1615,7 @@ describe('ProjectController', function () {
           archived: false,
           trashed: false,
           owner_ref: null,
-          isV1Project: false
+          isV1Project: false,
         })
       })
     })
@@ -1625,7 +1642,7 @@ describe('ProjectController', function () {
         '5a05cd8421f9fe22be131750',
         '5a05cd8421f9fe22be131751',
         '5a05cd8421f9fe22be131752',
-        '5a05cd8521f9fe22be131753'
+        '5a05cd8521f9fe22be131753',
       ]
     })
 
@@ -1654,7 +1671,7 @@ describe('ProjectController', function () {
         false,
         true,
         false,
-        true
+        true,
       ])
       expect(
         this.ids.map(i =>
@@ -1680,7 +1697,7 @@ describe('ProjectController', function () {
         true,
         true,
         false,
-        false
+        false,
       ])
     })
   })

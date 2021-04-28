@@ -257,7 +257,7 @@ const ProjectController = {
         if (err != null) {
           OError.tag(err, 'error cloning project', {
             projectId,
-            userId: currentUser._id
+            userId: currentUser._id,
           })
           return next(err)
         }
@@ -269,8 +269,8 @@ const ProjectController = {
             first_name: firstName,
             last_name: lastName,
             email,
-            _id: currentUser._id
-          }
+            _id: currentUser._id,
+          },
         })
       }
     )
@@ -282,7 +282,7 @@ const ProjectController = {
       first_name: firstName,
       last_name: lastName,
       email,
-      _id: userId
+      _id: userId,
     } = currentUser
     const projectName =
       req.body.projectName != null ? req.body.projectName.trim() : undefined
@@ -296,7 +296,7 @@ const ProjectController = {
           } else {
             ProjectCreationHandler.createBasicProject(userId, projectName, cb)
           }
-        }
+        },
       ],
       (err, project) => {
         if (err != null) {
@@ -309,8 +309,8 @@ const ProjectController = {
             first_name: firstName,
             last_name: lastName,
             email,
-            _id: userId
-          }
+            _id: userId,
+          },
         })
       }
     )
@@ -365,7 +365,7 @@ const ProjectController = {
             .sort((a, b) => (a.path > b.path ? 1 : a.path < b.path ? -1 : 0))
             .map(e => ({
               path: e.path,
-              type: e.doc != null ? 'doc' : 'file'
+              type: e.doc != null ? 'doc' : 'file',
             }))
           res.json({ project_id: projectId, entities })
         }
@@ -436,12 +436,12 @@ const ProjectController = {
                   (results && results[0]) || []
                 return cb(null, {
                   list: fullEmails,
-                  allInReconfirmNotificationPeriods
+                  allInReconfirmNotificationPeriods,
                 })
               }
             )
           })
-        }
+        },
       },
       (err, results) => {
         if (err != null) {
@@ -490,7 +490,7 @@ const ProjectController = {
                   email: affiliation.email,
                   institutionId: affiliation.institution.id,
                   institutionName: affiliation.institution.name,
-                  templateKey: 'notification_institution_sso_available'
+                  templateKey: 'notification_institution_sso_available',
                 })
               }
             })
@@ -502,7 +502,7 @@ const ProjectController = {
               notificationsInstitution.push({
                 email: samlSession.institutionEmail,
                 institutionName: samlSession.linked.universityName,
-                templateKey: 'notification_institution_sso_linked'
+                templateKey: 'notification_institution_sso_linked',
               })
             }
 
@@ -517,7 +517,7 @@ const ProjectController = {
               notificationsInstitution.push({
                 institutionEmail: samlSession.emailNonCanonical,
                 requestedEmail: samlSession.requestedEmail,
-                templateKey: 'notification_institution_sso_non_canonical'
+                templateKey: 'notification_institution_sso_non_canonical',
               })
             }
 
@@ -532,7 +532,7 @@ const ProjectController = {
             ) {
               notificationsInstitution.push({
                 email: samlSession.institutionEmail,
-                templateKey: 'notification_institution_sso_already_registered'
+                templateKey: 'notification_institution_sso_already_registered',
               })
             }
 
@@ -540,7 +540,7 @@ const ProjectController = {
             if (samlSession.error) {
               notificationsInstitution.push({
                 templateKey: 'notification_institution_sso_error',
-                error: samlSession.error
+                error: samlSession.error,
               })
             }
           }
@@ -581,7 +581,7 @@ const ProjectController = {
             reconfirmedViaSAML,
             samlBeta: req.session.samlBeta,
             isIE,
-            zipFileSizeLimit: Settings.maxUploadSize
+            zipFileSizeLimit: Settings.maxUploadSize,
           }
 
           if (
@@ -652,7 +652,7 @@ const ProjectController = {
               owner_ref: 1,
               brandVariationId: 1,
               overleaf: 1,
-              tokens: 1
+              tokens: 1,
             },
             (err, project) => {
               if (err != null) {
@@ -731,11 +731,11 @@ const ProjectController = {
               results.project.brandVariationId,
               (error, brandVariationDetails) => cb(error, brandVariationDetails)
             )
-          }
+          },
         ],
         flushToTpds: cb => {
           TpdsProjectFlusher.flushProjectToTpdsIfNeeded(projectId, cb)
-        }
+        },
       },
       (err, results) => {
         if (err != null) {
@@ -749,7 +749,7 @@ const ProjectController = {
           subscription,
           brandVariation,
           isTokenMember,
-          privilegeLevel
+          privilegeLevel,
         } = results
         const allowedImageNames = ProjectHelper.getAllowedImagesForUser(
           sessionUser
@@ -810,7 +810,7 @@ const ProjectController = {
 
             if (userId) {
               AnalyticsManager.recordEvent(userId, 'project-opened', {
-                projectId: project._id
+                projectId: project._id,
               })
             }
 
@@ -825,13 +825,13 @@ const ProjectController = {
                 {
                   name: 'Default',
                   val: '',
-                  path: res.app.locals.buildCssPath('')
+                  path: res.app.locals.buildCssPath(''),
                 },
                 {
                   name: 'Light',
                   val: 'light-',
-                  path: res.app.locals.buildCssPath('light-')
-                }
+                  path: res.app.locals.buildCssPath('light-'),
+                },
               ]
             }
 
@@ -859,7 +859,7 @@ const ProjectController = {
                 refProviders: _.mapValues(user.refProviders, Boolean),
                 alphaProgram: user.alphaProgram,
                 betaProgram: user.betaProgram,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
               },
               userSettings: {
                 mode: user.ace.mode,
@@ -871,7 +871,7 @@ const ProjectController = {
                 syntaxValidation: user.ace.syntaxValidation,
                 fontFamily: user.ace.fontFamily || 'lucida',
                 lineHeight: user.ace.lineHeight || 'normal',
-                overallTheme: user.ace.overallTheme
+                overallTheme: user.ace.overallTheme,
               },
               privilegeLevel,
               chatUrl: Settings.apis.chat.url,
@@ -906,7 +906,7 @@ const ProjectController = {
               showReactFileTree: !wantsOldFileTreeUI,
               showReactShareModal: !wantsOldShareModalUI,
               showReactAddFilesModal: !wantsOldAddFilesModalUI,
-              showReactGithubSync: !wantsOldGithubSyncUI && user.alphaProgram
+              showReactGithubSync: !wantsOldGithubSyncUI && user.alphaProgram,
             })
             timer.done()
           }
@@ -922,7 +922,7 @@ const ProjectController = {
       readAndWrite,
       readOnly,
       tokenReadAndWrite,
-      tokenReadOnly
+      tokenReadOnly,
     } = allProjects
     const projects = []
     for (project of owned) {
@@ -1010,7 +1010,7 @@ const ProjectController = {
       archived,
       trashed,
       owner_ref: project.owner_ref,
-      isV1Project: false
+      isV1Project: false,
     }
     if (accessLevel === PrivilegeLevels.READ_ONLY && source === Sources.TOKEN) {
       model.owner_ref = null
@@ -1079,12 +1079,12 @@ const ProjectController = {
         const portalPath = aff.institution.isUniversity ? '/edu/' : '/org/'
         portalTemplates.push({
           name: aff.institution.name,
-          url: Settings.siteUrl + portalPath + aff.portal.slug
+          url: Settings.siteUrl + portalPath + aff.portal.slug,
         })
       }
     }
     return portalTemplates
-  }
+  },
 }
 
 var defaultSettingsForAnonymousUser = userId => ({
@@ -1098,18 +1098,18 @@ var defaultSettingsForAnonymousUser = userId => ({
     spellCheckLanguage: '',
     overallTheme: '',
     pdfViewer: '',
-    syntaxValidation: true
+    syntaxValidation: true,
   },
   subscription: {
     freeTrial: {
-      allowed: true
-    }
+      allowed: true,
+    },
   },
   featureSwitches: {
-    github: false
+    github: false,
   },
   alphaProgram: false,
-  betaProgram: false
+  betaProgram: false,
 })
 
 module.exports = ProjectController

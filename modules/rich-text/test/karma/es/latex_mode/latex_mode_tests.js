@@ -48,7 +48,7 @@ describe('LatexMode', function () {
       'bracket',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(1)
     expect(_state.marks[0].from).to.deep.equal(pos(0, 0))
@@ -136,7 +136,7 @@ describe('LatexMode', function () {
     expect(parseLine('\\section{abc')).to.deep.equal([
       'tag',
       'bracket',
-      undefined
+      undefined,
     ])
     expect(_state.marks.length).to.equal(0)
     restartParse()
@@ -144,7 +144,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(1)
   })
@@ -223,7 +223,7 @@ describe('LatexMode', function () {
       undefined,
       'tag',
       undefined,
-      'keyword'
+      'keyword',
     ])
   })
 
@@ -238,14 +238,14 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('blah')).to.deep.equal([undefined])
     expect(parseLine('\\end{foo}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -254,14 +254,14 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\item okok')).to.deep.equal(['tag', undefined])
     expect(parseLine('\\end{itemize}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -270,14 +270,14 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\item okok')).to.deep.equal(['tag', undefined])
     expect(parseLine('\\end{enumerate}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -286,14 +286,14 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\foo')).to.deep.equal(['comment', 'comment'])
     expect(parseLine('\\end{comment}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -302,13 +302,13 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\end{figure}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -317,7 +317,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\includegraphics[]{abc}')).to.deep.equal([
       'tag',
@@ -325,13 +325,13 @@ describe('LatexMode', function () {
       'bracket',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\end{figure}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -340,19 +340,19 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\caption{caption}')).to.deep.equal([
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\end{figure}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -361,19 +361,19 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\label{caption}')).to.deep.equal([
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\end{figure}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 
@@ -384,7 +384,7 @@ describe('LatexMode', function () {
       'tag',
       'string',
       'tag',
-      'keyword'
+      'keyword',
     ])
 
     // do not match \\verbaXa as a \verb with switch "a" & string X
@@ -400,7 +400,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(1)
     expect(_state.marks[0].from).to.deep.equal(pos(0, 1))
@@ -413,7 +413,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(2)
     expect(_state.marks[1].from).to.deep.equal(pos(1, 1))
@@ -458,14 +458,14 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(0)
     expect(parseLine('\\titlestyle{foo}')).to.deep.equal([
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(0)
   })
@@ -475,7 +475,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(1)
     expect(_state.marks[0].kind).to.equal('section')
@@ -490,7 +490,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(1)
     expect(_state.marks[0].kind).to.equal('section\\*')
@@ -549,7 +549,7 @@ describe('LatexMode', function () {
     expect(parseLine('$1024.00$')).to.deep.equal([
       'keyword',
       'number',
-      'keyword'
+      'keyword',
     ])
   })
 
@@ -561,13 +561,13 @@ describe('LatexMode', function () {
   it('marks verbatim command correctly', function () {
     expect(parseLine('\\verb+my text akfdnakfnaf')).to.deep.equal([
       'tag',
-      'string'
+      'string',
     ])
     expect(_state.openMarks.length).to.equal(0)
     expect(parseLine('something else+null')).to.deep.equal([
       'string',
       'tag',
-      undefined
+      undefined,
     ])
     expect(_state.marks.length).to.equal(0)
   })
@@ -577,7 +577,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('abc')).to.deep.equal(['string'])
     expect(parseLine('\\textbf{}')).to.deep.equal(['string', 'string'])
@@ -586,7 +586,7 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(0)
   })
@@ -596,20 +596,20 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(_state.openMarks.length).to.equal(0)
     expect(parseLine('\\othercommand{test}')).to.deep.equal([
       'tag',
       'bracket',
       undefined,
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\end{tikzpicture}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(_state.marks.length).to.equal(0)
   })
@@ -619,25 +619,25 @@ describe('LatexMode', function () {
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\begin{array}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\end{array}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
     expect(parseLine('\\end{equation}')).to.deep.equal([
       'tag',
       'bracket',
       'keyword',
-      'bracket'
+      'bracket',
     ])
   })
 })

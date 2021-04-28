@@ -11,7 +11,7 @@ class MockRequest {
 
     this.prototype.ip = '42.42.42.42'
     this.prototype.headers = {
-      host: 'www.overleaf.com'
+      host: 'www.overleaf.com',
     }
     this.prototype.params = {}
     this.prototype.query = {}

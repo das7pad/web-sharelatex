@@ -31,7 +31,7 @@ const App = angular
     'ErrorCatcher',
     'storage',
     'ngTagsInput',
-    'ui.select'
+    'ui.select',
   ])
   .config(function ($qProvider, $httpProvider, uiSelectConfig) {
     $qProvider.errorOnUnhandledRejections(false)

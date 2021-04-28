@@ -22,7 +22,7 @@ const UrlHelper = {
       throw new Error('no linked url proxy configured')
     }
     const chain = Settings.apis.linkedUrlProxy.chain || [
-      Settings.apis.linkedUrlProxy.url
+      Settings.apis.linkedUrlProxy.url,
     ]
     return chain.reduce(
       (url, proxy) => `${proxy}?url=${encodeURIComponent(url)}`,

@@ -37,7 +37,7 @@ module.exports = SigmaJSGraph = {
         x: this.nodes.length,
         y: Math.floor(Math.random() * 10 + 1),
         size: 2,
-        color
+        color,
       })
     }
   },
@@ -70,8 +70,8 @@ module.exports = SigmaJSGraph = {
         count: Math.floor(Math.random() * 10 + 1),
         size: 2,
         projectId: project._id,
-        hash
+        hash,
       })
     }
-  }
+  },
 }

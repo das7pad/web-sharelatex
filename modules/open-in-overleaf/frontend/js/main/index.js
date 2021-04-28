@@ -63,7 +63,7 @@ export default App.controller(
       $http({
         method: 'POST',
         url: window.location.pathname,
-        data: params
+        data: params,
       }).then(
         function successCallback(response) {
           if (response.error) {

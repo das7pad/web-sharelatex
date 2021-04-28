@@ -19,11 +19,11 @@ MathJax.Hub.Config({
     // that isn't yet on the page, so we disable it and set a global font
     // scale factor
     scale: 110,
-    matchFontHeight: false
+    matchFontHeight: false,
   },
   TeX: {
     equationNumbers: { autoNumber: 'AMS' },
-    useLabelIDs: false
+    useLabelIDs: false,
   },
   skipStartupTypeset: true,
   tex2jax: {
@@ -31,13 +31,13 @@ MathJax.Hub.Config({
     // Dollar delimiters are added by the mathjax directive
     inlineMath: [
       ['\\(', '\\)'],
-      ['$', '$']
+      ['$', '$'],
     ],
     displayMath: [
       ['$$', '$$'],
-      ['\\[', '\\]']
-    ]
-  }
+      ['\\[', '\\]'],
+    ],
+  },
 })
 MathJax.Hub.Configured()
 export default MathJax

@@ -15,8 +15,8 @@ describe('UpdateMerger :', function () {
         '../Uploads/FileTypeManager': (this.FileTypeManager = {}),
         '../../infrastructure/FileWriter': (this.FileWriter = {}),
         '../Project/ProjectEntityHandler': (this.ProjectEntityHandler = {}),
-        '@overleaf/settings': { path: { dumpPath: 'dump_here' } }
-      }
+        '@overleaf/settings': { path: { dumpPath: 'dump_here' } },
+      },
     })
     this.project_id = 'project_id_here'
     this.user_id = 'mock-user-id'

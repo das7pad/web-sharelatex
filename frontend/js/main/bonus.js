@@ -13,7 +13,7 @@ App.controller('BonusLinksController', ($scope, $modal) => {
   $scope.openLinkToUsModal = () =>
     $modal.open({
       templateUrl: 'BonusLinkToUsModal',
-      controller: 'BonusModalController'
+      controller: 'BonusModalController',
     })
 
   $(function () {

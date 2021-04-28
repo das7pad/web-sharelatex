@@ -46,7 +46,7 @@ module.exports = OpenInOverleafMiddleware = {
     return res.render(Path.resolve(__dirname, '../views/gateway'), {
       form_data: req.method === 'GET' ? req.query : req.body,
       action,
-      target
+      target,
     })
-  }
+  },
 }

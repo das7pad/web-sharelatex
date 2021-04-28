@@ -45,7 +45,7 @@ module.exports = ProjectAdminController = {
           return next(err)
         }
         return res.render(Path.resolve(__dirname, '../views/project/show'), {
-          project
+          project,
         })
       }
     )
@@ -76,5 +76,5 @@ module.exports = ProjectAdminController = {
         )
       }
     }
-  }
+  },
 }

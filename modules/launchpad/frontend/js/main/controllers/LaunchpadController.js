@@ -110,7 +110,7 @@ export default App.controller(
           // hello IE11
           parsedURL = {
             origin: null,
-            pathname: wsUrl
+            pathname: wsUrl,
           }
         }
         const socket = SocketIoShim.connect(parsedURL.origin, {

@@ -2,7 +2,7 @@ import { positionsEqual } from './utils'
 
 const ORIGIN_POS = {
   line: 0,
-  ch: 0
+  ch: 0,
 }
 
 function _clearMatch() {
@@ -68,7 +68,7 @@ export function makePreambleMark(cm, titleMark, authorMark, maketitleMark) {
   var mark = cm.markText(ORIGIN_POS, maketitleMark.to, {
     clearOnEnter: true,
     collapsed: true,
-    inclusiveRight: true
+    inclusiveRight: true,
   })
 
   mark.wlTitle = titleMark.getContent(cm)

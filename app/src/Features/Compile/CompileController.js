@@ -219,7 +219,7 @@ module.exports = CompileController = {
         res.setHeader(
           'Content-Disposition',
           contentDisposition(filename, {
-            type: req.query.popupDownload ? 'attachment' : 'inline'
+            type: req.query.popupDownload ? 'attachment' : 'inline',
           })
         )
 

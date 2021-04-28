@@ -37,7 +37,7 @@ module.exports = CollaboratorsInviteController = {
       function (err, invites) {
         if (err != null) {
           OError.tag(err, 'error getting invites for project', {
-            projectId
+            projectId,
           })
           return next(err)
         }
@@ -90,7 +90,7 @@ module.exports = CollaboratorsInviteController = {
           endpointName: 'invite-to-project-by-user-id',
           timeInterval: 60 * 30,
           subjectName: user_id,
-          throttle: collabLimit
+          throttle: collabLimit,
         }
         return rateLimiter.addCount(opts, callback)
       }
@@ -153,7 +153,7 @@ module.exports = CollaboratorsInviteController = {
                     {
                       email,
                       projectId,
-                      sendingUserId
+                      sendingUserId,
                     }
                   )
                   return next(err)
@@ -165,7 +165,7 @@ module.exports = CollaboratorsInviteController = {
                   )
                   return res.json({
                     invite: null,
-                    error: 'cannot_invite_non_user'
+                    error: 'cannot_invite_non_user',
                   })
                 }
                 return CollaboratorsInviteHandler.inviteToProject(
@@ -178,7 +178,7 @@ module.exports = CollaboratorsInviteController = {
                       OError.tag(err, 'error creating project invite', {
                         projectId,
                         email,
-                        sendingUserId
+                        sendingUserId,
                       })
                       return next(err)
                     }
@@ -213,7 +213,7 @@ module.exports = CollaboratorsInviteController = {
         if (err != null) {
           OError.tag(err, 'error revoking invite', {
             projectId,
-            inviteId
+            inviteId,
           })
           return next(err)
         }
@@ -249,7 +249,7 @@ module.exports = CollaboratorsInviteController = {
             if (err != null) {
               OError.tag(err, 'error resending invite', {
                 projectId,
-                inviteId
+                inviteId,
               })
               return next(err)
             }
@@ -278,7 +278,7 @@ module.exports = CollaboratorsInviteController = {
       function (err, isMember) {
         if (err != null) {
           OError.tag(err, 'error checking if user is member of project', {
-            projectId
+            projectId,
           })
           return next(err)
         }
@@ -297,7 +297,7 @@ module.exports = CollaboratorsInviteController = {
             if (err != null) {
               OError.tag(err, 'error getting invite by token', {
                 projectId,
-                token
+                token,
               })
               return next(err)
             }
@@ -313,7 +313,7 @@ module.exports = CollaboratorsInviteController = {
               function (err, owner) {
                 if (err != null) {
                   OError.tag(err, 'error getting project owner', {
-                    projectId
+                    projectId,
                   })
                   return next(err)
                 }
@@ -328,7 +328,7 @@ module.exports = CollaboratorsInviteController = {
                   function (err, project) {
                     if (err != null) {
                       OError.tag(err, 'error getting project', {
-                        projectId
+                        projectId,
                       })
                       return next(err)
                     }
@@ -342,7 +342,7 @@ module.exports = CollaboratorsInviteController = {
                       project,
                       owner,
                       currentUsersEmail: currentUser.email,
-                      title: 'Project Invite'
+                      title: 'Project Invite',
                     })
                   }
                 )
@@ -370,7 +370,7 @@ module.exports = CollaboratorsInviteController = {
         if (err != null) {
           OError.tag(err, 'error accepting invite by token', {
             projectId,
-            token
+            token,
           })
           return next(err)
         }
@@ -381,7 +381,7 @@ module.exports = CollaboratorsInviteController = {
         )
         AnalyticsManager.recordEvent(currentUser._id, 'project-invite-accept', {
           projectId,
-          userId: currentUser._id
+          userId: currentUser._id,
         })
         if (req.xhr) {
           return res.sendStatus(204) //  Done async via project page notification
@@ -390,5 +390,5 @@ module.exports = CollaboratorsInviteController = {
         }
       }
     )
-  }
+  },
 }

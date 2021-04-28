@@ -50,7 +50,7 @@ const UserMembershipRouter = require('./Features/UserMembership/UserMembershipRo
 const SystemMessageController = require('./Features/SystemMessages/SystemMessageController')
 const { Joi, validate } = require('./infrastructure/Validation')
 const {
-  unsupportedBrowserMiddleware
+  unsupportedBrowserMiddleware,
 } = require('./infrastructure/UnsupportedBrowserMiddleware')
 
 const logger = require('logger-sharelatex')
@@ -128,7 +128,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'change-password',
       maxRequests: 10,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     UserController.changePassword
   )
@@ -144,7 +144,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'confirm-email',
       maxRequests: 10,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     UserEmailsController.confirm
   )
@@ -154,7 +154,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'resend-confirmation',
       maxRequests: 10,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     UserEmailsController.resendConfirmation
   )
@@ -166,7 +166,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       RateLimiterMiddleware.rateLimit({
         endpointName: 'add-email',
         maxRequests: 10,
-        timeInterval: 60
+        timeInterval: 60,
       }),
       UserEmailsController.add
     )
@@ -176,7 +176,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       RateLimiterMiddleware.rateLimit({
         endpointName: 'delete-email',
         maxRequests: 10,
-        timeInterval: 60
+        timeInterval: 60,
       }),
       UserEmailsController.remove
     )
@@ -191,7 +191,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       RateLimiterMiddleware.rateLimit({
         endpointName: 'endorse-email',
         maxRequests: 30,
-        timeInterval: 60
+        timeInterval: 60,
       }),
       UserEmailsController.endorse
     )
@@ -218,7 +218,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'delete-user',
       maxRequests: 10,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     AuthenticationController.requireLogin(),
     UserController.tryDeleteUser
@@ -265,7 +265,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'open-dashboard',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     unsupportedBrowserMiddleware,
     ProjectController.projectListPage
@@ -276,7 +276,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'create-project',
       maxRequests: 20,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     ProjectController.newProject
   )
@@ -287,7 +287,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       endpointName: 'open-project',
       params: ['Project_id'],
       maxRequests: 15,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     unsupportedBrowserMiddleware,
     AuthenticationController.validateUserSession(),
@@ -322,7 +322,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       endpointName: 'compile-project-http',
       params: ['Project_id'],
       maxRequests: 800,
-      timeInterval: 60 * 60
+      timeInterval: 60 * 60,
     }),
     AuthorizationMiddleware.ensureUserCanReadProject,
     CompileController.compile
@@ -340,7 +340,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     function (req, res, next) {
       const params = {
         Project_id: req.params[0],
-        build_id: req.params[1]
+        build_id: req.params[1],
       }
       req.params = params
       next()
@@ -354,7 +354,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     endpointName: 'misc-output-download',
     params: ['Project_id'],
     maxRequests: 1000,
-    timeInterval: 60 * 60
+    timeInterval: 60 * 60,
   })
 
   // direct url access to output files for a specific build (query string not required)
@@ -364,7 +364,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       const params = {
         Project_id: req.params[0],
         build_id: req.params[1],
-        file: req.params[2]
+        file: req.params[2],
       }
       req.params = params
       next()
@@ -382,7 +382,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
         Project_id: req.params[0],
         user_id: req.params[1],
         build_id: req.params[2],
-        file: req.params[3]
+        file: req.params[3],
       }
       req.params = params
       next()
@@ -506,7 +506,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'download-project-revision',
       maxRequests: 30,
-      timeInterval: 60 * 60
+      timeInterval: 60 * 60,
     }),
     AuthorizationMiddleware.ensureUserCanReadProject,
     HistoryController.downloadZipOfVersion
@@ -623,7 +623,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'create-tag',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TagsController.createTag
   )
@@ -633,7 +633,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'rename-tag',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TagsController.renameTag
   )
@@ -643,7 +643,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'delete-tag',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TagsController.deleteTag
   )
@@ -653,7 +653,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'add-project-to-tag',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TagsController.addProjectToTag
   )
@@ -663,7 +663,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'remove-project-from-tag',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TagsController.removeProjectFromTag
   )
@@ -719,7 +719,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     function (req, res, next) {
       const params = {
         Project_id: req.params[0],
-        file: req.params[1]
+        file: req.params[1],
       }
       req.params = params
       next()
@@ -800,7 +800,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'send-chat-message',
       maxRequests: 100,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     ChatController.sendMessage
   )
@@ -811,7 +811,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'index-project-references',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     ReferencesController.index
   )
@@ -821,7 +821,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'index-all-project-references',
       maxRequests: 30,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     ReferencesController.indexAll
   )
@@ -857,7 +857,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       const params = {
         submission_id: req.params[0],
         build_id: req.params[1],
-        file: req.params[2]
+        file: req.params[2],
       }
       req.params = params
       next()
@@ -870,7 +870,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'confirm-university-domain',
       maxRequests: 1,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     AuthenticationController.httpAuth,
     InstitutionsController.confirmDomain
@@ -1010,7 +1010,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'status-compiler',
       maxRequests: 10,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     AuthorizationMiddleware.ensureUserCanReadProject,
     function (req, res) {
@@ -1084,7 +1084,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'read-only-token',
       maxRequests: 15,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TokenAccessController.tokenAccessPage
   )
@@ -1094,7 +1094,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'read-and-write-token',
       maxRequests: 15,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TokenAccessController.tokenAccessPage
   )
@@ -1104,7 +1104,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'grant-token-access-read-write',
       maxRequests: 10,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TokenAccessController.grantTokenAccessReadAndWrite
   )
@@ -1114,7 +1114,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     RateLimiterMiddleware.rateLimit({
       endpointName: 'grant-token-access-read-only',
       maxRequests: 10,
-      timeInterval: 60
+      timeInterval: 60,
     }),
     TokenAccessController.grantTokenAccessReadOnly
   )

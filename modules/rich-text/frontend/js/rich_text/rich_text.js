@@ -139,7 +139,7 @@ export default function RichText(_cm, rtAdapter) {
             // than passing a second callback spec to Queue. I want my afternoon
             // back. JLM 20161222
             newMathMarks.forEach(mark => mark.changed())
-          }
+          },
         ]
       )
     }

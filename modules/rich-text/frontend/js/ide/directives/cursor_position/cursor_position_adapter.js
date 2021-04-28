@@ -21,14 +21,14 @@ export default CursorPositionAdapter = class CursorPositionAdapter {
   convertToAcePos({ line, ch }) {
     return {
       row: line,
-      column: ch
+      column: ch,
     }
   }
 
   convertFromAcePos({ row, column }) {
     return {
       line: row,
-      ch: column
+      ch: column,
     }
   }
 

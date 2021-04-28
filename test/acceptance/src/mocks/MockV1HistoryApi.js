@@ -68,7 +68,7 @@ class MockV1HistoryApi extends AbstractMockApi {
             process.env.V1_HISTORY_HOST || 'localhost'
           }:3100/fake-zip-download/${req.params.project_id}/version/${
             req.params.version
-          }`
+          }`,
         })
       }
     )

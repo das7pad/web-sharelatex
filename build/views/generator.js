@@ -16,16 +16,16 @@ function generateModuleInMemory({ path, debug }) {
         preLex: src => {
           src = src.replace(OL_META, 'meta(ng-non-bindable name=$2ol-')
           return src
-        }
-      }
+        },
+      },
     ],
     cache: false,
     compileDebug: debug,
-    doctype: 'html'
+    doctype: 'html',
   })
 }
 
 module.exports = {
   generateModule,
-  generateModuleInMemory
+  generateModuleInMemory,
 }

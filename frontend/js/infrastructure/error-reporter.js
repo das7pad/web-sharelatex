@@ -23,7 +23,7 @@ function sentryReporter() {
             /^AbortError/,
             // Ignore spurious error from Ace internals - see https://github.com/overleaf/issues/issues/3321
             'ResizeObserver loop limit exceeded',
-            'ResizeObserver loop completed with undelivered notifications.'
+            'ResizeObserver loop completed with undelivered notifications.',
           ],
 
           beforeSend(event) {
@@ -36,7 +36,7 @@ function sentryReporter() {
             } else {
               return event
             }
-          }
+          },
         }
         Sentry.init(Object.assign(baseConfig, getMeta('ol-sentry')))
 
@@ -56,7 +56,7 @@ function nullReporter() {
     },
     captureMessage: error => {
       console.error(error)
-    }
+    },
   })
 }
 

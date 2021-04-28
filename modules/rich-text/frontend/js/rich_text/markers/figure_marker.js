@@ -40,10 +40,10 @@ const FigureMarker = {
       clearOnEnter: true,
       inclusiveLeft: true,
       inclusiveRight: true,
-      replacedWith: wrapperDiv[0]
+      replacedWith: wrapperDiv[0],
     })
     clearOnMouseDown(cm, wrapperDiv[0], mark)
-  }
+  },
 }
 
 /**
@@ -86,7 +86,7 @@ function makeNotFoundSpan(path) {
     .text(`[Not Found: ${path}]`)
     .css({
       'font-size': 'small',
-      color: 'red'
+      color: 'red',
     })
     .addClass('wl-figure-not-found')
 }

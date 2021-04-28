@@ -7,6 +7,6 @@ const Features = require('../../app/src/infrastructure/Features')
 
 module.exports = {
   viewIncludes: {
-    'editor:main': 'main'
-  }
+    'editor:main': 'main',
+  },
 }

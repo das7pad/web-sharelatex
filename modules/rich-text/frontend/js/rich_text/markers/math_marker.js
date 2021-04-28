@@ -25,13 +25,13 @@ const MathMarker = {
 
     const editorMark = makeSingleMark(cm, sourceMark, 'outer', true, {
       clearOnEnter: true,
-      replacedWith: replacement
+      replacedWith: replacement,
     })
 
     clearOnMouseDown(cm, replacement, editorMark)
 
     return editorMark
-  }
+  },
 }
 
 function makeInlineMath(math) {
@@ -46,7 +46,7 @@ function makeDisplayMath(math) {
     'text-align': 'center',
     'font-family': 'Times',
     'padding-bottom': '10pt',
-    'padding-top': '10pt'
+    'padding-top': '10pt',
   })
   return divEl[0]
 }

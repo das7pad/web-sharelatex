@@ -10,7 +10,7 @@ import RichText from './rich_text/rich_text'
 import {
   makeKeyBindings,
   makeKeyUpHandler,
-  tearDownKeyUpHandler
+  tearDownKeyUpHandler,
 } from './key_bindings/key_bindings'
 import makeAutocomplete from './autocomplete/autocomplete'
 import HighlightedWordManager from './spell_check/highlighted_word_manager'
@@ -35,9 +35,9 @@ export class Editor {
       extraKeys: makeKeyBindings(getSetting, keyBindingsAdapter),
       hintOptions: {
         hint: makeAutocomplete(autocompleteAdapter, getSetting),
-        completeSingle: false
+        completeSingle: false,
       },
-      readOnly: getSetting('readOnly')
+      readOnly: getSetting('readOnly'),
     })
 
     this.adapter = richTextAdapter

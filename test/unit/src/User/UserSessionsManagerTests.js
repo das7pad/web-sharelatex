@@ -20,7 +20,7 @@ describe('UserSessionsManager', function () {
   beforeEach(function () {
     this.user = {
       _id: 'abcd',
-      email: 'user@example.com'
+      email: 'user@example.com',
     }
     this.sessionId = 'some_session_id'
 
@@ -34,7 +34,7 @@ describe('UserSessionsManager', function () {
       srem: sinon.stub(),
       smembers: sinon.stub(),
       mget: sinon.stub(),
-      pexpire: sinon.stub()
+      pexpire: sinon.stub(),
     }
     this.rclient.multi.returns(this.rclient)
     this.rclient.get.returns(this.rclient)
@@ -47,18 +47,18 @@ describe('UserSessionsManager', function () {
 
     this.UserSessionsRedis = {
       client: () => this.rclient,
-      sessionSetKey: user => `UserSessions:{${user._id}}`
+      sessionSetKey: user => `UserSessions:{${user._id}}`,
     }
     this.settings = {
       redis: {
-        web: {}
-      }
+        web: {},
+      },
     }
     return (this.UserSessionsManager = SandboxedModule.require(modulePath, {
       requires: {
         '@overleaf/settings': this.settings,
-        './UserSessionsRedis': this.UserSessionsRedis
-      }
+        './UserSessionsRedis': this.UserSessionsRedis,
+      },
     }))
   })
 
@@ -433,7 +433,7 @@ describe('UserSessionsManager', function () {
           expect(this.rclient.srem.firstCall.args[1]).to.deep.equal([
             'sess:one',
             'sess:three',
-            'sess:four'
+            'sess:four',
           ])
           return done()
         })
@@ -580,7 +580,7 @@ describe('UserSessionsManager', function () {
       this.sessionKeys = ['sess:one', 'sess:two', 'sess:three']
       this.sessions = [
         '{"user": {"ip_address": "a", "session_created": "b"}}',
-        '{"passport": {"user": {"ip_address": "c", "session_created": "d"}}}'
+        '{"passport": {"user": {"ip_address": "c", "session_created": "d"}}}',
       ]
       this.exclude = ['two']
       this.rclient.smembers.callsArgWith(1, null, this.sessionKeys)
@@ -608,7 +608,7 @@ describe('UserSessionsManager', function () {
       return this.call((err, sessions) => {
         expect(sessions).to.deep.equal([
           { ip_address: 'a', session_created: 'b' },
-          { ip_address: 'c', session_created: 'd' }
+          { ip_address: 'c', session_created: 'd' },
         ])
         return done()
       })

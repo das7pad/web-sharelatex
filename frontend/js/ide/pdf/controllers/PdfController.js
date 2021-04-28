@@ -983,7 +983,7 @@ App.controller(
         rootDocOverride_id:
           // Set the custom rootDoc when valid, else use null for default.
           (lastOpenedDocIsValidRootDoc && lastOpenedDoc) || null,
-        isAutoCompileOnLoad: true
+        isAutoCompileOnLoad: true,
       })
       autoCompileOnJoinProject = false
     }

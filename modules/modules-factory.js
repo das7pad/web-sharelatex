@@ -35,7 +35,7 @@ function genLoaderTarget(pattern) {
     return {
       code,
       watchDirs,
-      watchFiles
+      watchFiles,
     }
   }
 }

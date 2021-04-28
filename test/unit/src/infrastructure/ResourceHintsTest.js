@@ -16,9 +16,9 @@ describe('ResourceHints', function () {
       i18n: {
         subdomainLang: {
           fr: { lngCode: 'fr', url: 'http://localhost:3000' },
-          www: { lngCode: 'en', url: 'http://localhost:3000' }
-        }
-      }
+          www: { lngCode: 'en', url: 'http://localhost:3000' },
+        },
+      },
     }
 
     this.requires = {
@@ -38,12 +38,12 @@ describe('ResourceHints', function () {
         },
         staticPath(path) {
           return path
-        }
-      }
+        },
+      },
     }
 
     this.webRouter = {
-      use: sinon.stub()
+      use: sinon.stub(),
     }
 
     this.req = new MockRequest()
@@ -55,7 +55,7 @@ describe('ResourceHints', function () {
       //  settings values - e.g. the availability of a cdn
       this.ResourceHints = SandboxedModule.require(MODULE_PATH, {
         globals: { console },
-        requires: this.requires
+        requires: this.requires,
       })
       this.ResourceHints(this.app, this.webRouter)
     }
@@ -150,8 +150,8 @@ describe('ResourceHints', function () {
     beforeEach(function () {
       this.settings.i18n = {
         subdomainLang: {
-          www: { lngCode: 'en', url: 'http://localhost:3000' }
-        }
+          www: { lngCode: 'en', url: 'http://localhost:3000' },
+        },
       }
       this.settings.addResourceHints = true
       this.require()

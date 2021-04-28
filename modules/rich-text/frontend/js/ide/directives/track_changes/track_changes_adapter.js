@@ -64,7 +64,7 @@ class TrackChangesAdapter {
       { line: position.row, ch: position.column },
       {
         widget: el,
-        insertLeft: true
+        insertLeft: true,
       }
     )
 

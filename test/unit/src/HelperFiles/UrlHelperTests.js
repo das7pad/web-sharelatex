@@ -9,10 +9,10 @@ describe('UrlHelper', function () {
   beforeEach(function () {
     this.settings = {
       apis: { linkedUrlProxy: { url: undefined } },
-      siteUrl: 'http://localhost:3000'
+      siteUrl: 'http://localhost:3000',
     }
     this.UrlHelper = SandboxedModule.require(modulePath, {
-      requires: { '@overleaf/settings': this.settings }
+      requires: { '@overleaf/settings': this.settings },
     })
   })
   describe('wrapUrlWithProxy', function () {
@@ -54,7 +54,7 @@ describe('UrlHelper', function () {
         this.settings.apis.linkedUrlProxy.chain = [
           'http://last.proxy/proxy/abc',
           'http://intermediate.proxy/proxy/abc',
-          'http://first.proxy/proxy/abc'
+          'http://first.proxy/proxy/abc',
         ]
       })
       it('should wrap the url in the correct sequence', function () {

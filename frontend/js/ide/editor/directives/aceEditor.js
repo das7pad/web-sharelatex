@@ -52,7 +52,7 @@ const deps = [
   'files',
   '$http',
   '$q',
-  '$window'
+  '$window',
 ]
 App.directive('aceEditor', [...deps, aceEditorDirective])
 
@@ -102,7 +102,7 @@ function aceEditorDirective(
       docId: '=',
       rendererData: '=',
       lineHeight: '=',
-      fontFamily: '='
+      fontFamily: '=',
     },
     link(scope, element, attrs) {
       // Don't freak out if we're already in an apply callback
@@ -231,10 +231,10 @@ function aceEditorDirective(
             name: 'save',
             bindKey: {
               win: 'Ctrl-S',
-              mac: 'Command-S'
+              mac: 'Command-S',
             },
             exec: callback,
-            readOnly: true
+            readOnly: true,
           })
           // Not technically 'save', but Ctrl-. recompiles in OL v1
           // so maintain compatibility
@@ -242,10 +242,10 @@ function aceEditorDirective(
             name: 'recompile_v1',
             bindKey: {
               win: 'Ctrl-.',
-              mac: 'Ctrl-.'
+              mac: 'Ctrl-.',
             },
             exec: callback,
-            readOnly: true
+            readOnly: true,
           })
         }
       })
@@ -266,13 +266,13 @@ function aceEditorDirective(
         name: 'togglecomment',
         bindKey: {
           win: 'Ctrl-/|Ctrl-Shift-7',
-          mac: 'Command-/|Command-Shift-/'
+          mac: 'Command-/|Command-Shift-/',
         },
         exec(editor) {
           return editor.toggleCommentLines()
         },
         multiSelectAction: 'forEachLine',
-        scrollIntoView: 'selectionPart'
+        scrollIntoView: 'selectionPart',
       })
 
       // Trigger search AND replace on CMD+F
@@ -280,12 +280,12 @@ function aceEditorDirective(
         name: 'find',
         bindKey: {
           win: 'Ctrl-F',
-          mac: 'Command-F'
+          mac: 'Command-F',
         },
         exec(editor) {
           return SearchBox.Search(editor, true)
         },
-        readOnly: true
+        readOnly: true,
       })
 
       // Bold text on CMD+B
@@ -293,7 +293,7 @@ function aceEditorDirective(
         name: 'bold',
         bindKey: {
           win: 'Ctrl-B',
-          mac: 'Command-B'
+          mac: 'Command-B',
         },
         exec(editor) {
           const selection = editor.getSelection()
@@ -305,7 +305,7 @@ function aceEditorDirective(
             return editor.insert(`\\textbf{${text}}`)
           }
         },
-        readOnly: false
+        readOnly: false,
       })
 
       // Italicise text on CMD+I
@@ -313,7 +313,7 @@ function aceEditorDirective(
         name: 'italics',
         bindKey: {
           win: 'Ctrl-I',
-          mac: 'Command-I'
+          mac: 'Command-I',
         },
         exec(editor) {
           const selection = editor.getSelection()
@@ -325,7 +325,7 @@ function aceEditorDirective(
             return editor.insert(`\\textit{${text}}`)
           }
         },
-        readOnly: false
+        readOnly: false,
       })
 
       scope.$watch('onCtrlEnter', function (callback) {
@@ -334,12 +334,12 @@ function aceEditorDirective(
             name: 'compile',
             bindKey: {
               win: 'Ctrl-Enter',
-              mac: 'Command-Enter'
+              mac: 'Command-Enter',
             },
             exec: editor => {
               return callback()
             },
-            readOnly: true
+            readOnly: true,
           })
         }
       })
@@ -350,12 +350,12 @@ function aceEditorDirective(
             name: 'toggle-review-panel',
             bindKey: {
               win: 'Ctrl-J',
-              mac: 'Command-J'
+              mac: 'Command-J',
             },
             exec: editor => {
               return callback()
             },
-            readOnly: true
+            readOnly: true,
           })
         }
       })
@@ -366,12 +366,12 @@ function aceEditorDirective(
             name: 'add-new-comment',
             bindKey: {
               win: 'Ctrl-Shift-C',
-              mac: 'Command-Shift-C'
+              mac: 'Command-Shift-C',
             },
             exec: editor => {
               return callback()
             },
-            readOnly: true
+            readOnly: true,
           })
         }
       })
@@ -382,12 +382,12 @@ function aceEditorDirective(
             name: 'toggle-track-changes',
             bindKey: {
               win: 'Ctrl-Shift-A',
-              mac: 'Command-Shift-A'
+              mac: 'Command-Shift-A',
             },
             exec: editor => {
               return callback()
             },
-            readOnly: true
+            readOnly: true,
           })
         }
       })
@@ -470,7 +470,7 @@ function aceEditorDirective(
 
       scope.$watch('fontSize', value =>
         element.find('.ace_editor, .ace_content').css({
-          'font-size': value + 'px'
+          'font-size': value + 'px',
         })
       )
 
@@ -480,7 +480,7 @@ function aceEditorDirective(
           'Menlo',
           'Ubuntu Mono',
           'Consolas',
-          'monospace'
+          'monospace',
         ]
 
         if (value != null) {
@@ -636,7 +636,7 @@ function aceEditorDirective(
         spellCheckManager.init()
         editor.on('changeSession', onSessionChangeForSpellCheck)
         onSessionChangeForSpellCheck({
-          session: editor.getSession()
+          session: editor.getSession(),
         }) // Force initial setup
         return editor.on('nativecontextmenu', spellCheckManager.onContextMenu)
       }
@@ -952,7 +952,7 @@ function aceEditorDirective(
 
 </a>
 </div>\
-`
+`,
   }
 }
 

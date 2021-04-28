@@ -19,7 +19,7 @@ export default App.controller('EditorToolbarController', ($scope, ide) => {
       title: 'Insert Section Heading',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('section')
-      }
+      },
     },
     {
       iconText: '§',
@@ -27,21 +27,21 @@ export default App.controller('EditorToolbarController', ($scope, ide) => {
       title: 'Insert Subsection Heading',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('subsection')
-      }
+      },
     },
     {
       iconClass: 'formatting-icon fa fa-bold',
       title: 'Format Bold',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('bold')
-      }
+      },
     },
     {
       iconClass: 'formatting-icon fa fa-italic',
       title: 'Format Italic',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('italic')
-      }
+      },
     },
     {
       iconText: 'π',
@@ -49,7 +49,7 @@ export default App.controller('EditorToolbarController', ($scope, ide) => {
       title: 'Insert Inline Math',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('inlineMath')
-      }
+      },
     },
     {
       iconText: 'Σ',
@@ -57,21 +57,21 @@ export default App.controller('EditorToolbarController', ($scope, ide) => {
       title: 'Insert Math on its own line',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('displayMath')
-      }
+      },
     },
     {
       iconClass: 'formatting-icon fa fa-list-ol',
       title: 'Insert Numbered List',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('numberedList')
-      }
+      },
     },
     {
       iconClass: 'formatting-icon fa fa-list-ul',
       title: 'Insert Bullet Point List',
       handleClick() {
         return $scope.richText.formattingEvents.trigger('bulletList')
-      }
-    }
+      },
+    },
   ]
 })

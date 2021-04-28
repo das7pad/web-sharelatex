@@ -43,7 +43,7 @@ module.exports = GraphController = {
     const q = [
       { owner_ref: { $in: idsToSearch } },
       { readOnly_refs: { $in: idsToSearch } },
-      { collaberator_refs: { $in: idsToSearch } }
+      { collaberator_refs: { $in: idsToSearch } },
     ]
     db.projects
       .find(
@@ -54,8 +54,8 @@ module.exports = GraphController = {
             owner_ref: 1,
             readOnly_refs: 1,
             collaberator_refs: 1,
-            name: 1
-          }
+            name: 1,
+          },
         }
       )
       .toArray(function (err, relations) {
@@ -153,8 +153,8 @@ module.exports = GraphController = {
         { _id: { $in: usersObjId } },
         {
           projection: {
-            first_name: 1
-          }
+            first_name: 1,
+          },
         }
       )
       .toArray(function (err, users) {
@@ -199,11 +199,11 @@ module.exports = GraphController = {
             logger.log({ graph }, 'graph')
             return res.render(Path.resolve(__dirname, '../views/user/graph'), {
               user,
-              graph
+              graph,
             })
           }
         )
       }
     )
-  }
+  },
 }

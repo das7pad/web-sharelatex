@@ -24,7 +24,7 @@ function getAvailableViews() {
   return glob
     .sync('{,modules/*/}app/views/**/*.pug', {
       cwd: ROOT,
-      ignore: ['**/_*.pug', '**/_*/**/*.pug']
+      ignore: ['**/_*.pug', '**/_*/**/*.pug'],
     })
     .map(stripExtension)
 }
@@ -37,7 +37,7 @@ function processViews({ write, debug }) {
     try {
       const blob = Generator.generateModule({
         path: view + '.pug',
-        debug
+        debug,
       })
       logger.log({ view }, 'generated view')
       if (write) writeFile(view, blob)
@@ -55,7 +55,7 @@ function processViews({ write, debug }) {
 function main() {
   const failures = processViews({
     write: process.env.DRY_RUN !== 'true',
-    debug: process.env.DEBUG_VIEWS === 'true'
+    debug: process.env.DEBUG_VIEWS === 'true',
   })
   process.exit(failures)
 }
@@ -65,5 +65,5 @@ if (!module.parent) {
 }
 
 module.exports = {
-  processViews
+  processViews,
 }

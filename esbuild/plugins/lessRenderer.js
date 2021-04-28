@@ -24,7 +24,7 @@ async function renderLess(entrypointPath, options) {
     ...options,
 
     // Search imports in here.
-    paths: [dir]
+    paths: [dir],
 
     // NOTE: Source map support for css is not there yet in esbuild.
     // REF: https://github.com/evanw/esbuild/issues/519
@@ -41,7 +41,7 @@ async function renderLess(entrypointPath, options) {
       resolveDir: dir,
       warnings: [],
       // Wait for a fix in the file with errors.
-      watchFiles: [message.location.file]
+      watchFiles: [message.location.file],
     }
   }
 
@@ -55,7 +55,7 @@ async function renderLess(entrypointPath, options) {
     loader: 'css',
     resolveDir: dir,
     warnings: [],
-    watchFiles
+    watchFiles,
   }
 }
 
@@ -71,8 +71,8 @@ function convertLessError(error) {
       file: error.filename,
       line: error.line,
       column: error.column,
-      lineText
-    }
+      lineText,
+    },
   }
 }
 

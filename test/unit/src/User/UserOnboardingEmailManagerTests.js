@@ -16,31 +16,33 @@ describe('UserOnboardingEmailManager', function () {
       add: sinon.stub().resolves(),
       process: callback => {
         this.queueProcessFunction = callback
-      }
+      },
     }
     this.Queues = {
-      getOnboardingEmailsQueue: sinon.stub().returns(this.onboardingEmailsQueue)
+      getOnboardingEmailsQueue: sinon
+        .stub()
+        .returns(this.onboardingEmailsQueue),
     }
     this.UserGetter = {
       promises: {
         getUser: sinon.stub().resolves({
           _id: this.fakeUserId,
-          email: this.fakeUserEmail
-        })
-      }
+          email: this.fakeUserEmail,
+        }),
+      },
     }
     this.EmailHandler = {
       promises: {
-        sendEmail: sinon.stub().resolves()
-      }
+        sendEmail: sinon.stub().resolves(),
+      },
     }
     this.UserUpdater = {
       promises: {
-        updateUser: sinon.stub().resolves()
-      }
+        updateUser: sinon.stub().resolves(),
+      },
     }
     this.Features = {
-      hasFeature: sinon.stub()
+      hasFeature: sinon.stub(),
     }
     this.request = sinon.stub().yields()
 
@@ -48,15 +50,15 @@ describe('UserOnboardingEmailManager', function () {
       this.Features.hasFeature.withArgs('saas').returns(isSAAS)
       this.UserOnboardingEmailManager = SandboxedModule.require(MODULE_PATH, {
         globals: {
-          console: console
+          console: console,
         },
         requires: {
           '../../infrastructure/Features': this.Features,
           '../../infrastructure/Queues': this.Queues,
           '../Email/EmailHandler': this.EmailHandler,
           './UserGetter': this.UserGetter,
-          './UserUpdater': this.UserUpdater
-        }
+          './UserUpdater': this.UserUpdater,
+        },
       })
     }
   })
@@ -71,7 +73,7 @@ describe('UserOnboardingEmailManager', function () {
     })
     it('should not schedule any email', function () {
       this.UserOnboardingEmailManager.scheduleOnboardingEmail({
-        _id: this.fakeUserId
+        _id: this.fakeUserId,
       })
       expect(this.onboardingEmailsQueue.add).to.not.have.been.called
     })
@@ -84,7 +86,7 @@ describe('UserOnboardingEmailManager', function () {
 
     it('should schedule delayed job on queue', function () {
       this.UserOnboardingEmailManager.scheduleOnboardingEmail({
-        _id: this.fakeUserId
+        _id: this.fakeUserId,
       })
       sinon.assert.calledWith(
         this.onboardingEmailsQueue.add,
@@ -104,14 +106,14 @@ describe('UserOnboardingEmailManager', function () {
         this.EmailHandler.promises.sendEmail,
         'userOnboardingEmail',
         {
-          to: this.fakeUserEmail
+          to: this.fakeUserEmail,
         }
       )
       sinon.assert.calledWith(
         this.UserUpdater.promises.updateUser,
         this.fakeUserId,
         {
-          $set: { onboardingEmailSentAt: sinon.match.date }
+          $set: { onboardingEmailSentAt: sinon.match.date },
         }
       )
     })

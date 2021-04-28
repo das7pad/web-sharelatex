@@ -34,7 +34,7 @@ async function buildConfig({ isWatchMode, inMemory, autoReload }, cfg) {
     cfg.watch = {
       async onRebuild(error, result) {
         await onRebuild(DESCRIPTION, error, result)
-      }
+      },
     }
   }
   if (inMemory) {
@@ -64,5 +64,5 @@ async function buildAllConfigs(options) {
 }
 
 module.exports = {
-  buildAllConfigs
+  buildAllConfigs,
 }

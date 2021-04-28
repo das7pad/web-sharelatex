@@ -13,19 +13,19 @@ const InputMarker = {
     }
     const isFileFound = rtAdapter.fileExistsForPath(path)
     const preMark = makeSingleMark(cm, sourceMark, 'pre', false, {
-      replacedWith: makeOpeningSpan(isFileFound)
+      replacedWith: makeOpeningSpan(isFileFound),
     })
 
     const innerMark = makeSingleMark(cm, sourceMark, 'inner', true, {
-      className: 'wl-input'
+      className: 'wl-input',
     })
 
     const postMark = makeSingleMark(cm, sourceMark, 'post', false, {
-      replacedWith: makeClosingSpan()
+      replacedWith: makeClosingSpan(),
     })
 
     makeGroup([preMark, innerMark, postMark])
-  }
+  },
 }
 
 function makeOpeningSpan(isFileFound) {
@@ -33,7 +33,9 @@ function makeOpeningSpan(isFileFound) {
   const icon = $('<i>')
     .addClass('fa fa-fw fa-link')
     .css({
-      'border-bottom': isFileFound ? '1px dashed #1C8B22' : '1px dashed #bb1111'
+      'border-bottom': isFileFound
+        ? '1px dashed #1C8B22'
+        : '1px dashed #bb1111',
     })
   const bracket = $('<span>').text('{').addClass('wl-label-bracket')
 

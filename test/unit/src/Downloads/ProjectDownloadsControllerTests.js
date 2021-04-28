@@ -33,8 +33,8 @@ describe('ProjectDownloadsController', function () {
           '../Project/ProjectGetter': (this.ProjectGetter = {}),
           '@overleaf/metrics': (this.metrics = {}),
           '../DocumentUpdater/DocumentUpdaterHandler': this
-            .DocumentUpdaterHandler
-        }
+            .DocumentUpdaterHandler,
+        },
       }
     ))
   })

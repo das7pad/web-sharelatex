@@ -107,5 +107,5 @@ module.exports = {
   buildTPath,
   getEntrypointChunks,
   staticPath,
-  waitForBuild
+  waitForBuild,
 }

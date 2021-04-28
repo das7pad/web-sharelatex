@@ -35,7 +35,7 @@ module.exports = OpenInOverleafErrorController = {
       return res
         .status(e.status)
         .render(Path.resolve(__dirname, '../views/gateway'), {
-          error: errorText
+          error: errorText,
         })
     }
   },
@@ -49,7 +49,7 @@ module.exports = OpenInOverleafErrorController = {
       logger.warn({ err: error, url: req.url }, 'ambiguous parameters error')
       return {
         status: 400,
-        text: 'more_than_one_kind_of_snippet_was_requested'
+        text: 'more_than_one_kind_of_snippet_was_requested',
       }
     }
     if (error instanceof OpenInOverleafErrors.ZipExtractError) {
@@ -60,7 +60,7 @@ module.exports = OpenInOverleafErrorController = {
       logger.warn({ err: error, url: req.url }, 'invalid file type error')
       return {
         status: 422,
-        text: 'the_file_supplied_is_of_an_unsupported_type'
+        text: 'the_file_supplied_is_of_an_unsupported_type',
       }
     }
     if (error instanceof OpenInOverleafErrors.InvalidUriError) {
@@ -102,7 +102,7 @@ module.exports = OpenInOverleafErrorController = {
     )
     return {
       status: 500,
-      text: 'sorry_something_went_wrong_opening_the_document_please_try_again'
+      text: 'sorry_something_went_wrong_opening_the_document_please_try_again',
     }
-  }
+  },
 }

@@ -27,16 +27,16 @@ describe('GeoIpLookup', function () {
     this.settings = {
       apis: {
         geoIpLookup: {
-          url: 'http://lookup.com'
-        }
-      }
+          url: 'http://lookup.com',
+        },
+      },
     }
     this.request = { get: sinon.stub() }
     this.GeoIpLookup = SandboxedModule.require(modulePath, {
       requires: {
         request: this.request,
-        '@overleaf/settings': this.settings
-      }
+        '@overleaf/settings': this.settings,
+      },
     })
     this.ipAddress = '123.456.789.123'
 
@@ -51,7 +51,7 @@ describe('GeoIpLookup', function () {
       latitude: 51.0,
       longitude: -0.0493,
       metro_code: '',
-      area_code: ''
+      area_code: '',
     })
   })
 
@@ -68,7 +68,7 @@ describe('GeoIpLookup', function () {
               this.settings.apis.geoIpLookup.url + '/' + this.ipAddress
             ),
             timeout: 1000,
-            json: true
+            json: true,
           })
           .should.equal(true)
         return done()
@@ -95,7 +95,7 @@ describe('GeoIpLookup', function () {
                 this.settings.apis.geoIpLookup.url + '/' + this.ipAddress
               ),
               timeout: 1000,
-              json: true
+              json: true,
             })
             .should.equal(true)
           return done()

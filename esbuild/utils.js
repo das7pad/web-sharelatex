@@ -12,5 +12,5 @@ function trackDurationInMS() {
 
 module.exports = {
   logWithTimestamp,
-  trackDurationInMS
+  trackDurationInMS,
 }

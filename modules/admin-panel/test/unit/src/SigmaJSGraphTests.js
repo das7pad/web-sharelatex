@@ -24,7 +24,7 @@ const Path = require('path')
 describe('SigmaJSGraph', function () {
   beforeEach(function () {
     return (this.SigmaJSGraph = SandboxedModule.require(modulePath, {
-      requires: []
+      requires: [],
     }))
   })
 

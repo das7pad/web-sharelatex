@@ -14,7 +14,7 @@
   autocomplete_references: ['code']
  */
 const MAPPING = {
-  autocomplete_references: ['code']
+  autocomplete_references: ['code'],
 }
 
 const { transformLocales } = require('./transformLocales')

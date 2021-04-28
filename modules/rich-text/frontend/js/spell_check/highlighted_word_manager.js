@@ -26,13 +26,13 @@ export default class HighlightedWordManager {
     const from = { line, ch }
     const to = { line, ch: ch + word.length }
     const marker = this.editor.markText(from, to, {
-      className: 'spelling-error'
+      className: 'spelling-error',
     })
 
     this.highlights.push({
       word,
       suggestions,
-      marker
+      marker,
     })
   }
 

@@ -38,7 +38,7 @@ function MessageContent({ content }) {
 }
 
 MessageContent.propTypes = {
-  content: PropTypes.string.isRequired
+  content: PropTypes.string.isRequired,
 }
 
 export default MessageContent

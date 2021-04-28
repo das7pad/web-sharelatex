@@ -15,7 +15,7 @@ async function buildTestBundle(entrypoint, platform, target) {
     plugins: [
       valLoader(Path.join(ROOT, 'test/frontend/allTests.js')),
       valLoader(Path.join(ROOT, 'test/karma/allTests.js')),
-      ...plugins
+      ...plugins,
     ],
     outdir: OUTPUT_PATH,
     platform,
@@ -23,7 +23,7 @@ async function buildTestBundle(entrypoint, platform, target) {
     define,
     inject,
     loader,
-    tsconfig
+    tsconfig,
   }
 
   try {
@@ -47,5 +47,5 @@ async function buildTestBundleForNode(entrypoint) {
 
 module.exports = {
   buildTestBundleForBrowser,
-  buildTestBundleForNode
+  buildTestBundleForNode,
 }

@@ -8,7 +8,7 @@ const CONTENT_TYPES = new Map([
   ['.js', 'application/javascript'],
   ['.css', 'text/css'],
   ['.svg', 'image/svg+xml'],
-  ['.png', 'image/png']
+  ['.png', 'image/png'],
 ])
 const DEFAULT_CONTENT_TYPE = 'application/octet-stream'
 
@@ -16,7 +16,7 @@ const PUBLIC_CONTENT = new Map()
 const VENDOR_CONTENT = new Map()
 const CONTENT = new Map([
   ['public', PUBLIC_CONTENT],
-  ['vendor', VENDOR_CONTENT]
+  ['vendor', VENDOR_CONTENT],
 ])
 
 function trackOutput(name, outputFiles) {
@@ -79,7 +79,7 @@ async function handleRequest(request, response) {
     return
   }
   response.writeHead(200, {
-    'Content-Type': getContentType(path)
+    'Content-Type': getContentType(path),
   })
   response.write(body)
   response.end()
@@ -87,5 +87,5 @@ async function handleRequest(request, response) {
 
 module.exports = {
   handleRequest,
-  trackOutput
+  trackOutput,
 }

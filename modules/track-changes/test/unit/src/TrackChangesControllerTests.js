@@ -31,13 +31,13 @@ describe('TrackChanges TrackChangesController', function () {
         './TrackChangesManager': (this.TrackChangesManager = {}),
         '../../../../../app/src/Features/Editor/EditorRealTimeController': (this.EditorRealTimeController = {}),
         '../../../../../app/src/Features/User/UserInfoController': (this.UserInfoController = {}),
-        '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {})
-      }
+        '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
+      },
     })
     this.req = {}
     this.res = {
       json: sinon.stub(),
-      sendStatus: sinon.stub()
+      sendStatus: sinon.stub(),
     }
     return (this.next = sinon.stub())
   })

@@ -12,7 +12,7 @@ module.exports = function lessLoader(options = {}) {
       build.onLoad({ filter: /\.less$/ }, async args => {
         return await renderLessInSubprocess(args.path, options)
       })
-    }
+    },
   }
 }
 
@@ -23,7 +23,7 @@ async function renderLessInSubprocess(path, options) {
     '--unhandled-rejections=strict',
     RENDERER_PATH,
     path,
-    JSON.stringify(options)
+    JSON.stringify(options),
   ])
   const result = JSON.parse(stdOut)
   if (stdErr) {

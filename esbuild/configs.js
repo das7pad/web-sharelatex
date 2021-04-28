@@ -26,8 +26,8 @@ const COMMON_CFG = {
     '.woff2': 'file',
     '.png': 'file',
     '.svg': 'file',
-    '.gif': 'file'
-  }
+    '.gif': 'file',
+  },
 }
 
 const CONFIGS = [
@@ -40,7 +40,7 @@ const CONFIGS = [
     entryPoints: [
       Path.join(FRONTEND_PATH, 'js/ide.js'),
       Path.join(FRONTEND_PATH, 'js/main.js'),
-      ...glob.sync(Path.join(FRONTEND_PATH, 'js/pages/**/*.js'))
+      ...glob.sync(Path.join(FRONTEND_PATH, 'js/pages/**/*.js')),
     ],
     outbase: Path.join(FRONTEND_PATH, 'js'),
     outdir: Path.join(PUBLIC_PATH, 'js'),
@@ -50,14 +50,14 @@ const CONFIGS = [
       // work around 'process' usage in algoliasearch
       'process.env.RESET_APP_DATA_TIMER': 'null',
       // silence ad
-      __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }'
+      __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }',
     },
     plugins: [
       valLoader(Path.join(MODULES_PATH, 'modules-ide.js')),
-      valLoader(Path.join(MODULES_PATH, 'modules-main.js'))
+      valLoader(Path.join(MODULES_PATH, 'modules-main.js')),
     ],
     loader: { '.js': 'jsx' },
-    tsconfig: Path.join(ROOT, 'esbuild/tsconfig.json')
+    tsconfig: Path.join(ROOT, 'esbuild/tsconfig.json'),
   },
 
   {
@@ -66,7 +66,7 @@ const CONFIGS = [
     metafile: true,
     entryPoints: [Path.join(FRONTEND_PATH, 'js/MathJaxBundle.js')],
     outbase: Path.join(FRONTEND_PATH, 'js'),
-    outdir: Path.join(PUBLIC_PATH, 'js')
+    outdir: Path.join(PUBLIC_PATH, 'js'),
   },
 
   {
@@ -75,7 +75,7 @@ const CONFIGS = [
     metafile: true,
     entryPoints: require('glob').sync(Path.join(GENERATED_PATH, 'lng/*.js')),
     outbase: Path.join(GENERATED_PATH, 'lng'),
-    outdir: Path.join(PUBLIC_PATH, 'js/t')
+    outdir: Path.join(PUBLIC_PATH, 'js/t'),
   },
 
   {
@@ -85,16 +85,16 @@ const CONFIGS = [
     plugins: [
       lessLoader({
         // Resolve all the math expressions
-        math: 'always'
-      })
+        math: 'always',
+      }),
     ],
     entryPoints: [
       Path.join(FRONTEND_PATH, 'stylesheets/style.less'),
-      Path.join(FRONTEND_PATH, 'stylesheets/light-style.less')
+      Path.join(FRONTEND_PATH, 'stylesheets/light-style.less'),
     ],
     outbase: Path.join(FRONTEND_PATH, 'stylesheets'),
-    outdir: Path.join(PUBLIC_PATH, 'stylesheets')
-  }
+    outdir: Path.join(PUBLIC_PATH, 'stylesheets'),
+  },
 ]
 
 function inflateConfig(cfg) {
@@ -106,5 +106,5 @@ const MAIN_BUNDLES_CONFIG = CONFIGS[0]
 module.exports = {
   CONFIGS,
   MAIN_BUNDLES_CONFIG,
-  inflateConfig
+  inflateConfig,
 }

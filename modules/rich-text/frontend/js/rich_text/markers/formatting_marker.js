@@ -40,20 +40,20 @@ const FormattingMarker = {
 
   marker(cm, sourceMark) {
     const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
-      replacedWith: makeSpan('{', sourceMark.kind)
+      replacedWith: makeSpan('{', sourceMark.kind),
     })
     const innerMark = makeSingleMark(cm, sourceMark, 'inner', false, {
       inclusiveLeft: true,
       inclusiveRight: true,
       clearWhenEmpty: false,
-      className: `wl-${sourceMark.kind}`
+      className: `wl-${sourceMark.kind}`,
     })
     const postMark = makeSingleMark(cm, sourceMark, 'post', true, {
-      replacedWith: makeSpan('}', sourceMark.kind)
+      replacedWith: makeSpan('}', sourceMark.kind),
     })
 
     makeGroup([preMark, innerMark, postMark])
-  }
+  },
 }
 
 function makeSpan(text, kind) {

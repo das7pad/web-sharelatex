@@ -88,7 +88,7 @@ module.exports = WikiController = {
       },
       pageData(cb) {
         return WikiController._getPageContent(lngPage, cb)
-      }
+      },
     }
 
     return async.parallel(jobs, function (error, results) {
@@ -150,8 +150,8 @@ module.exports = WikiController = {
           page: decodeURIComponent(page),
           action: 'parse',
           format: 'json',
-          redirects: true
-        }
+          redirects: true,
+        },
       },
       function (err, response, data) {
         if (err != null) {
@@ -183,7 +183,7 @@ module.exports = WikiController = {
           redirects: __guard__(
             data != null ? data.parse : undefined,
             x5 => x5.redirects
-          )
+          ),
         }
         return callback(null, result)
       }
@@ -257,9 +257,9 @@ module.exports = WikiController = {
       contents,
       title,
       meta:
-        'A comprehensive LaTeX guide with easy to understand examples and how-tos.'
+        'A comprehensive LaTeX guide with easy to understand examples and how-tos.',
     })
-  }
+  },
 }
 
 function __guard__(value, transform) {

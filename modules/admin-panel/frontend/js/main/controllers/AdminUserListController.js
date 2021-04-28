@@ -131,8 +131,8 @@ App.controller(
         resolve: {
           users() {
             return $scope.getSelectedUsers()
-          }
-        }
+          },
+        },
       })
       return modalInstance.result.then(() => $scope.DeleteSelectedUsers())
     }
@@ -146,8 +146,8 @@ App.controller(
           method: 'DELETE',
           url: `/admin/user/${user._id}`,
           headers: {
-            'X-CSRF-Token': window.csrfToken
-          }
+            'X-CSRF-Token': window.csrfToken,
+          },
         })
       }
 
@@ -161,8 +161,8 @@ App.controller(
         resolve: {
           user() {
             return $scope.getFirstSelectedUser()
-          }
-        }
+          },
+        },
       })
       return modalInstance.result.then(newPassword =>
         $scope.SetUserPassword(newPassword)
@@ -174,7 +174,7 @@ App.controller(
 
       return queuedHttp.post(`/admin/user/${selected_user._id}/setPassword`, {
         newPassword,
-        _csrf: window.csrfToken
+        _csrf: window.csrfToken,
       })
     }
 

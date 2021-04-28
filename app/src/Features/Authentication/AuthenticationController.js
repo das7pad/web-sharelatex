@@ -19,7 +19,7 @@ const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const Csrf = require('../../infrastructure/Csrf')
 const UserAuditLogHandler = require('../User/UserAuditLogHandler')
 const {
-  acceptsJson
+  acceptsJson,
 } = require('../../infrastructure/RequestContentTypeDetection')
 
 function send401WithChallenge(res) {
@@ -60,7 +60,7 @@ const AuthenticationController = {
       session_created: new Date().toISOString(),
       ip_address: user._login_req_ip,
       must_reconfirm: user.must_reconfirm || undefined,
-      v1_id: user.overleaf != null ? user.overleaf.id : undefined
+      v1_id: user.overleaf != null ? user.overleaf.id : undefined,
     }
     callback(null, lightUser)
   },
@@ -160,7 +160,7 @@ const AuthenticationController = {
             logger.log({ email }, 'too many login requests')
             return done(null, null, {
               text: req.i18n.translate('to_many_login_requests_2_mins'),
-              type: 'error'
+              type: 'error',
             })
           }
           AuthenticationManager.authenticate(
@@ -178,7 +178,7 @@ const AuthenticationController = {
                 logger.log({ email }, 'failed log in')
                 done(null, false, {
                   text: req.i18n.translate('email_or_password_wrong_try_again'),
-                  type: 'error'
+                  type: 'error',
                 })
               }
             }
@@ -193,7 +193,7 @@ const AuthenticationController = {
       NotificationsBuilder.ipMatcherAffiliation(user._id).create(req.ip)
     }
     return UserUpdater.updateUser(user._id.toString(), {
-      $set: { lastLoginIp: req.ip }
+      $set: { lastLoginIp: req.ip },
     })
   },
 
@@ -449,7 +449,7 @@ const AuthenticationController = {
       userId.toString(),
       {
         $set: { lastLoggedIn: new Date() },
-        $inc: { loginCount: 1 }
+        $inc: { loginCount: 1 },
       },
       function (error) {
         if (error != null) {
@@ -479,7 +479,7 @@ const AuthenticationController = {
     if (req.session != null) {
       delete req.session.postLoginRedirect
     }
-  }
+  },
 }
 
 function _afterLoginSessionSetup(req, user, callback) {
@@ -489,7 +489,7 @@ function _afterLoginSessionSetup(req, user, callback) {
   req.login(user, function (err) {
     if (err) {
       OError.tag(err, 'error from req.login', {
-        user_id: user._id
+        user_id: user._id,
       })
       return callback(err)
     }
@@ -500,7 +500,7 @@ function _afterLoginSessionSetup(req, user, callback) {
     req.session.destroy(function (err) {
       if (err) {
         OError.tag(err, 'error when trying to destroy old session', {
-          user_id: user._id
+          user_id: user._id,
         })
         return callback(err)
       }
@@ -516,7 +516,7 @@ function _afterLoginSessionSetup(req, user, callback) {
       req.session.save(function (err) {
         if (err) {
           OError.tag(err, 'error saving regenerated session after login', {
-            user_id: user._id
+            user_id: user._id,
           })
           return callback(err)
         }

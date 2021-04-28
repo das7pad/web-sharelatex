@@ -72,5 +72,5 @@ module.exports = {
       '/project/:Project_id/brandVariationId',
       ProjectAdminController.updateBrandVariationId
     )
-  }
+  },
 }

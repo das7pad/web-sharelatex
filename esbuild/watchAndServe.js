@@ -43,7 +43,7 @@ function buildAndWatch({ autoReload }) {
   return buildAllConfigs({
     isWatchMode: true,
     inMemory: true,
-    autoReload
+    autoReload,
   })
     .then(() => {
       logWithTimestamp('esbuild is ready in watch-and-serve mode.')

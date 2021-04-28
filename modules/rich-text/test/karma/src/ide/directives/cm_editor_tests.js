@@ -41,10 +41,10 @@ describe('cmEditor', function () {
         off: sinon.stub(),
         getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
         refresh: sinon.stub(),
-        clearHistory: sinon.stub()
+        clearHistory: sinon.stub(),
       }),
       disable: sinon.stub(),
-      disableAutocomplete: sinon.stub()
+      disableAutocomplete: sinon.stub(),
     })
     return inject(($compile, $rootScope) => {
       $rootScope.sharejsDoc = stubSharejsDoc()
@@ -68,7 +68,7 @@ describe('cmEditor', function () {
     return inject(($compile, $rootScope, $browser) => {
       let getSnapshot, snapshot
       $rootScope.sharejsDoc = stubSharejsDoc({
-        getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {})))
+        getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {}))),
       })
       sinon.spy($rootScope.sharejsDoc, 'attachToCM')
       $rootScope.bundle = { Editor }
@@ -131,7 +131,7 @@ describe('cmEditor', function () {
     return inject(($compile, $rootScope) => {
       let detachFromCM
       $rootScope.sharejsDoc = stubSharejsDoc({
-        detachFromCM: (detachFromCM = sinon.stub())
+        detachFromCM: (detachFromCM = sinon.stub()),
       })
       $rootScope.bundle = { Editor }
       $rootScope.formattingEvents = new EventEmitter()
@@ -165,7 +165,7 @@ var stubCodeMirror = function (overrides) {
       getValue: sinon.stub().returns('some text'),
       getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
       refresh: sinon.stub(),
-      clearHistory: sinon.stub()
+      clearHistory: sinon.stub(),
     },
     overrides
   )
@@ -203,14 +203,14 @@ const stubSharejsDoc = function (overrides) {
     {
       ranges: {
         changes: [],
-        comments: []
+        comments: [],
       },
       attachToCM: function (cm) {
         cm.doc = this
       },
       getAllMarks: sinon.stub().returns([]),
       getSnapshot: sinon.stub(),
-      detachFromCM: sinon.stub()
+      detachFromCM: sinon.stub(),
     },
     overrides
   )

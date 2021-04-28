@@ -34,8 +34,8 @@ App.controller(
         edgeLabelSize: 'proportional',
         enableEdgeHovering: true,
         edgeHoverColor: 'edge',
-        edgeHoverSizeRatio: 3
-      }
+        edgeHoverSizeRatio: 3,
+      },
     }
 
     sigma.renderers.def = sigma.renderers.canvas
@@ -50,7 +50,7 @@ App.controller(
         name: e.data.node.label,
         id: e.data.node.id,
         type: 'User',
-        link: `/admin/user/${e.data.node.id}`
+        link: `/admin/user/${e.data.node.id}`,
       }
       return $scope.openGraphModal()
     })
@@ -60,7 +60,7 @@ App.controller(
         name: e.data.edge.label,
         id: e.data.edge.projectId,
         type: 'Project',
-        link: `/admin/project/${e.data.edge.projectId}`
+        link: `/admin/project/${e.data.edge.projectId}`,
       }
       return $scope.openGraphModal()
     })
@@ -75,8 +75,8 @@ App.controller(
         resolve: {
           element() {
             return $scope.selectedElement
-          }
-        }
+          },
+        },
       }))
     })
   }

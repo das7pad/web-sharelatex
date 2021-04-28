@@ -75,7 +75,7 @@ module.exports = RedirectManager = {
       return res.redirect(code, url + getQueryString(req))
     }
   },
-  getQueryString
+  getQueryString,
 }
 
 // Naively get the query params string. Stringifying the req.query object may

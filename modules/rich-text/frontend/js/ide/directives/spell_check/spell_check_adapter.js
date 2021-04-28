@@ -49,7 +49,7 @@ export default SpellCheckAdapter = class SpellCheckAdapter {
     return {
       start: { row: e.from.line },
       end: { row: e.to.line },
-      action: e.removed != null ? 'remove' : 'insert'
+      action: e.removed != null ? 'remove' : 'insert',
     }
   }
 
@@ -57,7 +57,7 @@ export default SpellCheckAdapter = class SpellCheckAdapter {
     e.stopPropagation()
     return {
       x: e.pageX,
-      y: e.pageY
+      y: e.pageY,
     }
   }
 
@@ -76,7 +76,7 @@ export default SpellCheckAdapter = class SpellCheckAdapter {
   getHighlightFromCoords(coords) {
     const position = this.editor.getCodeMirror().coordsChar({
       left: coords.x,
-      top: coords.y
+      top: coords.y,
     })
     return this.highlightedWordManager.findHighlightAtPosition(position)
   }

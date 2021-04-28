@@ -7,6 +7,6 @@ module.exports = function () {
       .concat(glob.sync('../../test/karma/*/**/*.js', CTX))
       .concat(glob.sync('../../modules/*/test/karma/**/*.js', CTX))
       .map(file => `import '${file}'`)
-      .join('\n')
+      .join('\n'),
   }
 }

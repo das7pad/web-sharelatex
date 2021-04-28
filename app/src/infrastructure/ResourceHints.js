@@ -4,7 +4,7 @@ const {
   buildCssPath,
   buildFontPath,
   buildImgPath,
-  buildJsPath
+  buildJsPath,
 } = require('./WebpackAssets')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
@@ -53,7 +53,7 @@ function getPreloadMiddleware() {
         'font-awesome-v470',
         'lato-v16-latin-ext-regular',
         'lato-v16-latin-ext-700',
-        'merriweather-v21-latin-regular'
+        'merriweather-v21-latin-regular',
       ].forEach(preloadFont)
       if (HAS_MULTIPLE_LANG) {
         preloadImg('sprite.png')
@@ -72,18 +72,18 @@ function getPreloadMiddleware() {
   const PRELOAD_DASHBOARD = generatePreloadLink({ usesBoldItalicFont: true })
   const PRELOAD_EDITOR_DEFAULT = generatePreloadLink({
     isEditor: true,
-    themeModifier: ''
+    themeModifier: '',
   })
   const PRELOAD_EDITOR_IEEE = generatePreloadLink({
     isEditor: true,
-    themeModifier: 'ieee-'
+    themeModifier: 'ieee-',
   })
   const PRELOAD_EDITOR_LIGHT = generatePreloadLink({
     isEditor: true,
-    themeModifier: 'light-'
+    themeModifier: 'light-',
   })
   const PRELOAD_PASSWORD_RESET = generatePreloadLink({
-    usesBoldItalicFont: true
+    usesBoldItalicFont: true,
   })
 
   return function preloadMiddleware(req, res, next) {

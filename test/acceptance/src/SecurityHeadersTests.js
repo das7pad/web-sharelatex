@@ -75,7 +75,7 @@ describe('SecurityHeaders', function () {
       [
         cb => this.user.login(cb),
         cb => this.user.request.get('/', cb),
-        cb => this.user.logout(cb)
+        cb => this.user.logout(cb),
       ],
       (err, results) => {
         const main_response = results[1][0]
@@ -102,7 +102,7 @@ describe('SecurityHeaders', function () {
             }
           )
         },
-        cb => this.user.logout(cb)
+        cb => this.user.logout(cb),
       ],
       (err, results) => {
         return request.get(`/project/${this.project_id}`, (err, res, body) => {

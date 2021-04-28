@@ -77,5 +77,5 @@ module.exports = OpenInOverleafErrors = {
   InvalidUriError,
   PublisherNotFoundError,
   TemplateNotFoundError,
-  ConversionNotFoundError
+  ConversionNotFoundError,
 }

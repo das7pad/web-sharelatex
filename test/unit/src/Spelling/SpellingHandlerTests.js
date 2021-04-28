@@ -23,11 +23,11 @@ describe('SpellingHandler', function () {
     requestRetry = {
       get: sinon
         .stub()
-        .yields(null, { statusCode: 200, body: dictionaryString })
+        .yields(null, { statusCode: 200, body: dictionaryString }),
     }
     request = {
       post: sinon.stub().yields(null, { statusCode: 204 }),
-      delete: sinon.stub().yields(null, { statusCode: 204 })
+      delete: sinon.stub().yields(null, { statusCode: 204 }),
     }
 
     SpellingHandler = SandboxedModule.require(modulePath, {
@@ -36,9 +36,9 @@ describe('SpellingHandler', function () {
         request: request,
         requestretry: { defaults: () => requestRetry },
         '@overleaf/settings': {
-          apis: { spelling: { host: SPELLING_HOST, url: SPELLING_URL } }
-        }
-      }
+          apis: { spelling: { host: SPELLING_HOST, url: SPELLING_URL } },
+        },
+      },
     })
   })
 
@@ -47,7 +47,7 @@ describe('SpellingHandler', function () {
       SpellingHandler.getUserDictionary(userId, () => {
         expect(requestRetry.get).to.have.been.calledWith({
           url: 'http://spelling.service.test/v20200714/user/wombat',
-          timeout: TIMEOUT
+          timeout: TIMEOUT,
         })
         done()
       })
@@ -76,9 +76,9 @@ describe('SpellingHandler', function () {
         expect(request.post).to.have.been.calledWith({
           url: 'http://spelling.service.test/v20200714/user/wombat/unlearn',
           json: {
-            word: word
+            word: word,
           },
-          timeout: TIMEOUT
+          timeout: TIMEOUT,
         })
         done()
       })
@@ -105,7 +105,7 @@ describe('SpellingHandler', function () {
       SpellingHandler.deleteUserDictionary(userId, () => {
         expect(request.delete).to.have.been.calledWith({
           url: 'http://spelling.service.test/v20200714/user/wombat',
-          timeout: TIMEOUT
+          timeout: TIMEOUT,
         })
         done()
       })

@@ -55,14 +55,14 @@ Please also take a moment to confirm your email address for ${settings.appName}:
   },
   ctaURL(opts) {
     return opts.confirmEmailUrl
-  }
+  },
 })
 
 module.exports = PublicRegistrationController = {
   showRegisterPage(req, res, next) {
     const sharedProjectData = {
       projectname: req.query.project_name || ' ',
-      username: req.query.user_first_name
+      username: req.query.user_first_name,
     }
 
     const newTemplateData = {}
@@ -73,7 +73,7 @@ module.exports = PublicRegistrationController = {
     return res.render(Path.resolve(__dirname, '../views/register'), {
       title: 'register',
       sharedProjectData,
-      newTemplateData
+      newTemplateData,
     })
   },
 
@@ -95,8 +95,8 @@ module.exports = PublicRegistrationController = {
             return res.json({
               message: {
                 text:
-                  'You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf.'
-              }
+                  'You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf.',
+              },
             })
           } else {
             return AuthenticationController.passportLogin(req, res, next)
@@ -141,7 +141,7 @@ module.exports = PublicRegistrationController = {
                       first_name: user.first_name,
                       last_name: user.last_name,
                       email: user.email,
-                      created: Date.now()
+                      created: Date.now(),
                     })
                 )
               )
@@ -150,7 +150,7 @@ module.exports = PublicRegistrationController = {
         }
       }
     )
-  }
+  },
 }
 
 function __guard__(value, transform) {

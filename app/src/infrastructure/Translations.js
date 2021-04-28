@@ -93,5 +93,5 @@ function postprocess(req, res, next) {
 
 module.exports = {
   middleware,
-  i18n: { translate: allLocales.get('en') }
+  i18n: { translate: allLocales.get('en') },
 }

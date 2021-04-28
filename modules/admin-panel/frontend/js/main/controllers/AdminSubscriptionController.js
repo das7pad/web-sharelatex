@@ -22,8 +22,8 @@ App.controller('AdminSubscriptionController', function ($scope, $http) {
       url: `/admin/subscription/${$scope.subscription._id}`,
       method: 'DELETE',
       headers: {
-        'X-CSRF-Token': window.csrfToken
-      }
+        'X-CSRF-Token': window.csrfToken,
+      },
     })
       .then(() => (window.location = `/admin/user/${$scope.user_id}`))
       .catch(() => ($scope.deleteError = true))
@@ -38,7 +38,7 @@ export default App.controller(
       groupPlan: true,
       planCode: 'professional',
       membersLimit: 10,
-      admin_id: window.data.admin_id
+      admin_id: window.data.admin_id,
     }
 
     return ($scope.onSuccess = function (result) {

@@ -5,7 +5,7 @@ import HighlightedWordManager from '../../../../frontend/js/spell_check/highligh
 describe('HighlightedWordManager', function () {
   beforeEach(function () {
     this.editor = {
-      markText: sinon.stub().returns({ clear: sinon.stub() })
+      markText: sinon.stub().returns({ clear: sinon.stub() }),
     }
     this.highlightedWordManager = new HighlightedWordManager(this.editor)
   })
@@ -15,7 +15,7 @@ describe('HighlightedWordManager', function () {
       row: 0,
       column: 0,
       word: 'foo',
-      suggestions: ['bar', 'baz']
+      suggestions: ['bar', 'baz'],
     })
 
     this.highlightedWordManager.reset()
@@ -26,24 +26,24 @@ describe('HighlightedWordManager', function () {
   it('clearRow removes highlights on the given row', function () {
     this.editor.markText.returns({
       clear: sinon.stub(),
-      find: sinon.stub().returns({ from: { line: 0 } })
+      find: sinon.stub().returns({ from: { line: 0 } }),
     })
     this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'row0',
-      suggestions: ['foo']
+      suggestions: ['foo'],
     })
     // Kind of ugly hack to get second marker to return correct row
     this.editor.markText.returns({
       clear: sinon.stub(),
-      find: sinon.stub().returns({ from: { line: 1 } })
+      find: sinon.stub().returns({ from: { line: 1 } }),
     })
     this.highlightedWordManager.addHighlight({
       row: 1,
       column: 0,
       word: 'row1',
-      suggestions: ['bar']
+      suggestions: ['bar'],
     })
 
     this.highlightedWordManager.clearRow(0)
@@ -60,7 +60,7 @@ describe('HighlightedWordManager', function () {
       row: 0,
       column: 0,
       word: 'foo',
-      suggestions: ['bar', 'baz']
+      suggestions: ['bar', 'baz'],
     })
 
     const highlight = this.highlightedWordManager.highlights[0]
@@ -74,7 +74,7 @@ describe('HighlightedWordManager', function () {
       row: 0,
       column: 0,
       word: 'foo',
-      suggestions: ['bar', 'baz']
+      suggestions: ['bar', 'baz'],
     })
 
     const highlight = this.highlightedWordManager.highlights[0]
@@ -88,7 +88,7 @@ describe('HighlightedWordManager', function () {
       row: 0,
       column: 0,
       word: 'foo',
-      suggestions: ['bar', 'baz']
+      suggestions: ['bar', 'baz'],
     })
 
     this.highlightedWordManager.removeWord('foo')
@@ -101,19 +101,19 @@ describe('HighlightedWordManager', function () {
       clear: sinon.stub(),
       find: sinon.stub().returns({
         from: { line: 0, ch: 0 },
-        to: { line: 0, ch: 3 }
-      })
+        to: { line: 0, ch: 3 },
+      }),
     })
     this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'foo',
-      suggestions: ['bar', 'baz']
+      suggestions: ['bar', 'baz'],
     })
 
     const found = this.highlightedWordManager.findHighlightAtPosition({
       line: 0,
-      ch: 1
+      ch: 1,
     })
 
     expect(found.word).to.equal('foo')
@@ -125,20 +125,20 @@ describe('HighlightedWordManager', function () {
       clear,
       find: sinon.stub().returns({
         from: { line: 0, ch: 0 },
-        to: { line: 0, ch: 3 }
-      })
+        to: { line: 0, ch: 3 },
+      }),
     })
     this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'foo',
-      suggestions: ['bar', 'baz']
+      suggestions: ['bar', 'baz'],
     })
 
     this.highlightedWordManager.clearHighlightTouchingRange({
       // Cursor is at the end of 'foo'
       from: { line: 0, ch: 3 },
-      to: { line: 0, ch: 3 }
+      to: { line: 0, ch: 3 },
     })
 
     expect(clear).to.have.been.called

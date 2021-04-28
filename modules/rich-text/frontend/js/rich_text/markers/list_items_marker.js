@@ -9,9 +9,9 @@ const ListItemsMarker = {
     makeSingleMark(cm, sourceMark, 'outer', true, {
       inclusiveLeft: true,
       inclusiveRight: false,
-      replacedWith: makeDiv(sourceMark)
+      replacedWith: makeDiv(sourceMark),
     })
-  }
+  },
 }
 
 function makeDiv(sourceMark) {

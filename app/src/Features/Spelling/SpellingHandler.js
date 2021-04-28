@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const request = require('request')
 const requestRetry = require('requestretry').defaults({
   maxAttempts: 3,
-  retryDelay: 10
+  retryDelay: 10,
 })
 const Settings = require('@overleaf/settings')
 const OError = require('@overleaf/o-error')

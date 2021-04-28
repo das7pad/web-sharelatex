@@ -5,7 +5,7 @@ const serverEpoch = Date.now()
 
 async function handleEventSourceRequest(request, response) {
   response.writeHead(200, {
-    'Content-Type': 'text/event-stream'
+    'Content-Type': 'text/event-stream',
   })
   response.flushHeaders()
 
@@ -32,12 +32,12 @@ function notifyFrontendAboutRebuild(name, error, result) {
   const blob = JSON.stringify({
     name,
     error,
-    warnings
+    warnings,
   })
   bus.emit('rebuild', blob)
 }
 
 module.exports = {
   handleEventSourceRequest,
-  notifyFrontendAboutRebuild
+  notifyFrontendAboutRebuild,
 }

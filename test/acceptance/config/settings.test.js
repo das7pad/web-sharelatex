@@ -2,7 +2,7 @@ let features
 const v1Api = {
   url: `http://${process.env.V1_HOST || 'localhost'}:5000`,
   user: 'overleaf',
-  pass: 'password'
+  pass: 'password',
 }
 
 const httpAuthUser = 'sharelatex'
@@ -15,7 +15,7 @@ module.exports = {
     url:
       process.env.MONGO_CONNECTION_STRING ||
       process.env.MONGO_URL ||
-      `mongodb://${process.env.MONGO_HOST || '127.0.0.1'}/sharelatex_dev`
+      `mongodb://${process.env.MONGO_HOST || '127.0.0.1'}/sharelatex_dev`,
   },
 
   // faster zip download tests
@@ -36,34 +36,34 @@ module.exports = {
   apis: {
     web: {
       user: httpAuthUser,
-      pass: httpAuthPass
+      pass: httpAuthPass,
     },
     v1: {
       url: v1Api.url,
       user: v1Api.user,
-      pass: v1Api.pass
+      pass: v1Api.pass,
     },
 
     linkedUrlProxy: {
-      url: `http://${process.env.LINKED_URL_PROXY_HOST || 'localhost'}:6543`
+      url: `http://${process.env.LINKED_URL_PROXY_HOST || 'localhost'}:6543`,
     },
 
     project_history: {
       sendProjectStructureOps: true,
       initializeHistoryForNewProjects: true,
-      displayHistoryForNewProjects: true
+      displayHistoryForNewProjects: true,
     },
 
     recurly: {
       // Set up our own mock recurly server
       url: `http://${process.env.RECURLY_HOST || 'localhost'}:6034`,
       subdomain: 'test',
-      apiKey: 'private-nonsense'
-    }
+      apiKey: 'private-nonsense',
+    },
   },
 
   security: {
-    bcryptRounds: 1
+    bcryptRounds: 1,
   },
 
   // for registration via SL, set enableLegacyRegistration to true
@@ -85,7 +85,7 @@ module.exports = {
       mendeley: true,
       compileTimeout: 60,
       compileGroup: 'standard',
-      trackChanges: false
+      trackChanges: false,
     },
     personal: {
       collaborators: 1,
@@ -99,7 +99,7 @@ module.exports = {
       mendeley: false,
       compileTimeout: 60,
       compileGroup: 'standard',
-      trackChanges: false
+      trackChanges: false,
     },
     collaborator: {
       collaborators: 10,
@@ -113,7 +113,7 @@ module.exports = {
       mendeley: true,
       compileTimeout: 180,
       compileGroup: 'priority',
-      trackChanges: true
+      trackChanges: true,
     },
     professional: {
       collaborators: -1,
@@ -127,8 +127,8 @@ module.exports = {
       mendeley: true,
       compileTimeout: 180,
       compileGroup: 'priority',
-      trackChanges: true
-    }
+      trackChanges: true,
+    },
   }),
 
   defaultFeatures: features.personal,
@@ -140,49 +140,49 @@ module.exports = {
       planCode: 'v1_free',
       name: 'V1 Free',
       price: 0,
-      features: features.v1_free
+      features: features.v1_free,
     },
     {
       planCode: 'personal',
       name: 'Personal',
       price: 0,
-      features: features.personal
+      features: features.personal,
     },
     {
       planCode: 'collaborator',
       name: 'Collaborator',
       price: 1500,
-      features: features.collaborator
+      features: features.collaborator,
     },
     {
       planCode: 'professional',
       name: 'Professional',
       price: 3000,
-      features: features.professional
-    }
+      features: features.professional,
+    },
   ],
 
   bonus_features: {
     1: {
       collaborators: 2,
       dropbox: false,
-      versioning: false
+      versioning: false,
     },
     3: {
       collaborators: 4,
       dropbox: false,
-      versioning: false
+      versioning: false,
     },
     6: {
       collaborators: 4,
       dropbox: true,
-      versioning: true
+      versioning: true,
     },
     9: {
       collaborators: -1,
       dropbox: true,
-      versioning: true
-    }
+      versioning: true,
+    },
   },
 
   proxyUrls: {
@@ -191,65 +191,65 @@ module.exports = {
       baseUrl: v1Api.url,
       path(params) {
         return `/universities/list/${params.id}`
-      }
+      },
     },
     '/institutions/domains': {
       baseUrl: v1Api.url,
-      path: '/university/domains'
+      path: '/university/domains',
     },
     '/proxy/missing/baseUrl': {
-      path: '/foo/bar'
+      path: '/foo/bar',
     },
     '/proxy/get_and_post': {
       methods: ['get', 'post'],
-      path: '/destination/get_and_post'
-    }
+      path: '/destination/get_and_post',
+    },
   },
 
   redirects: {
     '/redirect/one': '/destination/one',
     '/redirect/get_and_post': {
       methods: ['get', 'post'],
-      url: '/destination/get_and_post'
+      url: '/destination/get_and_post',
     },
     '/redirect/base_url': {
       baseUrl: 'https://example.com',
-      url: '/destination/base_url'
+      url: '/destination/base_url',
     },
     '/redirect/params/:id': {
       url(params) {
         return `/destination/${params.id}/params`
-      }
+      },
     },
     '/redirect/qs': '/destination/qs',
     '/docs_v1': {
-      url: '/docs'
-    }
+      url: '/docs',
+    },
   },
 
   oauthProviders: {
     provider: {
-      name: 'provider'
+      name: 'provider',
     },
     collabratec: {
-      name: 'collabratec'
+      name: 'collabratec',
     },
     google: {
-      name: 'google'
-    }
+      name: 'google',
+    },
   },
 
   // for testing /user/bonus
   social: {
     twitter: {
-      handle: 'overleaf'
+      handle: 'overleaf',
     },
 
     facebook: {
       appId: '400474170024644',
       picture: 'https://www.overleaf.com/img/ol-brand/logo-horizontal.png',
-      redirectUri: 'https://www.overleaf.com'
-    }
+      redirectUri: 'https://www.overleaf.com',
+    },
   },
 
   // setting to true since many features are enabled/disabled after availability of this
@@ -259,6 +259,6 @@ module.exports = {
   reconfirmNotificationDays: 14,
 
   unsupportedBrowsers: {
-    ie: '<=11'
-  }
+    ie: '<=11',
+  },
 }

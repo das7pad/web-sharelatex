@@ -92,7 +92,7 @@ I have a bad name
       name: 'Open Science Framework',
       partner: null,
       slug: 'OSF',
-      default_variation_id: 1234
+      default_variation_id: 1234,
     }
 
     MockV1Api.brand_variations[1234] = { id: 1235 }
@@ -102,14 +102,14 @@ I have a bad name
     MockV1Api.validation_clients.ieee_latexqc = {
       brand_variation_id: '1234',
       conversions: {
-        conversion_foo: 'http://example.org/project.zip'
-      }
+        conversion_foo: 'http://example.org/project.zip',
+      },
     }
     return (MockV1Api.validation_clients.wombat_university = {
       brand_variation_id: null,
       conversions: {
-        conversion_bar: 'http://example.org/project.zip'
-      }
+        conversion_bar: 'http://example.org/project.zip',
+      },
     })
   })
 
@@ -130,11 +130,11 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip: 'test'
+              snip: 'test',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -181,8 +181,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip: 'test'
-            }
+              snip: 'test',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -225,11 +225,11 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               snip: 'test',
-              engine: 'latex_dvipdf'
+              engine: 'latex_dvipdf',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -266,11 +266,11 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               snip: 'test',
-              brand_variation_id: '6789'
+              brand_variation_id: '6789',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -343,8 +343,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: 'badtoken',
-              snip: 'test'
-            }
+              snip: 'test',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -379,8 +379,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: guest.csrfToken,
-              snip: 'test'
-            }
+              snip: 'test',
+            },
           },
           (err, res, body) => {
             expect(err).not.to.exist
@@ -397,8 +397,8 @@ I have a bad name
           {
             url: '/docs',
             form: {
-              _csrf: this.user.csrfToken
-            }
+              _csrf: this.user.csrfToken,
+            },
           },
           (err, res, body) => {
             expect(err).not.to.exist
@@ -416,11 +416,11 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              encoded_snip: '%22wombat%5C%7B%5C%26%5C%7D%22'
+              encoded_snip: '%22wombat%5C%7B%5C%26%5C%7D%22',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -478,11 +478,11 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip_uri: 'http://example.org/test.tex'
+              snip_uri: 'http://example.org/test.tex',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -540,8 +540,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip_uri: 'http://example.org/project.zip'
-            }
+              snip_uri: 'http://example.org/project.zip',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -594,8 +594,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              zip_uri: 'http://example.org/project.zip'
-            }
+              zip_uri: 'http://example.org/project.zip',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -663,8 +663,8 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               zip_uri: 'http://example.org/project.zip',
-              publisher_slug: 'OSF'
-            }
+              publisher_slug: 'OSF',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -707,8 +707,8 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               zip_uri: 'http://example.org/project.zip',
-              brand_variation_id: '6789'
-            }
+              brand_variation_id: '6789',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -751,8 +751,8 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               zip_uri: 'http://example.org/project.zip',
-              publisher_slug: 'wombat'
-            }
+              publisher_slug: 'wombat',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -779,8 +779,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip_uri: 'http://example.org/badname.zip'
-            }
+              snip_uri: 'http://example.org/badname.zip',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -813,11 +813,11 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip_uri: 'http://example.org/test.texx'
+              snip_uri: 'http://example.org/test.texx',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -843,8 +843,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              template: 'blank'
-            }
+              template: 'blank',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -872,8 +872,8 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              template: 'peerj'
-            }
+              template: 'peerj',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -915,11 +915,11 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              template: 'wombat'
+              template: 'wombat',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -946,11 +946,11 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               template: 'wombat',
-              snip_uri: 'http://banana.net/pineapple.tex'
+              snip_uri: 'http://banana.net/pineapple.tex',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -979,8 +979,8 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               partner: 'ieee_latexqc',
-              client_media_id: 'conversion_foo'
-            }
+              client_media_id: 'conversion_foo',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -1023,8 +1023,8 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               partner: 'potato',
-              client_media_id: 'conversion_foo'
-            }
+              client_media_id: 'conversion_foo',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -1053,8 +1053,8 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               partner: 'wombat_university',
-              client_media_id: 'conversion_bar'
-            }
+              client_media_id: 'conversion_bar',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -1096,11 +1096,11 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip_uri: 'http://example.org/fancyname.tex'
+              snip_uri: 'http://example.org/fancyname.tex',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -1136,11 +1136,11 @@ I have a bad name
             url: '/docs',
             form: {
               _csrf: this.user.csrfToken,
-              snip_uri: 'http://example.org/fancyname.tex'
+              snip_uri: 'http://example.org/fancyname.tex',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (err, res, body) => {
             expect(err).not.to.exist
@@ -1170,11 +1170,11 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               snip_uri: 'http://example.org/fancyname.tex',
-              snip_name: 'penguin'
+              snip_name: 'penguin',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (_err, _res, _body) => {
             this.err = _err
@@ -1211,11 +1211,11 @@ I have a bad name
             form: {
               _csrf: this.user.csrfToken,
               snip_uri: 'http://example.org/fancyname.tex',
-              snip_name: 'penguin'
+              snip_name: 'penguin',
             },
             headers: {
-              'X-Requested-With': 'XMLHttpRequest'
-            }
+              'X-Requested-With': 'XMLHttpRequest',
+            },
           },
           (err, res, body) => {
             expect(err).not.to.exist
@@ -1247,12 +1247,12 @@ I have a bad name
                 _csrf: this.user.csrfToken,
                 snip_uri: [
                   'http://example.org/test.tex',
-                  'http://example.org/project.zip'
-                ]
+                  'http://example.org/project.zip',
+                ],
               },
               headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-              }
+                'X-Requested-With': 'XMLHttpRequest',
+              },
             },
             (_err, _res, _body) => {
               this.err = _err
@@ -1327,13 +1327,13 @@ I have a bad name
                 _csrf: this.user.csrfToken,
                 snip_uri: [
                   'http://example.org/test.tex',
-                  'http://example.org/project.zip'
+                  'http://example.org/project.zip',
                 ],
-                snip_name: ['wombat.tex', 'potato.zip']
+                snip_name: ['wombat.tex', 'potato.zip'],
               },
               headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-              }
+                'X-Requested-With': 'XMLHttpRequest',
+              },
             },
             (_err, _res, _body) => {
               this.err = _err
@@ -1375,13 +1375,13 @@ I have a bad name
                 _csrf: this.user.csrfToken,
                 snip_uri: [
                   'http://example.org/test.tex',
-                  'http://example.org/project.zip'
+                  'http://example.org/project.zip',
                 ],
-                brand_variation_id: '6789'
+                brand_variation_id: '6789',
               },
               headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-              }
+                'X-Requested-With': 'XMLHttpRequest',
+              },
             },
             (_err, _res, _body) => {
               this.err = _err
@@ -1418,13 +1418,13 @@ I have a bad name
                 _csrf: this.user.csrfToken,
                 snip_uri: [
                   'http://example.org/test.tex',
-                  'http://example.org/project.zip'
+                  'http://example.org/project.zip',
                 ],
-                brand_variation_id: 'wombat'
+                brand_variation_id: 'wombat',
               },
               headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-              }
+                'X-Requested-With': 'XMLHttpRequest',
+              },
             },
             (_err, _res, _body) => {
               this.err = _err

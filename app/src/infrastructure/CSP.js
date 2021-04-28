@@ -215,7 +215,7 @@ function getCspMiddleware() {
         'manifest-src': manifestSrc,
         'script-src': scriptSrc,
         'style-src': styleSrc,
-        'worker-src': workerSrc
+        'worker-src': workerSrc,
       },
       { reportViolations: true, dropHTTPProtocol: true }
     )
@@ -245,7 +245,7 @@ function getCspMiddleware() {
   }
 
   const CSP_BONUS_PAGE = generateCSP({
-    unsafeInlineStyle: true
+    unsafeInlineStyle: true,
   })
   // default CSP for other sources, like JSON or file downloads
   // lock down all but image source for loading the favicon
@@ -254,7 +254,7 @@ function getCspMiddleware() {
       'default-src': [],
       'form-action': [],
       'frame-ancestors': [],
-      'img-src': [SELF, assetsOrigin]
+      'img-src': [SELF, assetsOrigin],
     },
     { reportViolations: false }
   )
@@ -262,7 +262,7 @@ function getCspMiddleware() {
   const CSP_DEFAULT_RENDER = generateCSP({})
   const CSP_DASHBOARD = generateCSP({
     needsFront: true,
-    needsNotificationsAccess: true
+    needsNotificationsAccess: true,
   })
   const CSP_EDITOR = generateCSP({
     connectCDN: true,
@@ -270,15 +270,15 @@ function getCspMiddleware() {
     needsProjectFileAccess: true,
     needsSocketIo: true,
     needsSpellingAccess: true,
-    needsWorker: true
+    needsWorker: true,
   })
   const CSP_LAUNCHPAD = generateCSP({
     connectCDN: true,
-    needsSocketIo: true
+    needsSocketIo: true,
   })
   const CSP_LEARN = generateCSP({
     needsLearnWikiImageAccess: true,
-    hasUnsafeInlineStyle: true
+    hasUnsafeInlineStyle: true,
   })
   // the browsers 'native' viewer may use inline styles
   const CSP_OUTPUT_PDF = serializeCSP(
@@ -287,13 +287,13 @@ function getCspMiddleware() {
       'form-action': [],
       'frame-ancestors': [pdfDownloadOrigin],
       'img-src': [SELF, assetsOrigin],
-      'style-src': [UNSAFE_INLINE]
+      'style-src': [UNSAFE_INLINE],
     },
     { reportViolations: false }
   )
   const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
   const CSP_USER_GRAPH = generateCSP({
-    needsWorker: true
+    needsWorker: true,
   })
 
   const MODULE_PATH = Path.resolve(__dirname, '../../../modules')

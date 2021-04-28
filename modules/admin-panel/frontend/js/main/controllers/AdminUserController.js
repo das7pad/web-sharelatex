@@ -55,8 +55,8 @@ App.controller(
         resolve: {
           projects() {
             return $scope.getSelectedProjects()
-          }
-        }
+          },
+        },
       })
       return modalInstance.result.then(() =>
         $scope.archiveOrLeaveSelectedProjects()
@@ -72,8 +72,8 @@ App.controller(
           method: 'DELETE',
           url: `/admin/project/${project._id}`,
           headers: {
-            'X-CSRF-Token': window.csrfToken
-          }
+            'X-CSRF-Token': window.csrfToken,
+          },
         })
       }
 
@@ -104,21 +104,21 @@ App.controller(
         resolve: {
           users() {
             return [{ email: emailToRemove }]
-          }
-        }
+          },
+        },
       })
       return modalInstance.result.then(function () {
         return queuedHttp({
           method: 'DELETE',
           url: `/admin/user/${$scope.user._id}/secondaryemail`,
           data: {
-            emailToRemove
+            emailToRemove,
           },
           headers: {
             // required for angular 1 to send data on delete which is valid
             'Content-type': 'application/json;charset=utf-8',
-            'X-CSRF-Token': window.csrfToken
-          }
+            'X-CSRF-Token': window.csrfToken,
+          },
         }).then(() =>
           setTimeout(
             () => (window.location.href = `/admin/user/${$scope.user._id}`),
@@ -135,16 +135,16 @@ App.controller(
         resolve: {
           users() {
             return [$scope.user]
-          }
-        }
+          },
+        },
       })
       return modalInstance.result.then(() =>
         queuedHttp({
           method: 'DELETE',
           url: `/admin/user/${$scope.user._id}/overleaf`,
           headers: {
-            'X-CSRF-Token': window.csrfToken
-          }
+            'X-CSRF-Token': window.csrfToken,
+          },
         }).then(() =>
           setTimeout(
             () => (window.location.href = `/admin/user/${$scope.user._id}`),
@@ -162,8 +162,8 @@ App.controller(
         resolve: {
           users() {
             return [$scope.user]
-          }
-        }
+          },
+        },
       })
       return modalInstance.result.then(() => $scope.DeleteUser())
     }
@@ -174,8 +174,8 @@ App.controller(
         method: 'DELETE',
         url: `/admin/user/${user._id}`,
         headers: {
-          'X-CSRF-Token': window.csrfToken
-        }
+          'X-CSRF-Token': window.csrfToken,
+        },
       }).then(() =>
         setTimeout(() => (window.location.href = '/admin/user'), 100)
       )
@@ -188,8 +188,8 @@ App.controller(
         method: 'POST',
         url: `/admin/user/${user._id}/refresh_features`,
         headers: {
-          'X-CSRF-Token': window.csrfToken
-        }
+          'X-CSRF-Token': window.csrfToken,
+        },
       }).then(() => location.reload())
     }
 

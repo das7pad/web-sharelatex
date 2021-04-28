@@ -28,5 +28,5 @@ export function Trans({ i18nKey, values, components }) {
 Trans.propTypes = {
   i18nKey: PropTypes.string.isRequired,
   values: PropTypes.object,
-  components: PropTypes.array
+  components: PropTypes.array,
 }

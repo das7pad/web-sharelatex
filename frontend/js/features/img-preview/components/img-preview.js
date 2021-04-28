@@ -26,7 +26,7 @@ export default function ImgPreview({ file }) {
           src={url}
           alt={file.name}
           className={classNames({
-            'img-preview': status === PENDING
+            'img-preview': status === PENDING,
           })}
           onError={failedToLoad}
           onAbort={failedToLoad}
@@ -42,6 +42,6 @@ export default function ImgPreview({ file }) {
 ImgPreview.propTypes = {
   file: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired
-  }).isRequired
+    name: PropTypes.string.isRequired,
+  }).isRequired,
 }

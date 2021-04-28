@@ -63,7 +63,7 @@ const LockManager = {
         logger.log('exceeded lock timeout', {
           namespace,
           id,
-          slowExecutionError
+          slowExecutionError,
         })
       }
       const exceededLockTimeout = setTimeout(
@@ -81,7 +81,7 @@ const LockManager = {
               namespace,
               id,
               timeTaken,
-              slowExecutionError
+              slowExecutionError,
             })
           }
 
@@ -192,7 +192,7 @@ const LockManager = {
     })
 
     return null
-  }
+  },
 }
 
 module.exports = LockManager
@@ -202,5 +202,5 @@ LockManager.promises = {
   runWithLock(namespace, id, runner) {
     const cbRunner = callbackify(runner)
     return promisifiedRunWithLock(namespace, id, cbRunner)
-  }
+  },
 }

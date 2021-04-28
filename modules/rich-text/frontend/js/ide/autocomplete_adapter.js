@@ -31,7 +31,7 @@ export default AutocompleteAdapter = class AutocompleteAdapter {
       .map(snippet => ({
         text: snippet.caption,
         displayText: snippet.caption,
-        hint: handleCompletionPicked
+        hint: handleCompletionPicked,
       }))
   }
 

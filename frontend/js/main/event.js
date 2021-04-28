@@ -34,7 +34,7 @@ App.factory('eventTracking', function ($http) {
       sendMB(key, segmentation) {},
       sendMBSampled(key, segmentation, rate) {},
       sendMBOnce(key, segmentation) {},
-      eventInCache(key) {}
+      eventInCache(key) {},
     }
   }
   const _getEventCache = function () {

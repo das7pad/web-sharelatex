@@ -12,8 +12,8 @@ describe('EmailSender', function () {
   beforeEach(function () {
     this.RateLimiter = {
       promises: {
-        addCount: sinon.stub()
-      }
+        addCount: sinon.stub(),
+      },
     }
 
     this.Settings = {
@@ -21,11 +21,11 @@ describe('EmailSender', function () {
         transport: 'smtp',
         parameters: {
           host: 'foo',
-          port: 1337
+          port: 1337,
         },
         fromAddress: 'bob@bob.com',
-        replyToAddress: 'sally@gmail.com'
-      }
+        replyToAddress: 'sally@gmail.com',
+      },
     }
 
     this.sesClient = this.smtpClient = { sendMail: sinon.stub().resolves() }
@@ -38,15 +38,15 @@ describe('EmailSender', function () {
         '@overleaf/settings': this.Settings,
         '../../infrastructure/RateLimiter': this.RateLimiter,
         '@overleaf/metrics': {
-          inc() {}
-        }
-      }
+          inc() {},
+        },
+      },
     })
 
     this.opts = {
       to: 'bob@bob.com',
       subject: 'new email',
-      html: '<hello></hello>'
+      html: '<hello></hello>',
     }
   })
 
@@ -56,7 +56,7 @@ describe('EmailSender', function () {
       expect(this.sesClient.sendMail).to.have.been.calledWithMatch({
         html: this.opts.html,
         to: this.opts.to,
-        subject: this.opts.subject
+        subject: this.opts.subject,
       })
     })
 
@@ -70,14 +70,14 @@ describe('EmailSender', function () {
     it('should use the from address from settings', async function () {
       await this.EmailSender.promises.sendEmail(this.opts)
       expect(this.sesClient.sendMail).to.have.been.calledWithMatch({
-        from: this.Settings.email.fromAddress
+        from: this.Settings.email.fromAddress,
       })
     })
 
     it('should use the reply to address from settings', async function () {
       await this.EmailSender.promises.sendEmail(this.opts)
       expect(this.sesClient.sendMail).to.have.been.calledWithMatch({
-        replyTo: this.Settings.email.replyToAddress
+        replyTo: this.Settings.email.replyToAddress,
       })
     })
 
@@ -85,7 +85,7 @@ describe('EmailSender', function () {
       this.opts.replyTo = 'someone@else.com'
       await this.EmailSender.promises.sendEmail(this.opts)
       expect(this.sesClient.sendMail).to.have.been.calledWithMatch({
-        replyTo: this.opts.replyTo
+        replyTo: this.opts.replyTo,
       })
     })
 
@@ -122,7 +122,7 @@ describe('EmailSender', function () {
           html: this.opts.html,
           text: this.opts.text,
           to: this.opts.to,
-          subject: this.opts.subject
+          subject: this.opts.subject,
         })
       })
     })

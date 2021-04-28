@@ -8,14 +8,14 @@ ApplicationContext.Provider.propTypes = {
     user: PropTypes.shape({
       id: PropTypes.string.isRequired,
       firstName: PropTypes.string,
-      lastName: PropTypes.string
-    })
-  })
+      lastName: PropTypes.string,
+    }),
+  }),
 }
 
 export function ApplicationProvider({ children }) {
   const applicationContextValue = {
-    user: window.user
+    user: window.user,
   }
   return (
     <ApplicationContext.Provider value={applicationContextValue}>
@@ -25,7 +25,7 @@ export function ApplicationProvider({ children }) {
 }
 
 ApplicationProvider.propTypes = {
-  children: PropTypes.any
+  children: PropTypes.any,
 }
 
 export function useApplicationContext(propTypes) {

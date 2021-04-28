@@ -63,7 +63,7 @@ module.exports = OpenInOverleafHelper = {
     }
     const urisWithName = _.map(uris, (uri, index) => ({
       uri,
-      name: names[index]
+      name: names[index],
     }))
 
     return async.mapLimit(
@@ -113,7 +113,7 @@ module.exports = OpenInOverleafHelper = {
             function (file, cb) {
               file.name = SafePath.clean(uri.name || path.basename(uri.uri))
               return cb(null, file)
-            }
+            },
           ],
           mapcb
         ),
@@ -232,7 +232,7 @@ module.exports = OpenInOverleafHelper = {
       {
         uri: `/api/v2/partners/${encodeURIComponent(
           partner
-        )}/conversions/${encodeURIComponent(clientMediaId)}`
+        )}/conversions/${encodeURIComponent(clientMediaId)}`,
       },
       function (err, response, body) {
         if (
@@ -350,7 +350,7 @@ module.exports = OpenInOverleafHelper = {
             project._id,
             brandVariationId,
             err => cb(err)
-          )
+          ),
       ],
       callback
     )
@@ -369,7 +369,7 @@ module.exports = OpenInOverleafHelper = {
             {
               uri: `/api/v2/brand_variations/${encodeURIComponent(
                 brandVariationId
-              )}`
+              )}`,
             },
             function (err, response, body) {
               if (
@@ -386,7 +386,7 @@ module.exports = OpenInOverleafHelper = {
             project._id,
             brandVariationId,
             err => cb(err)
-          )
+          ),
       ],
       callback
     )
@@ -420,7 +420,7 @@ module.exports = OpenInOverleafHelper = {
 % resolution.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
-`
+`,
       }[key] + '\n'
     )
   },
@@ -510,5 +510,5 @@ ${content}
       }
       return result
     })()
-  }
+  },
 }

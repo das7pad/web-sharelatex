@@ -58,7 +58,7 @@ const ProjectCreationHandler = {
               }
               AnalyticsManager.recordEvent(owner_id, 'project-imported', {
                 projectId: project._id,
-                attributes
+                attributes,
               })
               return callback(error, project)
             }
@@ -69,7 +69,9 @@ const ProjectCreationHandler = {
               return callback(error)
             }
             attributes.overleaf = {
-              history: { id: history != null ? history.overleaf_id : undefined }
+              history: {
+                id: history != null ? history.overleaf_id : undefined,
+              },
             }
             return ProjectCreationHandler._createBlankProject(
               owner_id,
@@ -81,7 +83,7 @@ const ProjectCreationHandler = {
                 }
                 AnalyticsManager.recordEvent(owner_id, 'project-created', {
                   projectId: project._id,
-                  attributes
+                  attributes,
                 })
                 return callback(error, project)
               }
@@ -248,7 +250,7 @@ const ProjectCreationHandler = {
                 owner_id,
                 callback
               )
-            }
+            },
           ],
           error => callback(error, project)
         )
@@ -303,20 +305,20 @@ const ProjectCreationHandler = {
           'September',
           'October',
           'November',
-          'December'
+          'December',
         ]
 
         const data = {
           project_name,
           user,
           year: new Date().getUTCFullYear(),
-          month: monthNames[new Date().getUTCMonth()]
+          month: monthNames[new Date().getUTCMonth()],
         }
         const output = ProjectTemplateFiles[template_name](data)
         return callback(null, output.split('\n'))
       }
     )
-  }
+  },
 }
 
 metrics.timeAsyncMethod(
@@ -327,7 +329,7 @@ metrics.timeAsyncMethod(
 )
 
 const promises = {
-  createBlankProject: promisify(ProjectCreationHandler.createBlankProject)
+  createBlankProject: promisify(ProjectCreationHandler.createBlankProject),
 }
 
 ProjectCreationHandler.promises = promises

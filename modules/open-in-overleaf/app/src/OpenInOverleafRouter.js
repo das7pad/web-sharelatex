@@ -28,12 +28,12 @@ module.exports = {
       RateLimiterMiddleware.rateLimit({
         endpointName: 'open-in-overleaf',
         maxRequests: 20,
-        timeInterval: 60
+        timeInterval: 60,
       }),
       OpenInOverleafController.openInOverleaf,
       OpenInOverleafErrorController.handleError
     )
 
     return webRouter.get('/devs', OpenInOverleafController.showDocumentation)
-  }
+  },
 }

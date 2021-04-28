@@ -28,13 +28,13 @@ if (process.env.V1_API_URL || process.env.V1_HOST) {
   v1Api = {
     url: process.env.V1_API_URL || `http://${process.env.V1_HOST}:5000`,
     user: process.env.V1_API_USER,
-    pass: process.env.V1_API_PASSWORD
+    pass: process.env.V1_API_PASSWORD,
   }
 } else {
   v1Api = {
     url: undefined,
     user: undefined,
-    pass: undefined
+    pass: undefined,
   }
 }
 
@@ -79,7 +79,7 @@ const defaultTextExtensions = [
   'rmd',
   'lua',
   'gv',
-  'mf'
+  'mf',
 ]
 
 function parseTextExtensions(extensions) {
@@ -104,12 +104,12 @@ module.exports = {
       poolSize: parseInt(process.env.MONGO_POOL_SIZE, 10) || 10,
       serverSelectionTimeoutMS:
         parseInt(process.env.MONGO_SERVER_SELECTION_TIMEOUT, 10) || 60000,
-      socketTimeoutMS: parseInt(process.env.MONGO_SOCKET_TIMEOUT, 10) || 30000
+      socketTimeoutMS: parseInt(process.env.MONGO_SOCKET_TIMEOUT, 10) || 30000,
     },
     url:
       process.env.MONGO_CONNECTION_STRING ||
       process.env.MONGO_URL ||
-      `mongodb://${process.env.MONGO_HOST || '127.0.0.1'}/sharelatex`
+      `mongodb://${process.env.MONGO_HOST || '127.0.0.1'}/sharelatex`,
   },
 
   redis: {
@@ -118,7 +118,7 @@ module.exports = {
         process.env.LOCK_REDIS_HOST || process.env.REDIS_HOST || 'localhost',
       port: process.env.LOCK_REDIS_PORT || process.env.REDIS_PORT || '6379',
       password:
-        process.env.LOCK_REDIS_PASSWORD || process.env.REDIS_PASSWORD || ''
+        process.env.LOCK_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
     },
 
     realtime: {
@@ -129,7 +129,9 @@ module.exports = {
       port:
         process.env.REAL_TIME_REDIS_PORT || process.env.REDIS_PORT || '6379',
       password:
-        process.env.REAL_TIME_REDIS_PASSWORD || process.env.REDIS_PASSWORD || ''
+        process.env.REAL_TIME_REDIS_PASSWORD ||
+        process.env.REDIS_PASSWORD ||
+        '',
     },
 
     web: {
@@ -139,7 +141,7 @@ module.exports = {
         process.env.WEB_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
       maxRetriesPerRequest: parseInt(
         process.env.REDIS_MAX_RETRIES_PER_REQUEST || '20'
-      )
+      ),
     },
 
     websessions: {
@@ -155,7 +157,7 @@ module.exports = {
         '',
       maxRetriesPerRequest: parseInt(
         process.env.REDIS_MAX_RETRIES_PER_REQUEST || '20'
-      )
+      ),
     },
 
     // websessions:
@@ -195,14 +197,14 @@ module.exports = {
         process.env.API_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
       maxRetriesPerRequest: parseInt(
         process.env.REDIS_MAX_RETRIES_PER_REQUEST || '20'
-      )
+      ),
     },
 
     queues: {
       host: process.env.QUEUES_REDIS_HOST || 'localhost',
       port: process.env.QUEUES_REDIS_PORT || '6379',
-      password: process.env.QUEUES_REDIS_PASSWORD || ''
-    }
+      password: process.env.QUEUES_REDIS_PASSWORD || '',
+    },
   },
 
   // Service locations
@@ -214,11 +216,11 @@ module.exports = {
   internal: {
     web: {
       port: process.env.WEB_PORT || 3000,
-      host: process.env.LISTEN_ADDRESS || 'localhost'
+      host: process.env.LISTEN_ADDRESS || 'localhost',
     },
     documentupdater: {
-      port: (docUpdaterPort = 3003)
-    }
+      port: (docUpdaterPort = 3003),
+    },
   },
 
   gitBridgePublicBaseUrl: `http://${
@@ -234,30 +236,30 @@ module.exports = {
         process.env.WEB_API_HOST || process.env.WEB_HOST || 'localhost'
       }:${process.env.WEB_API_PORT || process.env.WEB_PORT || 3000}`,
       user: httpAuthUser,
-      pass: httpAuthPass
+      pass: httpAuthPass,
     },
     documentupdater: {
       url: `http://${
         process.env.DOCUPDATER_HOST ||
         process.env.DOCUMENT_UPDATER_HOST ||
         'localhost'
-      }:${docUpdaterPort}`
+      }:${docUpdaterPort}`,
     },
     thirdPartyDataStore: {
       url: `http://${process.env.TPDS_HOST || 'localhost'}:3002`,
       emptyProjectFlushDelayMiliseconds: 5 * seconds,
-      dropboxApp: process.env.TPDS_DROPBOX_APP
+      dropboxApp: process.env.TPDS_DROPBOX_APP,
     },
     tags: {
-      url: `http://${process.env.TAGS_HOST || 'localhost'}:3012`
+      url: `http://${process.env.TAGS_HOST || 'localhost'}:3012`,
     },
     spelling: {
       url: `http://${process.env.SPELLING_HOST || 'localhost'}:3005`,
       host: process.env.SPELLING_HOST,
-      publicUrl: process.env.SPELLING_PUBLIC_URL
+      publicUrl: process.env.SPELLING_PUBLIC_URL,
     },
     trackchanges: {
-      url: `http://${process.env.TRACK_CHANGES_HOST || 'localhost'}:3015`
+      url: `http://${process.env.TRACK_CHANGES_HOST || 'localhost'}:3015`,
     },
     project_history: {
       sendProjectStructureOps:
@@ -266,73 +268,73 @@ module.exports = {
         process.env.PROJECT_HISTORY_ENABLED === 'true' || false,
       displayHistoryForNewProjects:
         process.env.PROJECT_HISTORY_ENABLED === 'true' || false,
-      url: `http://${process.env.PROJECT_HISTORY_HOST || 'localhost'}:3054`
+      url: `http://${process.env.PROJECT_HISTORY_HOST || 'localhost'}:3054`,
     },
     docstore: {
       url: `http://${process.env.DOCSTORE_HOST || 'localhost'}:3016`,
-      pubUrl: `http://${process.env.DOCSTORE_HOST || 'localhost'}:3016`
+      pubUrl: `http://${process.env.DOCSTORE_HOST || 'localhost'}:3016`,
     },
     chat: {
       url: `http://${process.env.CHAT_HOST || 'localhost'}:3010`,
-      internal_url: `http://${process.env.CHAT_HOST || 'localhost'}:3010`
+      internal_url: `http://${process.env.CHAT_HOST || 'localhost'}:3010`,
     },
     blog: {
       url: 'http://localhost:3008',
-      port: 3008
+      port: 3008,
     },
     university: {
-      url: 'http://localhost:3011'
+      url: 'http://localhost:3011',
     },
     filestore: {
       url: `http://${process.env.FILESTORE_HOST || 'localhost'}:3009`,
       passthroughHeaders: (
         process.env.FILESTORE_PASSTHROUGH_HEADERS || ''
-      ).split(',')
+      ).split(','),
     },
     clsi: {
       url: `http://${process.env.CLSI_HOST || 'localhost'}:3013`,
       // url: "http://#{process.env['CLSI_LB_HOST']}:3014"
-      backendGroupName: undefined
+      backendGroupName: undefined,
     },
     templates: {
-      url: `http://${process.env.TEMPLATES_HOST || 'localhost'}:3007`
+      url: `http://${process.env.TEMPLATES_HOST || 'localhost'}:3007`,
     },
     githubSync: {
-      url: `http://${process.env.GITHUB_SYNC_HOST || 'localhost'}:3022`
+      url: `http://${process.env.GITHUB_SYNC_HOST || 'localhost'}:3022`,
     },
     recurly: {
       apiKey: process.env.RECURLY_API_KEY || '',
       apiVersion: process.env.RECURLY_API_VERSION,
       subdomain: process.env.RECURLY_SUBDOMAIN || '',
-      publicKey: process.env.RECURLY_PUBLIC_KEY || ''
+      publicKey: process.env.RECURLY_PUBLIC_KEY || '',
     },
     geoIpLookup: {
       url: `http://${
         process.env.GEOIP_HOST || process.env.FREEGEOIP_HOST || 'localhost'
-      }:8080/json/`
+      }:8080/json/`,
     },
     realTime: {
-      url: `http://${process.env.REALTIME_HOST || 'localhost'}:3026`
+      url: `http://${process.env.REALTIME_HOST || 'localhost'}:3026`,
     },
     contacts: {
-      url: `http://${process.env.CONTACTS_HOST || 'localhost'}:3036`
+      url: `http://${process.env.CONTACTS_HOST || 'localhost'}:3036`,
     },
     references: {
       url:
         process.env.REFERENCES_HOST != null
           ? `http://${process.env.REFERENCES_HOST}:3040`
-          : undefined
+          : undefined,
     },
     notifications: {
       url: `http://${process.env.NOTIFICATIONS_HOST || 'localhost'}:3042`,
-      publicUrl: process.env.NOTIFICATIONS_PUBLIC_URL
+      publicUrl: process.env.NOTIFICATIONS_PUBLIC_URL,
     },
     analytics: {
       enabled: true,
-      url: `http://${process.env.ANALYTICS_HOST || 'localhost'}:3050`
+      url: `http://${process.env.ANALYTICS_HOST || 'localhost'}:3050`,
     },
     linkedUrlProxy: {
-      url: process.env.LINKED_URL_PROXY
+      url: process.env.LINKED_URL_PROXY,
     },
     thirdpartyreferences: {
       url: `http://${
@@ -341,36 +343,36 @@ module.exports = {
       timeout: parseInt(
         process.env.THIRD_PARTY_REFERENCES_TIMEOUT || '30000',
         10
-      )
+      ),
     },
     v1: {
       url: v1Api.url,
       user: v1Api.user,
-      pass: v1Api.pass
+      pass: v1Api.pass,
     },
     v1_history: {
       url: `http://${process.env.V1_HISTORY_HOST || 'localhost'}:3100/api`,
       user: process.env.V1_HISTORY_USER || 'staging',
-      pass: process.env.V1_HISTORY_PASSWORD || 'password'
-    }
+      pass: process.env.V1_HISTORY_PASSWORD || 'password',
+    },
   },
 
   web: {
     enableWApiRouter: process.env.ENABLE_API_ROUTER,
     enableWebRouter: process.env.ENABLE_WEB_ROUTER,
-    web_router_port: process.env.WEB_ROUTER_PORT
+    web_router_port: process.env.WEB_ROUTER_PORT,
   },
 
   templates: {
     user_id: process.env.TEMPLATES_USER_ID || '5395eb7aad1f29a88756c7f2',
     showSocialButtons: false,
-    showComments: false
+    showComments: false,
   },
 
   cdn: {
     web: {
-      host: (cdnUrl = process.env.CDN_WEB_HOST || '')
-    }
+      host: (cdnUrl = process.env.CDN_WEB_HOST || ''),
+    },
   },
   // 		host:"http://nowhere.sharelatex.dev"
   //		darkHost:"http://cdn.sharelatex.dev:3000"
@@ -387,7 +389,7 @@ module.exports = {
     slowExecutionThreshold: intFromEnv(
       'LOCK_MANAGER_SLOW_EXECUTION_THRESHOLD',
       5000
-    )
+    ),
   },
 
   // Optional separate location for websocket connections, if unset defaults to siteUrl.
@@ -453,10 +455,10 @@ module.exports = {
       blockInlineStyle: process.env.CSP_BLOCK_INLINE_STYLE === 'true',
       reportURL: process.env.CSP_REPORT_URL,
       reportOnly: process.env.CSP_REPORT_ONLY,
-      enforce: process.env.CSP_ENFORCE
+      enforce: process.env.CSP_ENFORCE,
     },
     sessionSecret,
-    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS, 10) || 12
+    bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS, 10) || 12,
   }, // number of rounds used to hash user passwords (raised to power 2)
 
   httpAuthUsers,
@@ -470,28 +472,28 @@ module.exports = {
       sign: {
         options: {
           algorithm: 'HS512',
-          expiresIn: '30d'
+          expiresIn: '30d',
         },
         secret:
           process.env.JWT_NOTIFICATIONS_SIGN_SECRET ||
-          'jwt-notifications-secret'
-      }
+          'jwt-notifications-secret',
+      },
     },
     spelling: {
       sign: {
         options: {
           algorithm: 'HS512',
-          expiresIn: '30d'
+          expiresIn: '30d',
         },
-        secret: process.env.JWT_SPELLING_SIGN_SECRET || 'jwt-spelling-secret'
-      }
-    }
+        secret: process.env.JWT_SPELLING_SIGN_SECRET || 'jwt-spelling-secret',
+      },
+    },
   },
 
   twoFactorAuthentication: {
     enabled: process.env.TWO_FACTOR_AUTHENTICATION_ENABLED === 'true',
     requiredForStaff:
-      process.env.TWO_FACTOR_AUTHENTICATION_REQUIRED_FOR_STAFF === 'true'
+      process.env.TWO_FACTOR_AUTHENTICATION_REQUIRED_FOR_STAFF === 'true',
   },
 
   enableGitBridge: false,
@@ -499,8 +501,8 @@ module.exports = {
   enableSaml: !!process.env.SAML_UKAMF_INIT_PATH,
   saml: {
     ukamf: {
-      initPath: process.env.SAML_UKAMF_INIT_PATH
-    }
+      initPath: process.env.SAML_UKAMF_INIT_PATH,
+    },
   },
 
   // Default features
@@ -518,11 +520,11 @@ module.exports = {
     compileGroup: 'standard',
     references: true,
     templates: true,
-    trackChanges: true
+    trackChanges: true,
   }),
 
   features: {
-    personal: defaultFeatures
+    personal: defaultFeatures,
   },
 
   plans: [
@@ -530,8 +532,8 @@ module.exports = {
       planCode: 'personal',
       name: 'Personal',
       price: 0,
-      features: defaultFeatures
-    }
+      features: defaultFeatures,
+    },
   ],
 
   enableSubscriptions: false,
@@ -547,13 +549,13 @@ module.exports = {
     checkForHTMLInVars: process.env.I18N_CHECK_FOR_HTML_IN_VARS === 'true',
     escapeHTMLInVars: process.env.I18N_ESCAPE_HTML_IN_VARS === 'true',
     subdomainLang: {
-      www: { lngCode: 'en', url: siteUrl }
+      www: { lngCode: 'en', url: siteUrl },
     },
     defaultLng: 'en',
     loadLocalesFromDisk:
       process.env.LOAD_LOCALES_FROM_DISK !== undefined
         ? process.env.LOAD_LOCALES_FROM_DISK === 'true'
-        : process.env.NODE_ENV === 'production'
+        : process.env.NODE_ENV === 'production',
   },
 
   // Spelling languages
@@ -610,7 +612,7 @@ module.exports = {
     { code: 'tn', name: 'Tswana' },
     { code: 'hsb', name: 'Upper Sorbian' },
     { code: 'cy', name: 'Welsh' },
-    { code: 'xh', name: 'Xhosa' }
+    { code: 'xh', name: 'Xhosa' },
   ],
 
   // Password Settings
@@ -652,11 +654,11 @@ module.exports = {
   analytics: {
     enabled: process.env.ANALYTICS_ENABLED === 'true',
     ga: {
-      token: process.env.ANALYTICS_GA_TOKEN
+      token: process.env.ANALYTICS_GA_TOKEN,
     },
     gaOptimize: {
-      id: process.env.ANALYTICS_GA_OPTIMIZE_ID
-    }
+      id: process.env.ANALYTICS_GA_OPTIMIZE_ID,
+    },
   },
   // ShareLaTeX's help desk is provided by tenderapp.com
   // tenderUrl: ""
@@ -670,8 +672,8 @@ module.exports = {
       commit: process.env.COMMIT,
       release: process.env.SENTRY_RELEASE || process.env.RELEASE,
       environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV,
-      dsn: process.env.SENTRY_DSN_FRONTEND
-    }
+      dsn: process.env.SENTRY_DSN_FRONTEND,
+    },
   },
   // For all options see
   // https://docs.sentry.io/error-reporting/configuration/?platform=javascript
@@ -738,7 +740,7 @@ module.exports = {
         : ['development', 'test'].includes(process.env.ESBUILD_IN_MEMORY),
     host: process.env.ESBUILD_HOST,
     port: parseInt(process.env.ESBUILD_PORT, 10) || undefined,
-    proxyForInMemoryRequests: process.env.ESBUILD_PROXY_FOR_IN_MEMORY_REQUESTS
+    proxyForInMemoryRequests: process.env.ESBUILD_PROXY_FOR_IN_MEMORY_REQUESTS,
   },
 
   // If you are running ShareLaTeX over https, set this to true to send the
@@ -817,7 +819,7 @@ module.exports = {
     // that need processing but may be too big for memory, then write
     // them to disk here).
     dumpFolder: './data/dumpFolder',
-    uploadFolder: './data/uploads'
+    uploadFolder: './data/uploads',
   },
 
   // Automatic Snapshots
@@ -828,7 +830,7 @@ module.exports = {
     waitTimeAfterLastEdit: 5 * minutes,
     // Even if edits are still taking place, this is maximum
     // time to wait before taking another snapshot.
-    maxTimeBetweenSnapshots: 30 * minutes
+    maxTimeBetweenSnapshots: 30 * minutes,
   },
 
   // Smoke test
@@ -842,7 +844,7 @@ module.exports = {
     password: process.env.SMOKE_TEST_PASSWORD,
     projectId: process.env.SMOKE_TEST_PROJECT_ID,
     rateLimitSubject: process.env.SMOKE_TEST_RATE_LIMIT_SUBJECT || '127.0.0.1',
-    stepTimeout: parseInt(process.env.SMOKE_TEST_STEP_TIMEOUT || '4000', 10)
+    stepTimeout: parseInt(process.env.SMOKE_TEST_STEP_TIMEOUT || '4000', 10),
   },
 
   appName: process.env.APP_NAME || 'ShareLaTeX (Community Edition)',
@@ -860,20 +862,20 @@ module.exports = {
     left_footer: [
       {
         text:
-          "Powered by <a href='https://www.sharelatex.com'>ShareLaTeX</a> © 2016"
-      }
+          "Powered by <a href='https://www.sharelatex.com'>ShareLaTeX</a> © 2016",
+      },
     ],
 
     right_footer: [
       {
         text: "<i class='fa fa-github-square'></i> Fork on Github!",
-        url: 'https://github.com/sharelatex/sharelatex'
-      }
+        url: 'https://github.com/sharelatex/sharelatex',
+      },
     ],
 
     showSubscriptionLink: false,
 
-    header_extras: []
+    header_extras: [],
   },
   // Example:
   //   header_extras: [{text: "Some Page", url: "http://example.com/some/page", class: "subdued"}]
@@ -881,8 +883,8 @@ module.exports = {
   recaptcha: {
     disabled: {
       invite: true,
-      register: true
-    }
+      register: true,
+    },
   },
 
   editorThemes: [
@@ -923,7 +925,7 @@ module.exports = {
     'tomorrow_night_eighties',
     'twilight',
     'vibrant_ink',
-    'xcode'
+    'xcode',
   ],
 
   hasThemes: false,
@@ -953,12 +955,12 @@ module.exports = {
   //	}]
 
   redirects: {
-    '/templates/index': '/templates/'
+    '/templates/index': '/templates/',
   },
 
   disableModule: {
     'user-activate': process.env.DISABLE_MODULE_USER_ACTIVATE === 'true',
-    launchpad: process.env.DISABLE_MODULE_LAUNCHPAD === 'true'
+    launchpad: process.env.DISABLE_MODULE_LAUNCHPAD === 'true',
   },
 
   domainLicences: [],
@@ -999,8 +1001,8 @@ module.exports = {
   rateLimit: {
     autoCompile: {
       everyone: process.env.RATE_LIMIT_AUTO_COMPILE_EVERYONE || 100,
-      standard: process.env.RATE_LIMIT_AUTO_COMPILE_STANDARD || 25
-    }
+      standard: process.env.RATE_LIMIT_AUTO_COMPILE_STANDARD || 25,
+    },
   },
 
   // currentImage: "texlive-full:2017.1"
@@ -1074,7 +1076,7 @@ module.exports = {
           'span',
           'source',
           'video',
-          'del'
+          'del',
         ],
         allowedAttributes: {
           a: [
@@ -1085,7 +1087,7 @@ module.exports = {
             'event-tracking',
             'event-tracking-ga',
             'event-tracking-label',
-            'event-tracking-trigger'
+            'event-tracking-trigger',
           ],
           div: ['class', 'id', 'style'],
           h1: ['class', 'id'],
@@ -1104,7 +1106,7 @@ module.exports = {
             'height',
             'src',
             'style',
-            'width'
+            'width',
           ],
           img: ['alt', 'class', 'src', 'style'],
           source: ['src', 'type'],
@@ -1119,19 +1121,19 @@ module.exports = {
             'rowspan',
             'scope',
             'sorted',
-            'style'
+            'style',
           ],
           tr: ['class'],
-          video: ['alt', 'class', 'controls', 'height', 'width']
-        }
-      }
-    }
+          video: ['alt', 'class', 'controls', 'height', 'width'],
+        },
+      },
+    },
   },
 
   overleafModuleImports: {
     // modules to import (an empty array for each set of modules)
     createFileModes: [],
     gitBridge: [],
-    publishModal: []
-  }
+    publishModal: [],
+  },
 }

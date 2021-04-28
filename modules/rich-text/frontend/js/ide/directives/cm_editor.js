@@ -38,7 +38,7 @@ export default App.directive(
       fontSize: '=',
       lineHeight: '=',
       docId: '=',
-      onSave: '='
+      onSave: '=',
     },
 
     link(scope, element, attrs) {
@@ -54,7 +54,7 @@ export default App.directive(
       )
       const keyBindingsAdapter = {
         triggerRecompile: scope.onSave,
-        triggerSyncToPdf
+        triggerSyncToPdf,
       }
 
       // Name the scope to be editor. This means that events prefixed with
@@ -348,7 +348,7 @@ export default App.directive(
     learn-word="learnWord(highlight)"
   ></spell-menu>
 </div>\
-`
+`,
   })
 )
 

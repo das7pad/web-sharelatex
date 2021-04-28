@@ -22,8 +22,8 @@ const csrf = csurf({
     secure: Settings.secureCookie,
     domain: Settings.cookieDomain,
     maxAge: Settings.cookieSessionLength / 1000,
-    signed: true
-  }
+    signed: true,
+  },
 })
 const { promisify } = require('util')
 

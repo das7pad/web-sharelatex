@@ -15,7 +15,7 @@ import RichTextAdapter from '../../../../frontend/js/ide/rich_text_adapter'
 describe('RichTextAdapter', function () {
   beforeEach(function () {
     this.fileTreeManager = {
-      findEntityByPath: (this.findEntityByPath = sinon.stub())
+      findEntityByPath: (this.findEntityByPath = sinon.stub()),
     }
     return (this.RichTextAdapter = new RichTextAdapter(this.fileTreeManager))
   })
@@ -40,7 +40,7 @@ describe('RichTextAdapter', function () {
     it('returns url for valid path', function () {
       this.findEntityByPath.returns({
         id: 'entity_id',
-        name: 'entity.png'
+        name: 'entity.png',
       })
       const entity = this.RichTextAdapter.getEntityForPath('path/to/entity.png')
 
@@ -58,7 +58,7 @@ describe('RichTextAdapter', function () {
     it('returns any matching entry', function () {
       this.findEntityByPath.returns({
         id: 'entity_id',
-        name: 'entity.eps'
+        name: 'entity.eps',
       })
       const entity = this.RichTextAdapter.getEntityForPath('path/to/entity.eps')
       return expect(entity.id).to.equal('entity_id')
@@ -73,11 +73,11 @@ describe('RichTextAdapter', function () {
       it('returns entry for exact match before extension', function () {
         this.findEntityByPath.withArgs('path/to/entity').returns({
           id: 'no_extension_file_id',
-          name: 'entity'
+          name: 'entity',
         })
         this.findEntityByPath.withArgs('path/to/entity.png').returns({
           id: 'png_file_id',
-          name: 'entity.png'
+          name: 'entity.png',
         })
         const entity = this.RichTextAdapter.getEntityForPath('path/to/entity')
         return expect(entity.id).to.equal('no_extension_file_id')
@@ -86,7 +86,7 @@ describe('RichTextAdapter', function () {
       it('returns entry for pdf', function () {
         this.findEntityByPath.withArgs('path/to/entity.pdf').returns({
           id: 'pdf_file_id',
-          name: 'entity.pdf'
+          name: 'entity.pdf',
         })
         const entity = this.RichTextAdapter.getEntityForPath('path/to/entity')
         return expect(entity.id).to.equal('pdf_file_id')
@@ -95,7 +95,7 @@ describe('RichTextAdapter', function () {
       it('returns entry for png', function () {
         this.findEntityByPath.withArgs('path/to/entity.png').returns({
           id: 'png_file_id',
-          name: 'entity.png'
+          name: 'entity.png',
         })
         const entry = this.RichTextAdapter.getEntityForPath('path/to/entity')
         return expect(entry.id).to.equal('png_file_id')
@@ -104,7 +104,7 @@ describe('RichTextAdapter', function () {
       it('returns entry for jpg', function () {
         this.findEntityByPath.withArgs('path/to/entity.jpg').returns({
           id: 'jpg_file_id',
-          name: 'entity.jpg'
+          name: 'entity.jpg',
         })
         const entry = this.RichTextAdapter.getEntityForPath('path/to/entity')
         return expect(entry.id).to.equal('jpg_file_id')
@@ -113,7 +113,7 @@ describe('RichTextAdapter', function () {
       it('returns entry for jpeg', function () {
         this.findEntityByPath.withArgs('path/to/entity.jpeg').returns({
           id: 'jpeg_file_id',
-          name: 'entity.jpeg'
+          name: 'entity.jpeg',
         })
         const entry = this.RichTextAdapter.getEntityForPath('path/to/entity')
         return expect(entry.id).to.equal('jpeg_file_id')
@@ -122,7 +122,7 @@ describe('RichTextAdapter', function () {
       it('handles paths with dots', function () {
         this.findEntityByPath.withArgs('path/to/entity.foo.png').returns({
           id: 'png_file_id',
-          name: 'entity.png'
+          name: 'entity.png',
         })
         const entry = this.RichTextAdapter.getEntityForPath(
           'path/to/entity.foo'
@@ -134,25 +134,25 @@ describe('RichTextAdapter', function () {
         // Extensions are picked in order: [exact match], png, pdf, jpg, jpeg
         this.findEntityByPath.withArgs('path/to/entity.jpg').returns({
           id: 'jpg_file_id',
-          name: 'entity.jpg'
+          name: 'entity.jpg',
         })
         this.findEntityByPath.withArgs('path/to/entity.jpeg').returns({
           id: 'jpeg_file_id',
-          name: 'entity.jpeg'
+          name: 'entity.jpeg',
         })
         let entry = this.RichTextAdapter.getEntityForPath('path/to/entity')
         expect(entry.id).to.equal('jpg_file_id')
 
         this.findEntityByPath.withArgs('path/to/entity.pdf').returns({
           id: 'pdf_file_id',
-          name: 'entity.pdf'
+          name: 'entity.pdf',
         })
         entry = this.RichTextAdapter.getEntityForPath('path/to/entity')
         expect(entry.id).to.equal('pdf_file_id')
 
         this.findEntityByPath.withArgs('path/to/entity.png').returns({
           id: 'png_file_id',
-          name: 'entity.png'
+          name: 'entity.png',
         })
         entry = this.RichTextAdapter.getEntityForPath('path/to/entity')
         return expect(entry.id).to.equal('png_file_id')
@@ -161,11 +161,11 @@ describe('RichTextAdapter', function () {
       return it('returns correct entry for similarly named files', function () {
         this.findEntityByPath.withArgs('path/to/entity.png').returns({
           id: 'base_file_id',
-          name: 'entity.png'
+          name: 'entity.png',
         })
         this.findEntityByPath.withArgs('path/to/entity-1x1.png').returns({
           id: 'similar_file_id',
-          name: 'entity-1x1.png'
+          name: 'entity-1x1.png',
         })
         const entry = this.RichTextAdapter.getEntityForPath('path/to/entity')
         return expect(entry.id).to.equal('base_file_id')
@@ -177,21 +177,21 @@ describe('RichTextAdapter', function () {
     it('rejects PDF files for inline previews', function () {
       const previewable = this.RichTextAdapter.isPreviewableEntity({
         id: 'entity_id',
-        name: 'entity.pdf'
+        name: 'entity.pdf',
       })
       return expect(previewable).to.be.false
     })
     it('allows PNG files for inline previews', function () {
       const previewable = this.RichTextAdapter.isPreviewableEntity({
         id: 'entity_id',
-        name: 'entity.png'
+        name: 'entity.png',
       })
       return expect(previewable).to.be.true
     })
     it('ignores capitalization', function () {
       const previewable = this.RichTextAdapter.isPreviewableEntity({
         id: 'entity_id',
-        name: 'entity.PNG'
+        name: 'entity.PNG',
       })
       return expect(previewable).to.be.true
     })
@@ -208,7 +208,7 @@ describe('RichTextAdapter', function () {
     it('reads the global context', function () {
       const url = this.RichTextAdapter.getPreviewUrlForEntity({
         id: 'entity_id',
-        name: 'entity.png'
+        name: 'entity.png',
       })
       return expect(url).to.equal('/project/project_id/file/entity_id')
     })

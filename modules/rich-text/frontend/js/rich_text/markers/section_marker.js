@@ -11,7 +11,7 @@ const SectionMarker = {
       'subsection',
       'subsection\\*',
       'subsubsection',
-      'subsubsection\\*'
+      'subsubsection\\*',
     ]
     return validKinds.includes(sourceMark.kind) && sourceMark.hasContent(cm)
   },
@@ -33,21 +33,21 @@ const SectionMarker = {
     const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
       inclusiveLeft: !shouldSurroundWithBraces,
       inclusiveRight: false,
-      replacedWith: makeSpan(shouldSurroundWithBraces ? '{' : '', className)
+      replacedWith: makeSpan(shouldSurroundWithBraces ? '{' : '', className),
     })
     const innerMark = makeSingleMark(cm, sourceMark, 'inner', false, {
       inclusiveLeft: true,
       inclusiveRight: true,
-      className: 'wl-' + className
+      className: 'wl-' + className,
     })
     const postMark = makeSingleMark(cm, sourceMark, 'post', true, {
       inclusiveLeft: false,
       inclusiveRight: !shouldSurroundWithBraces,
-      replacedWith: makeSpan(shouldSurroundWithBraces ? '}' : '', className)
+      replacedWith: makeSpan(shouldSurroundWithBraces ? '}' : '', className),
     })
 
     makeGroup([preMark, innerMark, postMark])
-  }
+  },
 }
 
 function isSplitOverMultipleLines(cm, sourceMark) {

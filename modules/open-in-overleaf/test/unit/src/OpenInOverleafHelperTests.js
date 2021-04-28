@@ -41,33 +41,33 @@ describe('OpenInOverleafHelper', function () {
       writeUrlToDisk: sinon
         .stub()
         .withArgs('open_in_overleaf_snippet', this.snip_uri)
-        .callsArgWith(2, null, this.tmpfile)
+        .callsArgWith(2, null, this.tmpfile),
     }
     this.UrlHelper = { wrapUrlWithProxy: sinon.stub().returnsArg(0) }
     this.fs = {
       readFile: sinon
         .stub()
         .withArgs(this.tmpfile, { encoding: 'utf8' })
-        .callsArgWith(2, null, this.snip)
+        .callsArgWith(2, null, this.snip),
     }
     this.settings = {
       openInOverleaf: {
-        templateUriPrefix: this.templateUriPrefix
-      }
+        templateUriPrefix: this.templateUriPrefix,
+      },
     }
     this.ProjectEntityUpdateHandler = {
       addDoc: sinon.stub().callsArg(5),
-      addFile: sinon.stub().callsArg(6)
+      addFile: sinon.stub().callsArg(6),
     }
     this.ProjectRootDocManager = {
-      setRootDocFromName: sinon.stub().callsArg(2)
+      setRootDocFromName: sinon.stub().callsArg(2),
     }
     this.ProjectOptionsHandler = {
       setCompiler: sinon.stub().callsArg(2),
-      setBrandVariationId: sinon.stub().callsArg(2)
+      setBrandVariationId: sinon.stub().callsArg(2),
     }
     this.V1Api = {
-      request: sinon.stub().callsArgWith(1, null, { statusCode: 404 }, {})
+      request: sinon.stub().callsArgWith(1, null, { statusCode: 404 }, {}),
     }
     this.V1Api.request
       .withArgs({ uri: '/api/v2/brands/OSF' })
@@ -99,15 +99,15 @@ describe('OpenInOverleafHelper', function () {
         fs: this.fs,
         'logger-sharelatex': {
           log() {},
-          err() {}
-        }
-      }
+          err() {},
+        },
+      },
     })
 
     this.snippet = {
       snip: this.snip,
       comment: '% commenty comment\n',
-      defaultTitle: 'new_snippet_project'
+      defaultTitle: 'new_snippet_project',
     }
     this.snip_uri = 'http://snip.io/foo.tex'
     this.wrappedDocument = `\
@@ -124,11 +124,11 @@ snap snap
 `
     return (this.OpenInOverleafHelper.TEMPLATE_DATA = {
       wombat: {
-        brand_variation_id: null
+        brand_variation_id: null,
       },
       potato: {
-        brand_variation_id: 1234
-      }
+        brand_variation_id: 1234,
+      },
     })
   })
 
@@ -210,7 +210,7 @@ snap snap
 
       it('reads the file contents', function () {
         return sinon.assert.calledWith(this.fs.readFile, this.tmpfile, {
-          encoding: 'utf8'
+          encoding: 'utf8',
         })
       })
 
@@ -414,7 +414,7 @@ snap snap
           { statusCode: 200 },
           {
             brand_variation_id: null,
-            input_file_uri: 'http://example.org/potato.zip'
+            input_file_uri: 'http://example.org/potato.zip',
           }
         )
       return this.V1Api.request
@@ -425,7 +425,7 @@ snap snap
           { statusCode: 200 },
           {
             brand_variation_id: '1234',
-            input_file_uri: 'http://example.org/potato.zip'
+            input_file_uri: 'http://example.org/potato.zip',
           }
         )
     })
@@ -520,7 +520,7 @@ snap snap
         'http://c.cc/file.zip',
         'http://d.dd/a.tex',
         'http://e.ee/picard.gif',
-        'http://f.ff/file'
+        'http://f.ff/file',
       ]
       this.FileWriter.writeUrlToDisk = sinon
         .stub()
@@ -727,7 +727,7 @@ snap snap
     beforeEach(function (done) {
       this.project = {
         _id: '1234',
-        rootFolder: [{ _id: 'asdf' }]
+        rootFolder: [{ _id: 'asdf' }],
       }
       this.snippet = {
         rootDoc: 'foo.tex',
@@ -735,9 +735,9 @@ snap snap
           { content: 'snippety snip\nsnap snap', name: 'foo.tex' },
           { content: 'blippety blip\nblop blop', name: 'bar.tex' },
           { fspath: '/foo/baz.zip', name: 'baz.zip' },
-          { fspath: '/foo/qux.zip', name: 'qux.zip' }
+          { fspath: '/foo/qux.zip', name: 'qux.zip' },
         ],
-        comment: '% commenty comment\n'
+        comment: '% commenty comment\n',
       }
       this.error = null
       return this.OpenInOverleafHelper.populateProjectFromFileList(
@@ -774,7 +774,7 @@ snap snap
   describe('setProjectBrandVariationFromSlug', function () {
     beforeEach(function () {
       return (this.project = {
-        _id: '1234'
+        _id: '1234',
       })
     })
 
@@ -792,7 +792,7 @@ snap snap
 
       it('calls the V1 API with the slug', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
-          uri: '/api/v2/brands/OSF'
+          uri: '/api/v2/brands/OSF',
         })
       })
 
@@ -823,7 +823,7 @@ snap snap
 
       it('calls the V1 API with the slug', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
-          uri: '/api/v2/brands/wombat'
+          uri: '/api/v2/brands/wombat',
         })
       })
 
@@ -842,7 +842,7 @@ snap snap
   describe('setProjectBrandVariationFromId', function () {
     beforeEach(function () {
       return (this.project = {
-        _id: '1234'
+        _id: '1234',
       })
     })
 
@@ -860,7 +860,7 @@ snap snap
 
       it('calls the V1 API with the variation id', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
-          uri: '/api/v2/brand_variations/wombat'
+          uri: '/api/v2/brand_variations/wombat',
         })
       })
 
@@ -891,7 +891,7 @@ snap snap
 
       it('calls the V1 API with the variation id', function () {
         return sinon.assert.calledWith(this.V1Api.request, {
-          uri: '/api/v2/brand_variations/potato'
+          uri: '/api/v2/brand_variations/potato',
         })
       })
 

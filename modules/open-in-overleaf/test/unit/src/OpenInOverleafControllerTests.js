@@ -30,7 +30,7 @@ describe('OpenInOverleafController', function () {
     this.user = {
       _id: '588f3ddae8ebc1bac07c9fa4',
       first_name: 'bjkdsjfk',
-      features: {}
+      features: {},
     }
     this.snip = 'snippety snip\nsnap snap'
     this.comment = '% comment\n'
@@ -38,13 +38,13 @@ describe('OpenInOverleafController', function () {
     this.snippet = {
       comment: this.comment,
       snip: this.snip,
-      defaultTitle: 'default_title'
+      defaultTitle: 'default_title',
     }
     this.snip_uri = 'http://snip.io/foo.tex'
     this.tmpfile = '/tmp/foo.tex'
     this.req = {
       session: {
-        user: this.user
+        user: this.user,
       },
       body: {},
       header: sinon
@@ -52,33 +52,33 @@ describe('OpenInOverleafController', function () {
         .withArgs('Referer')
         .returns('https://example.org/1/2/3'),
       headers: {
-        accept: ['json']
+        accept: ['json'],
       },
       i18n: {
-        translate: sinon.stub().returnsArg(0)
-      }
+        translate: sinon.stub().returnsArg(0),
+      },
     }
     this.res = {
       json: sinon.stub(),
-      redirect: sinon.stub()
+      redirect: sinon.stub(),
     }
     this.project = { _id: this.project_id }
     this.ProjectCreationHandler = {
       createProjectFromSnippet: sinon
         .stub()
         .callsArgWith(3, null, this.project),
-      createBlankProject: sinon.stub().callsArgWith(2, null, this.project)
+      createBlankProject: sinon.stub().callsArgWith(2, null, this.project),
     }
     this.ProjectDetailsHandler = {
       generateUniqueName: sinon
         .stub()
         .callsArgWith(2, null, 'new_snippet_project'),
-      fixProjectName: sinon.stub().returnsArg(0)
+      fixProjectName: sinon.stub().returnsArg(0),
     }
     this.ProjectUploadManager = {
       createProjectFromZipArchive: sinon
         .stub()
-        .callsArgWith(3, null, this.project)
+        .callsArgWith(3, null, this.project),
     }
 
     this.OpenInOverleafHelper = {
@@ -94,8 +94,8 @@ describe('OpenInOverleafController', function () {
           {
             files: [
               { ctype: 'text/x-tex', content: this.snip },
-              { ctype: 'application/zip', fspath: '/foo/bar.zip' }
-            ]
+              { ctype: 'application/zip', fspath: '/foo/bar.zip' },
+            ],
           },
           this.snippet,
           { snip: undefined }
@@ -104,14 +104,14 @@ describe('OpenInOverleafController', function () {
       populateProjectFromFileList: sinon.stub().callsArg(2),
       setProjectBrandVariationFromSlug: sinon.stub().callsArg(2),
       snippetFileComment: sinon.stub().returns('% default_snippet_comment\n'),
-      setProjectBrandVariationFromId: sinon.stub().callsArg(2)
+      setProjectBrandVariationFromId: sinon.stub().callsArg(2),
     }
     this.OpenInOverleafHelper.snippetFileComment
       .withArgs('texample')
       .returns('% texample_snippet_comment\n')
     this.Csrf = { validateRequest: sinon.stub().callsArgWith(1, true) }
     this.AuthenticationController = {
-      getLoggedInUserId: sinon.stub().returns(this.user._id)
+      getLoggedInUserId: sinon.stub().returns(this.user._id),
     }
 
     return (this.OpenInOverleafController = SandboxedModule.require(
@@ -120,7 +120,7 @@ describe('OpenInOverleafController', function () {
         requires: {
           'logger-sharelatex': {
             log() {},
-            err() {}
+            err() {},
           },
           '../../../../app/src/Features/Project/ProjectHelper': ProjectHelper,
           '../../../../app/src/Features/Errors/Errors': Errors,
@@ -132,8 +132,8 @@ describe('OpenInOverleafController', function () {
             .ProjectDetailsHandler,
           '../../../../app/src/Features/Uploads/ProjectUploadManager': this
             .ProjectUploadManager,
-          './OpenInOverleafHelper': this.OpenInOverleafHelper
-        }
+          './OpenInOverleafHelper': this.OpenInOverleafHelper,
+        },
       }
     ))
   })
@@ -158,7 +158,7 @@ describe('OpenInOverleafController', function () {
           )
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
-            projectId: this.project_id
+            projectId: this.project_id,
           })
           return done()
         }
@@ -265,7 +265,7 @@ describe('OpenInOverleafController', function () {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
-            projectId: this.project_id
+            projectId: this.project_id,
           })
           return done()
         }
@@ -282,7 +282,7 @@ describe('OpenInOverleafController', function () {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
-            projectId: this.project_id
+            projectId: this.project_id,
           })
           return done()
         }
@@ -299,7 +299,7 @@ describe('OpenInOverleafController', function () {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
-            projectId: this.project_id
+            projectId: this.project_id,
           })
           return done()
         }
@@ -311,7 +311,7 @@ describe('OpenInOverleafController', function () {
       beforeEach(function () {
         return (this.req.body.snip_uri = [
           this.snip_uri,
-          'http://foo.net/foo.tex'
+          'http://foo.net/foo.tex',
         ])
       })
 
@@ -319,7 +319,7 @@ describe('OpenInOverleafController', function () {
         this.res.json = content => {
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
-            projectId: this.project_id
+            projectId: this.project_id,
           })
           return done()
         }
@@ -347,7 +347,7 @@ describe('OpenInOverleafController', function () {
           .stub()
           .callsArgWith(2, null, {
             projectFile: '/foo/bar.zip',
-            defaultTitle: 'new_snippet_project'
+            defaultTitle: 'new_snippet_project',
           }))
       })
 
@@ -361,7 +361,7 @@ describe('OpenInOverleafController', function () {
           )
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
-            projectId: this.project_id
+            projectId: this.project_id,
           })
           return done()
         }
@@ -374,7 +374,7 @@ describe('OpenInOverleafController', function () {
           .callsArgWith(2, null, {
             projectFile: '/foo/bar.zip',
             defaultTitle: 'new_snippet_project',
-            snip_name: 'potato'
+            snip_name: 'potato',
           })
         this.res.json = content => {
           sinon.assert.calledWith(
@@ -385,7 +385,7 @@ describe('OpenInOverleafController', function () {
           )
           assert.deepEqual(content, {
             redirect: '/project/' + this.project_id,
-            projectId: this.project_id
+            projectId: this.project_id,
           })
           return done()
         }
@@ -401,7 +401,7 @@ describe('OpenInOverleafController', function () {
           .callsArgWith(1, null, {
             projectFile: '/foo/bar.zip',
             defaultTitle: 'new_snippet_project',
-            publisherSlug: 'OSF'
+            publisherSlug: 'OSF',
           }))
       })
 
@@ -428,7 +428,7 @@ describe('OpenInOverleafController', function () {
             .callsArgWith(3, null, {
               projectFile: '/foo/bar.zip',
               defaultTitle: 'new_snippet_project',
-              brandVariationId: '1234'
+              brandVariationId: '1234',
             }))
         })
 
@@ -472,7 +472,7 @@ describe('OpenInOverleafController', function () {
             )
             assert.deepEqual(content, {
               redirect: '/project/' + this.project_id,
-              projectId: this.project_id
+              projectId: this.project_id,
             })
             return done()
           }
@@ -491,7 +491,7 @@ describe('OpenInOverleafController', function () {
             .stub()
             .callsArgWith(3, null, {
               projectFile: '/foo/bar.zip',
-              defaultTitle: 'new_snippet_project'
+              defaultTitle: 'new_snippet_project',
             }))
         })
 
@@ -505,7 +505,7 @@ describe('OpenInOverleafController', function () {
             )
             assert.deepEqual(content, {
               redirect: '/project/' + this.project_id,
-              projectId: this.project_id
+              projectId: this.project_id,
             })
             return done()
           }
@@ -537,7 +537,7 @@ describe('OpenInOverleafController', function () {
           .stub()
           .callsArgWith(2, null, {
             projectFile: '/foo/bar.zip',
-            defaultTitle: 'new_snippet_project'
+            defaultTitle: 'new_snippet_project',
           }))
       })
 
@@ -582,7 +582,7 @@ describe('OpenInOverleafController', function () {
             .callsArgWith(2, null, {
               projectFile: '/foo/bar.zip',
               defaultTitle: 'new_snippet_project',
-              brandVariationId: 1234
+              brandVariationId: 1234,
             }))
         })
 
@@ -734,7 +734,7 @@ describe('OpenInOverleafController', function () {
       this.OpenInOverleafController._sendResponse(this.req, this.res, project)
       sinon.assert.calledWith(this.res.json, {
         redirect: `/project/${this.project_id}`,
-        projectId: this.project_id
+        projectId: this.project_id,
       })
       return sinon.assert.notCalled(this.res.redirect)
     })

@@ -26,7 +26,7 @@ describe('AutocompleteAdapter', function () {
     it('typing on line with \\usepackage schedules metadata load', function () {
       const cm = {
         getCursor: sinon.stub().returns({ line: 0, ch: 12 }), // Cursor is in \usepackage argument
-        getLine: sinon.stub().withArgs(12).returns('\\usepackage{}')
+        getLine: sinon.stub().withArgs(12).returns('\\usepackage{}'),
       }
       this.metadata.scheduleLoadDocMetaFromServer = sinon.stub()
 
@@ -39,7 +39,7 @@ describe('AutocompleteAdapter', function () {
     it('typing on line with \\RequirePackage schedules metadata load', function () {
       const cm = {
         getCursor: sinon.stub().returns({ line: 0, ch: 16 }), // Cursor is in \RequirePacakge argument
-        getLine: sinon.stub().withArgs(16).returns('\\RequirePackage{}')
+        getLine: sinon.stub().withArgs(16).returns('\\RequirePackage{}'),
       }
       this.metadata.scheduleLoadDocMetaFromServer = sinon.stub()
 
@@ -52,7 +52,7 @@ describe('AutocompleteAdapter', function () {
     it('typing on line with \\label schedules metadata load', function () {
       const cm = {
         getCursor: sinon.stub().returns({ line: 0, ch: 7 }), // Cursor is in \label argument
-        getLine: sinon.stub().withArgs(7).returns('\\label{}')
+        getLine: sinon.stub().withArgs(7).returns('\\label{}'),
       }
       this.metadata.scheduleLoadDocMetaFromServer = sinon.stub()
 
@@ -67,7 +67,7 @@ describe('AutocompleteAdapter', function () {
       // fix, but I wanted to cover it anyway
       const cm = {
         getCursor: sinon.stub().returns({ line: 0, ch: 12 }), // Cursor is in \label argument
-        getLine: sinon.stub().withArgs(12).returns('\\label{} foo')
+        getLine: sinon.stub().withArgs(12).returns('\\label{} foo'),
       }
       this.metadata.scheduleLoadDocMetaFromServer = sinon.stub()
 

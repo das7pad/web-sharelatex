@@ -41,7 +41,7 @@ module.exports = UserAdminController = {
       }
       return res.render(Path.resolve(__dirname, '../views/user/index'), {
         users,
-        pages
+        pages,
       })
     })
   },
@@ -83,7 +83,7 @@ module.exports = UserAdminController = {
     const opts = {
       limit: UserAdminController.PER_PAGE,
       skip,
-      sort: { email: 1 }
+      sort: { email: 1 },
     }
     logger.log({ opts, q }, 'user options and query')
     return User.find(
@@ -134,7 +134,7 @@ module.exports = UserAdminController = {
               lastLoggedIn: 1,
               lastLoginIp: 1,
               refered_user_count: 1,
-              staffAccess: 1
+              staffAccess: 1,
             },
             cb
           )
@@ -147,7 +147,7 @@ module.exports = UserAdminController = {
               lastUpdated: 1,
               publicAccesLevel: 1,
               archived: 1,
-              owner_ref: 1
+              owner_ref: 1,
             },
             function (err, projects) {
               const { owned, readAndWrite, readOnly } = projects
@@ -165,7 +165,7 @@ module.exports = UserAdminController = {
               return cb(null, allProjects)
             }
           )
-        }
+        },
       },
       function (err, data) {
         if (err != null) {
@@ -240,7 +240,7 @@ module.exports = UserAdminController = {
     'features.mendeley',
     'features.zotero',
     'awareOfV2',
-    'refered_user_count'
+    'refered_user_count',
   ],
   SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
     'isAdmin',
@@ -249,7 +249,7 @@ module.exports = UserAdminController = {
     'staffAccess.institutionMetrics',
     'staffAccess.institutionManagement',
     'staffAccess.groupMetrics',
-    'staffAccess.groupManagement'
+    'staffAccess.groupManagement',
   ],
   BOOLEAN_ATTRIBUTES: [
     'betaProgram',
@@ -270,7 +270,7 @@ module.exports = UserAdminController = {
     'staffAccess.groupMetrics',
     'staffAccess.groupManagement',
     'awareOfV2',
-    'isAdmin'
+    'isAdmin',
   ],
   update(req, res, next) {
     const { user_id } = req.params
@@ -351,5 +351,5 @@ module.exports = UserAdminController = {
     } else {
       return false
     }
-  }
+  },
 }

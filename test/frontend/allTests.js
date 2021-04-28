@@ -7,6 +7,6 @@ module.exports = function () {
       .concat(glob.sync('../../test/frontend/*/**/*.js', CTX))
       .concat(glob.sync('../../modules/*/test/frontend/**/*.js', CTX))
       .map(file => `import '${file}'`)
-      .join('\n')
+      .join('\n'),
   }
 }

@@ -76,7 +76,7 @@ export default function makeAutocomplete(adapter, getSetting) {
       return {
         list,
         from: Pos(cursor.line, token.start),
-        to: Pos(cursor.line, token.end)
+        to: Pos(cursor.line, token.end),
       }
     } else {
       try {
@@ -85,7 +85,7 @@ export default function makeAutocomplete(adapter, getSetting) {
         return {
           list: fuzzySearch.search(token.string),
           from: Pos(cursor.line, token.start),
-          to: Pos(cursor.line, token.end)
+          to: Pos(cursor.line, token.end),
         }
       } catch (e) {
         if (e === 'Error: Pattern length is too long') {
@@ -112,7 +112,7 @@ export default function makeAutocomplete(adapter, getSetting) {
     return references.map(ref => {
       return {
         text: ref,
-        displayText: ref
+        displayText: ref,
       }
     })
   }
@@ -121,7 +121,7 @@ export default function makeAutocomplete(adapter, getSetting) {
     return adapter.getReferenceArguments().map(ref => {
       return {
         text: ref,
-        displayText: ref
+        displayText: ref,
       }
     })
   }
@@ -132,7 +132,7 @@ export default function makeAutocomplete(adapter, getSetting) {
       return {
         text: arg,
         displayText: arg,
-        hint: handleArgumentCompletionPicked
+        hint: handleArgumentCompletionPicked,
       }
     })
   }
@@ -161,11 +161,11 @@ export default function makeAutocomplete(adapter, getSetting) {
       const lineNo = selection.from.line
       const startPos = {
         line: lineNo,
-        ch: selection.from.ch + firstArg.index + 1
+        ch: selection.from.ch + firstArg.index + 1,
       }
       const endPos = {
         line: lineNo,
-        ch: startPos.ch + firstArg[1].length
+        ch: startPos.ch + firstArg[1].length,
       }
       cm.setSelection(startPos, endPos)
 
@@ -202,14 +202,14 @@ export default function makeAutocomplete(adapter, getSetting) {
           const whitespace = oneLineBelow.match(/^\s*/)
           cm.replaceRange(`${whitespace}\\item `, {
             line: lineNo + 1,
-            ch: 0
+            ch: 0,
           })
         }
 
         // Insert completion into \end{}
         cm.replaceRange(completion.text, {
           line: lineNo + 2,
-          ch: endIndex + 5 // Argument is 5 chars from the beginning of \end{}
+          ch: endIndex + 5, // Argument is 5 chars from the beginning of \end{}
         })
       }
 
@@ -252,12 +252,12 @@ export default function makeAutocomplete(adapter, getSetting) {
   const makeFuzzySearch = _.memoize(list => {
     return new Fuse(list, {
       threshold: 0.3,
-      keys: ['text']
+      keys: ['text'],
     })
   })
 
   const ARGUMENTS = {
-    '\\begin': adapter.getBeginCommandArguments()
+    '\\begin': adapter.getBeginCommandArguments(),
   }
 
   return autocomplete

@@ -18,7 +18,7 @@ const PreambleMarker = {
     mark.on('clear', clearWidget)
     mark.on('hide', clearWidget)
     clearOnMouseDown(cm, preamble, mark)
-  }
+  },
 }
 
 function makePreambleDiv(cm, titleMark) {

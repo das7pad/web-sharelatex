@@ -7,7 +7,7 @@ import * as TextWrapping from '../../../../frontend/js/key_bindings/text_wrappin
 const TEXTAREA_HTML = '<textarea></textarea>'
 
 const autocompleteAdapterStub = {
-  getBeginCommandArguments: () => ['environmentName']
+  getBeginCommandArguments: () => ['environmentName'],
 }
 
 describe('Text wrapping', function () {

@@ -76,5 +76,5 @@ module.exports = {
       AuthorizationMiddleware.ensureUserCanWriteProjectContent,
       CommentsController.deleteMessage
     )
-  }
+  },
 }

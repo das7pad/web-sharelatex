@@ -13,23 +13,23 @@ const ListEnvsMarker = {
       inclusiveLeft: true,
       inclusiveRight: true,
       clearWhenEmpty: false,
-      className: `wl-${sourceMark.kind}`
+      className: `wl-${sourceMark.kind}`,
     })
 
     makeGroup([innerMark].concat(collapsePrePostMark(cm, sourceMark)))
-  }
+  },
 }
 
 function collapsePrePostMark(cm, sourceMark) {
   const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
     inclusiveLeft: true,
     inclusiveRight: true,
-    collapsed: true
+    collapsed: true,
   })
   const postMark = makeSingleMark(cm, sourceMark, 'post', true, {
     inclusiveLeft: true,
     inclusiveRight: true,
-    collapsed: true
+    collapsed: true,
   })
 
   return [preMark, postMark]
