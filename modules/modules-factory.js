@@ -27,7 +27,14 @@ function genLoaderTarget(pattern) {
     const parents = isWatchMode ? getAllParents(pattern) : []
 
     // Import relative to entrypoint. The output is _public_.
-    const code = files.map(file => `import '${file}'`).join('\n')
+    const imports = files
+      .map((file, id) => `import * as import${id} from '${file}'`)
+      .join('\n')
+    // Compose a consumable list of imports
+    const defaultExport = `export default [\n${files
+      .map((file, id) => `{ import: import${id}, path: '${file}' }`)
+      .join(',\n')}\n]`
+    const code = `${imports}\n${defaultExport}\n`
 
     // Watch on absolute path.
     const watchDirs = isWatchMode ? toAbsolute(parents) : undefined
