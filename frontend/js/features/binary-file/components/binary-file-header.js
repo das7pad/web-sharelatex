@@ -2,15 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import Icon from '../../../shared/components/icon'
 import { formatTime, relativeDate } from '../../utils/format-date'
-import importOverleafModules from '../../../../macros/import-overleaf-module.macro'
 import { postJSON } from '../../../infrastructure/fetch-json'
 import t from '../../../misc/t'
 import { Trans } from '../../../components/trans'
 
-const tprLinkedFileInfo = importOverleafModules('tprLinkedFileInfo')
-const tprLinkedFileRefreshError = importOverleafModules(
-  'tprLinkedFileRefreshError'
-)
+const tprLinkedFileInfo = []
+const tprLinkedFileRefreshError = []
 
 const MAX_URL_LENGTH = 60
 const FRONT_OF_URL_LENGTH = 35
