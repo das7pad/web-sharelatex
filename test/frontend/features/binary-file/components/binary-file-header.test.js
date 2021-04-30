@@ -128,6 +128,7 @@ describe('<BinaryFileHeader/>', function () {
     })
 
     it('Reindexes references after refreshing a file from a third-party provider', async function () {
+      if ('Server CE'.includes(' ')) return this.skip()
       fetchMock.post(
         'express:/project/:project_id/linked_file/:file_id/refresh',
         {
