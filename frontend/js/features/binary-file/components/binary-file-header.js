@@ -6,8 +6,8 @@ import { postJSON } from '../../../infrastructure/fetch-json'
 import t from '../../../misc/t'
 import { Trans } from '../../../components/trans'
 
-const tprLinkedFileInfo = []
-const tprLinkedFileRefreshError = []
+import tprLinkedFileInfo from '../../../../../modules/modules-tpr-linked-file-info'
+import tprLinkedFileRefreshError from '../../../../../modules/modules-tpr-linked-file-refresh-error'
 
 const MAX_URL_LENGTH = 60
 const FRONT_OF_URL_LENGTH = 35

@@ -9,7 +9,7 @@ import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import { useFileTreeMutable } from '../../contexts/file-tree-mutable'
 import getMeta from '../../../../utils/meta'
 
-const createFileModeModules = []
+import createFileModeModules from '../../../../../../modules/modules-create-file-mode'
 
 export default function FileTreeModalCreateFileBody() {
   const { newFileCreateMode } = useFileTreeActionable()

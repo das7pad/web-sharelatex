@@ -11,7 +11,7 @@ import HistoryToggleButton from './history-toggle-button'
 import ShareProjectButton from './share-project-button'
 import PdfToggleButton from './pdf-toggle-button'
 
-const PublishButton = undefined
+import PublishButton from '../../../../../modules/modules-publish-button'
 
 function ToolbarHeader({
   cobranding,
