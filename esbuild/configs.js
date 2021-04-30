@@ -52,10 +52,7 @@ const CONFIGS = [
       // silence ad
       __REACT_DEVTOOLS_GLOBAL_HOOK__: '{ "isDisabled": true }',
     },
-    plugins: [
-      valLoader(Path.join(MODULES_PATH, 'modules-ide.js')),
-      valLoader(Path.join(MODULES_PATH, 'modules-main.js')),
-    ],
+    plugins: [valLoader(Path.join(MODULES_PATH, 'modules-.*.js'))],
     loader: { '.js': 'jsx' },
     tsconfig: Path.join(ROOT, 'esbuild/tsconfig.json'),
   },

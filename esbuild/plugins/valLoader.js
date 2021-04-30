@@ -1,9 +1,9 @@
-module.exports = function (path) {
+module.exports = function (pattern) {
   return {
-    name: 'valLoader@' + path,
+    name: 'valLoader@' + pattern,
     setup(build) {
-      build.onLoad({ filter: new RegExp(path) }, function () {
-        const { code: contents, watchDirs, watchFiles } = require(path)({
+      build.onLoad({ filter: new RegExp(pattern) }, function (args) {
+        const { code: contents, watchDirs, watchFiles } = require(args.path)({
           isWatchMode: !!build.initialOptions.watch,
         })
         return {
