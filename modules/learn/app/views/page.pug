@@ -4,6 +4,10 @@ include ../../../../app/views/_mixins/faq_search
 block vars
 	- metadata = { viewport: true }
 
+block append meta
+	meta(name="ol-mathJaxEntrypoint" content=buildMathJaxEntrypoint())
+	meta(name="ol-preLoadMathJax" data-type="boolean" content=true)
+
 block content
 	.content.content-page.content-alt
 		.container.wiki(ng-cloak)
@@ -20,6 +24,3 @@ block content
 						mathjax !{page.content}
 				.col-xs-12.col-sm-3.col-sm-pull-9.contents(ng-non-bindable)
 					| !{contents.content}
-
-	meta(name="ol-mathJaxEntrypoint" content=buildMathJaxEntrypoint())
-	meta(name="ol-preLoadMathJax" data-type="boolean" content=true)

@@ -166,6 +166,7 @@ block content
 			h3 {{ title }}
 		.modal-body(ng-bind-html="message")
 
+block append meta
 	meta(name="ol-useV2History" data-type="boolean" content=useV2History)
 	meta(name="ol-project_id" content=project_id)
 	meta(name="ol-projectRootDoc_id" content=projectRootDoc_id)
@@ -199,6 +200,8 @@ block content
 
 	meta(name="ol-overallThemes" data-type="json" content=overallThemes)
 	meta(name="ol-textExtensions" data-type="json" content=settings.textExtensions)
+	meta(name="ol-validRootDocExtensions" data-type="json" content=settings.validRootDocExtensions)
+	meta(name="ol-recaptchaDisabled" data-type="json" content=(settings.recaptcha && settings.recaptcha.disabled))
 
 block main-bundle
 	script(type='text/javascript' src=wsAssetUrl)

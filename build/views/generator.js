@@ -8,17 +8,7 @@ function generateModule({ path, debug }) {
 }
 
 function generateModuleInMemory({ path, debug }) {
-  const OL_META = /(^|\b)meta\(name=(["'])ol-/g
   return pug.compileFile(path, {
-    plugins: [
-      {
-        // Mitigate Angular XSS globally
-        preLex: src => {
-          src = src.replace(OL_META, 'meta(ng-non-bindable name=$2ol-')
-          return src
-        },
-      },
-    ],
     cache: false,
     compileDebug: debug,
     doctype: 'html',

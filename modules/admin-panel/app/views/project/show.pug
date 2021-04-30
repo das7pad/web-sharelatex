@@ -1,9 +1,9 @@
 extends ../../../../../app/views/_layout
 
-block content
-
+block append meta
 	meta(name="ol-admin-project-data" data-type="json" content=project)
 
+block content
 	.content.content-alt(ng-controller="AdminProjectController")
 		.container(ng-cloak)
 			p

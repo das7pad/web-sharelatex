@@ -10,6 +10,12 @@ block append meta
 
 	if ssoError
 		meta(name="ol-ssoError" content=ssoError)
+	if hasFeature('affiliations')
+		include ../_meta/saml.pug
+		if institutionLinked
+			meta(name="ol-institutionName" content=institutionLinked.universityName)
+		if institutionEmailNonCanonical
+			meta(name="ol-institutionEmailNonCanonical" content=institutionEmailNonCanonical)
 
 block content
 	main.content.content-alt

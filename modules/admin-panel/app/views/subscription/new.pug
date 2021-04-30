@@ -1,8 +1,9 @@
 extends ../../../../../app/views/_layout
 
-block content
+block append meta
 	meta(name="ol-admin_id" content=admin_id)
 
+block content
 	.content.content-alt(ng-controller="AdminCreateSubscriptionController")
 		.container(ng-cloak)
 			p

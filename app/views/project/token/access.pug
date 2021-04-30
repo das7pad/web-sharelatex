@@ -3,10 +3,10 @@ extends ../../_layout
 block vars
 	- metadata = { viewport: true }
 
-block content
-
+block append meta
 	meta(name="ol-token-access-data" data-type="json" content={ postUrl, csrfToken})
 
+block content
 	div(
 		ng-controller="TokenAccessPageController",
 		ng-init="post()"

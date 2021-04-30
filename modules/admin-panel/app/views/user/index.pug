@@ -1,9 +1,10 @@
 extends ../../../../../app/views/_layout
 
-block content
+block append meta
 	meta(name="ol-users" data-type="json" content=users)
 	meta(name="ol-pages" data-type="json" content=pages)
 
+block content
 	.content.content-alt(ng-controller="AdminUserListController")
 		.container(ng-cloak)
 			p

@@ -1,6 +1,6 @@
 const OError = require('@overleaf/o-error')
 const { assertHasStatusCode } = require('./requestHelper')
-const CSRF_REGEX = /<meta ng-non-bindable name="ol-csrfToken" content="(.+?)">/
+const CSRF_REGEX = /<meta name="ol-csrfToken" content="(.+?)">/
 
 function _parseCsrf(body) {
   const match = CSRF_REGEX.exec(body)

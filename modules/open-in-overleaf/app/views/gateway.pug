@@ -4,11 +4,16 @@ block vars
 	- var suppressNavbar = true
 	- var suppressFooter = true
 
-block content
+block append meta
 	meta(name="ol-oio-gateway-data" data-type="json" content={
-			params: form_data, action: action, target: target, csrfToken: csrfToken, error: error
-		})
+		params: form_data,
+		action,
+		target,
+		csrfToken,
+		error
+	})
 
+block content
 	.editor.full-size(
 			ng-controller="OpenInOverleafGatewayController",
 			ng-init="handleGateway();"

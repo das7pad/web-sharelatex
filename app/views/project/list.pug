@@ -3,7 +3,7 @@ extends ../_layout
 block vars
 	- var suppressNavContentLinks = true
 
-block content
+block append meta
 	meta(name="ol-projects" data-type="json" content=projects)
 	meta(name="ol-tags" data-type="json" content=tags)
 	meta(name="ol-publicUrlNotifications", content=settings.apis.notifications.publicUrl)
@@ -20,6 +20,11 @@ block content
 				api_key: algolia_api_key
 			}
 		})
+
+	meta(name="ol-userHasNoSubscription" data-type="boolean" content=!!(settings.enableSubscriptions && !hasSubscription))
+	include ../_meta/saml.pug
+
+block content
 
 	main.content.content-alt.project-list-page(
 		ng-controller="ProjectPageController"

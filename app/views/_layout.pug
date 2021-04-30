@@ -48,11 +48,15 @@ html(
 						indexName : settings.templates.indexName
 					})
 
+			if(settings.recaptcha && settings.recaptcha.siteKeyV3)
+				meta(name="ol-recaptchaSiteKeyV3" content=settings.recaptcha.siteKeyV3)
+
+			include _sentry
+
 		block head-scripts
 
 	body(ng-csp)
 		if(settings.recaptcha && settings.recaptcha.siteKeyV3)
-			meta(name="ol-recaptchaSiteKeyV3" content=settings.recaptcha.siteKeyV3)
 			script(type="text/javascript", src="https://www.google.com/recaptcha/api.js?render="+settings.recaptcha.siteKeyV3)
 
 
@@ -65,7 +69,6 @@ html(
 			include layout/_footer
 
 		!= moduleIncludes("contactModal", locals)
-		include _sentry
 
 		block foot-scripts
 			script(type='text/javascript' src=buildTPath(currentLngCode))

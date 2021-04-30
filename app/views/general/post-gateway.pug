@@ -4,9 +4,10 @@ block vars
 	- var suppressNavbar = true
 	- var suppressFooter = true
 
-block content
+block append meta
 	meta(name="ol-gateway-data" data-type="json" content={ params: form_data })
 
+block content
 	.content.content-alt
 		.container
 			.row
