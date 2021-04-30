@@ -1,5 +1,6 @@
 import getMeta from '../../../../../utils/meta'
 
+// eslint-disable-next-line prefer-regex-literals
 const BLACKLISTED_COMMAND_REGEX = new RegExp(
   `\
 \\\\\

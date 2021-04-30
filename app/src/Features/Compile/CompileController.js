@@ -259,7 +259,7 @@ module.exports = CompileController = {
   },
 
   _getSafeProjectName(project) {
-    return project.name.replace(new RegExp('\\W', 'g'), '_')
+    return project.name.replace(/\W/g, '_')
   },
 
   deleteAuxFiles(req, res, next) {
