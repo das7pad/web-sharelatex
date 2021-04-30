@@ -4,7 +4,7 @@ import BinaryFileHeader from './binary-file-header'
 import BinaryFileImage from './binary-file-image'
 import BinaryFileText from './binary-file-text'
 import Icon from '../../../shared/components/icon'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 const imageExtensions = ['png', 'jpg', 'jpeg', 'gif']
 
@@ -44,7 +44,6 @@ export default function BinaryFile({ file, storeReferencesKeys }) {
 
   const [contentLoading, setContentLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
-  const { t } = useTranslation()
   const isUnpreviewableFile =
     !imageExtensions.includes(extension) && !textExtensions.includes(extension)
 
@@ -94,7 +93,6 @@ export default function BinaryFile({ file, storeReferencesKeys }) {
 }
 
 function BinaryFileLoadingIndicator() {
-  const { t } = useTranslation()
   return (
     <div className="loading-panel loading-panel-binary-files">
       <span>
