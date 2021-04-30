@@ -209,7 +209,7 @@ function ProjectFilePathProvider({ file }) {
               ]
         }
         values={{
-          sourceEntityPath: file.linkedFileData.source_entity_path.slice(1),
+          sourceEntityPathHTML: file.linkedFileData.source_entity_path.slice(1),
           formattedDate: formatTime(file.created),
           relativeDate: relativeDate(file.created),
         }}
@@ -248,7 +248,7 @@ function ProjectOutputFileProvider({ file }) {
               ]
         }
         values={{
-          sourceOutputFilePath: file.linkedFileData.source_output_file_path,
+          sourceOutputFilePathHTML: file.linkedFileData.source_output_file_path,
           formattedDate: formatTime(file.created),
           relativeDate: relativeDate(file.created),
         }}
