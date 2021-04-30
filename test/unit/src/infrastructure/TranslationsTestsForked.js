@@ -103,7 +103,7 @@ describe('TranslationsForked', function () {
     function getLocaleWithFallback(lang, key) {
       return getLocale(lang, key) || getLocale('en', key) || key
     }
-    const KEYS = new RegExp('__(.+?)__', 'g')
+    const KEYS = /__(.+?)__/g
 
     beforeEach(function () {
       this.mockedTranslate = (lang, key, vars) => {

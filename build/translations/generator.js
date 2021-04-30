@@ -3,7 +3,7 @@ const { getInflatedLocales } = require('./inflate')
 function moduleGenerator(locales, inMemory, FIELDS, LOCALES) {
   // Browser and NodeJS compatible module
   // use ES5 syntax
-  FIELDS = new RegExp('__(.+?)__', 'g')
+  FIELDS = /__(.+?)__/g
   LOCALES = new Map()
   initMap(locales)
   locales = undefined // free asap

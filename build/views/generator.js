@@ -8,7 +8,7 @@ function generateModule({ path, debug }) {
 }
 
 function generateModuleInMemory({ path, debug }) {
-  const OL_META = new RegExp(`(^|\\b)meta\\(name=(["'])ol-`, 'g')
+  const OL_META = /(^|\b)meta\(name=(["'])ol-/g
   return pug.compileFile(path, {
     plugins: [
       {
