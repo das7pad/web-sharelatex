@@ -8,6 +8,44 @@ const {
   runSmokeTests,
 } = require('./../../../../test/smoke/src/SmokeTests')
 
+let lastApiCheck = {
+  expires: 0,
+  pending: Promise.resolve(false),
+}
+
+async function cachedApiCheck() {
+  const now = Date.now()
+  if (lastApiCheck.expires < now) {
+    lastApiCheck = {
+      expires: now + settings.performApiCheckEvery,
+      pending: doApiCheck(),
+    }
+  }
+  return lastApiCheck.pending
+}
+
+async function doApiCheck() {
+  try {
+    await rclient.healthCheck()
+  } catch (err) {
+    logger.err({ err }, 'failed api redis health check')
+    return false
+  }
+  try {
+    const email = await UserGetter.promises.getUserEmail(
+      settings.smokeTest.userId
+    )
+    if (!email) {
+      logger.err({}, 'failed api mongo health check (no email)')
+      return false
+    }
+  } catch (err) {
+    logger.err({ err }, 'failed api mongo health check')
+    return false
+  }
+  return true
+}
+
 module.exports = {
   check(req, res, next) {
     if (!settings.siteIsOpen || !settings.editorIsOpen) {
@@ -41,23 +79,12 @@ module.exports = {
   },
 
   checkApi(req, res, next) {
-    rclient.healthCheck(err => {
-      if (err) {
-        logger.err({ err }, 'failed api redis health check')
-        return res.sendStatus(500)
-      }
-      UserGetter.getUserEmail(settings.smokeTest.userId, (err, email) => {
-        if (err) {
-          logger.err({ err }, 'failed api mongo health check')
-          return res.sendStatus(500)
-        }
-        if (email == null) {
-          logger.err({ err }, 'failed api mongo health check (no email)')
-          return res.sendStatus(500)
-        }
-        res.sendStatus(200)
-      })
-    })
+    const ok = cachedApiCheck()
+    if (ok) {
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(500)
+    }
   },
 
   checkRedis(req, res, next) {

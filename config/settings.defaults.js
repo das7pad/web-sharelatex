@@ -863,6 +863,8 @@ module.exports = {
     rateLimitSubject: process.env.SMOKE_TEST_RATE_LIMIT_SUBJECT || '127.0.0.1',
     stepTimeout: parseInt(process.env.SMOKE_TEST_STEP_TIMEOUT || '4000', 10),
   },
+  performApiCheckEvery:
+    parseInt(process.env.PERFORM_API_CHECK_EVERY, 10) || 100,
 
   appName: process.env.APP_NAME || 'ShareLaTeX (Community Edition)',
 
