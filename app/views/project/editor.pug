@@ -99,11 +99,8 @@ block content
 					custom-toggler-msg-when-closed=(hasFeature('custom-togglers') ? '{{translate("tooltip_show_filetree")}}' : false)
 				)
 					.ui-layout-west
-						if showReactFileTree
-							include ./editor/_file-tree-react
-							include ./editor/_file-tree-history
-						else
-							include ./editor/_file-tree
+						include ./editor/_file-tree-react
+						include ./editor/_file-tree-history
 						include ./editor/history/_fileTreeV2
 
 					.ui-layout-center
@@ -190,8 +187,6 @@ block append meta
 	meta(name="ol-wsUrl" content=wsUrl)
 	meta(name="ol-wsRetryHandshake" data-type="json" content=settings.wsRetryHandshake)
 	meta(name="ol-hasLinkUrlFeature" data-type="boolean" content=hasFeature('link-url'))
-	meta(name="ol-showReactFileTree" data-type="boolean" content=showReactFileTree)
-	meta(name="ol-showReactAddFilesModal" data-type="boolean" content=showReactAddFilesModal)
 	meta(name="ol-showNewLogsUI" data-type="boolean" content=showNewLogsUI)
 	meta(name="ol-logsUISubvariant" content=logsUISubvariant)
 	
