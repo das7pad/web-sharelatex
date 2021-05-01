@@ -170,7 +170,7 @@ function UrlProvider({ file }) {
           [<a href={file.linkedFileData.url} />]
         }
         values={{
-          shortenedUrl: shortenedUrl(file.linkedFileData.url),
+          shortenedUrlHTML: shortenedUrl(file.linkedFileData.url),
           formattedDate: formatTime(file.created),
           relativeDate: relativeDate(file.created),
         }}
