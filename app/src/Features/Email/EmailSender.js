@@ -84,7 +84,7 @@ async function sendEmail(options) {
       throw new OError('rate limit hit sending email')
     }
     metrics.inc('email')
-    let sendMailOptions = {
+    const sendMailOptions = {
       to: options.to,
       from: EMAIL_SETTINGS.fromAddress || '',
       subject: options.subject,

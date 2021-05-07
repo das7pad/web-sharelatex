@@ -43,7 +43,7 @@ export default App.controller(
         ) {
           return UserTypes.MEMBER
         }
-        for (let member of Array.from(project.members)) {
+        for (const member of Array.from(project.members)) {
           if (member._id === user_id) {
             return UserTypes.MEMBER
           }
@@ -98,7 +98,7 @@ export default App.controller(
 
     window.addEventListener('beforeunload', function () {
       const collapsedStates = {}
-      for (let doc in $scope.reviewPanel.overview.docsCollapsedState) {
+      for (const doc in $scope.reviewPanel.overview.docsCollapsedState) {
         const state = $scope.reviewPanel.overview.docsCollapsedState[doc]
         if (state) {
           collapsedStates[doc] = state
@@ -151,7 +151,7 @@ export default App.controller(
       ) {
         return (() => {
           const result = []
-          for (let member of Array.from(members)) {
+          for (const member of Array.from(members)) {
             if (member.privileges === 'readAndWrite') {
               if ($scope.reviewPanel.trackChangesState[member._id] == null) {
                 // An added member will have track changes enabled if track changes is on for everyone
@@ -339,7 +339,7 @@ export default App.controller(
         const entries =
           $scope.reviewPanel.entries[$scope.editor.open_doc_id] || {}
         const permEntries = {}
-        for (let entry in entries) {
+        for (const entry in entries) {
           const entryData = entries[entry]
           if (!['add-comment', 'bulk-actions'].includes(entry)) {
             permEntries[entry] = entryData
@@ -366,7 +366,7 @@ export default App.controller(
           const docs = response.data
           return (() => {
             const result = []
-            for (let doc of Array.from(docs)) {
+            for (const doc of Array.from(docs)) {
               if (
                 $scope.reviewPanel.overview.docsCollapsedState[doc.id] == null
               ) {
@@ -477,7 +477,7 @@ export default App.controller(
         ensureThreadsAreLoaded()
       }
 
-      for (let comment of Array.from(rangesTracker.comments)) {
+      for (const comment of Array.from(rangesTracker.comments)) {
         var new_comment
         changed = true
         delete delete_changes[comment.id]
@@ -507,7 +507,7 @@ export default App.controller(
         }
       }
 
-      for (let change_id in delete_changes) {
+      for (const change_id in delete_changes) {
         const _ = delete_changes[change_id]
         changed = true
         delete entries[change_id]
@@ -559,7 +559,7 @@ export default App.controller(
           }
         }
 
-        for (let id in entries) {
+        for (const id in entries) {
           const entry = entries[id]
           let isChangeEntryAndWithinSelection = false
           if (
@@ -596,7 +596,7 @@ export default App.controller(
           }
 
           if (isChangeEntryAndWithinSelection) {
-            for (let entry_id of Array.from(entry.entry_ids)) {
+            for (const entry_id of Array.from(entry.entry_ids)) {
               $scope.reviewPanel.selectedEntryIds.push(entry_id)
             }
             $scope.reviewPanel.nVisibleSelectedChanges++
@@ -833,7 +833,7 @@ export default App.controller(
       if (thread == null) {
         return
       }
-      for (let message of Array.from(thread.messages)) {
+      for (const message of Array.from(thread.messages)) {
         if (message.id === comment_id) {
           message.content = content
         }
@@ -947,7 +947,7 @@ export default App.controller(
       }
       $scope.reviewPanel.trackChangesOnForEveryone = newValue
       const { project } = $scope
-      for (let member of Array.from(project.members)) {
+      for (const member of Array.from(project.members)) {
         _setUserTCState(member._id, newValue, isLocal)
       }
       _setGuestsTCState(newValue, isLocal)
@@ -973,7 +973,7 @@ export default App.controller(
         data.on = true
       } else {
         data.on_for = {}
-        for (let userId in $scope.reviewPanel.trackChangesState) {
+        for (const userId in $scope.reviewPanel.trackChangesState) {
           const userState = $scope.reviewPanel.trackChangesState[userId]
           data.on_for[userId] = userState.value
         }
@@ -993,7 +993,7 @@ export default App.controller(
         const { project } = $scope
         $scope.reviewPanel.trackChangesOnForEveryone = false
         _setGuestsTCState(state.__guests__ === true)
-        for (let member of Array.from(project.members)) {
+        for (const member of Array.from(project.members)) {
           _setUserTCState(
             member._id,
             state[member._id] != null ? state[member._id] : false
@@ -1122,7 +1122,7 @@ export default App.controller(
           }
           return (() => {
             const result = []
-            for (let user of Array.from(users)) {
+            for (const user of Array.from(users)) {
               if (user.id != null) {
                 result.push(($scope.users[user.id] = formatUser(user)))
               } else {
@@ -1154,7 +1154,7 @@ export default App.controller(
           }
           for (thread_id in threads) {
             const thread = threads[thread_id]
-            for (let comment of Array.from(thread.messages)) {
+            for (const comment of Array.from(thread.messages)) {
               formatComment(comment)
             }
             if (thread.resolved_by_user != null) {

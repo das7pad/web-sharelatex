@@ -122,15 +122,15 @@ App.controller('ProjectPageController', function (
 
   // Allow tags to be accessed on projects as well
   const projectsById = {}
-  for (let project of $scope.projects) {
+  for (const project of $scope.projects) {
     projectsById[project.id] = project
   }
 
   $scope.getProjectById = id => projectsById[id]
 
-  for (let tag of $scope.tags) {
-    for (let projectId of tag.project_ids || []) {
-      let project = projectsById[projectId]
+  for (const tag of $scope.tags) {
+    for (const projectId of tag.project_ids || []) {
+      const project = projectsById[projectId]
       if (project) {
         if (!project.tags) {
           project.tags = []
@@ -206,7 +206,7 @@ App.controller('ProjectPageController', function (
   $scope.updateVisibleProjects = function () {
     $scope.visibleProjects = []
     const selectedTag = $scope.getSelectedTag()
-    for (let project of $scope.projects) {
+    for (const project of $scope.projects) {
       let visible = true
       // Only show if it matches any search text
       if ($scope.searchText.value !== '') {
@@ -288,7 +288,7 @@ App.controller('ProjectPageController', function (
   }
 
   $scope.getSelectedTag = function () {
-    for (let tag of $scope.tags) {
+    for (const tag of $scope.tags) {
       if (tag.selected) {
         return tag
       }
@@ -300,7 +300,7 @@ App.controller('ProjectPageController', function (
     // Remove project_id from tag.project_ids
     const remainingProjectIds = []
     const removedProjectIds = []
-    for (let projectId of tag.project_ids) {
+    for (const projectId of tag.project_ids) {
       if (!removeProjectIds.includes(projectId)) {
         remainingProjectIds.push(projectId)
       } else {
@@ -330,7 +330,7 @@ App.controller('ProjectPageController', function (
     )
 
     // Remove tag from project.tags
-    for (let project of selectedProjects) {
+    for (const project of selectedProjects) {
       if (!project.tags) {
         project.tags = []
       }
@@ -340,7 +340,7 @@ App.controller('ProjectPageController', function (
       }
     }
 
-    for (let projectId of removedProjectIds) {
+    for (const projectId of removedProjectIds) {
       queuedHttp({
         method: 'DELETE',
         url: `/tag/${tag._id}/project/${projectId}`,
@@ -387,7 +387,7 @@ App.controller('ProjectPageController', function (
 
     // Add project_ids into tag.project_ids
     const addedProjectIds = []
-    for (let projectId of $scope.getSelectedProjectIds()) {
+    for (const projectId of $scope.getSelectedProjectIds()) {
       if (!tag.project_ids.includes(projectId)) {
         tag.project_ids.push(projectId)
         addedProjectIds.push(projectId)
@@ -395,7 +395,7 @@ App.controller('ProjectPageController', function (
     }
 
     // Add tag into each project.tags
-    for (let project of selectedProjects) {
+    for (const project of selectedProjects) {
       if (!project.tags) {
         project.tags = []
       }
@@ -404,7 +404,7 @@ App.controller('ProjectPageController', function (
       }
     }
 
-    for (let projectId of addedProjectIds) {
+    for (const projectId of addedProjectIds) {
       queuedHttp.post(`/tag/${tag._id}/project/${projectId}`, {
         _csrf: window.csrfToken,
       })
@@ -483,7 +483,7 @@ App.controller('ProjectPageController', function (
       .then(() => (project.name = newName))
 
   $scope.openRenameProjectModal = function () {
-    let project = $scope.getFirstSelectedProject()
+    const project = $scope.getFirstSelectedProject()
     if (!project || project.accessLevel !== 'owner') {
       return
     }
@@ -654,7 +654,7 @@ App.controller('ProjectPageController', function (
 
   //
   $scope.archiveProjects = function (projects) {
-    for (let project of projects) {
+    for (const project of projects) {
       project.archived = true
       project.trashed = false
       _archiveProject(project)
@@ -663,7 +663,7 @@ App.controller('ProjectPageController', function (
   }
 
   $scope.unarchiveProjects = function (projects) {
-    for (let project of projects) {
+    for (const project of projects) {
       project.archived = false
       _unarchiveProject(project)
     }
@@ -671,7 +671,7 @@ App.controller('ProjectPageController', function (
   }
 
   $scope.trashProjects = function (projects) {
-    for (let project of projects) {
+    for (const project of projects) {
       project.trashed = true
       project.archived = false
       _trashProject(project)
@@ -680,7 +680,7 @@ App.controller('ProjectPageController', function (
   }
 
   $scope.untrashProjects = function (projects) {
-    for (let project of projects) {
+    for (const project of projects) {
       project.trashed = false
       _untrashProject(project)
     }
@@ -689,7 +689,7 @@ App.controller('ProjectPageController', function (
 
   $scope.leaveProjects = function (projects) {
     _deleteOrLeaveProjectsLocally(projects)
-    for (let project of projects) {
+    for (const project of projects) {
       _leaveProject(project)
     }
     $scope.updateVisibleProjects()
@@ -697,7 +697,7 @@ App.controller('ProjectPageController', function (
 
   $scope.deleteProjects = function (projects) {
     _deleteOrLeaveProjectsLocally(projects)
-    for (let project of projects) {
+    for (const project of projects) {
       _deleteProject(project)
     }
     $scope.updateVisibleProjects()
@@ -705,7 +705,7 @@ App.controller('ProjectPageController', function (
 
   $scope.leaveOrDeleteProjects = function (projects) {
     _deleteOrLeaveProjectsLocally(projects)
-    for (let project of projects) {
+    for (const project of projects) {
       if (project.accessLevel === 'owner') {
         _deleteProject(project)
       } else {
@@ -778,10 +778,10 @@ App.controller('ProjectPageController', function (
 
   const _deleteOrLeaveProjectsLocally = function (projects) {
     const projectIds = projects.map(p => p.id)
-    for (let tag of $scope.tags || []) {
+    for (const tag of $scope.tags || []) {
       $scope._removeProjectIdsFromTagArray(tag, projectIds)
     }
-    for (let project of projects || []) {
+    for (const project of projects || []) {
       $scope._removeProjectFromList(project)
     }
   }
@@ -820,7 +820,7 @@ App.controller('ProjectPageController', function (
   }
 
   const markTagAsSelected = id => {
-    for (let tag of $scope.tags) {
+    for (const tag of $scope.tags) {
       if (tag._id === id) {
         tag.selected = true
       } else {

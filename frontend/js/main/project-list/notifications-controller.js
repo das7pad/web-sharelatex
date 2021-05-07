@@ -154,7 +154,7 @@ App.controller(
       }
       return false
     }
-    for (let userEmail of $scope.userEmails) {
+    for (const userEmail of $scope.userEmails) {
       userEmail.hide = false
     }
 

@@ -311,7 +311,7 @@ class UserHelper {
   }
 
   async addEmail(email) {
-    let response = await this.request.post({
+    const response = await this.request.post({
       form: {
         email,
       },

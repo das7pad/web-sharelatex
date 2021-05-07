@@ -21,7 +21,7 @@ export default App.factory('settings', (ide, eventTracking) => ({
     }
 
     // Tracking code.
-    for (let key of Array.from(Object.keys(data))) {
+    for (const key of Array.from(Object.keys(data))) {
       const changedSetting = key
       const changedSettingVal = data[key]
       eventTracking.sendMB('setting-changed', {

@@ -659,7 +659,7 @@ const ClsiManager = {
         )
       }
       const docs = {}
-      for (let doc of docUpdaterDocs || []) {
+      for (const doc of docUpdaterDocs || []) {
         const path = docPath[doc._id]
         docs[path] = doc
       }

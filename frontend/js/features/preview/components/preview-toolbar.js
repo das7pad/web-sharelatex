@@ -94,7 +94,7 @@ function PreviewToolbar({
 
     itemsWidth += 10 // add extra for some spacing between items
 
-    let canShowText = itemsWidth < toolbarWidth
+    const canShowText = itemsWidth < toolbarWidth
 
     if (!canShowText) {
       _checkToggleText(
