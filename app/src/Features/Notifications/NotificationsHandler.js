@@ -1,16 +1,3 @@
-/* eslint-disable
-    camelcase,
-    max-len,
-    no-unused-vars,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const jwt = require('jsonwebtoken')
 const OError = require('@overleaf/o-error')
 const settings = require('@overleaf/settings')
@@ -20,20 +7,18 @@ const requestRetry = require('requestretry').defaults({
   retryDelay: 10,
 })
 const logger = require('logger-sharelatex')
+const _ = require('lodash')
 
+const notificationsApi = _.get(settings, ['apis', 'notifications', 'url'])
 const oneSecond = 1000
 
 const makeRequest = function (opts, callback) {
-  if (
-    (settings.apis.notifications != null
-      ? settings.apis.notifications.url
-      : undefined) == null
-  ) {
-    return callback(null, { statusCode: 200 })
+  if (notificationsApi) {
+    request(opts, callback)
   } else if (opts.method === 'GET') {
     return requestRetry(opts, callback)
   } else {
-    return request(opts, callback)
+    callback(null, { statusCode: 200 })
   }
 }
 
@@ -47,13 +32,9 @@ module.exports = {
     )
   },
 
-  getUserNotifications(user_id, callback) {
+  getUserNotifications(userId, callback) {
     const opts = {
-      uri: `${
-        settings.apis.notifications != null
-          ? settings.apis.notifications.url
-          : undefined
-      }/user/${user_id}`,
+      uri: `${notificationsApi}/user/${userId}`,
       json: true,
       timeout: oneSecond,
       method: 'GET',
@@ -69,18 +50,18 @@ module.exports = {
       }
       if (err) {
         logger.err({ err }, 'something went wrong getting notifications')
-        return callback(null, [])
+        callback(null, [])
       } else {
         if (unreadNotifications == null) {
           unreadNotifications = []
         }
-        return callback(null, unreadNotifications)
+        callback(null, unreadNotifications)
       }
     })
   },
 
   createNotification(
-    user_id,
+    userId,
     key,
     templateKey,
     messageOpts,
@@ -98,63 +79,47 @@ module.exports = {
       templateKey,
       forceCreate,
     }
-    if (expiryDateTime != null) {
+    if (expiryDateTime) {
       payload.expires = expiryDateTime
     }
     const opts = {
-      uri: `${
-        settings.apis.notifications != null
-          ? settings.apis.notifications.url
-          : undefined
-      }/user/${user_id}`,
+      uri: `${notificationsApi}/user/${userId}`,
       timeout: oneSecond,
       method: 'POST',
       json: payload,
     }
-    return makeRequest(opts, callback)
+    makeRequest(opts, callback)
   },
 
-  markAsReadWithKey(user_id, key, callback) {
+  markAsReadWithKey(userId, key, callback) {
     const opts = {
-      uri: `${
-        settings.apis.notifications != null
-          ? settings.apis.notifications.url
-          : undefined
-      }/user/${user_id}`,
+      uri: `${notificationsApi}/user/${userId}`,
       method: 'DELETE',
       timeout: oneSecond,
       json: {
         key,
       },
     }
-    return makeRequest(opts, callback)
+    makeRequest(opts, callback)
   },
 
-  markAsRead(user_id, notification_id, callback) {
+  markAsRead(userId, notificationId, callback) {
     const opts = {
       method: 'DELETE',
-      uri: `${
-        settings.apis.notifications != null
-          ? settings.apis.notifications.url
-          : undefined
-      }/user/${user_id}/notification/${notification_id}`,
+      uri: `${notificationsApi}/user/${userId}/notification/${notificationId}`,
       timeout: oneSecond,
     }
-    return makeRequest(opts, callback)
+    makeRequest(opts, callback)
   },
 
   // removes notification by key, without regard for user_id,
   // should not be exposed to user via ui/router
   markAsReadByKeyOnly(key, callback) {
     const opts = {
-      uri: `${
-        settings.apis.notifications != null
-          ? settings.apis.notifications.url
-          : undefined
-      }/key/${key}`,
+      uri: `${notificationsApi}/key/${key}`,
       method: 'DELETE',
       timeout: oneSecond,
     }
-    return makeRequest(opts, callback)
+    makeRequest(opts, callback)
   },
 }

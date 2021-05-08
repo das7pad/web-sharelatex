@@ -8,6 +8,7 @@ const recurlyApiKey = recurlySettings ? recurlySettings.apiKey : undefined
 
 let client, recurly, errors
 if (recurlyApiKey) {
+  // eslint-disable-next-line import/no-extraneous-dependencies
   recurly = require('recurly')
   errors = recurly.errors
   client = new recurly.Client(recurlyApiKey)
