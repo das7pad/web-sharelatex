@@ -5,37 +5,17 @@
   "root": true,
   "extends": [
     "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:react-hooks/recommended",
-    "plugin:jsx-a11y/recommended",
     "standard",
-    "standard-jsx",
-    "standard-react",
     "prettier"
   ],
   "plugins": [
-    "jsx-a11y",
-    "mocha",
-    "chai-expect",
     "chai-friendly"
   ],
   "env": {
-    "browser": true,
-    "mocha": true,
+    "browser": false,
+    "mocha": false,
     "node": true,
     "es2020": true
-  },
-  "parserOptions": {
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
-  "settings": {
-    // Tell eslint-plugin-react to detect which version of React we are using
-    "react": {
-      "version": "detect"
-    }
   },
   "rules": {
     // Swap the no-unused-expressions rule with a more chai-friendly one
@@ -56,16 +36,20 @@
     "node/no-callback-literal": "off",
     "node/no-deprecated-api": "off",
     "node/handle-callback-err": "off",
-    "node/no-path-concat": "off",
-
-    "react/display-name": "off",
-    "react/no-unescaped-entities": "off",
-    "react/no-unused-prop-types": "off",
-    "react/jsx-no-target-blank": "off",
-    "react/jsx-handler-names": "off"
+    "node/no-path-concat": "off"
   },
   "overrides": [
     // NOTE: changing paths may require updating them in the Makefile too.
+    {
+      "files": ["**/test/**/*.js"],
+      "plugins": [
+        "mocha",
+        "chai-expect"
+      ],
+      "env": {
+        "mocha": true
+      }
+    },
     {
       // Test specific rules
       "files": ["**/test/*/src/**/*.js", "**/test/**/*.test.js"],
@@ -103,7 +87,10 @@
     },
     {
       // Backend specific rules
-      "files": ["**/app/src/**/*.js"],
+      "files": ["**/app/src/**/*.js", "app.js"],
+      "env": {
+        "node": true
+      },
       "rules": {
         // don't allow console.log in backend code
         "no-console": "error",
@@ -116,17 +103,32 @@
       }
     },
     {
-      // Frontend specific rules
-      "files": ["**/frontend/js/**/*.js"],
-      "globals": {
-        "$": true,
-        "angular": true,
-        "ace": true,
-        "ga": true,
-        "sl_console": true,
-        "sl_debugging": true
+      // React rules
+      "files": [
+        "**/frontend/js/**/*.js",
+        "**/frontend/stories/**/*.js",
+        "**/test/frontend/**/*.js"
+      ],
+      "extends": [
+        "plugin:react/recommended",
+        "plugin:react-hooks/recommended",
+        "plugin:jsx-a11y/recommended",
+        "standard-jsx",
+        "standard-react"
+      ],
+      "plugins": [
+        "jsx-a11y"
+      ],
+      "env": {
+        "browser": true
       },
       "rules": {
+        "react/display-name": "off",
+        "react/no-unescaped-entities": "off",
+        "react/no-unused-prop-types": "off",
+        "react/jsx-no-target-blank": "off",
+        "react/jsx-handler-names": "off",
+
         // Prevent usage of legacy string refs
         "react/no-string-refs": "error",
 
@@ -153,6 +155,37 @@
             }
           }
         ]
+      },
+      "settings": {
+        // Tell eslint-plugin-react to detect which version of React we are using
+        "react": {
+          "version": "detect"
+        }
+      },
+      "parserOptions": {
+        "sourceType": "module",
+        "ecmaFeatures": {
+          "jsx": true
+        }
+      }
+    },
+    {
+      // Frontend specific rules
+      "files": [
+        "esbuild/inject/*.js",
+        "**/frontend/js/**/*.js"
+      ],
+      "env": {
+        "browser": true,
+        "node": false
+      },
+      "globals": {
+        "$": true,
+        "angular": true,
+        "ace": true,
+        "ga": true,
+        "sl_console": true,
+        "sl_debugging": true
       }
     },
     {
@@ -169,6 +202,9 @@
         "scripts/*.js",
         "scripts/**/*.js"
       ],
+      "env": {
+        "node": true
+      },
       "rules": {
         // Do not allow importing of any dependencies unless specified in either
         //  - web/package.json
