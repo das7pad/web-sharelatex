@@ -66,7 +66,7 @@ const PATTERNS = []
 module.exports = { PATTERNS }
 
 if (require.main === module) {
-  for (let { from, to } of PATTERNS) {
+  for (const { from, to } of PATTERNS) {
     fsExtra.copySync(from, to)
   }
 }

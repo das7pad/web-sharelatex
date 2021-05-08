@@ -829,7 +829,7 @@ const ProjectController = {
 
             const logsUIVariant = getNewLogsUIVariantForUser(user)
 
-            function shouldDisplayFeature(name, variantFlag) {
+            const shouldDisplayFeature = (name, variantFlag) => {
               if (req.query && req.query[name]) {
                 return req.query[name] === 'true'
               } else {
