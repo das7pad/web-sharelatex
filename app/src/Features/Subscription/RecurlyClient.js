@@ -72,6 +72,29 @@ async function removeSubscriptionChangeByUuid(subscriptionUuid) {
   return await removeSubscriptionChange('uuid-' + subscriptionUuid)
 }
 
+async function reactivateSubscriptionByUuid(subscriptionUuid) {
+  return await client.reactivateSubscription('uuid-' + subscriptionUuid)
+}
+
+async function cancelSubscriptionByUuid(subscriptionUuid) {
+  try {
+    return await client.cancelSubscription('uuid-' + subscriptionUuid)
+  } catch (err) {
+    if (err instanceof recurly.errors.ValidationError) {
+      if (
+        err.message === 'Only active and future subscriptions can be canceled.'
+      ) {
+        logger.log(
+          { subscriptionUuid },
+          'subscription cancellation failed, subscription not active'
+        )
+      }
+    } else {
+      throw err
+    }
+  }
+}
+
 module.exports = {
   errors,
 
@@ -82,6 +105,8 @@ module.exports = {
   changeSubscriptionByUuid: callbackify(changeSubscriptionByUuid),
   removeSubscriptionChange: callbackify(removeSubscriptionChange),
   removeSubscriptionChangeByUuid: callbackify(removeSubscriptionChangeByUuid),
+  reactivateSubscriptionByUuid: callbackify(reactivateSubscriptionByUuid),
+  cancelSubscriptionByUuid: callbackify(cancelSubscriptionByUuid),
 
   promises: {
     getSubscription,
@@ -91,5 +116,7 @@ module.exports = {
     changeSubscriptionByUuid,
     removeSubscriptionChange,
     removeSubscriptionChangeByUuid,
+    reactivateSubscriptionByUuid,
+    cancelSubscriptionByUuid,
   },
 }
