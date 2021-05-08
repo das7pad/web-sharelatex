@@ -5,6 +5,7 @@ import FileTreeCreateFormProvider from '../../contexts/file-tree-create-form'
 import FileTreeModalCreateFileBody from '../file-tree-create/file-tree-modal-create-file-body'
 import FileTreeModalCreateFileFooter from '../file-tree-create/file-tree-modal-create-file-footer'
 import AccessibleModal from '../../../../shared/components/accessible-modal'
+import t from '../../../../misc/t'
 
 export default function FileTreeModalCreateFile() {
   const { isCreatingFile, cancel } = useFileTreeActionable()
@@ -17,7 +18,7 @@ export default function FileTreeModalCreateFile() {
     <FileTreeCreateFormProvider>
       <AccessibleModal bsSize="large" onHide={cancel} show>
         <Modal.Header closeButton>
-          <Modal.Title>Add Files</Modal.Title>
+          <Modal.Title>{t('add_files')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body className="modal-new-file">

@@ -10,16 +10,17 @@ import {
   InvalidFilenameError,
 } from '../../errors'
 import { Trans } from '../../../../components/trans'
+import t from '../../../../misc/t'
 
 /**
  * A form component that renders a text input with label,
  * plus a validation warning and/or an error message when needed
  */
 export default function FileTreeCreateNameInput({
-  label = 'File Name',
+  label,
   focusName = false,
   classes = {},
-  placeholder = 'File Name',
+  placeholder,
   error,
 }) {
   // the value is stored in a context provider, so it's available elsewhere in the form
@@ -40,11 +41,11 @@ export default function FileTreeCreateNameInput({
 
   return (
     <FormGroup controlId="new-doc-name" className={classes.formGroup}>
-      <ControlLabel>{label}</ControlLabel>
+      <ControlLabel>{label || t('file_name')}</ControlLabel>
 
       <FormControl
         type="text"
-        placeholder={placeholder}
+        placeholder={placeholder || t('file_name')}
         required
         value={name}
         onChange={event => setName(event.target.value)}

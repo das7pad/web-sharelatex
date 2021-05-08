@@ -1,19 +1,18 @@
 import React, { useState } from 'react'
 import { Button } from 'react-bootstrap'
 import Icon from '../../../shared/components/icon'
-import { startFreeTrial, upgradePlan } from '../../../main/account-upgrade'
-import { useShareProjectContext } from './share-project-modal'
+import { upgradePlan } from '../../../main/account-upgrade'
+import StartFreeTrialButton from '../../../shared/components/start-free-trial-button'
 import { Trans } from '../../../components/trans'
+import t from '../../../misc/t'
 
 export default function AddCollaboratorsUpgrade() {
-  const { eventTracking } = useShareProjectContext()
-
   const [startedFreeTrial, setStartedFreeTrial] = useState(false)
 
   return (
     <div className="add-collaborators-upgrade">
       <p className="text-center">
-        <Trans i18nKey="need_to_upgrade_for_more_collabs" />. Also:
+        <Trans i18nKey="need_to_upgrade_for_more_collabs" />. {t('also')}:
       </p>
 
       <ul className="list-unstyled">
@@ -54,20 +53,11 @@ export default function AddCollaboratorsUpgrade() {
 
       <p className="text-center row-spaced-thin">
         {window.user.allowedFreeTrial ? (
-          <Button
-            bsStyle="success"
-            onClick={() => {
-              startFreeTrial(
-                'projectMembers',
-                undefined,
-                undefined,
-                eventTracking
-              )
-              setStartedFreeTrial(true)
-            }}
-          >
-            <Trans i18nKey="start_free_trial" />
-          </Button>
+          <StartFreeTrialButton
+            buttonStyle="success"
+            setStartedFreeTrial={setStartedFreeTrial}
+            source="projectMembers"
+          />
         ) : (
           <Button
             bsStyle="success"
@@ -76,7 +66,7 @@ export default function AddCollaboratorsUpgrade() {
               setStartedFreeTrial(true)
             }}
           >
-            <Trans i18nKey="start_free_trial" />
+            <Trans i18nKey="upgrade" />
           </Button>
         )}
       </p>

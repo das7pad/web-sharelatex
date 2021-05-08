@@ -6,6 +6,7 @@ import classnames from 'classnames'
 
 import Icon from '../../../shared/components/icon'
 import { Trans } from '../../../components/trans'
+import t from '../../../misc/t'
 
 // Unicode characters in these Unicode groups:
 //  "General Punctuation — Spaces"
@@ -306,7 +307,7 @@ function SelectedItem({
       <button
         type="button"
         className="remove-button btn-inline-link"
-        aria-label="Remove"
+        aria-label={t('remove')}
         onClick={handleClick}
       >
         <Icon type="close" modifier="fw" />

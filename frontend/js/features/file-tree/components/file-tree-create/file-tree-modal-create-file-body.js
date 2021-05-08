@@ -8,6 +8,7 @@ import FileTreeCreateNameProvider from '../../contexts/file-tree-create-name'
 import { useFileTreeActionable } from '../../contexts/file-tree-actionable'
 import { useFileTreeMutable } from '../../contexts/file-tree-mutable'
 import getMeta from '../../../../utils/meta'
+import t from '../../../../misc/t'
 
 import createFileModeModules from '../../../../../../modules/modules-create-file-mode'
 
@@ -28,26 +29,26 @@ export default function FileTreeModalCreateFileBody() {
               <FileTreeModalCreateFileMode
                 mode="doc"
                 icon="file"
-                label="New File"
+                label={t('new_file')}
               />
 
               <FileTreeModalCreateFileMode
                 mode="upload"
                 icon="upload"
-                label="Upload"
+                label={t('upload')}
               />
 
               <FileTreeModalCreateFileMode
                 mode="project"
                 icon="folder-open"
-                label="From Another Project"
+                label={t('from_another_project')}
               />
 
               {getMeta('ol-hasLinkUrlFeature') && (
                 <FileTreeModalCreateFileMode
                   mode="url"
                   icon="globe"
-                  label="From External URL"
+                  label={t('from_external_url')}
                 />
               )}
 
