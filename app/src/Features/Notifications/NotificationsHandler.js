@@ -13,10 +13,10 @@ const notificationsApi = _.get(settings, ['apis', 'notifications', 'url'])
 const oneSecond = 1000
 
 const makeRequest = function (opts, callback) {
-  if (notificationsApi) {
+  if (notificationsApi && opts.method === 'GET') {
+    requestRetry(opts, callback)
+  } else if (notificationsApi) {
     request(opts, callback)
-  } else if (opts.method === 'GET') {
-    return requestRetry(opts, callback)
   } else {
     callback(null, { statusCode: 200 })
   }
