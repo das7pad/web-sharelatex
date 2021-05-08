@@ -199,16 +199,18 @@ function ProjectFilePathProvider({ file }) {
       &nbsp;
       <Trans
         i18nKey="imported_from_another_project_at_date"
-        components={
-          file.linkedFileData.v1_source_doc_id
-            ? [<span />]
-            : [
-                <a
-                  href={`/project/${file.linkedFileData.source_project_id}`}
-                  target="_blank"
-                />,
-              ]
-        }
+        components={[
+          <>
+            {file.linkedFileData.v1_source_doc_id ? (
+              <span />
+            ) : (
+              <a
+                href={`/project/${file.linkedFileData.source_project_id}`}
+                target="_blank"
+              />
+            )}
+          </>,
+        ]}
         values={{
           sourceEntityPathHTML: file.linkedFileData.source_entity_path.slice(1),
           formattedDate: formatTime(file.created),
@@ -238,16 +240,18 @@ function ProjectOutputFileProvider({ file }) {
       &nbsp;
       <Trans
         i18nKey="imported_from_the_output_of_another_project_at_date"
-        components={
-          file.linkedFileData.v1_source_doc_id
-            ? [<span />]
-            : [
-                <a
-                  href={`/project/${file.linkedFileData.source_project_id}`}
-                  target="_blank"
-                />,
-              ]
-        }
+        components={[
+          <>
+            {file.linkedFileData.v1_source_doc_id ? (
+              <span />
+            ) : (
+              <a
+                href={`/project/${file.linkedFileData.source_project_id}`}
+                target="_blank"
+              />
+            )}
+          </>,
+        ]}
         values={{
           sourceOutputFilePathHTML: file.linkedFileData.source_output_file_path,
           formattedDate: formatTime(file.created),
