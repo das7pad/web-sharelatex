@@ -61,7 +61,7 @@ const isInViewport = function (element) {
   return elBtm > viewportTop && elTop < viewportBtm
 }
 
-export default App.directive('eventTracking', eventTracking => ({
+const factory = eventTracking => ({
   scope: {
     eventTracking: '@',
     eventSegmentation: '=?',
@@ -126,4 +126,7 @@ export default App.directive('eventTracking', eventTracking => ({
       )
     }
   },
-}))
+})
+
+App.directive('eventTracking', factory)
+App.directive('eventTracking2', factory)

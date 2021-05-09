@@ -23,8 +23,10 @@ const isSAAS = getMeta('ol-isSAAS')
 // long wait until the next one
 let heartbeatsSent = 0
 let nextHeartbeat = new Date()
+App.factory('eventTracking', factory)
+App.factory('eventTracking2', factory)
 
-App.factory('eventTracking', function ($http) {
+function factory($http) {
   if (!isSAAS) {
     return {
       enabled: false,
@@ -136,7 +138,7 @@ App.factory('eventTracking', function ($http) {
       return _eventInCache(key)
     },
   }
-})
+}
 
 if (isSAAS) {
   $('.navbar a').on('click', function (e) {
