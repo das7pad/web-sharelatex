@@ -3,10 +3,9 @@ import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import Icon from './icon'
 import { Trans } from '../../components/trans'
+import t from '../../misc/t'
 
 export default function CopyLink({ link, tooltipId }) {
-  const { t } = useTranslation()
-
   const [copied, setCopied] = useState(false)
 
   const handleClick = useCallback(() => {

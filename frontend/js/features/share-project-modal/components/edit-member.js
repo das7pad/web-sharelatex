@@ -119,7 +119,6 @@ SelectPrivilege.propTypes = {
 }
 
 function RemoveMemberAction({ member }) {
-  const { t } = useTranslation()
   const { updateProject, monitorRequest } = useShareProjectContext()
   const project = useProjectContext()
 

@@ -9,6 +9,7 @@ import { Button, Col, Row, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import MemberPrivileges from './member-privileges'
 import { resendInvite, revokeInvite } from '../utils/api'
 import { Trans } from '../../../components/trans'
+import t from '../../../misc/t'
 
 export default function Invite({ invite, isAdmin }) {
   return (
@@ -75,7 +76,6 @@ ResendInvite.propTypes = {
 }
 
 function RevokeInvite({ invite }) {
-  const { t } = useTranslation()
   const { updateProject, monitorRequest } = useShareProjectContext()
   const project = useProjectContext()
 
