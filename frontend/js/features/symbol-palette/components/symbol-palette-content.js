@@ -16,7 +16,7 @@ export default function SymbolPaletteContent({ handleSelect }) {
   const [input, setInput] = useState('')
 
   // build the list of categories with translated labels
-  const categories = useMemo(() => createCategories(t), [t])
+  const categories = useMemo(() => createCategories(t), [])
 
   // group the symbols by category
   const categorisedSymbols = useMemo(
