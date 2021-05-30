@@ -95,6 +95,7 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
+    "@reach/tabs": "^0.15.0",
     "@sentry/browser": "^5.27.6",
     "@testing-library/dom": "^7.29.4",
     "@testing-library/react": "^11.2.3",
