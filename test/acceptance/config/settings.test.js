@@ -1,6 +1,6 @@
 let features
 const v1Api = {
-  url: `http://${process.env.V1_HOST || 'localhost'}:5000`,
+  url: 'http://localhost:5000',
   user: 'overleaf',
   pass: 'password',
 }

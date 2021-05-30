@@ -97,7 +97,7 @@ export function EditorProvider({ children, ide, settings }) {
     setTitle(
       `${projectName ? projectName + ' - ' : ''}Online LaTeX Editor ${appName}`
     )
-  }, [appName, projectName, setTitle])
+  }, [projectName, setTitle, appName])
 
   const editorContextValue = {
     cobranding,

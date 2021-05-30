@@ -1,9 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 let cdnUrl, defaultFeatures, docUpdaterPort, siteUrl, v1Api
 
 const http = require('http')
@@ -191,10 +185,9 @@ module.exports = {
     // 	]
 
     api: {
-      host: process.env.API_REDIS_HOST || process.env.REDIS_HOST || 'localhost',
-      port: process.env.API_REDIS_PORT || process.env.REDIS_PORT || '6379',
-      password:
-        process.env.API_REDIS_PASSWORD || process.env.REDIS_PASSWORD || '',
+      host: process.env.REDIS_HOST || 'localhost',
+      port: process.env.REDIS_PORT || '6379',
+      password: process.env.REDIS_PASSWORD || '',
       maxRetriesPerRequest: parseInt(
         process.env.REDIS_MAX_RETRIES_PER_REQUEST || '20'
       ),
@@ -371,7 +364,7 @@ module.exports = {
 
   splitTests: [
     {
-      id: 'example-project',
+      id: 'example-project-v2',
       active: process.env.SPLITTEST_EXAMPLE_PROJECT_ACTIVE === 'true',
       variants: [
         {
@@ -379,6 +372,20 @@ module.exports = {
           rolloutPercent: parseInt(
             process.env
               .SPLITTEST_EXAMPLE_PROJECT_FROG_VARIANT_ROLLOUT_PERCENT || '0',
+            10
+          ),
+        },
+      ],
+    },
+    {
+      id: 'subscription-page',
+      active: process.env.SPLITTEST_SUBSCRIPTION_PAGE_ACTIVE === 'true',
+      variants: [
+        {
+          id: 'new',
+          rolloutPercent: parseInt(
+            process.env
+              .SPLITTEST_SUBSCRIPTION_PAGE_NEW_VARIANT_ROLLOUT_PERCENT || '0',
             10
           ),
         },
