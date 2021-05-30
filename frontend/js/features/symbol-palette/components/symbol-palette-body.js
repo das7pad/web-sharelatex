@@ -1,8 +1,8 @@
 import React from 'react'
 import { TabPanels, TabPanel } from '@reach/tabs'
-import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import SymbolPaletteItems from './symbol-palette-items'
+import t from '../../../misc/t'
 
 export default function SymbolPaletteBody({
   categories,
@@ -11,8 +11,6 @@ export default function SymbolPaletteBody({
   handleSelect,
   focusInput,
 }) {
-  const { t } = useTranslation()
-
   // not searching: show the symbols grouped by category
   if (!filteredSymbols) {
     return (

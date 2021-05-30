@@ -1,8 +1,8 @@
 import { Tabs } from '@reach/tabs'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { matchSorter } from 'match-sorter'
+import t from '../../../misc/t'
 
 import symbols from '../data/symbols.json'
 import { buildCategorisedSymbols, createCategories } from '../utils/categories'
@@ -14,8 +14,6 @@ import SymbolPaletteTabs from './symbol-palette-tabs'
 
 export default function SymbolPaletteContent({ handleSelect }) {
   const [input, setInput] = useState('')
-
-  const { t } = useTranslation()
 
   // build the list of categories with translated labels
   const categories = useMemo(() => createCategories(t), [t])
