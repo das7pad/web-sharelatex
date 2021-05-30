@@ -1,11 +1,13 @@
 import React, { useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
+
 import Icon from '../../../shared/components/icon'
 import { formatTime, relativeDate } from '../../utils/format-date'
 import { postJSON } from '../../../infrastructure/fetch-json'
 import t from '../../../misc/t'
 import { Trans } from '../../../components/trans'
 import useIsMounted from '../../../shared/hooks/use-is-mounted'
+import { useEditorContext } from '../../../shared/context/editor-context'
 
 import tprLinkedFileInfo from '../../../../../modules/modules-tpr-linked-file-info'
 import tprLinkedFileRefreshError from '../../../../../modules/modules-tpr-linked-file-refresh-error'
@@ -28,10 +30,13 @@ function shortenedUrl(url) {
 }
 
 export default function BinaryFileHeader({ file, storeReferencesKeys }) {
+  const { projectId } = useEditorContext({
+    projectId: PropTypes.string.isRequired,
+  })
+  const isMounted = useIsMounted()
+
   const [refreshing, setRefreshing] = useState(false)
   const [refreshError, setRefreshError] = useState(null)
-
-  const isMounted = useIsMounted()
 
   let fileInfo
   if (file.linkedFileData) {
@@ -60,7 +65,7 @@ export default function BinaryFileHeader({ file, storeReferencesKeys }) {
     setRefreshing(true)
     // Replacement of the file handled by the file tree
     window.expectingLinkedFileRefreshedSocketFor = file.name
-    postJSON(`/project/${window.project_id}/linked_file/${file.id}/refresh`)
+    postJSON(`/project/${projectId}/linked_file/${file.id}/refresh`)
       .then(() => {
         if (isMounted.current) {
           setRefreshing(false)
@@ -87,7 +92,7 @@ export default function BinaryFileHeader({ file, storeReferencesKeys }) {
         body: { shouldBroadcast: true },
       }
 
-      postJSON(`/project/${window.project_id}/references/indexAll`, opts)
+      postJSON(`/project/${projectId}/references/indexAll`, opts)
         .then(response => {
           // Later updated by the socket but also updated here for immediate use
           storeReferencesKeys(response.keys)
@@ -96,7 +101,7 @@ export default function BinaryFileHeader({ file, storeReferencesKeys }) {
           console.log(error)
         })
     }
-  }, [file, isMounted, storeReferencesKeys])
+  }, [file, projectId, isMounted, storeReferencesKeys])
 
   return (
     <div className="binary-file-header">
@@ -117,7 +122,7 @@ export default function BinaryFileHeader({ file, storeReferencesKeys }) {
       )}
       &nbsp;
       <a
-        href={`/project/${window.project_id}/file/${file.id}`}
+        href={`/project/${projectId}/file/${file.id}`}
         className="btn btn-info"
       >
         <Icon type="download" modifier="fw" />

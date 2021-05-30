@@ -8,42 +8,13 @@ import t from '../../../misc/t'
 
 const imageExtensions = ['png', 'jpg', 'jpeg', 'gif']
 
-const textExtensions = [
-  'tex',
-  'latex',
-  'sty',
-  'cls',
-  'bst',
-  'bib',
-  'bibtex',
-  'txt',
-  'tikz',
-  'mtx',
-  'rtex',
-  'md',
-  'asy',
-  'latexmkrc',
-  'lbx',
-  'bbx',
-  'cbx',
-  'm',
-  'lco',
-  'dtx',
-  'ins',
-  'ist',
-  'def',
-  'clo',
-  'ldf',
-  'rmd',
-  'lua',
-  'gv',
-]
+const textExtensions = window.ExposedSettings.textExtensions
 
 export default function BinaryFile({ file, storeReferencesKeys }) {
-  const extension = file.name.split('.').pop().toLowerCase()
-
   const [contentLoading, setContentLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+
+  const extension = file.name.split('.').pop().toLowerCase()
   const isUnpreviewableFile =
     !imageExtensions.includes(extension) && !textExtensions.includes(extension)
 

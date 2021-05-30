@@ -22,6 +22,8 @@ export default App.directive('pdfng', $timeout => ({
     highlights: '=',
     position: '=',
     dblClickCallback: '=',
+    firstRenderDone: '=',
+    updateConsumedBandwidth: '=',
   },
   link(scope, element, attrs) {
     scope.loading = false
@@ -151,7 +153,18 @@ export default App.directive('pdfng', $timeout => ({
   // console.log 'pdfjs destroy event'
 
   template: `\
-<div data-pdf-viewer class="pdfjs-viewer" pdf-src='pdfSrc' position='position' scale='scale' highlights='highlights' please-jump-to='pleaseJumpTo'></div>
+<div
+    data-pdf-viewer
+    class="pdfjs-viewer"
+    pdf-src='pdfSrc'
+    position='position'
+    scale='scale'
+    highlights='highlights'
+    please-jump-to='pleaseJumpTo'
+    first-render-done="firstRenderDone"
+    update-consumed-bandwidth="updateConsumedBandwidth"
+>
+</div>
 <div class="pdfjs-controls" ng-class="{'flash': flashControls }">
   <div class="btn-group">
       <a href

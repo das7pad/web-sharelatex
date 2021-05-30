@@ -36,6 +36,7 @@ const UserController = require('../User/UserController')
 const SpellingHandler = require('../Spelling/SpellingHandler')
 const AnalyticsManager = require('../Analytics/AnalyticsManager')
 const Modules = require('../../infrastructure/Modules')
+const { getTestSegmentation } = require('../SplitTests/SplitTestHandler')
 const { getNewLogsUIVariantForUser } = require('../Helpers/NewLogsUI')
 
 const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
@@ -837,6 +838,22 @@ const ProjectController = {
               }
             }
 
+            const trackPdfDownload =
+              Settings.enablePdfCaching &&
+              (user.alphaProgram ||
+                (user.betaProgram &&
+                  getTestSegmentation(userId, 'track_pdf_download').variant ===
+                    'enabled'))
+            const enablePdfCaching =
+              Settings.enablePdfCaching &&
+              shouldDisplayFeature(
+                'enable_pdf_caching',
+                user.alphaProgram ||
+                  (user.betaProgram &&
+                    getTestSegmentation(userId, 'enable_pdf_caching')
+                      .variant === 'enabled')
+              )
+
             res.render('project/editor', {
               title: project.name,
               priority_title: true,
@@ -919,9 +936,8 @@ const ProjectController = {
               ),
               showNewBinaryFileUI: shouldDisplayFeature('new_binary_file'),
               showSymbolPalette: shouldDisplayFeature('symbol_palette'),
-              enablePdfCaching:
-                Settings.enablePdfCaching &&
-                shouldDisplayFeature('enable_pdf_caching', user.alphaProgram),
+              trackPdfDownload,
+              enablePdfCaching,
             })
             timer.done()
           }

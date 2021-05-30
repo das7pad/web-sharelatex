@@ -1,7 +1,9 @@
 import App from '../../../base'
 import { react2angular } from 'react2angular'
-import BinaryFile from '../components/binary-file'
 import _ from 'lodash'
+
+import { rootContext } from '../../../shared/context/root-context'
+import BinaryFile from '../components/binary-file'
 
 export default App.controller(
   'ReactBinaryFileController',
@@ -17,5 +19,5 @@ export default App.controller(
 
 App.component(
   'binaryFile',
-  react2angular(BinaryFile, ['storeReferencesKeys', 'file'])
+  react2angular(rootContext.use(BinaryFile), ['storeReferencesKeys', 'file'])
 )

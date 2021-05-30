@@ -8,6 +8,7 @@ import 'ace/ace'
 import { localStorage } from '../../../modules/storage'
 import getMeta from '../../../utils/meta'
 import { waitForServiceWorker } from '../../pdfng/directives/serviceWorkerManager'
+import { trackPdfDownload } from './PdfJsMetrics'
 
 const AUTO_COMPILE_MAX_WAIT = 5000
 // We add a 1 second debounce to sending user changes to server if they aren't
@@ -335,6 +336,8 @@ App.controller(
       }
     }
 
+    function noop() {}
+
     function parseCompileResponse(response) {
       // keep last url
       const lastPdfUrl = $scope.pdf.url
@@ -344,6 +347,8 @@ App.controller(
       $scope.pdf.timedout = false
       $scope.pdf.failure = false
       $scope.pdf.url = null
+      $scope.pdf.updateConsumedBandwidth = noop
+      $scope.pdf.firstRenderDone = noop
       $scope.pdf.clsiMaintenance = false
       $scope.pdf.tooRecentlyCompiled = false
       $scope.pdf.renderingError = false
@@ -393,8 +398,21 @@ App.controller(
           pdfDownloadDomain,
           fileByPath['output.pdf'].url
         )
+
+        if (window.location.search.includes('verify_chunks=true')) {
+          qs.verify_chunks = 'true'
+        }
+
         // convert the qs hash into a query string and append it
         $scope.pdf.url += createQueryString(qs)
+
+        if (getMeta('ol-trackPdfDownload')) {
+          const { firstRenderDone, updateConsumedBandwidth } = trackPdfDownload(
+            response
+          )
+          $scope.pdf.firstRenderDone = firstRenderDone
+          $scope.pdf.updateConsumedBandwidth = updateConsumedBandwidth
+        }
 
         // Save all downloads as files
         qs.popupDownload = true

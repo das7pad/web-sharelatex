@@ -151,12 +151,16 @@ describe('ProjectController', function () {
         .stub()
         .returns({ newLogsUI: false, subvariant: null }),
     }
+    this.SplitTestHandler = {
+      getTestSegmentation: sinon.stub().returns({ enabled: false }),
+    }
 
     this.ProjectController = SandboxedModule.require(MODULE_PATH, {
       requires: {
         mongodb: { ObjectId },
         '@overleaf/settings': this.settings,
         '@overleaf/metrics': this.Metrics,
+        '../SplitTests/SplitTestHandler': this.SplitTestHandler,
         './ProjectDeleter': this.ProjectDeleter,
         './ProjectDuplicator': this.ProjectDuplicator,
         './ProjectCreationHandler': this.ProjectCreationHandler,

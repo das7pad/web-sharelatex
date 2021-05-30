@@ -1,7 +1,48 @@
+import { v4 as uuid } from 'uuid'
 const COMPILE_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/compile$/
 const MIN_CHUNK_SIZE = 128 * 1024
 
 const PDF_FILES = new Map()
+
+const METRICS = {
+  id: uuid(),
+  epoch: Date.now(),
+  cachedBytes: 0,
+  fetchedBytes: 0,
+  requestedBytes: 0,
+}
+
+/**
+ *
+ * @param {number} size
+ * @param {number} cachedBytes
+ * @param {number} fetchedBytes
+ */
+function trackStats({ size, cachedBytes, fetchedBytes }) {
+  METRICS.cachedBytes += cachedBytes
+  METRICS.fetchedBytes += fetchedBytes
+  METRICS.requestedBytes += size
+}
+
+/**
+ * @param {boolean} sizeDiffers
+ * @param {boolean} mismatch
+ * @param {boolean} success
+ */
+function trackChunkVerify({ sizeDiffers, mismatch, success }) {
+  if (sizeDiffers) {
+    METRICS.chunkVerifySizeDiffers |= 0
+    METRICS.chunkVerifySizeDiffers += 1
+  }
+  if (mismatch) {
+    METRICS.chunkVerifyMismatch |= 0
+    METRICS.chunkVerifyMismatch += 1
+  }
+  if (success) {
+    METRICS.chunkVerifySuccess |= 0
+    METRICS.chunkVerifySuccess += 1
+  }
+}
 
 /**
  * @param {FetchEvent} event
@@ -18,6 +59,7 @@ function onFetch(event) {
   if (ctx) {
     return processPdfRequest(event, ctx)
   }
+
   // other request, ignore
 }
 
@@ -27,8 +69,9 @@ function processCompileRequest(event) {
       if (response.status !== 200) return response
 
       return response.json().then(body => {
-        handleCompileResponse(body)
-        // The response body is consumed, serialize it again.
+        handleCompileResponse(response, body)
+        // Send the service workers metrics to the frontend.
+        body.serviceWorkerMetrics = METRICS
         return new Response(JSON.stringify(body), response)
       })
     })
@@ -41,8 +84,12 @@ function processCompileRequest(event) {
  * @param {Object} file
  * @param {string} clsiServerId
  * @param {string} compileGroup
+ * @param {Date} pdfCreatedAt
  */
-function processPdfRequest(event, { file, clsiServerId, compileGroup }) {
+function processPdfRequest(
+  event,
+  { file, clsiServerId, compileGroup, pdfCreatedAt }
+) {
   if (!event.request.headers.has('Range') && file.size > MIN_CHUNK_SIZE) {
     // skip probe request
     const headers = new Headers()
@@ -58,6 +105,7 @@ function processPdfRequest(event, { file, clsiServerId, compileGroup }) {
     )
   }
 
+  const verifyChunks = event.request.url.includes('verify_chunks=true')
   const rangeHeader =
     event.request.headers.get('Range') || `bytes=0-${file.size}`
   const [start, last] = rangeHeader
@@ -96,6 +144,8 @@ function processPdfRequest(event, { file, clsiServerId, compileGroup }) {
       })
     )
   const size = end - start
+  let cachedBytes = 0
+  let fetchedBytes = 0
   const reAssembledBlob = new Uint8Array(size)
   event.respondWith(
     Promise.all(
@@ -108,6 +158,22 @@ function processPdfRequest(event, { file, clsiServerId, compileGroup }) {
                   response.status
                 }`
               )
+            }
+            const blobFetchDate = getServerTime(response)
+            const blobSize = getResponseSize(response)
+            if (blobFetchDate && blobSize) {
+              const chunkSize =
+                Math.min(end, chunk.end) - Math.max(start, chunk.start)
+              // Example: 2MB PDF, 1MB image, 128KB PDF.js chunk.
+              //     | pdf.js chunk |
+              //   | A BIG IMAGE BLOB |
+              // |     THE     FULL     PDF     |
+              if (blobFetchDate < pdfCreatedAt) {
+                cachedBytes += chunkSize
+              } else {
+                // Blobs are fetched in bulk.
+                fetchedBytes += blobSize
+              }
             }
             return response.arrayBuffer()
           })
@@ -134,14 +200,43 @@ function processPdfRequest(event, { file, clsiServerId, compileGroup }) {
           const insertPosition = Math.max(chunk.start - start, 0)
           reAssembledBlob.set(new Uint8Array(arrayBuffer), insertPosition)
         })
-        return new Response(reAssembledBlob, {
-          status: 206,
-          headers: {
-            'Accept-Ranges': 'bytes',
-            'Content-Length': size,
-            'Content-Range': `bytes ${start}-${last}/${file.size}`,
-            'Content-Type': 'application/pdf',
-          },
+
+        let verifyProcess = Promise.resolve(reAssembledBlob)
+        if (verifyChunks) {
+          verifyProcess = fetch(event.request)
+            .then(response => response.arrayBuffer())
+            .then(arrayBuffer => {
+              const fullBlob = new Uint8Array(arrayBuffer)
+              const metrics = {}
+              if (reAssembledBlob.byteLength !== fullBlob.byteLength) {
+                metrics.sizeDiffers = true
+              } else if (
+                !reAssembledBlob.every((v, idx) => v === fullBlob[idx])
+              ) {
+                metrics.mismatch = true
+              } else {
+                metrics.success = true
+              }
+              trackChunkVerify(metrics)
+              if (metrics.success === true) {
+                return reAssembledBlob
+              } else {
+                return fullBlob
+              }
+            })
+        }
+
+        return verifyProcess.then(blob => {
+          trackStats({ size, cachedBytes, fetchedBytes })
+          return new Response(blob, {
+            status: 206,
+            headers: {
+              'Accept-Ranges': 'bytes',
+              'Content-Length': size,
+              'Content-Range': `bytes ${start}-${last}/${file.size}`,
+              'Content-Type': 'application/pdf',
+            },
+          })
         })
       })
       .catch(error => {
@@ -152,16 +247,40 @@ function processPdfRequest(event, { file, clsiServerId, compileGroup }) {
 }
 
 /**
+ *
+ * @param {Response} response
+ */
+function getServerTime(response) {
+  const raw = response.headers.get('Date')
+  if (!raw) return undefined
+  return new Date(raw)
+}
+
+/**
+ *
+ * @param {Response} response
+ */
+function getResponseSize(response) {
+  const raw = response.headers.get('Content-Length')
+  if (!raw) return 0
+  return parseInt(raw, 10)
+}
+
+/**
+ * @param {Response} response
  * @param {Object} body
  */
-function handleCompileResponse(body) {
+function handleCompileResponse(response, body) {
   if (!body || body.status !== 'success') return
+
+  const pdfCreatedAt = getServerTime(response)
 
   for (const file of body.outputFiles) {
     if (file.path !== 'output.pdf') continue // not the pdf used for rendering
     if (file.ranges) {
       const { clsiServerId, compileGroup } = body
       PDF_FILES.set(file.url, {
+        pdfCreatedAt,
         file,
         clsiServerId,
         compileGroup,
