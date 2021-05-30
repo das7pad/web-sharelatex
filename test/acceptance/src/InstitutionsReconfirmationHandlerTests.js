@@ -1,5 +1,5 @@
 const { expect } = require('chai')
-const Settings = require('settings-sharelatex')
+const Settings = require('@overleaf/settings')
 const UserHelper = require('./helpers/UserHelper')
 const MockV1ApiClass = require('./mocks/MockV1Api')
 
