@@ -40,7 +40,6 @@ const CONFIGS = [
     entryPoints: [
       Path.join(FRONTEND_PATH, 'js/ide.js'),
       Path.join(FRONTEND_PATH, 'js/main.js'),
-      Path.join(FRONTEND_PATH, 'js/serviceWorker.js'),
       ...glob.sync(Path.join(FRONTEND_PATH, 'js/pages/**/*.js')),
     ],
     outbase: Path.join(FRONTEND_PATH, 'js'),
@@ -56,6 +55,15 @@ const CONFIGS = [
     plugins: [valLoader(Path.join(MODULES_PATH, 'modules-.*.js'))],
     loader: { '.js': 'jsx' },
     tsconfig: Path.join(ROOT, 'esbuild/tsconfig.json'),
+  },
+
+  {
+    DESCRIPTION: 'serviceWorker',
+
+    entryNames: '[dir]/[name]',
+    entryPoints: [Path.join(FRONTEND_PATH, 'js/serviceWorker.js')],
+    outbase: Path.join(FRONTEND_PATH, 'js'),
+    outdir: Path.join(PUBLIC_PATH, 'js'),
   },
 
   {
