@@ -47,6 +47,7 @@ function insertMeta(name, content) {
   }
   if (typeof content === 'object') {
     meta.setAttribute('data-type', 'json')
+    meta.content = JSON.stringify(content)
   }
   if (typeof content === 'number') {
     meta.setAttribute('data-type', 'json')
@@ -56,6 +57,37 @@ function insertMeta(name, content) {
 insertMeta('ol-appName', 'Overleaf')
 insertMeta('ol-maxEntitiesPerProject', 10)
 insertMeta('ol-maxUploadSize', 5 * 1024 * 1024)
+insertMeta('ol-textExtensions', [
+  'tex',
+  'latex',
+  'sty',
+  'cls',
+  'bst',
+  'bib',
+  'bibtex',
+  'txt',
+  'tikz',
+  'mtx',
+  'rtex',
+  'md',
+  'asy',
+  'latexmkrc',
+  'lbx',
+  'bbx',
+  'cbx',
+  'm',
+  'lco',
+  'dtx',
+  'ins',
+  'ist',
+  'def',
+  'clo',
+  'ldf',
+  'rmd',
+  'lua',
+  'gv',
+  'mf',
+])
 
 // Work around bundler hack in react-dom
 // esbuild does not populate the obfuscated require call when bundling.
