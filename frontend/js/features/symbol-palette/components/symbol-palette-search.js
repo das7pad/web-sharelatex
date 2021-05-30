@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { FormControl } from 'react-bootstrap'
 import useDebounce from '../../../shared/hooks/use-debounce'
 import t from '../../../misc/t'
 
@@ -13,11 +14,18 @@ export default function SymbolPaletteSearch({ setInput, inputRef }) {
     setInput(debouncedLocalInput)
   }, [debouncedLocalInput, setInput])
 
+  const inputRefCallback = useCallback(
+    element => {
+      inputRef.current = element
+    },
+    [inputRef]
+  )
+
   return (
-    <input
+    <FormControl
       className="symbol-palette-search"
       type="search"
-      ref={inputRef}
+      inputRef={inputRefCallback}
       id="symbol-palette-input"
       aria-label="Search"
       value={localInput}
