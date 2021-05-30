@@ -96,7 +96,7 @@
   },
   "devDependencies": {
     "@reach/tabs": "^0.15.0",
-    "@sentry/browser": "^5.27.6",
+    "@sentry/browser": "^6.3.5",
     "@testing-library/dom": "^7.29.4",
     "@testing-library/react": "^11.2.3",
     "@testing-library/react-hooks": "^5.1.0",
