@@ -77,4 +77,8 @@ module.exports = {
   security: {
     bcryptRounds: 1,
   },
+
+  test: {
+    counterInit: 0,
+  },
 }

@@ -261,4 +261,8 @@ module.exports = {
   unsupportedBrowsers: {
     ie: '<=11',
   },
+
+  test: {
+    counterInit: 0,
+  },
 }
