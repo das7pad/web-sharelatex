@@ -75,6 +75,7 @@ ResendInvite.propTypes = {
 }
 
 function RevokeInvite({ invite }) {
+  const { t } = useTranslation()
   const { updateProject, monitorRequest } = useShareProjectContext()
   const project = useProjectContext()
 
@@ -101,7 +102,7 @@ function RevokeInvite({ invite }) {
         type="button"
         bsStyle="link"
         onClick={handleClick}
-        aria-label="Revoke"
+        aria-label={t('revoke')}
         className="btn-inline-link"
       >
         <Icon type="times" />

@@ -5,6 +5,8 @@ import Icon from './icon'
 import { Trans } from '../../components/trans'
 
 export default function CopyLink({ link, tooltipId }) {
+  const { t } = useTranslation()
+
   const [copied, setCopied] = useState(false)
 
   const handleClick = useCallback(() => {
@@ -36,7 +38,7 @@ export default function CopyLink({ link, tooltipId }) {
         bsSize="xsmall"
         bsStyle="link"
         className="copy-button"
-        aria-label="Copy"
+        aria-label={t('copy')}
       >
         {copied ? <Icon type="check" /> : <Icon type="clipboard" />}
       </Button>

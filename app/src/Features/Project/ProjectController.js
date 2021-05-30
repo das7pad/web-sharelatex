@@ -914,6 +914,7 @@ const ProjectController = {
                 user.alphaProgram
               ),
               showNewBinaryFileUI: shouldDisplayFeature('new_binary_file'),
+              showSymbolPalette: shouldDisplayFeature('symbol_palette'),
             })
             timer.done()
           }
