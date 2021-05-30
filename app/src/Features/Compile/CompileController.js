@@ -375,7 +375,7 @@ module.exports = CompileController = {
       next = function (error) {}
     }
     const project_id = req.params.Project_id
-    const { page, h, v } = req.query
+    const { page, h, v, buildId } = req.query
     if (!(page != null ? page.match(/^\d+$/) : undefined)) {
       return next(new Error('invalid page parameter'))
     }
@@ -394,7 +394,7 @@ module.exports = CompileController = {
         if (error) return next(error)
 
         const url = CompileController._getUrl(project_id, user_id, 'sync/pdf')
-        const destination = { url, qs: { page, h, v, imageName } }
+        const destination = { url, qs: { page, h, v, imageName, buildId } }
         return CompileController.proxyToClsi(
           project_id,
           destination,
@@ -411,7 +411,7 @@ module.exports = CompileController = {
       next = function (error) {}
     }
     const project_id = req.params.Project_id
-    const { file, line, column } = req.query
+    const { file, line, column, buildId } = req.query
     if (file == null) {
       return next(new Error('missing file parameter'))
     }
@@ -438,7 +438,10 @@ module.exports = CompileController = {
         if (error) return next(error)
 
         const url = CompileController._getUrl(project_id, user_id, 'sync/code')
-        const destination = { url, qs: { file, line, column, imageName } }
+        const destination = {
+          url,
+          qs: { file, line, column, imageName, buildId },
+        }
         return CompileController.proxyToClsi(
           project_id,
           destination,

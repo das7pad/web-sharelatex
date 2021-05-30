@@ -404,14 +404,15 @@ describe('CompileController', function () {
     })
   })
   describe('proxySyncCode', function () {
-    let file, line, column, imageName
+    let file, line, column, imageName, buildId
 
     beforeEach(function (done) {
       this.req.params = { Project_id: this.project_id }
       file = 'main.tex'
       line = String(Date.now())
       column = String(Date.now() + 1)
-      this.req.query = { file, line, column }
+      buildId = String(Math.random())
+      this.req.query = { file, line, column, buildId }
 
       imageName = 'foo/bar:tag-0'
       this.ProjectGetter.getProject = sinon.stub().yields(null, { imageName })
@@ -428,7 +429,7 @@ describe('CompileController', function () {
         this.project_id,
         {
           url: `/project/${this.project_id}/user/${this.user_id}/sync/code`,
-          qs: { file, line, column, imageName },
+          qs: { file, line, column, imageName, buildId },
         },
         this.req,
         this.res,
@@ -438,14 +439,15 @@ describe('CompileController', function () {
   })
 
   describe('proxySyncPdf', function () {
-    let page, h, v, imageName
+    let page, h, v, imageName, buildId
 
     beforeEach(function (done) {
       this.req.params = { Project_id: this.project_id }
       page = String(Date.now())
       h = String(Math.random())
       v = String(Math.random())
-      this.req.query = { page, h, v }
+      buildId = String(Math.random())
+      this.req.query = { page, h, v, buildId }
 
       imageName = 'foo/bar:tag-1'
       this.ProjectGetter.getProject = sinon.stub().yields(null, { imageName })
@@ -462,7 +464,7 @@ describe('CompileController', function () {
         this.project_id,
         {
           url: `/project/${this.project_id}/user/${this.user_id}/sync/pdf`,
-          qs: { page, h, v, imageName },
+          qs: { page, h, v, imageName, buildId },
         },
         this.req,
         this.res,

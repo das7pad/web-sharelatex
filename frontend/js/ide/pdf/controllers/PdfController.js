@@ -357,6 +357,9 @@ App.controller(
         }
       }
 
+      // Reset global context.
+      ide.buildId = ''
+
       // prepare query string
       let qs = {}
       // add a query string parameter for the compile group
@@ -389,6 +392,7 @@ App.controller(
         qs.popupDownload = true
 
         const { build: buildId } = fileByPath['output.pdf']
+        ide.buildId = buildId
         $scope.pdf.downloadUrl =
           `/download/project/${$scope.project_id}/build/${buildId}/output/output.pdf` +
           createQueryString(qs)
@@ -1032,6 +1036,7 @@ App.factory('synctex', function (ide, $http, $q) {
           file: path,
           line: row + 1,
           column,
+          buildId: ide.buildId,
           clsiserverid: ide.clsiServerId,
         },
       })
@@ -1097,6 +1102,7 @@ App.factory('synctex', function (ide, $http, $q) {
           page: position.page + 1,
           h: h.toFixed(2),
           v: v.toFixed(2),
+          buildId: ide.buildId,
           clsiserverid: ide.clsiServerId,
         },
       })
