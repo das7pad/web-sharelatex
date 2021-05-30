@@ -10,6 +10,7 @@ import {
   waitForElementToBeRemoved,
 } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
+import { get } from 'lodash'
 import ShareProjectModal from '../../../../../frontend/js/features/share-project-modal/components/share-project-modal'
 
 describe('<ShareProjectModal/>', function () {
@@ -69,11 +70,16 @@ describe('<ShareProjectModal/>', function () {
   ]
 
   const ideWithProject = project => {
+    const scope = { project }
+
     return {
       $scope: {
-        $watch: () => () => {},
+        $watch: (path, callback) => {
+          callback(get(scope, path))
+          return () => null
+        },
         $applyAsync: () => {},
-        project,
+        ...scope,
       },
     }
   }
@@ -242,7 +248,7 @@ describe('<ShareProjectModal/>', function () {
     )
 
     await screen.findByText(
-      'To change access permissions, please ask the project owner'
+      'To add more collaborators or turn on link sharing, please ask the project owner'
     )
 
     expect(screen.queryByRole('button', { name: 'Turn off link sharing' })).to
