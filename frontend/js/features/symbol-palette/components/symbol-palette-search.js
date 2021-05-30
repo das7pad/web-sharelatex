@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import useDebounce from '../hooks/use-debounce'
+import useDebounce from '../../../shared/hooks/use-debounce'
 import t from '../../../misc/t'
 
 export default function SymbolPaletteSearch({ setInput, inputRef }) {

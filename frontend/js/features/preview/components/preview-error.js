@@ -8,7 +8,7 @@ import t from '../../../misc/t'
 import getMeta from '../../../utils/meta'
 
 function PreviewError({ name }) {
-  const { isProjectOwner } = useEditorContext({
+  const { hasPremiumCompile, isProjectOwner } = useEditorContext({
     isProjectOwner: PropTypes.bool,
   })
   const enableSubscriptions = getMeta('ol-enableSubscriptions')
@@ -68,7 +68,7 @@ function PreviewError({ name }) {
         entryAriaLabel={t('compile_error_entry_description')}
         level="error"
       />
-      {name === 'timedout' && enableSubscriptions ? (
+      {name === 'timedout' && enableSubscriptions && !hasPremiumCompile ? (
         <TimeoutUpgradePrompt isProjectOwner={isProjectOwner} />
       ) : null}
     </>
