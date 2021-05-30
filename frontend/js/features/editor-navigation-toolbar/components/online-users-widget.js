@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Dropdown, MenuItem, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import Icon from '../../../shared/components/icon'
-import ColorManager from '../../../ide/colors/ColorManager'
+import { getHueForUserId } from '../../../shared/utils/colors'
 import t from '../../../misc/t'
 
 function OnlineUsersWidget({ onlineUsers, goToUser }) {
@@ -62,9 +62,7 @@ OnlineUsersWidget.propTypes = {
 }
 
 function UserIcon({ user, showName, onClick }) {
-  const backgroundColor = `hsl(${ColorManager.getHueForUserId(
-    user.user_id
-  )}, 70%, 50%)`
+  const backgroundColor = `hsl(${getHueForUserId(user.user_id)}, 70%, 50%)`
 
   function handleOnClick() {
     onClick(user)

@@ -11,7 +11,7 @@ import { useDroppable } from '../contexts/file-tree-draggable'
 
 import FileTreeItemInner from './file-tree-item/file-tree-item-inner'
 import FileTreeFolderList from './file-tree-folder-list'
-import usePersistedState from '../../../infrastructure/persisted-state-hook'
+import usePersistedState from '../../../shared/hooks/use-persisted-state'
 import t from '../../../misc/t'
 
 function FileTreeFolder({ name, id, folders, docs, files }) {

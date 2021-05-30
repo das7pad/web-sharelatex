@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Form, FormGroup, FormControl, Button } from 'react-bootstrap'
 import { useMultipleSelection } from 'downshift'
 import {
@@ -10,20 +10,12 @@ import { resendInvite, sendInvite } from '../utils/api'
 import { useUserContacts } from '../hooks/use-user-contacts'
 import { Trans } from '../../../components/trans'
 import t from '../../../misc/t'
+import useIsMounted from '../../../shared/hooks/use-is-mounted'
 
 export default function AddCollaborators() {
   const [privileges, setPrivileges] = useState('readAndWrite')
 
-  const isMounted = useRef(true)
-
-  // the component will be unmounted if the project can't have any more collaborators
-  useEffect(() => {
-    isMounted.current = true
-
-    return () => {
-      isMounted.current = false
-    }
-  }, [isMounted])
+  const isMounted = useIsMounted()
 
   const { data: contacts } = useUserContacts()
 

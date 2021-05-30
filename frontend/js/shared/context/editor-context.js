@@ -1,7 +1,7 @@
-import React, { createContext, useCallback, useContext } from 'react'
+import React, { createContext, useCallback, useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import useScopeValue from './util/scope-value-hook'
-import useBrowserWindow from '../../infrastructure/browser-window-hook'
+import useBrowserWindow from '../hooks/use-browser-window'
 import getMeta from '../../utils/meta'
 
 export const EditorContext = createContext()
@@ -93,9 +93,11 @@ export function EditorProvider({ children, ide, settings }) {
   )
 
   const { setTitle } = useBrowserWindow()
-  setTitle(
-    `${projectName ? projectName + ' - ' : ''}Online LaTeX Editor ${appName}`
-  )
+  useEffect(() => {
+    setTitle(
+      `${projectName ? projectName + ' - ' : ''}Online LaTeX Editor ${appName}`
+    )
+  }, [appName, projectName, setTitle])
 
   const editorContextValue = {
     cobranding,

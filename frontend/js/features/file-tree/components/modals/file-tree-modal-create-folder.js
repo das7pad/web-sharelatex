@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { Button, Modal } from 'react-bootstrap'
-import { useRefWithAutoFocus } from '../../../../infrastructure/auto-focus'
+import { useRefWithAutoFocus } from '../../../../shared/hooks/use-ref-with-auto-focus'
 
 import AccessibleModal from '../../../../shared/components/accessible-modal'
 

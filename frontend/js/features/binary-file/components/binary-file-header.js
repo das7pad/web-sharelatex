@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import Icon from '../../../shared/components/icon'
 import { formatTime, relativeDate } from '../../utils/format-date'
 import { postJSON } from '../../../infrastructure/fetch-json'
 import t from '../../../misc/t'
 import { Trans } from '../../../components/trans'
+import useIsMounted from '../../../shared/hooks/use-is-mounted'
 
 import tprLinkedFileInfo from '../../../../../modules/modules-tpr-linked-file-info'
 import tprLinkedFileRefreshError from '../../../../../modules/modules-tpr-linked-file-refresh-error'
@@ -27,14 +28,10 @@ function shortenedUrl(url) {
 }
 
 export default function BinaryFileHeader({ file, storeReferencesKeys }) {
-  const isMounted = useRef(true)
   const [refreshing, setRefreshing] = useState(false)
   const [refreshError, setRefreshError] = useState(null)
 
-  useEffect(() => {
-    // set to false on unmount to avoid unmounted component warning when refreshing
-    return () => (isMounted.current = false)
-  }, [])
+  const isMounted = useIsMounted()
 
   let fileInfo
   if (file.linkedFileData) {
@@ -63,9 +60,7 @@ export default function BinaryFileHeader({ file, storeReferencesKeys }) {
     setRefreshing(true)
     // Replacement of the file handled by the file tree
     window.expectingLinkedFileRefreshedSocketFor = file.name
-    postJSON(`/project/${window.project_id}/linked_file/${file.id}/refresh`, {
-      disableAutoLoginRedirect: true,
-    })
+    postJSON(`/project/${window.project_id}/linked_file/${file.id}/refresh`)
       .then(() => {
         if (isMounted.current) {
           setRefreshing(false)
