@@ -22,12 +22,13 @@ const layoutOptions = {
   },
 }
 
-export default App.directive('verticalResizablePanes', () => ({
+export default App.directive('verticalResizablePanes', ide => ({
   restrict: 'A',
   link(scope, element, attrs) {
     const name = attrs.verticalResizablePanes
     const minSize = attrs.verticalResizablePanesMinSize
     const maxSize = attrs.verticalResizablePanesMaxSize
+    const defaultSize = attrs.verticalResizablePanesDefaultSize
     let storedSize = null
     let manualResizeIncoming = false
 
@@ -42,6 +43,8 @@ export default App.directive('verticalResizablePanes', () => ({
     }
 
     const toggledExternally = attrs.verticalResizablePanesToggledExternallyOn
+    const hiddenExternally = attrs.verticalResizablePanesHiddenExternallyOn
+    const hiddenInitially = attrs.verticalResizablePanesHiddenInitially
     const resizeOn = attrs.verticalResizablePanesResizeOn
     const resizerDisabledClass = `${layoutOptions.south.resizerClass}-disabled`
 
@@ -83,6 +86,16 @@ export default App.directive('verticalResizablePanes', () => ({
       })
     }
 
+    if (hiddenExternally) {
+      ide.$scope.$on(hiddenExternally, (e, open) => {
+        if (open) {
+          layoutHandle.show('south')
+        } else {
+          layoutHandle.hide('south')
+        }
+      })
+    }
+
     if (resizeOn) {
       scope.$on(resizeOn, () => {
         layoutHandle.resizeAll()
@@ -97,6 +110,10 @@ export default App.directive('verticalResizablePanes', () => ({
       layoutOptions.south.minSize = minSize
     }
 
+    if (defaultSize) {
+      layoutOptions.south.size = defaultSize
+    }
+
     // The `drag` event fires only when the user manually resizes the panes; the `resize` event fires even when
     // the layout library internally resizes itself. In order to get explicit user-initiated resizes, we need to
     // listen to `drag` events. However, when the `drag` event fires, the panes aren't yet finished sizing so we
@@ -107,5 +124,8 @@ export default App.directive('verticalResizablePanes', () => ({
     layoutOptions.south.onresize = handleResize
 
     const layoutHandle = element.layout(layoutOptions)
+    if (hiddenInitially === 'true') {
+      layoutHandle.hide('south')
+    }
   },
 }))

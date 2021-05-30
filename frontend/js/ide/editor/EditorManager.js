@@ -20,6 +20,7 @@ import './directives/aceEditor'
 import './directives/toggleSwitch'
 import './controllers/SavingNotificationController'
 import { captureException } from '../../infrastructure/error-reporter'
+import '../../features/symbol-palette/controllers/symbol-palette-controller'
 let EditorManager
 
 export default EditorManager = (function () {
@@ -28,7 +29,7 @@ export default EditorManager = (function () {
       this.prototype._syncTimeout = null
     }
 
-    constructor(ide, $scope, localStorage) {
+    constructor(ide, $scope, localStorage, eventTracking) {
       this.ide = ide
       this.editorOpenDocEpoch = 0 // track pending document loads
       this.$scope = $scope
@@ -41,6 +42,19 @@ export default EditorManager = (function () {
         trackChanges: false,
         wantTrackChanges: false,
         showRichText: this.showRichText(),
+        showSymbolPalette: false,
+        toggleSymbolPalette: () => {
+          const newValue = !this.$scope.editor.showSymbolPalette
+          this.$scope.editor.showSymbolPalette = newValue
+          ide.$scope.$emit('symbol-palette-toggled', newValue)
+          eventTracking.sendMB(
+            newValue ? 'symbol-palette-show' : 'symbol-palette-hide'
+          )
+        },
+        insertSymbol: symbol => {
+          ide.$scope.$emit('editor:replace-selection', symbol.command)
+          eventTracking.sendMB('symbol-palette-insert')
+        },
       }
 
       this.$scope.$on('entity:selected', (event, entity) => {
