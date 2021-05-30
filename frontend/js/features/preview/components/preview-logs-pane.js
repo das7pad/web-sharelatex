@@ -22,6 +22,7 @@ function PreviewLogsPane({
   onLogEntryLocationClick,
   onClearCache,
 }) {
+  const nowTS = Date.now()
   const {
     all: allCompilerIssues = [],
     errors: compilerErrors = [],
@@ -30,26 +31,25 @@ function PreviewLogsPane({
   } = logEntries
 
   const errorsUI = Object.keys(errors).map((name, index) => (
-    <PreviewError key={index} name={name} />
+    <PreviewError key={`${nowTS}-${index}`} name={name} />
   ))
 
   const validationIssuesUI = Object.keys(
     validationIssues
   ).map((name, index) => (
     <PreviewValidationIssue
-      key={index}
+      key={`${nowTS}-${index}`}
       name={name}
       details={validationIssues[name]}
     />
   ))
-
   const logEntriesUI = [
     ...compilerErrors,
     ...compilerWarnings,
     ...compilerTypesettingIssues,
-  ].map((logEntry, idx) => (
+  ].map((logEntry, index) => (
     <PreviewLogsPaneEntry
-      key={idx}
+      key={`${nowTS}-${index}`}
       headerTitle={logEntry.message}
       rawContent={logEntry.content}
       logType={logEntry.type}

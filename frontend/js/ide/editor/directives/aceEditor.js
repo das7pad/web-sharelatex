@@ -139,7 +139,11 @@ function aceEditorDirective(
 
       ide.$scope.$on('editor:replace-selection', (event, text) => {
         editor.focus()
-        editor.insert(text)
+        const document = editor.session.getDocument()
+          const ranges = editor.selection.getAllRanges()
+          for (const range of ranges) {
+            document.replace(range, text)
+          }
       })
       scope.$watch('autoPairDelimiters', autoPairDelimiters => {
         if (autoPairDelimiters) {
