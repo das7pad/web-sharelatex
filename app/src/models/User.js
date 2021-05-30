@@ -170,6 +170,7 @@ const UserSchema = new Schema({
   },
   onboardingEmailSentAt: { type: Date },
   auditLog: [AuditLogEntrySchema],
+  splitTests: Schema.Types.Mixed,
 })
 
 exports.User = mongoose.model('User', UserSchema)

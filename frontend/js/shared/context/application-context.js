@@ -14,9 +14,12 @@ ApplicationContext.Provider.propTypes = {
 }
 
 export function ApplicationProvider({ children }) {
-  const applicationContextValue = {
-    user: window.user,
+  const applicationContextValue = {}
+
+  if (window.user.id) {
+    applicationContextValue.user = window.user
   }
+
   return (
     <ApplicationContext.Provider value={applicationContextValue}>
       {children}
