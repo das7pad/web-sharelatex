@@ -5,10 +5,11 @@ import BinaryFileImage from './binary-file-image'
 import BinaryFileText from './binary-file-text'
 import Icon from '../../../shared/components/icon'
 import t from '../../../misc/t'
+import getMeta from '../../../utils/meta'
 
 const imageExtensions = ['png', 'jpg', 'jpeg', 'gif']
 
-const textExtensions = window.ExposedSettings.textExtensions
+const textExtensions = getMeta('ol-textExtensions')
 
 export default function BinaryFile({ file, storeReferencesKeys }) {
   const [contentLoading, setContentLoading] = useState(true)
