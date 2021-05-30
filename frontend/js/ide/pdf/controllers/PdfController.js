@@ -7,6 +7,7 @@ import { rootContext } from '../../../shared/context/root-context'
 import 'ace/ace'
 import { localStorage } from '../../../modules/storage'
 import getMeta from '../../../utils/meta'
+import { waitForServiceWorker } from '../../pdfng/directives/serviceWorkerManager'
 
 const AUTO_COMPILE_MAX_WAIT = 5000
 // We add a 1 second debounce to sending user changes to server if they aren't
@@ -272,9 +273,14 @@ App.controller(
         options = {}
       }
       const url = `/project/${$scope.project_id}/compile`
+      let setup = Promise.resolve()
       const params = {}
       if (options.isAutoCompileOnLoad || options.isAutoCompileOnChange) {
         params.auto_compile = true
+      }
+      if (getMeta('ol-enablePdfCaching')) {
+        setup = waitForServiceWorker()
+        params.enable_pdf_caching = true
       }
       // if the previous run was a check, clear the error logs
       if ($scope.check) {
@@ -304,18 +310,20 @@ App.controller(
         checkType = 'silent'
       }
 
-      return $http.post(
-        url,
-        {
-          rootDoc_id: options.rootDocOverride_id || null,
-          draft: $scope.draft,
-          check: checkType,
-          // use incremental compile for all users but revert to a full
-          // compile if there is a server error
-          incrementalCompilesEnabled: !$scope.pdf.error,
-          _csrf: window.csrfToken,
-        },
-        { params }
+      return setup.then(() =>
+        $http.post(
+          url,
+          {
+            rootDoc_id: options.rootDocOverride_id || null,
+            draft: $scope.draft,
+            check: checkType,
+            // use incremental compile for all users but revert to a full
+            // compile if there is a server error
+            incrementalCompilesEnabled: !$scope.pdf.error,
+            _csrf: window.csrfToken,
+          },
+          { params }
+        )
       )
     }
 
