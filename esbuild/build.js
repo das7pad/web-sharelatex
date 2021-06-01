@@ -8,7 +8,7 @@ const { writeManifest } = require('./writeManifest')
 
 const ROOT = Path.dirname(__dirname)
 
-async function onRebuild(name, error, result) {
+async function onRebuild(name, inMemory, error, result) {
   notifyFrontendAboutRebuild(name, error, result)
   if (error) {
     logWithTimestamp('watch build failed.')
@@ -19,7 +19,7 @@ async function onRebuild(name, error, result) {
 
   trackOutput(name, result.outputFiles)
   try {
-    await writeManifest(result.metafile)
+    await writeManifest(result.metafile, inMemory)
   } catch (error) {
     logWithTimestamp('writing manifest failed in watch mode:', error)
   }
@@ -33,7 +33,7 @@ async function buildConfig({ isWatchMode, inMemory, autoReload }, cfg) {
   if (isWatchMode) {
     cfg.watch = {
       async onRebuild(error, result) {
-        await onRebuild(DESCRIPTION, error, result)
+        await onRebuild(DESCRIPTION, inMemory, error, result)
       },
     }
   }
