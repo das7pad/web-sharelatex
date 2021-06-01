@@ -123,7 +123,7 @@
     "downshift": "^6.1.0",
     "east": "^1.1.0",
     "east-mongo": "^0.3.6",
-    "esbuild": "^0.11.8",
+    "esbuild": "^0.12.5",
     "fetch-mock": "9.10.2",
     "fuse.js": "^3.0.0",
     "jquery": "^2.2.4",
