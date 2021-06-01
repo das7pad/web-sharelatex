@@ -11,7 +11,7 @@ import HistoryToggleButton from './history-toggle-button'
 import ShareProjectButton from './share-project-button'
 import PdfToggleButton from './pdf-toggle-button'
 
-import PublishButton from '../../../../../modules/modules-publish-button'
+import publishButtons from '../../../../../modules/modules-publish-button'
 
 function ToolbarHeader({
   cobranding,
@@ -64,7 +64,9 @@ function ToolbarHeader({
           />
         )}
         <ShareProjectButton onClick={openShareModal} />
-        {PublishButton && <PublishButton cobranding={cobranding} />}
+        {publishButtons.map(({ import: { PublishButton }, path }) => (
+          <PublishButton cobranding={cobranding} key={path} />
+        ))}
         {!isRestrictedTokenMember && (
           <>
             <HistoryToggleButton
