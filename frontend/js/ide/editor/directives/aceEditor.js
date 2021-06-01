@@ -145,6 +145,11 @@ function aceEditorDirective(
           document.replace(range, text)
         }
       })
+      ide.$scope.$on('symbol-palette-toggled', (event, isToggled) => {
+        if (!isToggled) {
+          editor.focus()
+        }
+      })
       scope.$watch('autoPairDelimiters', autoPairDelimiters => {
         if (autoPairDelimiters) {
           return editor.setOption('behavioursEnabled', true)
