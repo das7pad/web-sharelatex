@@ -1,10 +1,8 @@
 import React from 'react'
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { useTranslation } from 'react-i18next'
+import t from '../../../misc/t'
 
 export default function SymbolPaletteInfoLink() {
-  const { t } = useTranslation()
-
   return (
     <OverlayTrigger
       placement="top"
