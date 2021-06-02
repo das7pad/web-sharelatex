@@ -46,9 +46,16 @@ function onRebuild({ data }) {
   }
 }
 
-const bus = new EventSource(import.meta.url + '/event-source')
-bus.addEventListener('epoch', onEpoch)
-bus.addEventListener('rebuild', onRebuild)
+function openNewBus() {
+  const bus = new EventSource(import.meta.url + '/event-source')
+  bus.addEventListener('epoch', onEpoch)
+  bus.addEventListener('rebuild', onRebuild)
+  bus.addEventListener('error', () => {
+    bus.close()
+    setTimeout(openNewBus, 1000)
+  })
+}
+openNewBus()
 
 // Use a dummy export map for marking this file as ES6.
 export {}
