@@ -20,7 +20,10 @@ export default App.controller('OnlineUsersController', function ($scope, ide) {
   }
 
   return ($scope.userInitial = function (user) {
-    if (user.user_id === 'anonymous-user') {
+    if (
+      user.user_id === 'anonymous-user' ||
+      user.user_id === '000000000000000000000000'
+    ) {
       return '?'
     } else {
       return user.name.slice(0, 1)

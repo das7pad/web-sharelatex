@@ -104,7 +104,7 @@ function tryContentAccess(user, projectId, test, callback) {
   if (user.id != null) {
     userId = user.id
   } else {
-    userId = 'anonymous-user'
+    userId = '000000000000000000000000'
   }
   request.post(
     {

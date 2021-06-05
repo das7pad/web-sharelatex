@@ -12,7 +12,7 @@ describe('colors', function () {
 
     it('returns the ANONYMOUS_HUE for an anonymous user', function () {
       expect(getHueForUserId()).to.equal(100)
-      expect(getHueForUserId('anonymous-user')).to.equal(100)
+      expect(getHueForUserId('000000000000000000000000')).to.equal(100)
     })
 
     it('generates a hue based on user id', function () {

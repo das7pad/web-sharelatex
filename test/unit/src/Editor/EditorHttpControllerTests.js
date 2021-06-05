@@ -231,7 +231,7 @@ describe('EditorHttpController', function () {
 
     describe('with an anonymous user', function () {
       beforeEach(function (done) {
-        this.req.query = { user_id: 'anonymous-user' }
+        this.req.query = { user_id: '000000000000000000000000' }
         this.res.json.callsFake(() => done())
         this.AuthorizationManager.isRestrictedUser
           .withArgs(null, 'readOnly', false)

@@ -56,7 +56,11 @@ export default ColorManager = {
   OWN_HUE_BLOCKED_SIZE: 20, // no other user should havea HUE in this range
   TOTAL_HUES: 360, // actually 361, but 360 for legacy reasons
   getHueForUserId(user_id) {
-    if (user_id == null || user_id === 'anonymous-user') {
+    if (
+      user_id == null ||
+      user_id === 'anonymous-user' ||
+      user_id === '000000000000000000000000'
+    ) {
       return this.ANONYMOUS_HUE
     }
 

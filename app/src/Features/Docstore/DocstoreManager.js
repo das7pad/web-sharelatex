@@ -18,10 +18,35 @@ const logger = require('logger-sharelatex')
 const settings = require('@overleaf/settings')
 const Errors = require('../Errors/Errors')
 const { promisifyAll } = require('../../util/promises')
+const { ObjectId } = require('mongodb')
 
 const TIMEOUT = 30 * 1000 // request timeout
 
+function normalizeRange(range) {
+  const { metadata } = range
+  if (metadata && metadata.user_id === 'anonymous-user') {
+    metadata.user_id = ObjectId('000000000000000000000000')
+  }
+}
+
 const DocstoreManager = {
+  normalizeRanges(ranges) {
+    if (!ranges) {
+      ranges = {}
+    }
+    if (ranges.comments) {
+      ranges.comments.forEach(normalizeRange)
+    } else {
+      ranges.comments = []
+    }
+    if (ranges.changes) {
+      ranges.changes.forEach(normalizeRange)
+    } else {
+      ranges.changes = []
+    }
+    return ranges
+  },
+
   deleteDoc(project_id, doc_id, name, deletedAt, callback) {
     if (callback == null) {
       callback = function (error) {}
@@ -224,6 +249,9 @@ const DocstoreManager = {
     if (callback == null) {
       callback = function (error, modified, rev) {}
     }
+
+    ranges = DocstoreManager.normalizeRanges(ranges)
+
     const url = `${settings.apis.docstore.url}/project/${project_id}/doc/${doc_id}`
     return request.post(
       {

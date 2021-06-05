@@ -6,7 +6,11 @@ const OWN_HUE_BLOCKED_SIZE = 20 // no other user should have a HUE in this range
 const TOTAL_HUES = 360 // actually 361, but 360 for legacy reasons
 
 export function getHueForUserId(userId, currentUserId) {
-  if (userId == null || userId === 'anonymous-user') {
+  if (
+    userId == null ||
+    userId === 'anonymous-user' ||
+    userId === '000000000000000000000000'
+  ) {
     return ANONYMOUS_HUE
   }
 

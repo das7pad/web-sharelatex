@@ -103,7 +103,10 @@ export default OnlineUsersManager = (function () {
         if (user.name === null || user.name.trim().length === 0) {
           if (user.email) {
             user.name = user.email.trim()
-          } else if (user.user_id === 'anonymous-user') {
+          } else if (
+            user.user_id === 'anonymous-user' ||
+            user.user_id === '000000000000000000000000'
+          ) {
             user.name = 'Anonymous'
           }
         }

@@ -56,7 +56,7 @@ const unsupportedSpellcheckLanguages = [
 async function joinProject(req, res, next) {
   const projectId = req.params.Project_id
   let userId = req.query.user_id
-  if (userId === 'anonymous-user') {
+  if (userId === '000000000000000000000000' || userId === 'anonymous-user') {
     userId = null
   }
   Metrics.inc('editor.join-project')
