@@ -29,7 +29,7 @@ const DocstoreManager = {
     const url = `${settings.apis.docstore.url}/project/${project_id}/doc/${doc_id}`
     const docMetaData = { deleted: true, deletedAt, name }
     const options = { url, json: docMetaData, timeout: TIMEOUT }
-    request.patch(options, function (error, res) {
+    request.patch(options, function (error, res, body) {
       if (error != null) {
         return callback(error)
       }
@@ -50,6 +50,7 @@ const DocstoreManager = {
           {
             project_id,
             doc_id,
+            body,
           }
         )
         return callback(error)
@@ -77,7 +78,7 @@ const DocstoreManager = {
         } else {
           error = new OError(
             `docstore api responded with non-success code: ${res.statusCode}`,
-            { project_id }
+            { project_id, body: docs }
           )
           return callback(error)
         }
@@ -100,7 +101,7 @@ const DocstoreManager = {
           callback(
             new OError(
               `docstore api responded with non-success code: ${res.statusCode}`,
-              { project_id }
+              { project_id, body: docs }
             )
           )
         }
@@ -128,7 +129,7 @@ const DocstoreManager = {
         } else {
           error = new OError(
             `docstore api responded with non-success code: ${res.statusCode}`,
-            { project_id }
+            { project_id, body: docs }
           )
           return callback(error)
         }
@@ -182,6 +183,7 @@ const DocstoreManager = {
             {
               project_id,
               doc_id,
+              body: doc,
             }
           )
           return callback(error)
@@ -210,7 +212,7 @@ const DocstoreManager = {
           callback(
             new OError(
               `docstore api responded with non-success code: ${res.statusCode}`,
-              { project_id, doc_id }
+              { project_id, doc_id, body }
             )
           )
         }
@@ -246,7 +248,7 @@ const DocstoreManager = {
         } else {
           error = new OError(
             `docstore api responded with non-success code: ${res.statusCode}`,
-            { project_id, doc_id }
+            { project_id, doc_id, body: result }
           )
           return callback(error)
         }
@@ -270,7 +272,7 @@ const DocstoreManager = {
     const url = `${settings.apis.docstore.url}/project/${project_id}/${method}`
     logger.log({ project_id }, `calling ${method} for project in docstore`)
     // use default timeout for archiving/unarchiving/destroying
-    request.post(url, function (err, res, docs) {
+    request.post(url, function (err, res, body) {
       if (err != null) {
         OError.tag(err, `error calling ${method} project in docstore`, {
           project_id,
@@ -281,8 +283,9 @@ const DocstoreManager = {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         callback()
       } else {
-        const error = new Error(
-          `docstore api responded with non-success code: ${res.statusCode}`
+        const error = new OError(
+          `docstore api responded with non-success code: ${res.statusCode}`,
+          { project_id, body }
         )
         logger.warn(
           { err: error, project_id },
