@@ -199,6 +199,8 @@ module.exports = {
       password: process.env.QUEUES_REDIS_PASSWORD || '',
     },
   },
+  publishOnIndividualChannels:
+    process.env.PUBLISH_ON_INDIVIDUAL_CHANNELS || false,
 
   // Service locations
   // -----------------
