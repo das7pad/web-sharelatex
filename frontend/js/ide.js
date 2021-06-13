@@ -192,7 +192,9 @@ App.controller(
       localStorage,
       eventTracking
     )
-    ide.onlineUsersManager = new OnlineUsersManager(ide, $scope)
+    if (!$scope.isRestrictedTokenMember) {
+      ide.onlineUsersManager = new OnlineUsersManager(ide, $scope)
+    }
     if (window.data.useV2History) {
       ide.historyManager = new HistoryV2Manager(ide, $scope, localStorage)
     } else {
