@@ -704,7 +704,7 @@ const ProjectController = {
             userId,
             projectId,
             anonRequestToken,
-            cb
+            (err, privilegeLevel) => cb(err, privilegeLevel)
           )
         },
         brandVariation: [
