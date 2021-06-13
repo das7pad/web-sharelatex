@@ -152,14 +152,24 @@ export default OnlineUsersManager = (function () {
     }
 
     sendCursorPositionUpdate(position) {
+      const doc_id = this.$scope.editor.open_doc_id
+      if (
+        position &&
+        this.lastCursorData &&
+        position.row === this.lastCursorData.row &&
+        position.column === this.lastCursorData.column &&
+        doc_id === this.lastCursorData.doc_id
+      ) {
+        // No update to the position in the doc.
+        return
+      }
       if (position != null) {
         this.$scope.currentPosition = position // keep track of the latest position
       }
       if (this.cursorUpdateTimeout == null) {
         return (this.cursorUpdateTimeout = setTimeout(() => {
-          const doc_id = this.$scope.editor.open_doc_id
           // always send the latest position to other clients
-          this.ide.socket.emit('clientTracking.updatePosition', {
+          const cursorData = {
             row:
               this.$scope.currentPosition != null
                 ? this.$scope.currentPosition.row
@@ -169,7 +179,9 @@ export default OnlineUsersManager = (function () {
                 ? this.$scope.currentPosition.column
                 : undefined,
             doc_id,
-          })
+          }
+          this.lastCursorData = cursorData
+          this.ide.socket.emit('clientTracking.updatePosition', cursorData)
 
           return delete this.cursorUpdateTimeout
         }, this.cursorUpdateInterval))
