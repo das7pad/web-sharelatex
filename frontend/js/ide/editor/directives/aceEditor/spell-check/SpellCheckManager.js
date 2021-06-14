@@ -98,8 +98,8 @@ class SpellCheckManager {
       return true
     })
 
-    if (prefetchUserDict !== false) {
-      this.prefetchUserDict()
+    if (prefetchUserDict !== false && !this.userDictFetched) {
+      setTimeout(() => this.prefetchUserDict(), 100)
     }
   }
 
