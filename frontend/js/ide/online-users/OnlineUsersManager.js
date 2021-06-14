@@ -151,41 +151,46 @@ export default OnlineUsersManager = (function () {
       }
     }
 
+    isAlreadySubmittedCursorData(cursorData) {
+      return (
+        this.submittedCursorData &&
+        cursorData.row === this.submittedCursorData.row &&
+        cursorData.column === this.submittedCursorData.column &&
+        cursorData.doc_id === this.submittedCursorData.doc_id
+      )
+    }
+
     sendCursorPositionUpdate(position) {
-      const doc_id = this.$scope.editor.open_doc_id
-      if (
-        position &&
-        this.lastCursorData &&
-        position.row === this.lastCursorData.row &&
-        position.column === this.lastCursorData.column &&
-        doc_id === this.lastCursorData.doc_id
-      ) {
+      let cursorData = {
+        row: position && position.row,
+        column: position && position.column,
+        doc_id: this.$scope.editor.open_doc_id,
+      }
+      if (this.isAlreadySubmittedCursorData(cursorData)) {
         // No update to the position in the doc.
         return
       }
-      if (position != null) {
-        this.$scope.currentPosition = position // keep track of the latest position
-      }
-      if (this.cursorUpdateTimeout == null) {
-        return (this.cursorUpdateTimeout = setTimeout(() => {
-          // always send the latest position to other clients
-          const cursorData = {
-            row:
-              this.$scope.currentPosition != null
-                ? this.$scope.currentPosition.row
-                : undefined,
-            column:
-              this.$scope.currentPosition != null
-                ? this.$scope.currentPosition.column
-                : undefined,
-            doc_id,
-          }
-          this.lastCursorData = cursorData
-          this.ide.socket.emit('clientTracking.updatePosition', cursorData)
 
-          return delete this.cursorUpdateTimeout
-        }, this.cursorUpdateInterval))
+      // Keep track of the latest position.
+      this.currentCursorData = cursorData
+
+      if (this.cursorUpdateTimeout) {
+        // Sending is in progress, it will pick up ^.
+        return
       }
+      this.cursorUpdateTimeout = setTimeout(() => {
+        delete this.cursorUpdateTimeout
+
+        // Always send the latest position to other clients.
+        cursorData = this.currentCursorData
+
+        if (this.isAlreadySubmittedCursorData(cursorData)) {
+          // They changed back to the old position.
+          return
+        }
+        this.submittedCursorData = cursorData
+        this.ide.socket.emit('clientTracking.updatePosition', cursorData)
+      }, this.cursorUpdateInterval)
     }
   }
   OnlineUsersManager.initClass()
