@@ -39,7 +39,7 @@ App.controller('SystemMessagesController', ($http, $scope) => {
         // ignore errors
       })
   }
-  pollSystemMessages()
+  setTimeout(pollSystemMessages, 100)
   setInterval(pollSystemMessages, MESSAGE_POLL_INTERVAL)
 })
 
