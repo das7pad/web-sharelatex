@@ -11,6 +11,17 @@ pdfjsBundle.GlobalWorkerOptions.workerSrc = staticPath(
 )
 
 const hasWorkerSupport = typeof window !== 'undefined' && 'Worker' in window
-export const worker = hasWorkerSupport && new pdfjsBundle.PDFWorker()
+let worker
+
+export function getPDFJSWorker() {
+  if (!worker && hasWorkerSupport) {
+    worker = new pdfjsBundle.PDFWorker()
+  }
+  return worker
+}
+
+export function preloadPDFJSWorker() {
+  getPDFJSWorker()
+}
 
 export default pdfjsBundle

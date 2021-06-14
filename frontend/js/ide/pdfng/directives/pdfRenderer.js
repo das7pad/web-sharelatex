@@ -18,7 +18,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
-import PDFJS, { worker as PDFJSWorker } from '../../../pdfjsBundle'
+import PDFJS, { getPDFJSWorker } from '../../../pdfjsBundle'
 import staticPath from '../../../utils/staticPath'
 import { captureMessage } from '../../../infrastructure/error-reporter'
 
@@ -65,7 +65,7 @@ export default App.factory(
           this.pdfjs = PDFJS.getDocument({
             url: this.url,
             // lazy loaded worker
-            worker: PDFJSWorker,
+            worker: getPDFJSWorker(),
             cMapUrl: staticPath('/vendor/pdfjs-dist/cmaps/'),
             cMapPacked: true,
             disableFontFace,

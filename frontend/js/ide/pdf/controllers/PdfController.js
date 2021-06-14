@@ -9,6 +9,7 @@ import { localStorage } from '../../../modules/storage'
 import getMeta from '../../../utils/meta'
 import { waitForServiceWorker } from '../../pdfng/directives/serviceWorkerManager'
 import { trackPdfDownload } from './PdfJsMetrics'
+import { preloadPDFJSWorker } from '../../../pdfjsBundle'
 
 const AUTO_COMPILE_MAX_WAIT = 5000
 // We add a 1 second debounce to sending user changes to server if they aren't
@@ -1022,6 +1023,7 @@ App.controller(
       })
       autoCompileOnJoinProject = false
     }
+    setTimeout(preloadPDFJSWorker, 100)
   }
 )
 
