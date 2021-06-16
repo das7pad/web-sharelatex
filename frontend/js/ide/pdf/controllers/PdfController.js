@@ -443,6 +443,7 @@ App.controller(
             'editor-click-feature',
             'compile-timeout'
           )
+          eventTracking.sendMB('compile-timeout-paywall-prompt')
         }
       } else if (response.status === 'terminated') {
         $scope.pdf.view = 'errors'
@@ -523,6 +524,7 @@ App.controller(
           $scope.pdf.rateLimited ? { rateLimited: true } : null,
           $scope.pdf.compileInProgress ? { compileInProgress: true } : null,
           $scope.pdf.timedout ? { timedout: true } : null,
+          $scope.pdf.projectTooLarge ? { projectTooLarge: true } : null,
           $scope.pdf.autoCompileDisabled ? { autoCompileDisabled: true } : null
         )
 

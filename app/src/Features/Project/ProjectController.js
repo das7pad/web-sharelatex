@@ -731,7 +731,7 @@ const ProjectController = {
           if (!userId) return cb(null, '')
           SplitTestHandler.getTestSegmentation(
             userId,
-            'pdf_caching_beta',
+            'pdf_caching_beta_full',
             (err, segmentation) => {
               if (err) {
                 // Do not fail loading the editor.
@@ -928,7 +928,7 @@ const ProjectController = {
                 'new_navigation_ui',
                 user.alphaProgram
               ),
-              showNewBinaryFileUI: shouldDisplayFeature('new_binary_file'),
+              showNewFileViewUI: shouldDisplayFeature('new_file_view'),
               showSymbolPalette: shouldDisplayFeature(
                 'symbol_palette',
                 user.alphaProgram

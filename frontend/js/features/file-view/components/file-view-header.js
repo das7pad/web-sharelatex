@@ -29,7 +29,7 @@ function shortenedUrl(url) {
   return url
 }
 
-export default function BinaryFileHeader({ file, storeReferencesKeys }) {
+export default function FileViewHeader({ file, storeReferencesKeys }) {
   const { projectId } = useEditorContext({
     projectId: PropTypes.string.isRequired,
   })
@@ -104,7 +104,7 @@ export default function BinaryFileHeader({ file, storeReferencesKeys }) {
   }, [file, projectId, isMounted, storeReferencesKeys])
 
   return (
-    <div className="binary-file-header">
+    <div>
       {file.linkedFileData && fileInfo}
       {file.linkedFileData &&
         tprLinkedFileInfo.map(({ import: { LinkedFileInfo }, path }) => (
@@ -146,7 +146,7 @@ export default function BinaryFileHeader({ file, storeReferencesKeys }) {
   )
 }
 
-BinaryFileHeader.propTypes = {
+FileViewHeader.propTypes = {
   file: PropTypes.shape({
     id: PropTypes.string,
     name: PropTypes.string,

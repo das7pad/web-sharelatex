@@ -1,6 +1,10 @@
 import { v4 as uuid } from 'uuid'
 const OError = require('@overleaf/o-error')
 
+// VERSION should get incremented when making changes to caching behavior or
+//  adjusting metrics collection.
+const VERSION = 1
+
 const COMPILE_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/compile$/
 const PDF_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/.*\/output.pdf$/
 const PDF_JS_CHUNK_SIZE = 128 * 1024
@@ -21,11 +25,19 @@ function getClientContext(clientId) {
   if (!clientContext) {
     const pdfs = new Map()
     const metrics = {
+      version: VERSION,
       id: uuid(),
       epoch: Date.now(),
+      failedCount: 0,
+      tooLargeOverheadCount: 0,
+      tooManyRequestsCount: 0,
+      cachedCount: 0,
       cachedBytes: 0,
+      fetchedCount: 0,
       fetchedBytes: 0,
+      requestedCount: 0,
       requestedBytes: 0,
+      compileCount: 0,
     }
     clientContext = { pdfs, metrics }
     CLIENT_CONTEXT.set(clientId, clientContext)
@@ -82,12 +94,20 @@ function expirePdfContexts() {
  *
  * @param {Object} metrics
  * @param {number} size
+ * @param {number} cachedCount
  * @param {number} cachedBytes
+ * @param {number} fetchedCount
  * @param {number} fetchedBytes
  */
-function trackDownloadStats(metrics, { size, cachedBytes, fetchedBytes }) {
+function trackDownloadStats(
+  metrics,
+  { size, cachedCount, cachedBytes, fetchedCount, fetchedBytes }
+) {
+  metrics.cachedCount += cachedCount
   metrics.cachedBytes += cachedBytes
+  metrics.fetchedCount += fetchedCount
   metrics.fetchedBytes += fetchedBytes
+  metrics.requestedCount++
   metrics.requestedBytes += size
 }
 
@@ -155,6 +175,7 @@ function processCompileRequest(event) {
 
         // Send the service workers metrics to the frontend.
         const { metrics } = getClientContext(event.clientId)
+        metrics.compileCount++
         body.serviceWorkerMetrics = metrics
 
         return new Response(JSON.stringify(body), response)
@@ -231,10 +252,19 @@ function processPdfRequest(
   const chunks = getMatchingChunks(file.ranges, start, end)
   const dynamicChunks = getInterleavingDynamicChunks(chunks, start, end)
   const chunksSize = countBytes(chunks)
+  const size = end - start
 
   if (chunks.length + dynamicChunks.length > MAX_SUBREQUEST_COUNT) {
     // fall back to the original range request when splitting the range creates
     // too many subrequests.
+    metrics.tooManyRequestsCount++
+    trackDownloadStats(metrics, {
+      size,
+      cachedCount: 0,
+      cachedBytes: 0,
+      fetchedCount: 1,
+      fetchedBytes: size,
+    })
     return
   }
   if (
@@ -244,6 +274,14 @@ function processPdfRequest(
     // fall back to the original range request when a very large amount of
     // object data would be requested, unless it is the only object in the
     // request.
+    metrics.tooLargeOverheadCount++
+    trackDownloadStats(metrics, {
+      size,
+      cachedCount: 0,
+      cachedBytes: 0,
+      fetchedCount: 1,
+      fetchedBytes: size,
+    })
     return
   }
 
@@ -272,8 +310,9 @@ function processPdfRequest(
         }
       })
     )
-  const size = end - start
+  let cachedCount = 0
   let cachedBytes = 0
+  let fetchedCount = 0
   let fetchedBytes = 0
   const reAssembledBlob = new Uint8Array(size)
   event.respondWith(
@@ -296,9 +335,11 @@ function processPdfRequest(
               //   | A BIG IMAGE BLOB |
               // |     THE     FULL     PDF     |
               if (blobFetchDate < pdfCreatedAt) {
+                cachedCount++
                 cachedBytes += chunkSize
               } else {
                 // Blobs are fetched in bulk.
+                fetchedCount++
                 fetchedBytes += blobSize
               }
             }
@@ -360,7 +401,13 @@ function processPdfRequest(
         }
 
         return verifyProcess.then(blob => {
-          trackDownloadStats(metrics, { size, cachedBytes, fetchedBytes })
+          trackDownloadStats(metrics, {
+            size,
+            cachedCount,
+            cachedBytes,
+            fetchedCount,
+            fetchedBytes,
+          })
           return new Response(blob, {
             status: 206,
             headers: {
@@ -373,6 +420,15 @@ function processPdfRequest(
         })
       })
       .catch(error => {
+        fetchedBytes += size
+        metrics.failedCount++
+        trackDownloadStats(metrics, {
+          size,
+          cachedCount: 0,
+          cachedBytes: 0,
+          fetchedCount,
+          fetchedBytes,
+        })
         reportError(event, OError.tag(error, 'failed to compose pdf response'))
         return fetch(event.request)
       })

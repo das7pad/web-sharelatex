@@ -18,6 +18,7 @@ const RedirectManager = require('../../infrastructure/RedirectManager')
 const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const Csrf = require('../../infrastructure/Csrf')
 const UserAuditLogHandler = require('../User/UserAuditLogHandler')
+const AnalyticsRegistrationSourceMiddleware = require('../Analytics/AnalyticsRegistrationSourceMiddleware')
 const {
   acceptsJson,
 } = require('../../infrastructure/RequestContentTypeDetection')
@@ -130,6 +131,7 @@ const AuthenticationController = {
               return next(err)
             }
             AuthenticationController._clearRedirectFromSession(req)
+            AnalyticsRegistrationSourceMiddleware.doClearSource(req.session)
             AsyncFormHelper.redirect(req, res, redir)
           })
         })
@@ -380,7 +382,7 @@ const AuthenticationController = {
         expectedPassword.length === pass.length &&
         crypto.timingSafeEqual(Buffer.from(expectedPassword), Buffer.from(pass))
       if (!isValid) {
-        logger.err({ user, pass }, 'invalid login details')
+        logger.err({ user }, 'invalid login details')
       }
       return isValid
     })

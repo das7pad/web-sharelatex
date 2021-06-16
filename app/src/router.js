@@ -48,6 +48,7 @@ const TemplatesRouter = require('./Features/Templates/TemplatesRouter')
 const InstitutionsController = require('./Features/Institutions/InstitutionsController')
 const UserMembershipRouter = require('./Features/UserMembership/UserMembershipRouter')
 const SystemMessageController = require('./Features/SystemMessages/SystemMessageController')
+const AnalyticsRegistrationSourceMiddleware = require('./Features/Analytics/AnalyticsRegistrationSourceMiddleware')
 const { Joi, validate } = require('./infrastructure/Validation')
 const {
   renderUnsupportedBrowserPage,
@@ -1097,7 +1098,9 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       maxRequests: 15,
       timeInterval: 60,
     }),
-    TokenAccessController.tokenAccessPage
+    AnalyticsRegistrationSourceMiddleware.setSource('link-sharing'),
+    TokenAccessController.tokenAccessPage,
+    AnalyticsRegistrationSourceMiddleware.clearSource()
   )
 
   webRouter.get(
@@ -1107,7 +1110,9 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       maxRequests: 15,
       timeInterval: 60,
     }),
-    TokenAccessController.tokenAccessPage
+    AnalyticsRegistrationSourceMiddleware.setSource('link-sharing'),
+    TokenAccessController.tokenAccessPage,
+    AnalyticsRegistrationSourceMiddleware.clearSource()
   )
 
   webRouter.post(
