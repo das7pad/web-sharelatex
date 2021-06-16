@@ -1,5 +1,5 @@
 import { captureException } from '../../../infrastructure/error-reporter'
-const OError = require('@overleaf/o-error')
+import OError from '@overleaf/o-error'
 
 let pendingWorkerSetup = Promise.resolve()
 

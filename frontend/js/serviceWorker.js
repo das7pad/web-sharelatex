@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-const OError = require('@overleaf/o-error')
+import OError from '@overleaf/o-error'
 
 // VERSION should get incremented when making changes to caching behavior or
 //  adjusting metrics collection.
