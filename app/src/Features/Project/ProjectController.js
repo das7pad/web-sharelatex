@@ -843,7 +843,7 @@ const ProjectController = {
               }
             }
 
-            function partOfPdfCachingRollout(flag) {
+            const partOfPdfCachingRollout = flag => {
               if (!Settings.enablePdfCaching) {
                 // The feature is disabled globally.
                 return false
