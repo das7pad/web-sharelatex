@@ -339,7 +339,7 @@ App.controller(
 
     function noop() {}
 
-    function parseCompileResponse(response) {
+    function parseCompileResponse(response, compileTimeClientE2E) {
       // keep last url
       const lastPdfUrl = $scope.pdf.url
       const { pdfDownloadDomain } = response
@@ -414,7 +414,8 @@ App.controller(
 
         if (getMeta('ol-trackPdfDownload')) {
           const { firstRenderDone, updateConsumedBandwidth } = trackPdfDownload(
-            response
+            response,
+            compileTimeClientE2E
           )
           $scope.pdf.firstRenderDone = firstRenderDone
           $scope.pdf.updateConsumedBandwidth = updateConsumedBandwidth
@@ -823,12 +824,14 @@ App.controller(
         options.rootDocOverride_id = getRootDocOverrideId()
       }
 
+      const t0 = performance.now()
       sendCompileRequest(options)
         .then(function (response) {
           const { data } = response
+          const compileTimeClientE2E = performance.now() - t0
           $scope.pdf.view = 'pdf'
           $scope.pdf.compiling = false
-          parseCompileResponse(data)
+          parseCompileResponse(data, compileTimeClientE2E)
         })
         .catch(function (response) {
           const { status } = response

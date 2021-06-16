@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import { sendMBSampled } from '../../../infrastructure/event-tracking'
+import { sendMB } from '../../../infrastructure/event-tracking'
 
 const pdfJsMetrics = {
   id: uuid(),
@@ -9,7 +9,7 @@ const pdfJsMetrics = {
 
 const SAMPLING_RATE = 0.01
 
-export function trackPdfDownload(response) {
+export function trackPdfDownload(response, compileTimeClientE2E) {
   const { serviceWorkerMetrics, stats, timings } = response
 
   const t0 = performance.now()
@@ -19,7 +19,11 @@ export function trackPdfDownload(response) {
     // The renderer does not yield in case the browser tab is hidden.
     // It will yield when the browser tab is visible again.
     // This will skew our performance metrics for rendering!
-    const latencyRender = timePDFRendered - timePDFFetched
+    // We are omitting the render time in case we detect this state.
+    let latencyRender
+    if (timePDFRendered) {
+      latencyRender = timePDFRendered - timePDFFetched
+    }
     done({ latencyFetch, latencyRender })
   }
   function updateConsumedBandwidth(bytes) {
@@ -36,6 +40,7 @@ export function trackPdfDownload(response) {
     submitCompileMetrics({
       latencyFetch,
       latencyRender,
+      compileTimeClientE2E,
       stats,
       timings,
     })
@@ -50,11 +55,34 @@ export function trackPdfDownload(response) {
 }
 
 function submitCompileMetrics(metrics) {
+  let {
+    latencyFetch,
+    latencyRender,
+    compileTimeClientE2E,
+    stats,
+    timings,
+  } = metrics
+  stats = stats || {}
+  timings = timings || {}
+  const leanMetrics = {
+    latencyFetch,
+    latencyRender,
+    pdfSize: stats['pdf-size'],
+    compileTimeClientE2E,
+    compileTimeServerE2E: timings.compileE2E,
+  }
   sl_console.log('/event/compile-metrics', JSON.stringify(metrics))
-  sendMBSampled('compile-metrics', metrics, SAMPLING_RATE)
+  sendMB('compile-metrics-v2', leanMetrics, SAMPLING_RATE)
 }
 
 function submitPDFBandwidth(metrics) {
+  const metricsFlat = {}
+  Object.entries(metrics).forEach(([section, items]) => {
+    if (!items) return
+    Object.entries(items).forEach(([key, value]) => {
+      metricsFlat[section + '_' + key] = value
+    })
+  })
   sl_console.log('/event/pdf-bandwidth', JSON.stringify(metrics))
-  sendMBSampled('pdf-bandwidth', metrics, SAMPLING_RATE)
+  sendMB('pdf-bandwidth-v2', metricsFlat, SAMPLING_RATE)
 }
