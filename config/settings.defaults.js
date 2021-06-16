@@ -74,6 +74,8 @@ const defaultTextExtensions = [
   'lua',
   'gv',
   'mf',
+  'yml',
+  'yaml',
 ]
 
 function parseTextExtensions(extensions) {
