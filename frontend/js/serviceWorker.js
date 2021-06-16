@@ -3,13 +3,16 @@ import OError from '@overleaf/o-error'
 
 // VERSION should get incremented when making changes to caching behavior or
 //  adjusting metrics collection.
-const VERSION = 1
+// Keep in sync with PdfJsMetrics.
+const VERSION = 2
 
+const CLEAR_CACHE_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/output$/
 const COMPILE_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/compile$/
 const PDF_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/.*\/output.pdf$/
 const PDF_JS_CHUNK_SIZE = 128 * 1024
-const MAX_SUBREQUEST_COUNT = 8
+const MAX_SUBREQUEST_COUNT = 4
 const MAX_SUBREQUEST_BYTES = 4 * PDF_JS_CHUNK_SIZE
+const INCREMENTAL_CACHE_SIZE = 1000
 
 // Each compile request defines a context (essentially the specific pdf file for
 // that compile), requests for that pdf file can use the hashes in the compile
@@ -23,6 +26,7 @@ const CLIENT_CONTEXT = new Map()
 function getClientContext(clientId) {
   let clientContext = CLIENT_CONTEXT.get(clientId)
   if (!clientContext) {
+    const cached = new Set()
     const pdfs = new Map()
     const metrics = {
       version: VERSION,
@@ -39,7 +43,7 @@ function getClientContext(clientId) {
       requestedBytes: 0,
       compileCount: 0,
     }
-    clientContext = { pdfs, metrics }
+    clientContext = { pdfs, metrics, cached }
     CLIENT_CONTEXT.set(clientId, clientContext)
     // clean up old client maps
     expirePdfContexts()
@@ -54,8 +58,14 @@ function getClientContext(clientId) {
  */
 function registerPdfContext(clientId, path, pdfContext) {
   const clientContext = getClientContext(clientId)
-  const { pdfs, metrics } = clientContext
+  const { pdfs, metrics, cached, clsiServerId } = clientContext
   pdfContext.metrics = metrics
+  pdfContext.cached = cached
+  if (pdfContext.clsiServerId !== clsiServerId) {
+    // VM changed, this invalidates all browser caches.
+    clientContext.clsiServerId = pdfContext.clsiServerId
+    cached.clear()
+  }
   // we only need to keep the last 3 contexts
   for (const key of pdfs.keys()) {
     if (pdfs.size < 3) {
@@ -159,7 +169,22 @@ function onFetch(event) {
     }
   }
 
+  if (
+    event.request.method === 'DELETE' &&
+    path.match(CLEAR_CACHE_REQUEST_MATCHER)
+  ) {
+    return processClearCacheRequest(event)
+  }
+
   // other request, ignore
+}
+
+/**
+ * @param {FetchEvent} event
+ */
+function processClearCacheRequest(event) {
+  CLIENT_CONTEXT.delete(event.clientId)
+  // use default request proxy.
 }
 
 /**
@@ -228,10 +253,11 @@ function handleProbeRequest(request, file) {
  * @param {string} compileGroup
  * @param {Date} pdfCreatedAt
  * @param {Object} metrics
+ * @param {Set} cached
  */
 function processPdfRequest(
   event,
-  { file, clsiServerId, compileGroup, pdfCreatedAt, metrics }
+  { file, clsiServerId, compileGroup, pdfCreatedAt, metrics, cached }
 ) {
   const response = handleProbeRequest(event.request, file)
   if (response) {
@@ -249,15 +275,17 @@ function processPdfRequest(
 
   // Check that handling the range request won't trigger excessive subrequests,
   // (to avoid unwanted latency compared to the original request).
-  const chunks = getMatchingChunks(file.ranges, start, end)
+  const { chunks, newChunks } = cutRequestAmplification(
+    getMatchingChunks(file.ranges, start, end),
+    cached,
+    metrics
+  )
   const dynamicChunks = getInterleavingDynamicChunks(chunks, start, end)
-  const chunksSize = countBytes(chunks)
+  const chunksSize = countBytes(newChunks)
   const size = end - start
 
-  if (chunks.length + dynamicChunks.length > MAX_SUBREQUEST_COUNT) {
-    // fall back to the original range request when splitting the range creates
-    // too many subrequests.
-    metrics.tooManyRequestsCount++
+  if (chunks.length === 0 && dynamicChunks.length === 1) {
+    // fall back to the original range request when no chunks are cached.
     trackDownloadStats(metrics, {
       size,
       cachedCount: 0,
@@ -269,11 +297,11 @@ function processPdfRequest(
   }
   if (
     chunksSize > MAX_SUBREQUEST_BYTES &&
-    !(dynamicChunks.length === 0 && chunks.length === 1)
+    !(dynamicChunks.length === 0 && newChunks.length <= 1)
   ) {
     // fall back to the original range request when a very large amount of
     // object data would be requested, unless it is the only object in the
-    // request.
+    // request or everything is already cached.
     metrics.tooLargeOverheadCount++
     trackDownloadStats(metrics, {
       size,
@@ -288,6 +316,27 @@ function processPdfRequest(
   // URL prefix is /project/:id/user/:id/build/... or /project/:id/build/...
   //  for authenticated and unauthenticated users respectively.
   const perUserPrefix = file.url.slice(0, file.url.indexOf('/build/'))
+  const byteRanges = dynamicChunks
+    .map(chunk => `${chunk.start}-${chunk.end - 1}`)
+    .join(',')
+  const coalescedDynamicChunks = []
+  switch (dynamicChunks.length) {
+    case 0:
+      break
+    case 1:
+      coalescedDynamicChunks.push({
+        chunk: dynamicChunks[0],
+        url: event.request.url,
+        init: { headers: { Range: `bytes=${byteRanges}` } },
+      })
+      break
+    default:
+      coalescedDynamicChunks.push({
+        chunk: dynamicChunks,
+        url: event.request.url,
+        init: { headers: { Range: `bytes=${byteRanges}` } },
+      })
+  }
   const requests = chunks
     .map(chunk => {
       const path = `${perUserPrefix}/content/${file.contentId}/${chunk.hash}`
@@ -300,16 +349,7 @@ function processPdfRequest(
       }
       return { chunk, url: url.toString() }
     })
-    .concat(
-      dynamicChunks.map(chunk => {
-        const { start, end } = chunk
-        return {
-          chunk,
-          url: event.request.url,
-          init: { headers: { Range: `bytes=${start}-${end - 1}` } },
-        }
-      })
-    )
+    .concat(coalescedDynamicChunks)
   let cachedCount = 0
   let cachedBytes = 0
   let fetchedCount = 0
@@ -325,6 +365,13 @@ function processPdfRequest(
                 'non successful response status: ' + response.status
               )
             }
+            const boundary = getMultipartBoundary(response)
+            if (Array.isArray(chunk) && !boundary) {
+              throw new OError('missing boundary on multipart request', {
+                headers: Object.fromEntries(response.headers.entries()),
+                chunk,
+              })
+            }
             const blobFetchDate = getServerTime(response)
             const blobSize = getResponseSize(response)
             if (blobFetchDate && blobSize) {
@@ -337,26 +384,42 @@ function processPdfRequest(
               if (blobFetchDate < pdfCreatedAt) {
                 cachedCount++
                 cachedBytes += chunkSize
+                // Roll the position of the hash in the Map.
+                cached.delete(chunk.hash)
+                cached.add(chunk.hash)
               } else {
                 // Blobs are fetched in bulk.
                 fetchedCount++
                 fetchedBytes += blobSize
               }
             }
-            return response.arrayBuffer()
-          })
-          .then(arrayBuffer => {
-            return {
-              chunk,
-              data: backFillObjectContext(chunk, arrayBuffer),
-            }
+            return response
+              .blob()
+              .then(blob => blob.arrayBuffer())
+              .then(arraybuffer => {
+                return {
+                  boundary,
+                  chunk,
+                  data: backFillObjectContext(chunk, arraybuffer),
+                }
+              })
           })
           .catch(error => {
             throw OError.tag(error, 'cannot fetch chunk', { url })
           })
       )
     )
-      .then(responses => {
+      .then(rawResponses => {
+        const responses = []
+        for (const response of rawResponses) {
+          if (response.boundary) {
+            responses.push(
+              ...getMultiPartResponses(response, file, metrics, verifyChunks)
+            )
+          } else {
+            responses.push(response)
+          }
+        }
         responses.forEach(({ chunk, data }) => {
           // overlap:
           //     | REQUESTED_RANGE |
@@ -369,7 +432,7 @@ function processPdfRequest(
           if (offsetStart > 0 || offsetEnd > 0) {
             // compute index positions for slice to handle case where offsetEnd=0
             const chunkSize = chunk.end - chunk.start
-            data = data.slice(offsetStart, chunkSize - offsetEnd)
+            data = data.subarray(offsetStart, chunkSize - offsetEnd)
           }
           const insertPosition = Math.max(chunk.start - start, 0)
           reAssembledBlob.set(data, insertPosition)
@@ -456,6 +519,62 @@ function getResponseSize(response) {
 }
 
 /**
+ *
+ * @param {Response} response
+ */
+function getMultipartBoundary(response) {
+  const raw = response.headers.get('Content-Type')
+  if (!raw.includes('multipart/byteranges')) return ''
+  const idx = raw.indexOf('boundary=')
+  if (idx === -1) return ''
+  return raw.slice(idx + 'boundary='.length)
+}
+
+/**
+ * @param {Object} response
+ * @param {Object} file
+ * @param {Object} metrics
+ * @param {boolean} verifyChunks
+ */
+function getMultiPartResponses(response, file, metrics, verifyChunks) {
+  const { chunk: chunks, data, boundary } = response
+  const responses = []
+  let offsetStart = 0
+  for (const chunk of chunks) {
+    const header = `\r\n--${boundary}\r\nContent-Type: application/pdf\r\nContent-Range: bytes ${
+      chunk.start
+    }-${chunk.end - 1}/${file.size}\r\n\r\n`
+    const headerSize = header.length
+
+    // Verify header content. A proxy might have tampered with it.
+    const headerRaw = ENCODER.encode(header)
+    if (
+      !data
+        .subarray(offsetStart, offsetStart + headerSize)
+        .every((v, idx) => v === headerRaw[idx])
+    ) {
+      metrics.headerVerifyFailure |= 0
+      metrics.headerVerifyFailure++
+      throw new OError('multipart response header does not match', {
+        actual: new TextDecoder().decode(
+          data.subarray(offsetStart, offsetStart + headerSize)
+        ),
+        expected: header,
+      })
+    }
+
+    offsetStart += headerSize
+    const chunkSize = chunk.end - chunk.start
+    responses.push({
+      chunk,
+      data: data.subarray(offsetStart, offsetStart + chunkSize),
+    })
+    offsetStart += chunkSize
+  }
+  return responses
+}
+
+/**
  * @param {FetchEvent} event
  * @param {Response} response
  * @param {Object} body
@@ -532,6 +651,43 @@ function getMatchingChunks(chunks, start, end) {
     matchingChunks.push(chunk)
   }
   return matchingChunks
+}
+
+/**
+ * @param {Array} potentialChunks
+ * @param {Set} cached
+ * @param {Object} metrics
+ */
+function cutRequestAmplification(potentialChunks, cached, metrics) {
+  const chunks = []
+  const newChunks = []
+  let tooManyRequests = false
+  for (const chunk of potentialChunks) {
+    if (cached.has(chunk.hash)) {
+      chunks.push(chunk)
+      continue
+    }
+    if (newChunks.length < MAX_SUBREQUEST_COUNT) {
+      chunks.push(chunk)
+      newChunks.push(chunk)
+    } else {
+      tooManyRequests = true
+    }
+  }
+  if (tooManyRequests) {
+    metrics.tooManyRequestsCount++
+  }
+  if (cached.size > INCREMENTAL_CACHE_SIZE) {
+    for (const key of cached) {
+      if (cached.size < INCREMENTAL_CACHE_SIZE) {
+        break
+      }
+      // Map keys are stored in insertion order.
+      // We re-insert keys on cache hit, 'cached' is a cheap LRU.
+      cached.delete(key)
+    }
+  }
+  return { chunks, newChunks }
 }
 
 /**

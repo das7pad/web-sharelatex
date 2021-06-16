@@ -1,7 +1,13 @@
 import { v4 as uuid } from 'uuid'
 import { sendMB } from '../../../infrastructure/event-tracking'
 
+// VERSION should get incremented when making changes to caching behavior or
+//  adjusting metrics collection.
+// Keep in sync with the service worker.
+const VERSION = 2
+
 const pdfJsMetrics = {
+  version: VERSION,
   id: uuid(),
   epoch: Date.now(),
   totalBandwidth: 0,
@@ -65,6 +71,7 @@ function submitCompileMetrics(metrics) {
   stats = stats || {}
   timings = timings || {}
   const leanMetrics = {
+    version: VERSION,
     latencyFetch,
     latencyRender,
     pdfSize: stats['pdf-size'],
