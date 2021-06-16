@@ -59,6 +59,8 @@ module.exports = {
       url: `http://${process.env.RECURLY_HOST || 'localhost'}:6034`,
       subdomain: 'test',
       apiKey: 'private-nonsense',
+      webhookUser: 'recurly',
+      webhookPass: 'webhook',
     },
   },
 

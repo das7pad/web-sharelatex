@@ -1,8 +1,54 @@
 import { v4 as uuid } from 'uuid'
 const COMPILE_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/compile$/
+const PDF_REQUEST_MATCHER = /^\/project\/[0-9a-f]{24}\/.*\/output.pdf$/
 const PDF_JS_CHUNK_SIZE = 128 * 1024
+const MAX_SUBREQUEST_COUNT = 8
+const MAX_SUBREQUEST_BYTES = 4 * PDF_JS_CHUNK_SIZE
 
-const PDF_FILES = new Map()
+// Each compile request defines a context (essentially the specific pdf file for
+// that compile), requests for that pdf file can use the hashes in the compile
+// response, which are stored in the context.
+
+const pdfContext = new Map()
+
+function registerPdfContext(clientId, path, context) {
+  let clientMap = pdfContext.get(clientId)
+  if (!clientMap) {
+    clientMap = new Map()
+    pdfContext.set(clientId, clientMap)
+    // clean up old client maps
+    expirePdfContexts()
+  }
+  // we only need to keep the last 3 contexts
+  for (const key of clientMap.keys()) {
+    if (clientMap.size < 3) {
+      break
+    }
+    clientMap.delete(key) // the map keys are returned in insertion order, so we are deleting the oldest entry here
+  }
+  clientMap.set(path, context)
+}
+
+function getPdfContext(clientId, path) {
+  const clientMap = pdfContext.get(clientId)
+  const context = clientMap && clientMap.get(path)
+  return context
+}
+
+function expirePdfContexts() {
+  // discard client maps for clients that are no longer connected
+  const currentClientSet = new Set()
+  self.clients.matchAll().then(function (clientList) {
+    clientList.forEach(client => {
+      currentClientSet.add(client.id)
+    })
+    pdfContext.forEach((map, clientId) => {
+      if (!currentClientSet.has(clientId)) {
+        pdfContext.delete(clientId)
+      }
+    })
+  })
+}
 
 const METRICS = {
   id: uuid(),
@@ -45,6 +91,15 @@ function trackChunkVerify({ sizeDiffers, mismatch, success }) {
 }
 
 /**
+ * @param {Array} chunks
+ */
+function countBytes(chunks) {
+  return chunks.reduce((totalBytes, chunk) => {
+    return totalBytes + (chunk.end - chunk.start)
+  }, 0)
+}
+
+/**
  * @param {FetchEvent} event
  */
 function onFetch(event) {
@@ -55,9 +110,11 @@ function onFetch(event) {
     return processCompileRequest(event)
   }
 
-  const ctx = PDF_FILES.get(path)
-  if (ctx) {
-    return processPdfRequest(event, ctx)
+  if (path.match(PDF_REQUEST_MATCHER)) {
+    const ctx = getPdfContext(event.clientId, path)
+    if (ctx) {
+      return processPdfRequest(event, ctx)
+    }
   }
 
   // other request, ignore
@@ -69,7 +126,7 @@ function processCompileRequest(event) {
       if (response.status !== 200) return response
 
       return response.json().then(body => {
-        handleCompileResponse(response, body)
+        handleCompileResponse(event, response, body)
         // Send the service workers metrics to the frontend.
         body.serviceWorkerMetrics = METRICS
         return new Response(JSON.stringify(body), response)
@@ -140,9 +197,26 @@ function processPdfRequest(
     .map(i => parseInt(i, 10))
   const end = last + 1
 
+  // Check that handling the range request won't trigger excessive subrequests,
+  // (to avoid unwanted latency compared to the original request).
   const chunks = getMatchingChunks(file.ranges, start, end)
-
   const dynamicChunks = getInterleavingDynamicChunks(chunks, start, end)
+  const chunksSize = countBytes(chunks)
+
+  if (chunks.length + dynamicChunks.length > MAX_SUBREQUEST_COUNT) {
+    // fall back to the original range request when splitting the range creates
+    // too many subrequests.
+    return
+  }
+  if (
+    chunksSize > MAX_SUBREQUEST_BYTES &&
+    !(dynamicChunks.length === 0 && chunks.length === 1)
+  ) {
+    // fall back to the original range request when a very large amount of
+    // object data would be requested, unless it is the only object in the
+    // request.
+    return
+  }
 
   // URL prefix is /project/:id/user/:id/build/... or /project/:id/build/...
   //  for authenticated and unauthenticated users respectively.
@@ -281,7 +355,7 @@ function processPdfRequest(
  */
 function getServerTime(response) {
   const raw = response.headers.get('Date')
-  if (!raw) return undefined
+  if (!raw) return new Date()
   return new Date(raw)
 }
 
@@ -296,10 +370,11 @@ function getResponseSize(response) {
 }
 
 /**
+ * @param {FetchEvent} event
  * @param {Response} response
  * @param {Object} body
  */
-function handleCompileResponse(response, body) {
+function handleCompileResponse(event, response, body) {
   if (!body || body.status !== 'success') return
 
   const pdfCreatedAt = getServerTime(response)
@@ -309,7 +384,7 @@ function handleCompileResponse(response, body) {
     if (file.ranges) {
       file.ranges.forEach(backFillEdgeBounds)
       const { clsiServerId, compileGroup } = body
-      PDF_FILES.set(file.url, {
+      registerPdfContext(event.clientId, file.url, {
         pdfCreatedAt,
         file,
         clsiServerId,
