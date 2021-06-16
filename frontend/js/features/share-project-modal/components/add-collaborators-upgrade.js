@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
 import { Button } from 'react-bootstrap'
+import PropTypes from 'prop-types'
+
+import { useApplicationContext } from '../../../shared/context/application-context'
+
 import Icon from '../../../shared/components/icon'
 import { upgradePlan } from '../../../main/account-upgrade'
 import StartFreeTrialButton from '../../../shared/components/start-free-trial-button'
@@ -7,6 +11,10 @@ import { Trans } from '../../../components/trans'
 import t from '../../../misc/t'
 
 export default function AddCollaboratorsUpgrade() {
+  const { user } = useApplicationContext({
+    user: PropTypes.shape({ allowedFreeTrial: PropTypes.boolean }),
+  })
+
   const [startedFreeTrial, setStartedFreeTrial] = useState(false)
 
   return (
@@ -52,7 +60,7 @@ export default function AddCollaboratorsUpgrade() {
       </ul>
 
       <p className="text-center row-spaced-thin">
-        {window.user.allowedFreeTrial ? (
+        {user.allowedFreeTrial ? (
           <StartFreeTrialButton
             buttonStyle="success"
             setStartedFreeTrial={setStartedFreeTrial}

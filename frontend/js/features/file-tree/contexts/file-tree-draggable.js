@@ -12,6 +12,7 @@ import {
 import { useFileTreeActionable } from './file-tree-actionable'
 import { useFileTreeMutable } from './file-tree-mutable'
 import { useFileTreeSelectable } from '../contexts/file-tree-selectable'
+import { useFileTreeMainContext } from './file-tree-main'
 import t from '../../../misc/t'
 
 // HACK ALERT
@@ -73,10 +74,11 @@ FileTreeDraggableProvider.propTypes = {
 }
 
 export function useDraggable(draggedEntityId) {
+  const { hasWritePermissions } = useFileTreeMainContext()
   const { fileTreeData } = useFileTreeMutable()
   const { selectedEntityIds } = useFileTreeSelectable()
 
-  const [isDraggable, setIsDraggable] = useState(true)
+  const [isDraggable, setIsDraggable] = useState(hasWritePermissions)
 
   const item = { type: DRAGGABLE_TYPE }
   const [{ isDragging }, dragRef, preview] = useDrag({
@@ -94,6 +96,7 @@ export function useDraggable(draggedEntityId) {
     collect: monitor => ({
       isDragging: !!monitor.isDragging(),
     }),
+    canDrag: () => isDraggable,
   })
 
   // remove the automatic preview as we're using a custom preview via
@@ -105,7 +108,6 @@ export function useDraggable(draggedEntityId) {
   return {
     dragRef,
     isDragging,
-    isDraggable,
     setIsDraggable,
   }
 }
