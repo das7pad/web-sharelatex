@@ -1,11 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import { Button, Alert } from 'react-bootstrap'
+import t from '../../../misc/t'
 
 function ChatFallbackError({ reconnect }) {
-  const { t } = useTranslation()
-
   return (
     <aside className="chat">
       <div className="chat-error">
