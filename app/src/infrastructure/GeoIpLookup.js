@@ -54,7 +54,7 @@ function getDetails(ip, callback) {
   }
   ip = ip.trim().split(' ')[0]
   const opts = {
-    url: new URL(ip, settings.apis.geoIpLookup.url),
+    url: new URL(ip, settings.apis.geoIpLookup.url).href,
     timeout: 1000,
     json: true,
   }
