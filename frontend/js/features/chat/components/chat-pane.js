@@ -4,11 +4,13 @@ import PropTypes from 'prop-types'
 import MessageList from './message-list'
 import MessageInput from './message-input'
 import InfiniteScroll from './infinite-scroll'
+import ChatFallbackError from './chat-fallback-error'
 import Icon from '../../../shared/components/icon'
 import t from '../../../misc/t'
 import { useLayoutContext } from '../../../shared/context/layout-context'
 import { useApplicationContext } from '../../../shared/context/application-context'
 import withErrorBoundary from '../../../infrastructure/error-boundary'
+import { FetchError } from '../../../infrastructure/fetch-json'
 import { useChatContext } from '../context/chat-context'
 
 function ChatPane() {
@@ -24,8 +26,10 @@ function ChatPane() {
     atEnd,
     loadInitialMessages,
     loadMoreMessages,
+    reset,
     sendMessage,
     markMessagesAsRead,
+    error,
   } = useChatContext()
 
   useEffect(() => {
@@ -40,6 +44,14 @@ function ChatPane() {
     (acc, { contents }) => acc + contents.length,
     0
   )
+
+  if (error) {
+    // let user try recover from fetch errors
+    if (error instanceof FetchError) {
+      return <ChatFallbackError reconnect={reset} />
+    }
+    throw error
+  }
 
   return (
     <aside className="chat">
@@ -91,4 +103,4 @@ function Placeholder() {
   )
 }
 
-export default withErrorBoundary(ChatPane)
+export default withErrorBoundary(ChatPane, ChatFallbackError)

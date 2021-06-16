@@ -8,7 +8,6 @@ import 'libs/angular-autocomplete/angular-autocomplete'
 import 'libs/ui-bootstrap'
 import 'libs/ng-context-menu'
 import 'libs/passfield'
-import 'libs/ng-tags-input'
 import 'libs/select/select'
 import './misc/ga'
 

@@ -30,7 +30,6 @@ const App = angular
     'ngSanitize',
     'ErrorCatcher',
     'storage',
-    'ngTagsInput',
     'ui.select',
   ])
   .config(function ($qProvider, $httpProvider, uiSelectConfig) {

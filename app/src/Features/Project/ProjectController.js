@@ -895,7 +895,6 @@ const ProjectController = {
                 overallTheme: user.ace.overallTheme,
               },
               privilegeLevel,
-              chatUrl: Settings.apis.chat.url,
               anonymous,
               anonymousAccessToken: anonymous ? anonRequestToken : null,
               isTokenMember,
@@ -928,18 +927,6 @@ const ProjectController = {
               showNewNavigationUI: shouldDisplayFeature(
                 'new_navigation_ui',
                 user.alphaProgram
-              ),
-              showReactShareModal: shouldDisplayFeature(
-                'new_share_modal_ui',
-                true
-              ),
-              showReactDropboxModal: shouldDisplayFeature(
-                'new_dropbox_modal_ui',
-                user.betaProgram
-              ),
-              showReactGithubSync: shouldDisplayFeature(
-                'new_github_sync_ui',
-                user.betaProgram || user.alphaProgram
               ),
               showNewBinaryFileUI: shouldDisplayFeature('new_binary_file'),
               showSymbolPalette: shouldDisplayFeature(
