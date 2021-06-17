@@ -731,7 +731,7 @@ const ProjectController = {
           if (!userId) return cb(null, '')
           SplitTestHandler.getTestSegmentation(
             userId,
-            'pdf_caching_beta_full',
+            'pdf_caching_5',
             (err, segmentation) => {
               if (err) {
                 // Do not fail loading the editor.
@@ -849,8 +849,7 @@ const ProjectController = {
                 return false
               }
               const canSeeFeaturePreview =
-                user.alphaProgram ||
-                (user.betaProgram && pdfCachingFeatureFlag.includes(flag))
+                user.alphaProgram || pdfCachingFeatureFlag.includes(flag)
               if (!canSeeFeaturePreview) {
                 // The user is not in the target group.
                 return false
@@ -928,13 +927,17 @@ const ProjectController = {
                 'new_navigation_ui',
                 user.alphaProgram
               ),
-              showNewFileViewUI: shouldDisplayFeature('new_file_view'),
+              showNewFileViewUI: shouldDisplayFeature(
+                'new_file_view',
+                user.alphaProgram
+              ),
               showSymbolPalette: shouldDisplayFeature(
                 'symbol_palette',
                 user.alphaProgram
               ),
               trackPdfDownload: partOfPdfCachingRollout('collect-metrics'),
               enablePdfCaching: partOfPdfCachingRollout('enable-caching'),
+              resetServiceWorker: Boolean(Settings.resetServiceWorker),
             })
             timer.done()
           }

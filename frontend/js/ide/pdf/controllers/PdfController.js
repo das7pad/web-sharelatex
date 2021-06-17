@@ -7,7 +7,10 @@ import { rootContext } from '../../../shared/context/root-context'
 import 'ace/ace'
 import { localStorage } from '../../../modules/storage'
 import getMeta from '../../../utils/meta'
-import { waitForServiceWorker } from '../../pdfng/directives/serviceWorkerManager'
+import {
+  waitForServiceWorker,
+  unregisterServiceWorker,
+} from '../../pdfng/directives/serviceWorkerManager'
 import { trackPdfDownload } from './PdfJsMetrics'
 import { preloadPDFJSWorker } from '../../../pdfjsBundle'
 
@@ -270,18 +273,22 @@ App.controller(
       }
     })
 
+    const serviceWorker = getMeta('ol-enablePdfCaching')
+      ? waitForServiceWorker()
+      : Promise.resolve()
+
+    ide.$scope.$on('service-worker:unregister', unregisterServiceWorker)
+
     function sendCompileRequest(options) {
       if (options == null) {
         options = {}
       }
       const url = `/project/${$scope.project_id}/compile`
-      let setup = Promise.resolve()
       const params = {}
       if (options.isAutoCompileOnLoad || options.isAutoCompileOnChange) {
         params.auto_compile = true
       }
       if (getMeta('ol-enablePdfCaching')) {
-        setup = waitForServiceWorker()
         params.enable_pdf_caching = true
       }
       // if the previous run was a check, clear the error logs
@@ -312,7 +319,7 @@ App.controller(
         checkType = 'silent'
       }
 
-      return setup.then(() =>
+      return serviceWorker.then(() =>
         $http.post(
           url,
           {

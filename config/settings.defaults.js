@@ -397,16 +397,16 @@ module.exports = {
       ],
     },
     {
-      id: 'pdf_caching_beta_full',
-      active: process.env.SPLIT_TEST_PDF_CACHING_BETA_ACTIVE === 'true',
+      id: 'pdf_caching_5',
+      active: process.env.SPLIT_TEST_PDF_CACHING_5_ACTIVE === 'true',
       variants: [
         {
           id: 'collect-metrics-only',
-          rolloutPercent: 50,
+          rolloutPercent: 5,
         },
         {
           id: 'collect-metrics-and-enable-caching',
-          rolloutPercent: 50,
+          rolloutPercent: 5,
         },
       ],
     },
@@ -842,6 +842,9 @@ module.exports = {
 
   // By default turn on feature flag, can be overridden per request.
   enablePdfCaching: process.env.ENABLE_PDF_CACHING === 'true',
+
+  // Whether to disable any existing service worker on the next load of the editor
+  resetServiceWorker: process.env.RESET_SERVICE_WORKER === 'true',
 
   // Maximum size of text documents in the real-time editing system.
   max_doc_length: 2 * 1024 * 1024, // 2mb

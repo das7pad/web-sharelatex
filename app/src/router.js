@@ -945,6 +945,11 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     AuthorizationMiddleware.ensureUserIsSiteAdmin,
     AdminController.clearMessages
   )
+  webRouter.post(
+    '/admin/unregisterServiceWorker',
+    AuthorizationMiddleware.ensureUserIsSiteAdmin,
+    AdminController.unregisterServiceWorker
+  )
 
   privateApiRouter.post(
     '/disconnectAllUsers',

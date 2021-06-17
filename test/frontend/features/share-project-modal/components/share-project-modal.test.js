@@ -4,16 +4,17 @@ import React from 'react'
 import {
   screen,
   fireEvent,
+  render,
   waitFor,
   waitForElementToBeRemoved,
 } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import { get } from 'lodash'
 
 import ShareProjectModal from '../../../../../frontend/js/features/share-project-modal/components/share-project-modal'
 import {
   renderWithEditorContext,
   cleanUpContext,
+  EditorProviders,
 } from '../../../helpers/render-with-context'
 
 describe('<ShareProjectModal/>', function () {
@@ -72,23 +73,7 @@ describe('<ShareProjectModal/>', function () {
     },
   ]
 
-  const ideWithProject = project => {
-    const scope = { project }
-
-    return {
-      $scope: {
-        $watch: (path, callback) => {
-          callback(get(scope, path))
-          return () => null
-        },
-        $applyAsync: () => {},
-        ...scope,
-      },
-    }
-  }
-
   const modalProps = {
-    ide: ideWithProject(project),
     show: true,
     isAdmin: true,
     handleHide: sinon.stub(),
@@ -104,7 +89,9 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('renders the modal', async function () {
-    renderWithEditorContext(<ShareProjectModal {...modalProps} />)
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: { project },
+    })
 
     await screen.findByText('Share Project')
   })
@@ -113,7 +100,8 @@ describe('<ShareProjectModal/>', function () {
     const handleHide = sinon.stub()
 
     renderWithEditorContext(
-      <ShareProjectModal {...modalProps} handleHide={handleHide} />
+      <ShareProjectModal {...modalProps} handleHide={handleHide} />,
+      { scope: { project } }
     )
 
     const [
@@ -128,12 +116,9 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('handles access level "private"', async function () {
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({ ...project, publicAccesLevel: 'private' })}
-      />
-    )
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: { project: { ...project, publicAccesLevel: 'private' } },
+    })
 
     await screen.findByText(
       'Link sharing is off, only invited users can view this project.'
@@ -147,12 +132,9 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('handles access level "tokenBased"', async function () {
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({ ...project, publicAccesLevel: 'tokenBased' })}
-      />
-    )
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: { project: { ...project, publicAccesLevel: 'tokenBased' } },
+    })
 
     await screen.findByText('Link sharing is on')
     await screen.findByRole('button', { name: 'Turn off link sharing' })
@@ -164,12 +146,9 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('handles legacy access level "readAndWrite"', async function () {
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({ ...project, publicAccesLevel: 'readAndWrite' })}
-      />
-    )
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: { project: { ...project, publicAccesLevel: 'readAndWrite' } },
+    })
 
     await screen.findByText(
       'This project is public and can be edited by anyone with the URL.'
@@ -178,12 +157,9 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('handles legacy access level "readOnly"', async function () {
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({ ...project, publicAccesLevel: 'readOnly' })}
-      />
-    )
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: { project: { ...project, publicAccesLevel: 'readOnly' } },
+    })
 
     await screen.findByText(
       'This project is public and can be viewed but not edited by anyone with the URL'
@@ -201,16 +177,18 @@ describe('<ShareProjectModal/>', function () {
     ]
 
     // render as admin: actions should be present
-    const { rerender } = renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
-          ...project,
-          invites,
-          publicAccesLevel: 'tokenBased',
-        })}
-        isAdmin
-      />
+    const { rerender } = render(
+      <EditorProviders
+        scope={{
+          project: {
+            ...project,
+            invites,
+            publicAccesLevel: 'tokenBased',
+          },
+        }}
+      >
+        <ShareProjectModal {...modalProps} isAdmin />
+      </EditorProviders>
     )
 
     await screen.findByRole('button', { name: 'Turn off link sharing' })
@@ -218,15 +196,17 @@ describe('<ShareProjectModal/>', function () {
 
     // render as non-admin (non-owner), link sharing on: actions should be missing and message should be present
     rerender(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
-          ...project,
-          invites,
-          publicAccesLevel: 'tokenBased',
-        })}
-        isAdmin={false}
-      />
+      <EditorProviders
+        scope={{
+          project: {
+            ...project,
+            invites,
+            publicAccesLevel: 'tokenBased',
+          },
+        }}
+      >
+        <ShareProjectModal {...modalProps} isAdmin={false} />
+      </EditorProviders>
     )
 
     await screen.findByText(
@@ -241,15 +221,17 @@ describe('<ShareProjectModal/>', function () {
 
     // render as non-admin (non-owner), link sharing off: actions should be missing and message should be present
     rerender(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
-          ...project,
-          invites,
-          publicAccesLevel: 'private',
-        })}
-        isAdmin={false}
-      />
+      <EditorProviders
+        scope={{
+          project: {
+            ...project,
+            invites,
+            publicAccesLevel: 'private',
+          },
+        }}
+      >
+        <ShareProjectModal {...modalProps} isAdmin={false} />
+      </EditorProviders>
     )
 
     await screen.findByText(
@@ -264,13 +246,10 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('only shows read-only token link to restricted token members', async function () {
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({ ...project, publicAccesLevel: 'tokenBased' })}
-      />,
-      { isRestrictedTokenMember: true }
-    )
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      isRestrictedTokenMember: true,
+      scope: { project: { ...project, publicAccesLevel: 'tokenBased' } },
+    })
 
     // no buttons
     expect(screen.queryByRole('button', { name: 'Turn on link sharing' })).to.be
@@ -311,17 +290,16 @@ describe('<ShareProjectModal/>', function () {
       },
     ]
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           members,
           invites,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     expect(screen.queryAllByText('project-owner@example.com')).to.have.length(1)
     expect(screen.queryAllByText('member-author@example.com')).to.have.length(1)
@@ -355,16 +333,15 @@ describe('<ShareProjectModal/>', function () {
       },
     ]
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           invites,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     const [, closeButton] = screen.getAllByRole('button', {
       name: 'Close',
@@ -390,16 +367,15 @@ describe('<ShareProjectModal/>', function () {
       },
     ]
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           invites,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     const [, closeButton] = screen.getAllByRole('button', {
       name: 'Close',
@@ -424,16 +400,15 @@ describe('<ShareProjectModal/>', function () {
       },
     ]
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           members,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     const [, closeButton] = await screen.getAllByRole('button', {
       name: 'Close',
@@ -467,16 +442,15 @@ describe('<ShareProjectModal/>', function () {
       },
     ]
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           members,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     expect(screen.queryAllByText('member-viewer@example.com')).to.have.length(1)
 
@@ -507,16 +481,15 @@ describe('<ShareProjectModal/>', function () {
       },
     ]
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           members,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     expect(screen.queryAllByText('member-viewer@example.com')).to.have.length(1)
 
@@ -558,15 +531,14 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('sends invites to input email addresses', async function () {
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     const [inputElement] = await screen.findAllByLabelText(
       'Share with your collaborators'
@@ -648,24 +620,21 @@ describe('<ShareProjectModal/>', function () {
   it('displays a message when the collaborator limit is reached', async function () {
     fetchMock.post('/event/project-sharing-paywall-prompt', {})
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      user: {
+        id: '123abd',
+        allowedFreeTrial: true,
+      },
+      scope: {
+        project: {
           ...project,
           publicAccesLevel: 'tokenBased',
           features: {
             collaborators: 0,
           },
-        })}
-      />,
-      {
-        user: {
-          id: '123abd',
-          allowedFreeTrial: true,
         },
-      }
-    )
+      },
+    })
 
     expect(screen.queryByLabelText('Share with your collaborators')).to.be.null
 
@@ -675,15 +644,14 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('handles server error responses', async function () {
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: {
+        project: {
           ...project,
           publicAccesLevel: 'tokenBased',
-        })}
-      />
-    )
+        },
+      },
+    })
 
     // loading contacts
     await waitFor(() => {
@@ -745,25 +713,19 @@ describe('<ShareProjectModal/>', function () {
 
     const watchCallbacks = {}
 
-    const ideWithProject = project => {
+    const scopeWithProject = project => {
       return {
-        $scope: {
-          $watch: (path, callback, deep) => {
-            watchCallbacks[path] = callback
-            return () => {}
-          },
-          $applyAsync: () => {},
-          project,
+        $watch: (path, callback) => {
+          watchCallbacks[path] = callback
+          return () => {}
         },
+        project,
       }
     }
 
-    renderWithEditorContext(
-      <ShareProjectModal
-        {...modalProps}
-        ide={ideWithProject({ ...project, publicAccesLevel: 'private' })}
-      />
-    )
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: scopeWithProject({ ...project, publicAccesLevel: 'private' }),
+    })
 
     await screen.findByText(
       'Link sharing is off, only invited users can view this project.'
@@ -806,7 +768,9 @@ describe('<ShareProjectModal/>', function () {
   })
 
   it('avoids selecting unmatched contact', async function () {
-    renderWithEditorContext(<ShareProjectModal {...modalProps} />)
+    renderWithEditorContext(<ShareProjectModal {...modalProps} />, {
+      scope: { project },
+    })
 
     const [inputElement] = await screen.findAllByLabelText(
       'Share with your collaborators'
