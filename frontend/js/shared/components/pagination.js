@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { useTranslation } from 'react-i18next'
+import t from '../../misc/t'
 
 function Pagination({ currentPage, totalPages, handlePageClick }) {
-  const { t } = useTranslation()
-
   const maxOtherPageButtons = useMemo(() => {
     let maxOtherPageButtons = 4 // does not include current page, prev/next buttons
     if (totalPages < maxOtherPageButtons + 1) {
@@ -104,7 +102,6 @@ function Pagination({ currentPage, totalPages, handlePageClick }) {
 }
 
 function PaginationItem({ page, currentPage, handlePageClick }) {
-  const { t } = useTranslation()
   const itemClassName = classNames({ active: currentPage === page })
   const ariaCurrent = currentPage === page
   const ariaLabel =

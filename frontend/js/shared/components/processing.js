@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useTranslation } from 'react-i18next'
 import Icon from './icon'
+import t from '../../misc/t'
 
 function Processing({ isProcessing }) {
-  const { t } = useTranslation()
   if (isProcessing) {
     return (
       <div aria-live="polite">
