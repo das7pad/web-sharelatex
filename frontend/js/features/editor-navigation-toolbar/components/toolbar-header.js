@@ -12,6 +12,7 @@ import ShareProjectButton from './share-project-button'
 import PdfToggleButton from './pdf-toggle-button'
 
 import publishButtons from '../../../../../modules/modules-publish-button'
+const PublishButton = publishButtons.pop()?.import.PublishButton
 
 function ToolbarHeader({
   cobranding,
@@ -26,6 +27,7 @@ function ToolbarHeader({
   onlineUsers,
   goToUser,
   isRestrictedTokenMember,
+  isAnonymousUser,
   projectName,
   renameProject,
   openShareModal,
@@ -33,11 +35,15 @@ function ToolbarHeader({
   pdfButtonIsVisible,
   togglePdfView,
 }) {
+  const shouldDisplayPublishButton = !isAnonymousUser && PublishButton
+
   return (
     <header className="toolbar toolbar-header toolbar-with-labels">
       <div className="toolbar-left">
         <MenuButton onClick={onShowLeftMenuClick} />
-        {cobranding ? <CobrandingLogo {...cobranding} /> : null}
+        {cobranding &&
+          cobranding.isProjectCobranded &&
+          cobranding.logoImgUrl && <CobrandingLogo {...cobranding} />}
         <BackToProjectsButton />
       </div>
       {pdfButtonIsVisible && (
@@ -64,9 +70,9 @@ function ToolbarHeader({
           />
         )}
         <ShareProjectButton onClick={openShareModal} />
-        {publishButtons.map(({ import: { PublishButton }, path }) => (
-          <PublishButton cobranding={cobranding} key={path} />
-        ))}
+        {shouldDisplayPublishButton && (
+          <PublishButton cobranding={cobranding} />
+        )}
         {!isRestrictedTokenMember && (
           <>
             <HistoryToggleButton
@@ -98,6 +104,7 @@ ToolbarHeader.propTypes = {
   onlineUsers: PropTypes.array.isRequired,
   goToUser: PropTypes.func.isRequired,
   isRestrictedTokenMember: PropTypes.bool,
+  isAnonymousUser: PropTypes.bool,
   projectName: PropTypes.string.isRequired,
   renameProject: PropTypes.func.isRequired,
   openShareModal: PropTypes.func.isRequired,

@@ -29,6 +29,7 @@ describe('<ToolbarHeader />', function () {
       const props = {
         ...defaultProps,
         cobranding: {
+          isProjectCobranded: true,
           brandVariationHomeUrl: 'http://cobranding',
           brandVariationName: 'variation',
           logoImgUrl: 'http://cobranding/logo',
@@ -100,6 +101,22 @@ describe('<ToolbarHeader />', function () {
       }
       render(<ToolbarHeader {...props} />)
       expect(screen.queryByText('Chat')).to.not.exist
+    })
+  })
+
+  describe('Publish button', function () {
+    it('is displayed by default', function () {
+      render(<ToolbarHeader {...defaultProps} />)
+      screen.getByText('Submit')
+    })
+
+    it('is not displayed for anonymous users', function () {
+      const props = {
+        ...defaultProps,
+        isAnonymousUser: true,
+      }
+      render(<ToolbarHeader {...props} />)
+      expect(screen.queryByText('Submit')).to.not.exist
     })
   })
 })

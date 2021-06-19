@@ -32,12 +32,12 @@ export default function SymbolPaletteContent({ handleSelect }) {
       return null
     }
 
-    const words = input.trim().split(/\W+/)
+    const words = input.trim().split(/\s+/)
 
     return words.reduceRight(
       (symbols, word) =>
         matchSorter(symbols, word, {
-          keys: ['command', 'description'],
+          keys: ['command', 'description', 'character', 'aliases'],
           threshold: matchSorter.rankings.CONTAINS,
         }),
       symbols
@@ -72,11 +72,11 @@ export default function SymbolPaletteContent({ handleSelect }) {
             <BetaBadge
               tooltip={{
                 id: 'tooltip-symbol-palette-beta',
-                text: t('beta_badge_tooltip', {
-                  feature: 'entering symbols',
-                }),
+                text:
+                  'The Symbol Palette is a beta feature. Click here to give feedback.',
                 placement: 'top',
               }}
+              url="https://forms.gle/BybHV5svGE8rJ6Ki9"
             />
             {/* NOTE: replace the beta badge with this info link when rolling out to all users */}
             {/* <SymbolPaletteInfoLink /> */}
