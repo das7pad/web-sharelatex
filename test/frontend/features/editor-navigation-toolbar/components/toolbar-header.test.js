@@ -3,6 +3,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 
 import ToolbarHeader from '../../../../../frontend/js/features/editor-navigation-toolbar/components/toolbar-header'
+import publishButtons from '../../../../../modules/modules-publish-button'
 
 describe('<ToolbarHeader />', function () {
   const defaultProps = {
@@ -105,6 +106,11 @@ describe('<ToolbarHeader />', function () {
   })
 
   describe('Publish button', function () {
+    before(function () {
+      if (publishButtons.length === 0) {
+        this.skip()
+      }
+    })
     it('is displayed by default', function () {
       render(<ToolbarHeader {...defaultProps} />)
       screen.getByText('Submit')
