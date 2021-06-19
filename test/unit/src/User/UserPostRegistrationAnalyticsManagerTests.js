@@ -42,6 +42,11 @@ describe('UserPostRegistrationAnalyticsManager', function () {
           console: console,
         },
         requires: {
+          '../../infrastructure/Features': {
+            hasFeature() {
+              return true
+            },
+          },
           '../../infrastructure/Queues': this.Queues,
           './UserGetter': this.UserGetter,
           '../Institutions/InstitutionsAPI': this.InstitutionsAPI,
