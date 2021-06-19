@@ -27,10 +27,10 @@ function onRebuild({ data }) {
 
   if (error) {
     console.group('esbuild rebuild failed:', name)
-    for (const message of error.errors) {
+    for (const message of error.errors || []) {
       formatMessage('error', message)
     }
-    for (const message of error.warnings) {
+    for (const message of error.warnings || []) {
       formatMessage('warning', message)
     }
     console.groupEnd()
